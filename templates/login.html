@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="images/logo.png">
+
+</head>
+<body class="auth-page login-page">
+
+    <header class="navbar">
+        <div class="logo-wrapper">
+            <img src="images/logo.png" alt="Stilnovo" class="logo-img">
+            <span class="brand">Stilnovo</span>
+        </div>
+        <nav class="nav-actions">
+            <a href="index.html" class="link-back">Back to home</a>
+        </nav>
+    </header>
+
+    <main class="auth-container">
+        <div class="auth-card">
+            <h1 class="auth-title">Welcome back</h1>
+            <p class="auth-subtitle">Manage your treasures with Stilnovo</p>
+
+            <form class="auth-form">
+                <div class="input-group">
+                    <label>Email address</label>
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="email" placeholder="name@example.com" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <div class="auth-options">
+                    <label class="checkbox-container">
+                        <input type="checkbox"> <span>Remember me</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-signin">Sign in</button>
+            </form>
+
+            <div class="auth-footer">
+                Don't have an account? <a href="signup.html">Sign up for free</a>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

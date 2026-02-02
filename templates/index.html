@@ -3,9 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Stilnovo</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
 </head>
 <body>
-    
+
+    <header class="navbar">
+        <div class="logo-wrapper">
+            <img src="images/logo.png" alt="Stilnovo" class="logo-img">
+            <span class="brand">Stilnovo</span>
+        </div>
+        
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" placeholder="Search for treasures...">
+        </div>
+        
+        <nav class="nav-actions">
+            <a href="login.html" class="link-login">Log in</a>
+            <a href="signup.html" class="btn-signup">Sign up</a>
+        </nav>
+    </header>
+
+    <nav class="sub-nav">
+        <div class="sub-nav-container">
+            <span class="label-categories">Categories</span>
+            <div class="category-list">
+                <a href="#">Fashion</a>
+                <a href="#">Technology</a>
+                <a href="#">Sports</a>
+                <a href="#">Home</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="hero">
+        <div class="hero-flex">
+            <div class="hero-text-block">
+                <h1 class="animate-up">Reinvent your space: Where design with history finds its new home.</h1>
+                <p class="animate-up-delay">Start buying or selling your items today</p>
+                
+                <div class="hero-btns animate-up-delay">
+                    <a href="sell.html" class="btn-sell">Sell Now</a>
+                    <a href="about.html" class="btn-about">About Us</a>
+                </div>
+            </div>
+            
+            <div class="hero-visual-block">
+                <img src="images/main-banner.png" alt="Stilnovo Items" class="clay-float">
+            </div>
+        </div>
+    </main>
+
+    <div class="footer-divider">
+        <span>Curated items section starts below</span>
+    </div>
+
 </body>
 </html>
