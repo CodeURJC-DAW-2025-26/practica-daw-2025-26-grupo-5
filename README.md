@@ -4,9 +4,10 @@
 | Nombre y Apellidos | Correo URJC | Usuario GitHub |
 |:--- |:--- |:--- |
 | Raúl Tejada Merinero | r.tejada.2023@alumnos.urjc.es | @raultejada24 |
-| [Nombre 2] | [email2]@alumnos.urjc.es | [@User2] |
+| Gabriele Antonio Ricucci | ga.ricucci.2025@alumnos.urjc.es | @gabrieleri |
 | [Nombre 3] | [email3]@alumnos.urjc.es | [@User3] |
 | [Nombre 4] | [email4]@alumnos.urjc.es | [@User4] |
+| [Nombre 5] | [email5]@alumnos.urjc.es | [@User5] |
 
 ---
 
