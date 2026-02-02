@@ -3,9 +3,9 @@
 ## 👥 Miembros del Equipo
 | Nombre y Apellidos | Correo URJC | Usuario GitHub |
 |:--- |:--- |:--- |
-| Raúl Tejada Merinero | r.tejada.2023@alumnos.urjc.es | @raultejada24 |
 | Gabriele Antonio Ricucci | ga.ricucci.2025@alumnos.urjc.es | @gabrieleri |
 | Victor Hugo Oliveira Petroceli | vh.deoliveira.2023@alumnos.urjc.es | @CodVictor |
+| Raúl Tejada Merinero | r.tejada.2023@alumnos.urjc.es | @raultejada24 |
 | [Nombre 4] | [email4]@alumnos.urjc.es | [@User4] |
 | [Nombre 5] | [email5]@alumnos.urjc.es | [@User5] |
 
