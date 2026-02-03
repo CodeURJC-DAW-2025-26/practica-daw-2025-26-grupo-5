@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>STILNOVO - Curated Design Marketplace</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <!-- Theme Configuration -->
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6c1fe0",
+                        "background-light": "#faf8fb",
+                        "background-dark": "#171220",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#231b2e",
+                        "text-main": "#130f1a",
+                        "text-main-dark": "#ece8f3",
+                        "text-sec-light": "#6c5095",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+
+    <!-- React Dependencies -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/history@5/umd/history.development.js"></script>
+    <script src="https://unpkg.com/react-router@6.3.0/umd/react-router.development.js"></script>
+    <script src="https://unpkg.com/react-router-dom@6.3.0/umd/react-router-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-main dark:text-gray-100 font-display transition-colors duration-200">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { createRoot } = ReactDOM;
+        const { MemoryRouter, Routes, Route, Link, useNavigate, useLocation } = ReactRouterDOM;
+
+        // --- Shared Components ---
+
+        const NavHeader = () => {
+            const location = useLocation();
+            
+            // Determine active states for styling
+            const isActive = (path) => location.pathname === path ? "text-primary font-bold" : "text-[#130f1a] dark:text-gray-200 font-semibold hover:text-primary";
+
+            return (
+                <header class="sticky top-0 z-50 w-full border-b border-[#ece8f2] dark:border-gray-800 bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur-sm">
+                    <div class="max-w-[1440px] mx-auto px-6 lg:px-10 h-20 flex items-center justify-between">
+                        <div class="flex items-center gap-10">
+                            {/* Logo */}
+                            <Link to="/" class="flex items-center gap-3 text-primary hover:opacity-80 transition-opacity">
+                                <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+                                    <span class="material-symbols-outlined">chair</span>
+                                </div>
+                                <h1 class="text-[#130f1a] dark:text-white text-xl font-extrabold tracking-tight">STILNOVO</h1>
+                            </Link>
+                            {/* Desktop Nav Links */}
+                            <nav class="hidden lg:flex items-center gap-8">
+                                <Link to="/" class={`text-sm transition-colors ${isActive('/')}`}>Home</Link>
+                                <Link to="/" class="text-sm font-semibold text-[#130f1a] dark:text-gray-200 hover:text-primary transition-colors">Shop</Link>
+                                <Link to="/profile" class={`text-sm transition-colors ${isActive('/profile')}`}>Profile</Link>
+                                <Link to="/orders" class={`text-sm transition-colors ${isActive('/orders')}`}>Orders</Link>
+                            </nav>
+                        </div>
+                        <div class="flex items-center gap-6">
+                            {/* Search Bar (Hidden on smaller screens for simplicity in header component, or responsive) */}
+                            <div class="hidden md:flex items-center bg-[#f2eff5] dark:bg-gray-800 rounded-lg px-4 py-2.5 w-64 lg:w-80 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+                                <span class="material-symbols-outlined text-gray-500 dark:text-gray-400">search</span>
+                                <input class="bg-transparent border-none text-sm text-[#130f1a] dark:text-white placeholder-gray-500 dark:placeholder-gray-400 w-full focus:ring-0 ml-2" placeholder="Search furniture, lighting..." type="text"/>
+                            </div>
+                            {/* Action Icons */}
+                            <div class="flex items-center gap-3">
+                                <button class="flex items-center justify-center size-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-[#130f1a] dark:text-white">
+                                    <span class="material-symbols-outlined">notifications</span>
+                                </button>
+                                <button class="flex items-center justify-center size-10 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-[#130f1a] dark:text-white relative">
+                                    <span class="material-symbols-outlined">shopping_cart</span>
+                                    <span class="absolute top-1 right-1 size-2.5 bg-primary rounded-full border-2 border-white dark:border-background-dark"></span>
+                                </button>
+                                <Link to="/profile" class="flex items-center justify-center size-10 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                                    <img class="w-full h-full object-cover" data-alt="User avatar profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBi7XWDB4blrcQ2irGNc7HHcaAvSPyuPtUYghude-QDkeQEEbu7ACz675-Xb9H-yz_12ABgXT1gBsjQqszmrz_-_sykjgYRfsgQfC4C1HhjdSK-8rOEUw7wRSUMd7_Bq0wx3mnyQ3l0SQoDI12zEnuXHYAoHU9UEOn5R4u8TOUFyJAsYDVPv8ZW5E8aAPnyAh213YE9A-4_rD7MrGiLBo4o_ghzkD7cntUe35SLPJfbEZJ4oXM8vCb4_aQ1dYSVa0VhWqMphtM4AEU"/>
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+            );
+        };
+
+        const Footer = () => (
+            <footer class="bg-surface-light dark:bg-surface-dark border-t border-[#ece8f2] dark:border-gray-800 pt-16 pb-8">
+                <div class="max-w-[1440px] mx-auto px-6 lg:px-10">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+                        <div class="space-y-4">
+                            <Link to="/" class="flex items-center gap-3 text-primary">
+                                <div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+                                    <span class="material-symbols-outlined">chair</span>
+                                </div>
+                                <h2 class="text-[#130f1a] dark:text-white text-xl font-extrabold tracking-tight">STILNOVO</h2>
+                            </Link>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">
+                                The premier peer-to-peer marketplace for curated design, vintage furniture, and unique decor from around the world.
+                            </p>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-[#130f1a] dark:text-white mb-4">Marketplace</h4>
+                            <ul class="space-y-2 text-sm text-gray-500 dark:text-gray-400">
+                                <li><a class="hover:text-primary transition-colors" href="#">Shop All</a></li>
+                                <li><a class="hover:text-primary transition-colors" href="#">Sell an Item</a></li>
+                                <li><a class="hover:text-primary transition-colors" href="#">Editor's Choice</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-[#130f1a] dark:text-white mb-4">Support</h4>
+                            <ul class="space-y-2 text-sm text-gray-500 dark:text-gray-400">
+                                <li><a class="hover:text-primary transition-colors" href="#">Help Center</a></li>
+                                <li><a class="hover:text-primary transition-colors" href="#">Trust & Safety</a></li>
+                                <li><a class="hover:text-primary transition-colors" href="#">Shipping Guide</a></li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-[#130f1a] dark:text-white mb-4">Stay Connected</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Join our newsletter for weekly design drops.</p>
+                            <div class="flex gap-2">
+                                <input class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm w-full focus:ring-primary focus:border-primary" placeholder="Your email" type="email"/>
+                                <button class="bg-primary hover:bg-primary/90 text-white rounded-lg px-4 py-2 font-bold text-sm transition-colors">Join</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <p class="text-xs text-gray-400">© 2023 STILNOVO Inc. All rights reserved.</p>
+                        <div class="flex gap-6">
+                            <a class="text-xs text-gray-400 hover:text-primary" href="#">Privacy Policy</a>
+                            <a class="text-xs text-gray-400 hover:text-primary" href="#">Terms of Service</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        );
+
+        // --- Page Components ---
+
+        const HomePage = () => {
+            return (
+                <main class="flex flex-col min-h-screen">
+                    {/* Hero Section */}
+                    <section class="w-full max-w-[1440px] mx-auto px-6 lg:px-10 py-8">
+                        <div class="relative w-full h-[320px] rounded-2xl overflow-hidden group">
+                            <div class="absolute inset-0 bg-gradient-to-r from-gray-900/80 to-transparent z-10 flex flex-col justify-center px-10 md:px-16">
+                                <span class="text-primary font-bold tracking-wider text-sm uppercase mb-2">Exclusive Collection</span>
+                                <h2 class="text-white text-4xl md:text-5xl font-black tracking-tight mb-4 max-w-xl leading-tight">
+                                    Curated Design,<br/>Peer-to-Peer
+                                </h2>
+                                <p class="text-gray-200 text-lg mb-8 max-w-md">Discover unique furniture and decor from collectors and designers worldwide.</p>
+                                <button class="bg-primary hover:bg-primary/90 text-white font-bold py-3 px-8 rounded-lg w-fit transition-all transform hover:scale-105 flex items-center gap-2">
+                                    Explore Collection
+                                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                                </button>
+                            </div>
+                            <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Modern living room with violet velvet sofa and minimalist decor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAw3WzzEncWcDf2TIIeB2U6mgSH9XlKFidOmDBjqCOvdB3hNuJN8Z3Uy7hNSZUjlwUJBM7ED2U-k-A_VC6zOttolce-t2h3qNhSu8JzzUPCMt5EY_oh8_GMJYngOaMuatKDa15z189p88AqheVQx1StOAfYRgPMgbW2ppZZsSa0bwgEo8JdombQzc3k7egZeXyPDrB532wAPDJAtzr1pZJNH80Cv1IO_9_aeoOKM_bHsAwLvj4tBGnn_lw2cUuWObvRmjipx6_PdoI"/>
+                        </div>
+                    </section>
+
+                    {/* Main Content Area: Sidebar + Grid */}
+                    <div class="max-w-[1440px] mx-auto px-6 lg:px-10 w-full flex flex-col lg:flex-row gap-10 pb-20">
+                        {/* Sidebar Filters */}
+                        <aside class="w-full lg:w-64 flex-shrink-0 space-y-8">
+                            {/* Categories */}
+                            <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-[#ece8f2] dark:border-gray-800">
+                                <h3 class="text-[#130f1a] dark:text-white font-bold text-lg mb-4 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">category</span> Categories
+                                </h3>
+                                <div class="space-y-3">
+                                    {['Seating', 'Lighting', 'Tables', 'Storage', 'Decor & Art'].map((cat, i) => (
+                                        <label key={i} class="flex items-center gap-3 cursor-pointer group">
+                                            <input defaultChecked={i===0} class="rounded border-gray-300 text-primary focus:ring-primary h-5 w-5" type="checkbox"/>
+                                            <span class="text-gray-600 dark:text-gray-300 group-hover:text-primary transition-colors">{cat}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                            {/* Price Range */}
+                            <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-[#ece8f2] dark:border-gray-800">
+                                <h3 class="text-[#130f1a] dark:text-white font-bold text-lg mb-4 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-primary">attach_money</span> Price Range
+                                </h3>
+                                <div class="flex items-center gap-4 mb-4">
+                                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-2 w-full">
+                                        <span class="text-xs text-gray-400 block">Min</span>
+                                        <div class="flex items-center">
+                                            <span class="text-sm font-semibold text-[#130f1a] dark:text-white">$</span>
+                                            <input class="w-full border-none p-0 text-sm font-semibold text-[#130f1a] dark:text-white bg-transparent focus:ring-0" type="number" defaultValue="0"/>
+                                        </div>
+                                    </div>
+                                    <span class="text-gray-400">-</span>
+                                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-2 w-full">
+                                        <span class="text-xs text-gray-400 block">Max</span>
+                                        <div class="flex items-center">
+                                            <span class="text-sm font-semibold text-[#130f1a] dark:text-white">$</span>
+                                            <input class="w-full border-none p-0 text-sm font-semibold text-[#130f1a] dark:text-white bg-transparent focus:ring-0" type="number" defaultValue="5000"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input class="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary" max="5000" min="0" type="range"/>
+                            </div>
+                        </aside>
+
+                        {/* Product Grid */}
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between mb-6">
+                                <h2 class="text-2xl font-bold text-[#130f1a] dark:text-white">New Arrivals</h2>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm text-gray-500 font-medium">Sort by:</span>
+                                    <select class="bg-transparent border-none text-sm font-bold text-[#130f1a] dark:text-white focus:ring-0 cursor-pointer">
+                                        <option>Recommended</option>
+                                        <option>Price: Low to High</option>
+                                        <option>Price: High to Low</option>
+                                        <option>Newest</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {/* Navigable Products */}
+                                {/* Product 1: Bauhaus Lamp */}
+                                <Link to="/product/lamp" class="group bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden border border-[#ece8f2] dark:border-gray-800 hover:shadow-lg transition-all duration-300 cursor-pointer">
+                                    <div class="relative aspect-square overflow-hidden bg-gray-100">
+                                        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2MFbE7VE-IZ3iqd-DkczRO_DjZH28SQTlV2e-hazCG_2XAyAoZeLHd68Us6CbGLCYhP3c-28P3PEm_DjOOj4KtMd514CDv-6x6BvXYR-21Czgm9JZiieOyBXRU_vkO1SEC-ezPJbCQGgfhvmfo1NbFppRERaEat3JbWl5fFVaET6Ap6621ANRw5oALN_nUoy-qrZkaNZqBF95-IXsC7_MRiEQ88xYfobgCiICRWPZKj7uOIKmJAcFAb4eYja8WR8URza0PbqCxmo"/>
+                                        <button class="absolute top-3 right-3 size-8 bg-white/90 dark:bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-400 hover:text-primary hover:scale-110 transition-all">
+                                            <span class="material-symbols-outlined text-[20px]">favorite</span>
+                                        </button>
+                                    </div>
+                                    <div class="p-4">
+                                        <h3 class="font-bold text-[#130f1a] dark:text-white text-lg truncate pr-2">Bauhaus Lamp</h3>
+                                        <p class="text-primary font-extrabold text-lg mb-2">$350</p>
+                                        <div class="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                                            <div class="size-6 rounded-full bg-gray-200 overflow-hidden">
+                                                <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeW8ayNInhPqR8ysuES4nWwXvS476Ry-sC477tTavRNoJp_ZveVBWVNoTi60swjYay6EmZ0PGYuYHScY2_aMF-QQYzLFs0F1h9RpACWpOwBi647-UBcwRVbbiJwndhppXb9ufpnjbLreFEFPXzxX_h1VA5crH55tnhwL2TN-T8D3aYF6BP51_2Mnd0nijGT9v5E0cmNXEpfeBTki3jBpOoiR4LtTHgRP0PmhWZuO98BniRwBMJoPQuN5T3vnBYWnG7AyhTz6t1i_s"/>
+                                            </div>
+                                            <span class="text-xs text-gray-500 font-medium">DesignHunter</span>
+                                        </div>
+                                    </div>
+                                </Link>
+
+                                {/* Product 2: Velvet Sofa */}
+                                <Link to="/product/sofa" class="group bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden border border-[#ece8f2] dark:border-gray-800 hover:shadow-lg transition-all duration-300 cursor-pointer">
+                                    <div class="relative aspect-square overflow-hidden bg-gray-100">
+                                        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7AFW7FtlfYYRt_FggrKJ61cLIQOlztaTVP4BPzl-Lm6XpuzWaKrwo0j5tPTDwGwW81gZIcRSSnUX7qQaMF-8ST3xMkw_7Aoqb4OCESYIIB0YP4AuntvhC6N347_eoceRsS9m3iGC6Wz_A4plRumn5LIrWub-9LL-0SB8lwWsud9a95FWl7P_Wt70CZX4uN_mGgwVLjb_AukEGl4bGCs-JwKuXHVTli4_keei_Q5K5Lir7p4VbFScEroesku1epPZ4mbI4e8LeNnc"/>
+                                        <button class="absolute top-3 right-3 size-8 bg-white/90 dark:bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-400 hover:text-primary hover:scale-110 transition-all">
+                                            <span class="material-symbols-outlined text-[20px]">favorite</span>
+                                        </button>
+                                    </div>
+                                    <div class="p-4">
+                                        <h3 class="font-bold text-[#130f1a] dark:text-white text-lg truncate pr-2">Velvet Modular Sofa</h3>
+                                        <p class="text-primary font-extrabold text-lg mb-2">$1,250</p>
+                                        <div class="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                                            <div class="size-6 rounded-full bg-gray-200 overflow-hidden">
+                                                <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUqGxunH2JPlMByesZzovS-rmYkzlPL3K9VvVu3DZPidWSdJRecmnNIJC-WiXEwVw4912CYdwGfARIVOQfFSD09EThuQlowejSvhYXanyN-HQf-DcKT2ee5HP7cT3acLqX_OQUdmBa45Mzlg16FEGTV6UTfsxwdIqpKtCUJJlNKbTd-Pv1_kidfUkf8PtMasDXVJSOHxQT6-BMeXxpgyyZal9PyIlpGwYK_Urra69fMYF7xeBIFBu-dWUOYX5mTXv8PPg6fkaUdlA"/>
+                                            </div>
+                                            <span class="text-xs text-gray-500 font-medium">VelvetInteriors</span>
+                                        </div>
+                                    </div>
+                                </Link>
+
+                                {/* Generic Product (no specific link) */}
+                                <div class="group bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden border border-[#ece8f2] dark:border-gray-800 hover:shadow-lg transition-all duration-300 cursor-pointer">
+                                    <div class="relative aspect-square overflow-hidden bg-gray-100">
+                                        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFsfPL-J_jCYe0qcbdC3QJ4Sx3fJpbOuOagoIfa4D_AD6gSR8w5pEne-3L1QxDYQE1nQEjmU3ejo30DiJvXE-1rUkEvDCZi78YfvepYIAm1cDM_cooufgb_XQHtKNqH3pJCLsEM-kcOg6pIdc024WVDLKR3vZZxUEeWIA_jtgXwqqLd2a2kgOAR_MvPaS1Vh82iCna4OCqF9BHJ2vORY6xqYLs2EHZ8lHc3X_80e0sxb-TtuHZJBeaW5c2AvticgzLS213hZ1kBA4"/>
+                                        <button class="absolute top-3 right-3 size-8 bg-white/90 dark:bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-400 hover:text-primary hover:scale-110 transition-all">
+                                            <span class="material-symbols-outlined text-[20px]">favorite</span>
+                                        </button>
+                                    </div>
+                                    <div class="p-4">
+                                        <h3 class="font-bold text-[#130f1a] dark:text-white text-lg truncate pr-2">Eames Lounge Chair</h3>
+                                        <p class="text-primary font-extrabold text-lg mb-2">$4,500</p>
+                                        <div class="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                                            <div class="size-6 rounded-full bg-gray-200 overflow-hidden">
+                                                <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUUOeoPSUHa5yC1uP9WSVWAWRRDuaz11NgdX44uVpFwhi9oSPiV4xWR6mVdHtP_jeJO1gUjgsbM2y6ed9spHhskGwvLSjrMOfHjBVeVqLnv4aRTVekPlqchnHo77nAnC_AlSVsmZih6H6BpLRhJPHM7C4y4ragf6q947RnZNzkgIQqaDTNRgVE-UeM97NcqzBSI4QyqmdwiPC9idGwxAsEr3SkrJcbAMIg_vn8nXrkG2qPVcwRamPp2Dnu1eywFfZZT2Pwv4gr9Ew"/>
+                                            </div>
+                                            <span class="text-xs text-gray-500 font-medium">MidCenturyModerns</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {/* More placeholders to fill grid visually if needed */}
+                                <div class="group bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden border border-[#ece8f2] dark:border-gray-800 hover:shadow-lg transition-all duration-300 cursor-pointer">
+                                    <div class="relative aspect-square overflow-hidden bg-gray-100">
+                                        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPO6lcMQp3bdufKGjWuooUZV2VACN440IzsjQkkOQ6VLVkn5gXel15hSQQxbLmKa_KTImR2InImFkJxbwLt86SvMvijjntbyNI2HRHLNPVE6nLaHjz-GefFi6d1QtmvH1jexWwPitWVDASQto1nDkvrSn7IkXyihTAYBgWD_JlTHRC1UTMJ4OdCrjyEieBD1-ax7CU8_PKRKuoxqFwKBNkfig671MnyIg-w001HgvTbk2gdDYxp_wAXQgYcs-Xh--UzIl3Jp0iP68"/>
+                                        <button class="absolute top-3 right-3 size-8 bg-white/90 dark:bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-400 hover:text-primary hover:scale-110 transition-all">
+                                            <span class="material-symbols-outlined text-[20px]">favorite</span>
+                                        </button>
+                                    </div>
+                                    <div class="p-4">
+                                        <h3 class="font-bold text-[#130f1a] dark:text-white text-lg truncate pr-2">Minimalist Oak Desk</h3>
+                                        <p class="text-primary font-extrabold text-lg mb-2">$800</p>
+                                        <div class="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                                            <div class="size-6 rounded-full bg-gray-200 overflow-hidden">
+                                                <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtj4OGrbomtKCIiVMsVZ3NjUXHhjrBxe6UzipAD6OYG7GDZQT1GeFigaaVBX-cfPyzu89VjH1c8lntYrDttdOmQC7N32c6puOVIjKASE3Ii3Vs0k8ONWLZCOmHPdsR1U0WQ34xaAUmdFSex0cV8pRAIE5Wirvh_42UvRRjUBiNopAnxk8n10cNLuQ-mPnZ2MHpbgV9clAa0x5dm-PAeIPZ_xMepa4872zGCHupwFZGBBXOSsyI45QCEs92HiNHiCPA3i7373vMzDY"/>
+                                            </div>
+                                            <span class="text-xs text-gray-500 font-medium">ScandiHome</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex justify-center mt-12">
+                                <button class="border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800 text-[#130f1a] dark:text-white font-bold py-3 px-8 rounded-lg transition-colors">
+                                    Load More Products
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            );
+        };
+
+        const ProfilePage = () => (
+            <main class="flex-1 w-full max-w-[1200px] mx-auto px-4 md:px-8 py-8 flex flex-col gap-8">
+                {/* Profile Header Card */}
+                <section class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 md:p-8 shadow-sm border border-[#ece8f2] dark:border-gray-800">
+                    <div class="flex flex-col md:flex-row gap-6 md:gap-8 items-start md:items-center">
+                        <div class="relative group shrink-0 mx-auto md:mx-0">
+                            <div class="size-32 rounded-full bg-center bg-cover border-4 border-background-light dark:border-background-dark shadow-md" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDtuEfiQTMItmKd-SkN_UmWknMTMB62KGMnMQt0hQ6N7jKJkm68cc197rzhL8QQ4y8TluQ3It-S6akKasVC5z9BXNeO39Kbwcc_of_UKU3J6EeaNN4dfJ584ysrh70rbPhTVXRG9PK0ZEEtqaXX2YKhfQdKYcG7h8FyFUyeIPuJbi-ly5DuYWwTxJvteZ-UmfDn99ARUqcKd4YbaT117vUfTDlAV5Oa4RmDiNcnIl5yeP9pz1BsGpQyF69DiBZng3P2TsElqWTGBTk")'}}></div>
+                            <button class="absolute bottom-1 right-1 bg-surface-light dark:bg-surface-dark p-2 rounded-full shadow-md text-text-sec-light hover:text-primary transition-colors border border-[#ece8f2] dark:border-gray-800">
+                                <span class="material-symbols-outlined text-[18px]">edit</span>
+                            </button>
+                        </div>
+                        <div class="flex-1 flex flex-col items-center md:items-start text-center md:text-left">
+                            <h1 class="text-3xl font-bold text-text-main dark:text-text-main-dark mb-1">Alex Designer</h1>
+                            <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 text-text-sec-light dark:text-gray-400 text-sm mb-4">
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">location_on</span> San Francisco, CA</span>
+                                <span class="hidden md:inline">•</span>
+                                <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">calendar_month</span> Member since 2021</span>
+                            </div>
+                            <p class="text-text-main dark:text-text-main-dark/80 max-w-lg text-sm md:text-base leading-relaxed">
+                                Passionate UI/UX designer creating modern digital assets. Specialized in minimalist icons and clean interface kits.
+                            </p>
+                        </div>
+                        <div class="w-full md:w-auto flex flex-col gap-3 shrink-0">
+                            <button class="flex items-center justify-center gap-2 h-10 px-6 rounded-lg border border-[#ece8f2] dark:border-gray-800 hover:bg-background-light dark:hover:bg-background-dark text-text-main dark:text-text-main-dark text-sm font-bold transition-colors w-full md:w-auto">
+                                <span class="material-symbols-outlined text-[20px]">settings</span> Settings
+                            </button>
+                            <button class="flex items-center justify-center gap-2 h-10 px-6 rounded-lg bg-primary hover:bg-primary/90 text-white text-sm font-bold transition-colors shadow-lg shadow-primary/20 w-full md:w-auto">
+                                <span class="material-symbols-outlined text-[20px]">share</span> Share Profile
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8 items-start">
+                    {/* Sidebar: Reputation Summary */}
+                    <aside class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 shadow-sm border border-[#ece8f2] dark:border-gray-800 h-auto sticky top-24">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">verified</span> Reputation
+                        </h3>
+                        <div class="flex flex-col gap-4">
+                            <div class="flex items-end gap-3">
+                                <span class="text-5xl font-black text-text-main dark:text-text-main-dark tracking-tighter">4.8</span>
+                                <div class="flex flex-col pb-1">
+                                    <div class="flex text-primary">
+                                        <span class="material-symbols-outlined text-[20px] filled">star</span>
+                                        <span class="material-symbols-outlined text-[20px] filled">star</span>
+                                        <span class="material-symbols-outlined text-[20px] filled">star</span>
+                                        <span class="material-symbols-outlined text-[20px] filled">star</span>
+                                        <span class="material-symbols-outlined text-[20px] filled opacity-50">star</span>
+                                    </div>
+                                    <span class="text-xs text-text-sec-light dark:text-gray-400 font-medium">Based on 52 reviews</span>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+
+                    {/* Tabs & Content */}
+                    <div class="flex flex-col min-w-0">
+                        <div class="border-b border-[#ece8f2] dark:border-gray-800 mb-6">
+                            <nav aria-label="Tabs" class="flex gap-8 px-2">
+                                <button class="border-b-[3px] border-primary text-primary py-3 px-1 text-sm font-bold flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-[20px]">grid_view</span> Active Listings <span class="bg-primary/10 text-primary text-[10px] px-1.5 py-0.5 rounded-full ml-1">12</span>
+                                </button>
+                                <button class="border-b-[3px] border-transparent text-gray-500 dark:text-gray-400 py-3 px-1 text-sm font-bold flex items-center gap-2 transition-all">
+                                    <span class="material-symbols-outlined text-[20px]">reviews</span> Reviews
+                                </button>
+                            </nav>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                            {/* Dummy Listing 1 */}
+                            <div class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl border border-[#ece8f2] dark:border-gray-800 overflow-hidden hover:shadow-lg hover:border-primary/30 transition-all duration-300">
+                                <div class="relative w-full pt-[80%] overflow-hidden bg-background-light dark:bg-background-dark">
+                                    <div class="absolute inset-0 bg-center bg-cover transition-transform duration-500 group-hover:scale-105" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuC31dxotZrmgonzc4bHfbVJSkWlhoAnlhp9ItiL8LciYVgzwj8QR6PvbhSRVZ1r4Aucb7buAPHxN8_uUKQVbpXvH0RP0VuC3gN4D4HFWCCicpE_7JI8vBiGoUWGzCTqw4Kuy1f5BfoWT3Z1D-rLofjoTo1TQ-8082enJRZUL4sbYDpa1jSeyPEdUqPc3jHKRcJGbDzjuUSmQ2dY9-C4JhtRsGpxVXhFRcCltZEyrqmxGPdpuB5_Ylyl1XFRe61sMuqs8eIwiMZfooM")'}}></div>
+                                </div>
+                                <div class="p-4 flex flex-col gap-2 flex-1">
+                                    <h3 class="text-text-main dark:text-text-main-dark font-bold text-base leading-tight group-hover:text-primary transition-colors">Minimalist Chair</h3>
+                                    <div class="mt-auto pt-3 flex items-center justify-between">
+                                        <p class="text-primary font-bold text-lg">$150.00</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {/* Add New Item Card */}
+                            <div class="flex flex-col items-center justify-center bg-background-light/50 dark:bg-surface-dark/50 rounded-xl border-2 border-dashed border-[#ece8f2] dark:border-gray-800 hover:border-primary/50 hover:bg-primary/5 transition-all duration-300 cursor-pointer min-h-[300px] group">
+                                <div class="size-16 rounded-full bg-background-light dark:bg-background-dark flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                    <span class="material-symbols-outlined text-primary text-[32px]">add</span>
+                                </div>
+                                <h3 class="text-text-main dark:text-text-main-dark font-bold text-lg">Create New Listing</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        );
+
+        const OrdersPage = () => (
+            <div class="px-4 md:px-10 lg:px-40 flex flex-1 justify-center py-8">
+                <div class="layout-content-container flex flex-col w-full max-w-[1024px] flex-1">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-8">
+                        <div class="flex flex-col gap-2">
+                            <h1 class="text-text-main dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">My Orders</h1>
+                            <p class="text-text-sec-light text-base font-normal leading-normal">Track your shipment status, view receipts, or buy items again.</p>
+                        </div>
+                        <div class="flex gap-4">
+                            <div class="flex flex-col gap-1 rounded-xl bg-surface-light dark:bg-surface-dark border border-[#ece8f2] dark:border-gray-800 px-5 py-3 shadow-sm min-w-[120px]">
+                                <p class="text-text-main dark:text-white tracking-tight text-3xl font-bold leading-none">24</p>
+                                <span class="text-text-sec-light text-xs font-semibold uppercase tracking-wider">Total Orders</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-surface-light dark:bg-surface-dark border border-[#ece8f2] dark:border-gray-800 rounded-xl shadow-sm overflow-hidden">
+                        <div class="hidden md:grid grid-cols-12 gap-4 p-4 border-b border-[#ece8f2] dark:border-gray-800 bg-background-light/50 dark:bg-surface-dark/50 text-xs font-bold text-text-sec-light uppercase tracking-wider">
+                            <div class="col-span-5">Product Details</div>
+                            <div class="col-span-2">Date</div>
+                            <div class="col-span-2">Total</div>
+                            <div class="col-span-3">Status & Actions</div>
+                        </div>
+                        {/* Order Item 1 */}
+                        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 p-5 border-b border-[#ece8f2] dark:border-gray-800 hover:bg-primary/5 transition-colors group items-center">
+                            <div class="col-span-5 flex gap-4">
+                                <div class="w-20 h-20 rounded-lg bg-cover bg-center shrink-0 border border-[#ece8f2] dark:border-gray-800" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDAQEjeC52t1o8ZJFXjdD49TV8Wy124T9F1xj_-vTr9ivUkH0oPLDlbOqo1H6ofpQiYIyvB5J7IcYIElWdHhX1i2Oofopz95NNDY6_UmRN-Cx6LCt-sxtzgPhZSFrESZOG0dFN04LcLPoIBszsjKIvdCvEsZP_t-Xtgk3UNFa8sOBTkV8Jm2cue-ddV97pOrgGDmqzZ1nW9u3pSME0utLnBhL1nv_EMEZeRyDHxSDK3WXiU_p3a7gswBEW1PYpszlioQdXwhUiHnQU")'}}></div>
+                                <div class="flex flex-col justify-center gap-1">
+                                    <h3 class="text-text-main dark:text-white font-bold text-base leading-snug">Ceramic Blue Vase</h3>
+                                    <p class="text-text-sec-light text-sm">Order #293849 • Artisan Collection</p>
+                                </div>
+                            </div>
+                            <div class="col-span-2 flex md:flex-col items-center md:items-start gap-2 md:gap-0">
+                                <span class="text-text-main dark:text-white text-sm font-medium">Oct 24, 2023</span>
+                            </div>
+                            <div class="col-span-2 flex md:flex-col items-center md:items-start gap-2 md:gap-0">
+                                <span class="text-text-main dark:text-white text-base font-bold">$45.00</span>
+                            </div>
+                            <div class="col-span-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
+                                    <span class="material-symbols-outlined text-[16px] animate-pulse">sync</span> Processing
+                                </span>
+                            </div>
+                        </div>
+                         {/* Order Item 2 */}
+                         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 p-5 border-b border-[#ece8f2] dark:border-gray-800 hover:bg-primary/5 transition-colors group items-center">
+                            <div class="col-span-5 flex gap-4">
+                                <div class="w-20 h-20 rounded-lg bg-cover bg-center shrink-0 border border-[#ece8f2] dark:border-gray-800" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBnN53ZDpGl-v5b8ZQLxCa8kF7Ox-tuZ8tSp2acwL_GU-x33iWcVKPgJ3wWTAiQ6fEstAg7KGiSdPe7Qvcy31a8-nLJa2jpz3iaGLvWuePmhr1LMQIWAkdj3So_py0uIoPu41-D7zadG8G6r1__D4JCzwJjc5yuZhJPJa02cU_yPT60NWcs8oNkeB-x-3uTcXB_DL_xLhfjnVbCdRDOfEtv0Ve3OGdqdICIcAfOvLu602DLjisHKClzvGDpSoC34T4a8UEEExW1Otw")'}}></div>
+                                <div class="flex flex-col justify-center gap-1">
+                                    <h3 class="text-text-main dark:text-white font-bold text-base leading-snug">Mechanical Keychron K2</h3>
+                                    <p class="text-text-sec-light text-sm">Order #293812 • Tech Haven</p>
+                                </div>
+                            </div>
+                            <div class="col-span-2 flex md:flex-col items-center md:items-start gap-2 md:gap-0">
+                                <span class="text-text-main dark:text-white text-sm font-medium">Sep 12, 2023</span>
+                            </div>
+                            <div class="col-span-2 flex md:flex-col items-center md:items-start gap-2 md:gap-0">
+                                <span class="text-text-main dark:text-white text-base font-bold">$89.99</span>
+                            </div>
+                            <div class="col-span-3 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800">
+                                    <span class="material-symbols-outlined text-[16px]">check_circle</span> Delivered
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const ProductPageLamp = () => (
+            <main class="flex-grow w-full px-4 md:px-10 lg:px-40 py-8">
+                <div class="max-w-[1280px] mx-auto">
+                    <nav class="mb-8 flex items-center text-sm font-medium text-gray-500">
+                        <Link to="/" class="hover:text-primary transition-colors">Home</Link>
+                        <span class="mx-2 text-gray-400">/</span>
+                        <span class="text-text-main dark:text-white">Bauhaus Edition Desk Lamp</span>
+                    </nav>
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                        {/* Left Column: Gallery */}
+                        <div class="lg:col-span-7 flex flex-col gap-4">
+                            <div class="group relative w-full aspect-[4/3] bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-zoom-in">
+                                <div class="absolute inset-0 bg-center bg-cover transition-transform duration-700 group-hover:scale-105" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDtz9jdbrxpqQxOUBLxj6Ozl_siD2T6au8-oR3WNtc_-wv6HPoD4ObVAkInBY5lPpFffZX8bjiPdwVH88MwGWJOGIXf1V6jaLKSFFQs9h55Qh2By2fdH-uuZ_H8mRvtX5xiQSgxgNY6ONyaCfMw-LXpVlea3AW2AQkBbLf1q4aPqPa-ZdZ5et_yODQlAlfKewpiFy5Uw6OTuh9UxlYy4aM-cGsPmy4gWCP3enGDtWiPzOYJQETZNgwKDajuofEorZjnC_feRLNTt5s')"}}></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="w-full aspect-square bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary transition-all">
+                                    <div class="w-full h-full bg-center bg-cover" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuCl2frwUaRXZSO8e3-CZsQldVM3ag1GmQJ-M8S2SMgGwqr76Yh2srh8UBnr4NBrUdJkYsfM0qIFVunPSau9gd6EiaxS81NqDq-zqVGIgCmQ5XWoUwQkLSi--MJqtQYkDlXsc3zrnoD2LvYnM6GDnkJng_E8bMTI-gffCDaxc0oPGmehP6NhUggeiTGzw-LpJEkEJ-_h3QuxrhRxa2DRKG6FR86KB9mz3JhORS9e7JLD-ld03HigT24Byuy6-wNHDzUg3DUZFGg0bUY')"}}></div>
+                                </div>
+                                <div class="w-full aspect-square bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary transition-all">
+                                    <div class="w-full h-full bg-center bg-cover" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuC4fyLnHxkYYgDF1DiXYbL7DAEeqHOZgwtjAsLr9siyAz5epVJDCGFSd8BteSRvElqHdyAddkri1RNUvup8NZDX2eWeya1gfnH9H-FsPYWSHg4Hv06JPeLKB_GSf1gpLDuZ-1Wt8lGpL3gHzsLaMtFv-MKTHHoBrnoD7dfQezj6wT6HSTi4mjB3Z1Anj6dP6p5OV6EquakAjiwZTMSh-iR1N3bEKTXmJ-n8O793EbsKoFnoI55Q65uLf1ng6So_PW5nTDbKwNBnHvw')"}}></div>
+                                </div>
+                            </div>
+                        </div>
+                        {/* Right Column: Product Details */}
+                        <div class="lg:col-span-5 relative">
+                            <div class="sticky top-24 flex flex-col gap-6">
+                                <div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h3 class="text-gray-500 text-sm font-semibold uppercase tracking-wider">Designed by Wilhelm Wagenfeld, 1924</h3>
+                                        <div class="flex items-center gap-1 text-yellow-500">
+                                            <span class="material-symbols-outlined text-sm filled">star</span>
+                                            <span class="text-text-main dark:text-white text-sm font-bold ml-1">4.9</span>
+                                        </div>
+                                    </div>
+                                    <h1 class="text-3xl md:text-4xl font-bold text-text-main dark:text-white leading-tight mb-4">Bauhaus Edition Desk Lamp</h1>
+                                    <div class="flex items-baseline gap-4">
+                                        <span class="text-4xl font-bold text-primary">$450</span>
+                                        <span class="text-lg text-gray-500 line-through decoration-slate-400">$520</span>
+                                    </div>
+                                </div>
+                                <hr class="border-[#ece8f2] dark:border-gray-800"/>
+                                <div class="text-text-main/80 dark:text-white/80 text-base leading-relaxed">
+                                    <p>A masterpiece of industrial design, this lamp embodies the "form follows function" philosophy. Featuring a hand-blown opal glass dome and a precision-milled chromed steel base, it casts a diffuse, glare-free light perfect for focused work or ambient reading.</p>
+                                </div>
+                                <div class="pt-4 flex flex-col gap-3">
+                                    <button class="flex-1 bg-primary hover:bg-[#5a1bbd] text-white font-bold rounded-lg h-14 flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/25">
+                                        <span class="material-symbols-outlined">shopping_bag</span> Buy Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        );
+
+        const ProductPageSofa = () => (
+            <main class="max-w-[1280px] mx-auto px-4 md:px-10 py-6 min-h-screen">
+                <nav class="flex items-center gap-2 text-sm text-slate-500 mb-6 flex-wrap">
+                    <Link to="/" class="hover:text-primary transition-colors">Home</Link>
+                    <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                    <span class="text-slate-900 dark:text-slate-200 font-medium">Modular Velvet Sofa</span>
+                </nav>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                    <div class="lg:col-span-8 flex flex-col gap-8">
+                        <div class="h-[300px] md:h-[500px] relative group overflow-hidden rounded-xl">
+                            <div class="w-full h-full bg-center bg-no-repeat bg-cover transition-transform duration-700 group-hover:scale-105" style={{backgroundImage: 'url("https://lh3.googleusercontent.com/aida-public/AB6AXuDyiv7HbTIuF_0xn4enQM8TQYeTP4IdyvTkQNqg3BFuFd8t9fwKtXFwCmUWe0P6bvUMxjEs4Nui7Mxq4g_vzfzCZiIKWEx4WHz4rhCDP-cRjzOD0WCbV6MBhxbF3xP_0RCoFSiSqK_Mg7DkoT_4AkkreTnKDYYGiviZ24MHLOdzFv2lEZmrr6G--bDlFjo0-ZJc--Se_Mr_gIpPb3A-vFPD-WgRYR5DvknneR5FIur0F1u4L4IzUOSUenvRu6JQ3-aXvi-SsVjuDs4")'}}></div>
+                        </div>
+                        <div class="bg-surface-light dark:bg-surface-dark p-6 md:p-8 rounded-xl border border-slate-200 dark:border-slate-800">
+                            <h3 class="text-xl font-bold mb-4 text-text-main dark:text-white">About this item</h3>
+                            <div class="prose dark:prose-invert text-slate-600 dark:text-slate-300 max-w-none">
+                                <p class="mb-4">Selling our beloved emerald green velvet modular sofa. It's been the centerpiece of our living room for about 18 months but we are moving to a smaller apartment and unfortunately, it won't fit.</p>
+                                <p>The velvet is incredibly soft and high quality (Italian imported fabric). The foam is high-density and hasn't lost its shape at all.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-4">
+                        <div class="sticky top-24 flex flex-col gap-5">
+                            <div class="bg-surface-light dark:bg-surface-dark p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                                <div class="flex flex-col gap-1 mb-6">
+                                    <h1 class="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white leading-tight">Modular Velvet Sofa</h1>
+                                    <div class="flex items-center justify-between mt-2">
+                                        <span class="text-3xl font-bold text-primary">$1,250</span>
+                                        <span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">Like New</span>
+                                    </div>
+                                </div>
+                                <button class="w-full bg-primary hover:bg-[#5b1abf] text-white font-bold py-3.5 px-4 rounded-lg shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2">
+                                    <span>Buy Now</span>
+                                    <span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        );
+        };
+
+        // --- Main App ---
+
+        const App = () => {
+            return (
+                <MemoryRouter>
+                    <div className="min-h-screen flex flex-col">
+                        <NavHeader />
+                        <Routes>
+                            <Route path="/" element={<HomePage />} />
+                            <Route path="/profile" element={<ProfilePage />} />
+                            <Route path="/orders" element={<OrdersPage />} />
+                            <Route path="/product/lamp" element={<ProductPageLamp />} />
+                            <Route path="/product/sofa" element={<ProductPageSofa />} />
+                        </Routes>
+                        <Footer />
+                    </div>
+                </MemoryRouter>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
