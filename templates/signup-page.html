@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="images/logo.png">
+
+</head>
+<body class="auth-page signup-page">
+
+    <header class="navbar">
+        <div class="logo-wrapper">
+            <img src="images/logo.png" alt="Stilnovo" class="logo-img">
+            <span class="brand">Stilnovo</span>
+        </div>
+        <nav class="nav-actions">
+            <a href="index.html" class="link-back">Back to home</a>
+        </nav>
+    </header>
+
+    <main class="auth-container">
+        <div class="auth-card">
+            <h1 class="auth-title">Create account</h1>
+            <p class="auth-subtitle">Join Stilnovo and start discovering.</p>
+
+            <form class="auth-form">
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-user"></i>
+                        <input type="text" placeholder="John Doe" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Profile Photo</label>
+                    <div class="input-wrapper" style="position: relative;">
+                        <i class="fa-solid fa-camera"></i>
+                        <span id="file-chosen" class="file-placeholder">Choose profile photo...</span>
+                        <input type="file" id="avatar" name="avatar" accept="image/*" class="hidden-file-input"
+                               onchange="document.getElementById('file-chosen').textContent = this.files[0].name">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Email address</label>
+                    <div class="input-wrapper">
+                        <i class="fa-regular fa-envelope"></i>
+                        <input type="email" placeholder="name@example.com" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <div class="input-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" placeholder="At least 8 characters" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-signin">Create account</button>
+            </form>
+
+            <div class="auth-footer">
+                Already have an account? <a href="login.html">Log in</a>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
