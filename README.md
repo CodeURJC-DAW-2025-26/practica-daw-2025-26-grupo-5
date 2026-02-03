@@ -6,8 +6,8 @@
 | Gabriele Antonio Ricucci | ga.ricucci.2025@alumnos.urjc.es | @gabrieleri |
 | Victor Hugo Oliveira Petroceli | vh.deoliveira.2023@alumnos.urjc.es | @CodVictor |
 | Raúl Tejada Merinero | r.tejada.2023@alumnos.urjc.es | @raultejada24 |
-| [Nombre 4] | [email4]@alumnos.urjc.es | [@User4] |
-| [Nombre 5] | [email5]@alumnos.urjc.es | [@User5] |
+| Ariel Rodríguez Lozano | a.rodriguezl.2023@alumnos.urjc.es | @Ariel1725 |
+| Alonso Gutierrez Sánchez | a.gutierrez.2023@alumnos.urjc.es | @Alon345 |
 
 ---
 
