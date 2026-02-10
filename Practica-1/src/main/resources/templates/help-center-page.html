@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Center</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+    <div class="d-flex min-vh-100">
+        <aside class="sidebar-stilnovo p-4 d-none d-lg-flex flex-column">
+            <div class="logo-wrapper mb-5">
+                <a href="index.html" class="text-decoration-none d-flex align-items-center gap-2">
+                    <img src="images/logo.png" alt="Stilnovo" class="logo-img">
+                    <span class="brand">Stilnovo</span>
+                </a>
+            </div>
+            
+            <nav class="nav flex-column gap-1">
+                <a class="nav-link-stilnovo" href="user-page.html"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                <a class="nav-link-stilnovo" href="user-products-page.html"><i class="fa-solid fa-box-open"></i> My Products</a>
+                <a class="nav-link-stilnovo" href="favorite-products-page.html"><i class="fa-solid fa-heart"></i> Favorites</a>
+                <a class="nav-link-stilnovo" href="sales-and-orders-page.html"><i class="fa-solid fa-handshake"></i> Sales & Orders</a>
+                <a class="nav-link-stilnovo" href="statistics-page.html"><i class="fa-solid fa-magnifying-glass-chart"></i> Statistics</a>
+                <a class="nav-link-stilnovo" href="user-setting-page.html"><i class="fa-solid fa-user-gear"></i> Settings</a>
+                <a class="nav-link-stilnovo active" href="#"><i class="fa-solid fa-circle-question"></i> Help Center</a>
+            </nav>
+        
+            <div class="mt-auto pt-4 border-top">
+                <a href="index.html" class="btn-sell w-100 d-flex align-items-center justify-content-center gap-2 text-decoration-none shadow-sm mb-3" style="height: 45px; font-size: 0.9rem;">
+                    <i class="fa-solid fa-shop"></i> Browse Market
+                </a>
+
+                <a href="index.html" class="nav-link-stilnovo logout-link">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-grow-1 p-4 p-md-5 overflow-auto">
+            <header class="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h1 class="fw-800 h2">Help Center</h1>
+                    <p class="text-muted small">Answers to your questions and support contact.</p>
+                </div>
+            
+                <div class="d-flex align-items-center gap-4">
+                    <nav class="nav-actions">
+                        <a href="user-page.html" class="btn-about py-2 px-3 small text-decoration-none">
+                            <i class="fa-solid fa-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </nav>
+                </div>
+            </header>
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <div class="clay-card p-4 h-100">
+                        <h3 class="fw-800 h6 text-primary mb-2">How do I sell?</h3>
+                        <p class="small text-muted mb-0">Upload your items, set a price, and wait for buyers. It's that simple.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="clay-card p-4 h-100">
+                        <h3 class="fw-800 h6 text-primary mb-2">Secure Payments</h3>
+                        <p class="small text-muted mb-0">We protect every transaction. Your funds are released upon successful delivery.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="clay-card p-4 h-100">
+                        <h3 class="fw-800 h6 text-primary mb-2">Verified Sellers</h3>
+                        <p class="small text-muted mb-0">Use your Digital Seller Card in settings to verify your identity in person.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="clay-card p-4 h-100">
+                        <h3 class="fw-800 h6 text-primary mb-2">Global Shipping</h3>
+                        <p class="small text-muted mb-0">We offer worldwide shipping labels for all your design treasures.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="clay-card p-5 text-center mt-5">
+                <h3 class="fw-800 h4 mb-3">Still need help?</h3>
+                <p class="text-muted mb-4">Our specialized support team is available 24/7 to assist you.</p>
+                <button class="btn-sell px-5 py-3">
+                    <i class="fa-solid fa-headset me-2"></i> Contact Support
+                </button>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Settings</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+    <header class="navbar container-fluid px-lg-5 py-3 header-border-line bg-white shadow-sm">
+        <div class="logo-wrapper">
+            <a href="index.html" class="text-decoration-none d-flex align-items-center gap-2">
+                <img src="images/logo.png" alt="Stilnovo" class="logo-img" width="40">
+                <span class="brand">Stilnovo</span>
+            </a>
+        </div>
+        <nav class="nav-actions">
+            <a href="user-page.html" class="btn-about py-2 px-3 small text-decoration-none">
+                <i class="fa-solid fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </nav>
+    </header>
+
+    <main class="settings-page-container pb-5">
+        <div class="container py-5">
+            <div class="row g-5">
+                
+                <div class="col-lg-5">
+                    <div class="clay-card p-4 p-md-5 settings-card">
+                        <h2 class="fw-800 mb-4">Edit Profile</h2>
+                        
+                        <form>
+                            <div class="mb-4 text-center">
+                                <div class="profile-upload-container mx-auto mb-2">
+                                    <img src="images/profile-photo.png" id="preview-avatar" class="img-fluid rounded-circle p-1" alt="Profile">
+                                    <input type="file" id="profilePic" accept="image/*" class="file-input-hidden">
+                                </div>
+                                <label for="profilePic" class="form-label fw-700 small cursor-pointer" style="color: var(--brand-blue)">
+                                    <i class="fa-solid fa-camera me-1"></i> Change profile picture
+                                </label>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="label-categories mb-2 d-block">FULL NAME</label>
+                                <div class="search-box w-100 py-2">
+                                    <i class="fa-solid fa-signature small"></i>
+                                    <input type="text" id="input-name" value="Alex Morgan" placeholder="Enter your name">
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-sell w-100 justify-content-center mb-5">Save Changes</button>
+
+                            <div class="p-3 rounded-4" style="background: rgba(47, 108, 237, 0.05); border-left: 4px solid var(--brand-blue);">
+                                <p class="mb-0 x-small fw-700" style="color: var(--navy-dark)">
+                                    <i class="fa-solid fa-shield-halved me-2 text-primary"></i>
+                                    <strong>Security Tip:</strong> Your Digital ID card is for personal use within the Stilnovo marketplace.
+                                </p>
+                            </div>
+
+                            <div class="py-5 my-4"></div> 
+
+                            <div class="danger-zone-block pt-4 border-top">
+                                <p class="text-danger fw-800 mb-1 small">DANGER ZONE</p>
+                                <p class="x-small opacity-50 mb-3">Deleting your account is permanent. All data will be lost.</p>
+                                <button type="button" class="btn-delete-minimal">
+                                    <i class="fa-solid fa-trash-can me-2"></i>Delete account
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-lg-7 text-center card-column-adjust">
+                    <p class="label-categories mb-4 opacity-50">YOUR DIGITAL SELLER CARD</p>
+                    
+                    <div class="flip-card-container mx-auto">
+                        <div class="flip-card-lizard">
+                            <div class="flip-card-inner-lizard">
+                                <div class="flip-card-front-lizard">
+                                    <div class="lizard-bg-pattern"></div>
+                                    <div class="lizard-content">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="lizard-logo text-white">STILNOVO</div>
+                                            <div class="lizard-chip"></div>
+                                        </div>
+                                        <div class="lizard-user mt-4">
+                                            <h3 id="card-name" class="fw-800">ALEX MORGAN</h3>
+                                            <p class="lizard-id">ID: 2026-ST-892</p>
+                                        </div>
+                                        <div class="lizard-footer d-flex justify-content-between align-items-end">
+                                            <div class="lizard-valid"><span>VALID THRU</span><p>12/28</p></div>
+                                            <div class="lizard-brand-mark">PREMIUM SELLER</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flip-card-back-lizard">
+                                    <i class="fa-solid fa-qrcode fa-5x"></i>
+                                    <p class="x-small mt-3 opacity-50">SCAN TO VERIFY</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-muted small"><i class="fa-solid fa-rotate me-2"></i> Hover the card to flip it</p>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Seller</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* Mantenemos la estructura de pantalla única sin scroll */
+        body, html { height: 100%; overflow: hidden; background-color: #f8fafc; }
+        .main-wrapper { min-height: calc(100vh - 70px); display: flex; align-items: center; }
+    </style>
+</head>
+<body>
+
+    <header class="navbar container-fluid px-lg-5 py-2 bg-white border-bottom sticky-top justify-content-center" style="height: 70px;">
+        <a href="info-product-page.html" class="text-decoration-none text-muted small fw-700 position-absolute start-0 ms-4">
+            <i class="fa-solid fa-arrow-left me-1"></i> Back
+        </a>
+        <img src="images/logo.png" alt="Stilnovo" style="height: 40px; width: auto;">
+    </header>
+
+    <main class="container main-wrapper py-3">
+        <div class="row justify-content-center w-100 m-0">
+            <div class="col-xl-11 col-lg-12">
+                
+                <div class="clay-card p-4 p-lg-5 shadow-lg">
+                    <div class="row g-5 align-items-center">
+                        
+                        <div class="col-lg-4 border-end pe-lg-5 text-center text-lg-start">
+                            <div class="mb-4">
+                                <span class="badge rounded-pill bg-primary-subtle text-primary px-3 mb-3 fw-700">New Inquiry</span>
+                                <img src="images/coche.png" alt="Product" class="img-fluid rounded-4 mb-3 shadow-sm d-block mx-auto mx-lg-0" style="max-height: 180px; object-fit: cover;">
+                                <h2 class="fw-800 h4 mb-1">Audi A3 Sportback</h2>
+                                <p class="price mb-0 fs-5" style="color: var(--brand-blue)">45.200 €</p>
+                            </div>
+
+                            <div class="p-3 bg-light rounded-4 d-flex align-items-center gap-3 mb-4">
+                                <div class="avatar-sm bg-white rounded-circle d-flex align-items-center justify-content-center fw-800 shadow-sm" style="width: 45px; height: 45px;">MG</div>
+                                <div>
+                                    <p class="x-small fw-800 text-muted mb-0">Seller</p>
+                                    <p class="fw-700 mb-0">Mario G.</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 pt-2 text-muted border-top">
+                                <p class="small fw-600 mb-1"><i class="fa-solid fa-circle-check text-success me-2"></i> Your message will be sent via email</p>
+                                <p class="small fw-600 mb-0"><i class="fa-solid fa-circle-check text-success me-2"></i> Response time: ~24 hours</p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-8 ps-lg-5">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h3 class="fw-800 h5 mb-0">Complete your Inquiry</h3>
+                                <span class="x-small text-muted fw-700"><i class="fa-solid fa-lock me-1"></i> Secure Form</span>
+                            </div>
+                            
+                            <form action="/api/v1/notifications/send-inquiry" method="POST">
+                                <input type="hidden" name="productId" value="AUDI_A3_001">
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="label-categories mb-1 x-small">FULL NAME</label>
+                                        <div class="search-box w-100 py-2">
+                                            <i class="fa-solid fa-user small"></i>
+                                            <input type="text" name="name" value="Alex Morgan" required class="small fw-700">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="label-categories mb-1 x-small">PHONE</label>
+                                        <div class="search-box w-100 py-2">
+                                            <i class="fa-solid fa-phone small"></i>
+                                            <input type="tel" name="phone" placeholder="+34 000 000 000" class="small fw-600">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mb-3">
+                                    <div class="col-md-6">
+                                        <label class="label-categories mb-1 x-small">YOUR EMAIL</label>
+                                        <div class="search-box w-100 py-2">
+                                            <i class="fa-solid fa-envelope small"></i>
+                                            <input type="email" name="email" value="alex.morgan@example.com" required class="small fw-600">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="label-categories mb-1 x-small">INQUIRY TYPE</label>
+                                        <div class="search-box w-100 py-2">
+                                            <i class="fa-solid fa-tags small"></i>
+                                            <select name="type" class="w-100 border-0 bg-transparent fw-700 small" style="outline: none; color: var(--navy-dark);">
+                                                <option value="general">General Question</option>
+                                                <option value="viewing">Request Viewing</option>
+                                                <option value="offer">Make Offer</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="label-categories mb-1 x-small">MESSAGE</label>
+                                    <div class="search-box w-100 align-items-start py-2" style="border-radius: 18px;">
+                                        <i class="fa-solid fa-comment-dots mt-1 small"></i>
+                                        <textarea name="message" class="w-100 border-0 bg-transparent px-2 small fw-600" rows="3" 
+                                                placeholder="Hi Mario, is this still available?" 
+                                                style="outline: none; resize: none;" required></textarea>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn-sell w-100 justify-content-center gap-2 py-3">
+                                    <i class="fa-solid fa-paper-plane"></i> Send Email Inquiry
+                                </button>
+                                
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

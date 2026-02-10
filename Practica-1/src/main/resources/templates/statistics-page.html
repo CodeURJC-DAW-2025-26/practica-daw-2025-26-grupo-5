@@ -1,0 +1,168 @@
+<!--Mostrará Ventas Totales, Artículos Vendido, Valor del Inventario, Valoración Media
+Además,
+Ingresos Mensuales (Line Chart): Una línea que muestre cuánto dinero ha ganado cada mes. Es la motivación principal del vendedor.
+Ventas por Categoría (Doughnut Chart): ¿Qué vende más? ¿Ropa, electrónica, muebles? Esto ayuda al usuario a saber en qué nicho tiene más éxito.
+Visitas vs. Interés (Bar Chart): Comparar cuántas personas ven sus anuncios frente a cuántas le escriben o marcan como favorito. Si tiene muchas visitas pero pocas ventas, sabrá que tiene que bajar el precio.
+-->
+
+<!-- Posibilidad de descargar estos gráficos como pdf, usar boton https://uiverse.io/Na3ar-17/evil-dragon-24-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Statistics</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+    <div class="d-flex min-vh-100">
+        <aside class="sidebar-stilnovo p-4 d-none d-lg-flex flex-column">
+            <div class="logo-wrapper mb-5">
+                <a href="index.html" class="text-decoration-none d-flex align-items-center gap-2">
+                    <img src="images/logo.png" alt="Stilnovo" class="logo-img">
+                    <span class="brand">Stilnovo</span>
+                </a>
+            </div>
+            
+            <nav class="nav flex-column gap-1">
+                <a class="nav-link-stilnovo" href="user-page.html"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                <a class="nav-link-stilnovo" href="user-products-page.html"><i class="fa-solid fa-box-open"></i> My Products</a>
+                <a class="nav-link-stilnovo" href="favorite-products-page.html"><i class="fa-solid fa-heart"></i> Favorites</a>
+                <a class="nav-link-stilnovo" href="sales-and-orders-page.html"><i class="fa-solid fa-handshake"></i> Sales & Orders</a>
+                <a class="nav-link-stilnovo active" href="#"><i class="fa-solid fa-magnifying-glass-chart"></i> Statistics</a>
+                <a class="nav-link-stilnovo" href="user-setting-page.html"><i class="fa-solid fa-user-gear"></i> Settings</a>
+                <a class="nav-link-stilnovo text-muted" href="help-center-page.html"><i class="fa-solid fa-circle-question"></i> Help Center</a>
+            </nav>
+        
+            <div class="mt-auto pt-4 border-top">
+                <a href="index.html" class="btn-sell w-100 d-flex align-items-center justify-content-center gap-2 text-decoration-none shadow-sm mb-3" style="height: 45px; font-size: 0.9rem;">
+                    <i class="fa-solid fa-shop"></i> Browse Market
+                </a>
+
+                <a href="index.html" class="nav-link-stilnovo logout-link">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-grow-1 p-4 p-md-5 overflow-auto">
+            <header class="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h1 class="fw-800 h2">Statistics</h1>
+                    <p class="text-muted small">Comprehensive performance and interest analysis.</p>
+                </div>
+            
+                <div class="d-flex align-items-center gap-4">
+                    <div class="d-flex gap-3 d-none d-md-flex">
+                        <button class="btn-sell py-2 px-3 small" style="height: auto;"><i class="fa-solid fa-file-export me-2"></i> Export PDF</button>
+                    </div>
+
+                    <a href="user-setting-page.html" class="text-decoration-none">
+                        <img src="images/profile-photo.png" alt="User" class="rounded-circle border border-2 shadow-sm" width="48" height="48" style="object-fit: cover;">
+                    </a>
+                </div>
+            </header>
+
+            <div class="row g-4 mb-5">
+                <div class="col-xl-3 col-md-6">
+                    <div class="clay-card p-4">
+                        <p class="label-categories mb-1">Ventas Totales</p>
+                        <h2 class="fw-800 mb-0">$124,500</h2>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="clay-card p-4">
+                        <p class="label-categories mb-1">Artículos Vendidos</p>
+                        <h2 class="fw-800 mb-0">82</h2>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="clay-card p-4">
+                        <p class="label-categories mb-1">Valor Inventario</p>
+                        <h2 class="fw-800 mb-0" style="color: var(--brand-blue)">$45,200</h2>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-md-6">
+                    <div class="clay-card p-4 text-center">
+                        <p class="label-categories mb-1">Valoración Media</p>
+                        <div class="d-flex justify-content-center align-items-center gap-2">
+                            <h2 class="fw-800 mb-0" style="color: #FFD700">4.9</h2>
+                            <i class="fa-solid fa-star text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-5">
+                <div class="col-lg-8">
+                    <div class="clay-card p-4 h-100">
+                        <h3 class="fw-800 h5 mb-4">Ingresos Mensuales</h3>
+                        <div class="chart-container-css" style="height: 250px;">
+                            <svg viewBox="0 0 500 150" class="svg-chart">
+                                <path d="M0,120 Q50,130 100,80 T200,100 T300,50 T400,90 T500,20" fill="none" stroke="#2f6ced" stroke-width="4" />
+                                <path d="M0,120 Q50,130 100,80 T200,100 T300,50 T400,90 T500,20 L500,150 L0,150 Z" fill="rgba(47, 108, 237, 0.05)" />
+                            </svg>
+                            <div class="d-flex justify-content-between mt-3 text-muted x-small fw-800">
+                                <span>ENE</span><span>MAR</span><span>MAY</span><span>JUL</span><span>SEP</span><span>NOV</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="clay-card p-4 h-100 text-center">
+                        <h3 class="fw-800 h5 mb-4 text-start">Ventas por Categoría</h3>
+                        <div class="doughnut-chart-css mx-auto my-4">
+                            <div class="doughnut-hole"></div>
+                        </div>
+                        <div class="d-flex flex-wrap justify-content-center gap-3 mt-2">
+                            <span class="x-small fw-800"><i class="fa-solid fa-circle me-1" style="color: #2f6ced"></i> Home</span>
+                            <span class="x-small fw-800"><i class="fa-solid fa-circle me-1" style="color: #1A365D"></i> Tech</span>
+                            <span class="x-small fw-800"><i class="fa-solid fa-circle me-1" style="color: #cbd5e0"></i> Art</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="clay-card p-4">
+                <h3 class="fw-800 h5 mb-5">Visitas vs. Interés</h3>
+                <div class="bar-chart-compare d-flex align-items-end justify-content-around" style="height: 200px;">
+                    <div class="bar-group">
+                        <div class="d-flex gap-1 align-items-end h-100">
+                            <div class="bar-fill visit" style="height: 90%" title="Visitas"></div>
+                            <div class="bar-fill interest" style="height: 40%" title="Favoritos"></div>
+                        </div>
+                        <span class="x-small fw-800 mt-2 d-block">CHAIRS</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="d-flex gap-1 align-items-end h-100">
+                            <div class="bar-fill visit" style="height: 70%" title="Visitas"></div>
+                            <div class="bar-fill interest" style="height: 60%" title="Favoritos"></div>
+                        </div>
+                        <span class="x-small fw-800 mt-2 d-block">LIGHTING</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="d-flex gap-1 align-items-end h-100">
+                            <div class="bar-fill visit" style="height: 50%" title="Visitas"></div>
+                            <div class="bar-fill interest" style="height: 15%" title="Favoritos"></div>
+                        </div>
+                        <span class="x-small fw-800 mt-2 d-block">DECOR</span>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center gap-4 mt-4">
+                    <span class="x-small fw-800 text-muted"><i class="fa-solid fa-square me-1" style="color: #cbd5e0"></i> Visitas</span>
+                    <span class="x-small fw-800 text-muted"><i class="fa-solid fa-square me-1" style="color: #2f6ced"></i> Interés (Favs/Msg)</span>
+                </div>
+            </div>
+
+            <div class="py-5"></div>
+        </main>
+    </div>
+
+</body>
+</html>

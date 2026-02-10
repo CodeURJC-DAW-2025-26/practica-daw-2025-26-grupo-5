@@ -1,3 +1,0 @@
-- Templates: Los archivos .html que ya tienes (como index.html, login-page.html, etc.) son tus maquetas.
-- Framework: Recuerda que debes usar Bootstrap o Material Design para que se vea profesional
-- Imágenes: Se guardarán en la base de datos más adelante, pero para las maquetas las tienes en frontend/templates/images

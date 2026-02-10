@@ -1,0 +1,1334 @@
+/* --- GLOBAL & VARS --- */
+:root {
+    --brand-blue: #2f6ced;
+    --brand-blue-dark: #1e479a;
+    --navy-dark: #1A365D;
+    --border-light: #f1f4f8;
+    --bg-light: #f8fafc;
+}
+
+body { font-family: 'Montserrat', sans-serif; color: var(--navy-dark); background-color: white; }
+.fw-800 { font-weight: 800; }
+
+/* --- NAVBAR ADJUSTMENTS --- */
+.link-login { 
+    text-decoration: none !important; 
+    color: var(--brand-blue); 
+    font-weight: 800; 
+    transition: 0.2s;
+}
+.link-login:hover { color: var(--brand-blue-dark); opacity: 0.8; }
+
+/* --- BRANDING & LOGO --- */
+.logo-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-img {
+    height: 42px;
+    width: auto;
+}
+
+.brand {
+    /* Changed from 800 to 700 for a thinner, more elegant look */
+    font-weight: 700; 
+    font-size: 26px;
+    color: var(--brand-blue);
+    letter-spacing: -0.5px;
+    /* Ensures no default browser decoration */
+    text-decoration: none; 
+}
+
+/* --- SEARCH BOX SECTION --- */
+.search-box {
+    /* Slightly darker but still light gray for better contrast */
+    background: #eff2f6; 
+    border: 2px solid transparent; 
+    border-radius: 50px;
+    padding: 10px 22px;
+    width: 38%; /* Adjusted width to match the visual balance */
+    display: flex;
+    align-items: center; 
+    gap: 14px;
+    transition: all 0.3s ease;
+}
+
+/* Blue border and white background on focus */
+.search-box:focus-within {
+    border-color: var(--brand-blue);
+    background: #ffffff;
+    box-shadow: 0 4px 15px rgba(47, 108, 237, 0.12);
+}
+
+.search-box input { 
+    border: none; 
+    background: transparent; 
+    outline: none; 
+    width: 100%; 
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500;
+    color: var(--navy-dark);
+}
+
+/* Icon style inside search */
+.search-box i {
+    color: #a0aec0;
+    transition: color 0.3s;
+}
+
+.search-box:focus-within i {
+    color: var(--brand-blue);
+}
+
+
+/* --- SUB-NAV and Styles--- */
+/* Altura completa de la pantalla menos el Header principal */
+.hero-wrapper {
+    min-height: calc(100vh - 85px); /* Ajusta 85px según la altura de tu navbar */
+    display: flex;
+    flex-direction: column;
+}
+
+/* El Hero ahora es el "músculo" que se estira y centra todo */
+.hero {
+    flex: 1; /* Ocupa todo el espacio disponible */
+    display: flex;
+    align-items: center; /* Centra el Row verticalmente */
+}
+
+/* Ajuste fino del texto para que no parezca que flota sin sentido */
+.hero-text-block h1 {
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+}
+
+.sub-nav {
+    border-top: 1px solid #edf2f7;
+    border-bottom: 1px solid #edf2f7;
+}
+.label-categories { font-weight: 800; font-size: 12px; color: #a0aec0; letter-spacing: 1px; }
+
+.category-list a { 
+    text-decoration: none; 
+    color: var(--navy-dark); 
+    font-weight: 700; 
+    font-size: 14px; 
+    transition: color 0.3s ease; 
+}
+/* cursor efect */
+.category-list a:hover { 
+    color: var(--brand-blue); 
+}
+
+/* --- BOTONES CLAY STYLE --- */
+.hero-subtitle {
+    color: var(--brand-blue); 
+    font-weight: 700;        
+    font-size: 1.1rem;       
+    margin-bottom: 0;         
+}
+.btn-sell, .btn-about, .btn-signup {
+    height: 55px; padding: 0 35px; border-radius: 14px;
+    display: inline-flex; align-items: center; font-weight: 800; text-decoration: none;
+    transition: 0.2s;
+}
+.btn-sell { background: var(--brand-blue); color: white; border-bottom: 5px solid var(--brand-blue-dark); }
+.btn-about { background: #f1f4f8; color: var(--navy-dark); border-bottom: 5px solid #d1d9e6; }
+.btn-signup { background: #f1f4f8; color: var(--navy-dark); border-bottom: 4px solid #d1d9e6; height: 45px; padding: 0 25px; }
+
+.btn-sell:active, .btn-about:active, .btn-signup:active { transform: translateY(3px); border-bottom-width: 0px; }
+
+/* --- CONTENT DIVIDER SECTION --- */
+.content-divider {
+    /* Fine lines matching the category section  */
+    border-top: 1px solid #edf2f7;
+    border-bottom: 1px solid #edf2f7;
+    background-color: #ffffff;
+}
+
+.divider-phrase {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    /* Same dark blue as your main headings  */
+    color: var(--navy-dark); 
+    margin: 0;
+    /* Spacing for a premium look */
+    letter-spacing: 0.5px;
+    /* Removed text-transform: uppercase for a softer tone */
+}
+
+
+/* --- PRODUCT CARDS --- */
+.clay-card {
+    background: #ffffff; border-radius: 24px; border: 1px solid #f1f4f8;
+    overflow: hidden; transition: all 0.3s ease; height: 100%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+.clay-card:hover { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08); }
+
+.img-container { position: relative; aspect-ratio: 1 / 1; background-color: #f8fafc; overflow: hidden; }
+.img-container img { width: 100%; height: 100%; object-fit: cover; }
+
+.favorite-btn {
+    position: absolute; top: 15px; right: 15px;
+    width: 38px; height: 38px; background: rgba(255, 255, 255, 0.9);
+    border: none; border-radius: 50%; display: flex;
+    align-items: center; justify-content: center; color: #cbd5e0; transition: 0.2s;
+}
+.favorite-btn:hover { color: #f56565; transform: scale(1.1); }
+
+.product-details { padding: 20px; text-align: left; }
+.product-details h3 { font-size: 17px; font-weight: 800; margin-bottom: 5px; }
+.product-details .price { color: var(--brand-blue); font-weight: 800; font-size: 19px; }
+
+/* Botón Cargar más (Estilo profesional) */
+.btn-load-more {
+    background: transparent; border: 2px solid var(--brand-blue);
+    color: var(--brand-blue); padding: 12px 45px; border-radius: 50px;
+    font-weight: 800; transition: 0.3s;
+}
+.btn-load-more:hover { background: var(--brand-blue); color: white; }
+
+/* --- HERO EFFECTS --- */
+.hero-glow {
+    position: absolute; top: 50%; left: 50%; transform: translate(-30%, -50%);
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(47, 108, 237, 0.1) 0%, rgba(255,255,255,0) 70%);
+}
+.clay-float { animation: floatingItems 6s infinite ease-in-out; }
+@keyframes floatingItems { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+.footer-divider { border-top: 1px solid #e2e8f0; color: #cbd5e0; font-weight: 700; font-size: 12px; }
+
+/*ABOUT PAGE*/
+/* The single line to differentiate the header */
+.header-border-line {
+    border-bottom: 1px solid #edf2f7 !important;
+}
+
+/* Adjusting hero-wrapper height calculation for the missing sub-nav */
+.about-page .hero-wrapper {
+    min-height: calc(100vh - 85px); /* Matches navbar height */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Enhancing the 3D Illustration size for the About page */
+.about-page .clay-float {
+    max-width: 90%;
+}
+
+/* Subtitle styling to match the brand color requested before */
+.about-page .hero-subtitle {
+    color: var(--brand-blue);
+    font-weight: 700;
+}
+
+/* --- AUTHENTICATION STYLES (ADDITIVE ONLY) --- */
+
+/* Centers the card and gives it a specific width for login */
+.auth-card {
+    width: 100%;
+    max-width: 450px;
+    background: white;
+    z-index: 2;
+}
+
+/* Reusing your search-box style for form inputs */
+.auth-card .search-box {
+    width: 100% !important;
+}
+
+/* Subtitle for the auth form title */
+.auth-page .hero-subtitle {
+    font-size: 0.95rem;
+    opacity: 0.8;
+}
+
+/* Optional soft background glow for the login screen */
+.auth-background {
+    background: radial-gradient(circle at 10% 20%, rgba(47, 108, 237, 0.03) 0%, rgba(255, 255, 255, 1) 90%);
+}
+
+/* Ensure labels match the dark navy theme */
+.form-label {
+    color: var(--navy-dark);
+    margin-left: 10px;
+}
+
+/* Specific adjustment for the header line in auth pages */
+.header-border-line {
+    border-bottom: 1px solid #edf2f7 !important;
+}
+
+/* --- SIGN UP SPECIFIC STYLES --- */
+
+/* Profile picture upload circle */
+.profile-upload-container {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: #f1f4f8;
+    border: 2px dashed #cbd5e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.profile-upload-container:hover {
+    border-color: var(--brand-blue);
+    background: #ffffff;
+    box-shadow: 0 5px 15px rgba(47, 108, 237, 0.1);
+}
+
+.file-input-hidden {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Specific styling for the Auth Card on Sign Up to accommodate more fields */
+.auth-page .auth-card {
+    max-width: 550px; /* Slightly wider for the two-column row */
+}
+
+/* Helper for cursor on labels */
+.cursor-pointer {
+    cursor: pointer;
+}
+/* --- NO FOOTER LAYOUT ADJUSTMENT --- */
+
+/* Ensures the auth container fills the entire screen height without the footer */
+.no-footer-layout {
+    min-height: calc(100vh - 85px); /* Header height only */
+    display: flex;
+    align-items: center;
+    background: radial-gradient(circle at 50% 50%, rgba(47, 108, 237, 0.02) 0%, rgba(255, 255, 255, 1) 100%);
+}
+
+/* Extra focus for the auth title */
+.auth-card h2 {
+    color: var(--navy-dark);
+}
+
+/*USER PAGE*/
+/* --- DASHBOARD NAVIGATION & LAYOUT --- */
+
+.sidebar-stilnovo {
+    width: 280px;
+    background-color: white;
+    border-right: 1px solid var(--border-light);
+    position: sticky;
+    top: 0;
+}
+
+.nav-link-stilnovo {
+    color: var(--navy-dark);
+    font-weight: 700;
+    padding: 12px 18px;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.nav-link-stilnovo:hover, .nav-link-stilnovo.active {
+    background-color: var(--bg-light);
+    color: var(--brand-blue);
+}
+
+.nav-link-stilnovo.active {
+    background-color: #eff5ff;
+}
+
+/* --- PURE CSS CHARTS --- */
+
+.chart-container-css {
+    padding-top: 20px;
+}
+
+.svg-chart {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 10px 10px rgba(47, 108, 237, 0.1));
+}
+
+.bar-chart-css {
+    height: 180px;
+    margin-top: 20px;
+}
+
+.bar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 50px;
+}
+
+.bar-fill {
+    width: 10px;
+    background: var(--brand-blue);
+    border-radius: 20px 20px 0 0;
+    transition: height 1s ease;
+}
+
+.bar-item span {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #a0aec0;
+    text-transform: uppercase;
+}
+
+/* --- TABLE ADJUSTMENTS --- */
+.table thead th {
+    border-top: none;
+    border-bottom: 2px solid var(--border-light);
+    padding-bottom: 15px;
+}
+
+.table tbody td {
+    border-bottom: 1px solid var(--border-light);
+    padding: 18px 0;
+}
+
+/*SETTING*/
+/* --- PREMIUM LIZARD CARD STYLES --- */
+
+.flip-card-container {
+    width: 400px; /* Tamaño más grande para Settings */
+    height: 250px;
+    perspective: 1500px;
+}
+
+.flip-card-lizard {
+    width: 100%;
+    height: 100%;
+}
+
+.flip-card-inner-lizard {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transform-style: preserve-3d;
+    cursor: pointer;
+}
+
+.flip-card-container:hover .flip-card-inner-lizard {
+    transform: rotateY(180deg);
+}
+
+.flip-card-front-lizard, .flip-card-back-lizard {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 25px;
+    padding: 30px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+}
+
+/* --- FRONT: THE "REAL LIFE" LOOK --- */
+.flip-card-front-lizard {
+    background: linear-gradient(135deg, #121212 0%, #1c1c1c 100%);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Patrón sutil de fondo para textura */
+.lizard-bg-pattern {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    opacity: 0.05;
+    background-image: radial-gradient(#ffffff 0.5px, transparent 0.5px);
+    background-size: 10px 10px;
+    pointer-events: none;
+}
+
+.lizard-content { position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
+
+.lizard-logo { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: 2px; font-size: 0.8rem; }
+.filter-white { filter: brightness(0) invert(1); }
+
+.lizard-chip {
+    width: 45px; height: 35px;
+    background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+    border-radius: 8px;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+}
+
+.lizard-user h3 { font-size: 1.5rem; letter-spacing: 2px; margin-top: 15px; text-transform: uppercase; text-align: left; }
+.lizard-id { font-family: 'Courier New', monospace; font-size: 0.9rem; color: #7c3aed; text-align: left; }
+
+.lizard-footer { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; }
+.lizard-valid span { font-size: 0.5rem; display: block; opacity: 0.5; }
+.lizard-valid p { font-size: 0.8rem; margin: 0; font-weight: 700; }
+.lizard-brand-mark { font-size: 0.6rem; font-weight: 800; letter-spacing: 3px; color: var(--brand-blue); }
+
+/* --- BACK SIDE --- */
+.flip-card-back-lizard {
+    background: white;
+    color: #121212;
+    transform: rotateY(180deg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+
+.lizard-back-header { font-size: 0.6rem; font-weight: 800; letter-spacing: 1px; margin-bottom: 20px; opacity: 0.5; }
+.lizard-qr-container { color: var(--navy-dark); }
+.lizard-back-footer { font-size: 0.5rem; margin-top: 20px; font-family: monospace; opacity: 0.4; }
+
+/* --- FORM HELPERS --- */
+#preview-avatar { width: 100%; height: 100%; object-fit: cover; }
+.profile-upload-container { width: 120px; height: 120px; background: white; border: 2px solid var(--border-light); }
+
+/* --- SETTINGS ADJUSTMENTS --- */
+
+.settings-page-container {
+    background-color: #f8fafc;
+    min-height: 100vh;
+}
+
+/* Baja la tarjeta para que se centre mejor con el formulario largo */
+.card-column-adjust {
+    padding-top: 100px; /* Ajusta este valor si quieres que baje más */
+}
+
+/* Tarjeta sin altura fija para que el scroll funcione */
+.settings-card {
+    height: auto !important;
+    min-height: min-content;
+}
+
+/* Danger Zone Minimalista */
+.btn-delete-minimal {
+    background: transparent;
+    color: #a0aec0;
+    border: 1px solid #e2e8f0;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+    width: 100%;
+    text-transform: uppercase;
+}
+
+.btn-delete-minimal:hover {
+    background: #fff5f5;
+    color: #e53e3e;
+    border-color: #feb2b2;
+}
+
+/* El espaciador visual */
+.py-5.my-4 {
+    border: none;
+    background: transparent;
+}
+
+/*HEL CENTER*/
+/* --- SIDEBAR FIX  --- */
+.sidebar-stilnovo {
+    width: 280px !important;      /* Ancho fijo */
+    min-width: 280px !important;  /* Evita que se encoja */
+    flex-shrink: 0;               /* PROPIEDAD CLAVE: No se comprime */
+    height: 100vh;
+    background-color: white;
+    border-right: 1px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+}
+
+/* Para que el contenido principal ocupe el resto del espacio sin empujar */
+.flex-grow-1 {
+    flex-grow: 1;
+    min-width: 0; /* Permite que el contenido interno se ajuste */
+}
+
+/*STATISTICS PAGE*/
+/* --- FIX PARA EL HUECO BLANCO --- */
+.sidebar-stilnovo {
+    width: 280px !important;
+    min-width: 280px !important;
+    flex-shrink: 0;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+}
+
+/* --- DRAGON BUTTON (Inspirado en Uiverse Evil Dragon) --- */
+.dragon-btn {
+    appearance: none;
+    background-color: transparent;
+    border: 0.125em solid #1A365D;
+    border-radius: 0.9375em;
+    box-sizing: border-box;
+    color: #1A365D;
+    cursor: pointer;
+    display: inline-block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 800;
+    line-height: normal;
+    margin: 0;
+    min-height: 3.5em;
+    min-width: 0;
+    outline: none;
+    padding: 1em 1.5em;
+    text-align: center;
+    text-decoration: none;
+    transition: all 300ms cubic-bezier(.23, 1, 0.32, 1);
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    will-change: transform;
+}
+
+.dragon-btn:hover {
+    color: #fff;
+    background-color: #2f6ced;
+    box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
+    transform: translateY(-2px);
+    border-color: #2f6ced;
+}
+
+.dragon-btn:active {
+    box-shadow: none;
+    transform: translateY(0);
+}
+
+/* --- DOUGHNUT CHART CSS --- */
+.doughnut-chart-css {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: conic-gradient(
+        #2f6ced 0% 60%, 
+        #1A365D 60% 85%, 
+        #cbd5e0 85% 100%
+    );
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.doughnut-hole {
+    width: 70px;
+    height: 70px;
+    background-color: white;
+    border-radius: 50%;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+}
+
+/* --- BAR COMPARISON CHART --- */
+.bar-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+.bar-fill.visit {
+    width: 12px;
+    background-color: #cbd5e0;
+    border-radius: 4px 4px 0 0;
+}
+
+.bar-fill.interest {
+    width: 12px;
+    background-color: #2f6ced;
+    border-radius: 4px 4px 0 0;
+}
+
+/*MESSAGE PAGES*/
+/* --- CHAT ELEGANCE REFINEMENTS --- */
+
+/* Sidebar Fija - Evita el encogimiento */
+.sidebar-stilnovo {
+    width: 280px !important;
+    min-width: 280px !important;
+    flex-shrink: 0 !important;
+    border-right: 1px solid #f1f4f8 !important;
+}
+
+/* Inbox list refinement */
+.inbox-item {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f8fafc !important;
+}
+
+.active-chat {
+    background-color: #f4f8ff !important;
+    border-left: 3px solid var(--brand-blue) !important;
+}
+
+/* Chat Bubbles: More elegant */
+.msg-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 65%;
+}
+
+.msg-container.sent {
+    align-self: flex-end;
+}
+
+.msg-bubble {
+    padding: 12px 18px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.msg-bubble.received {
+    background: white;
+    color: var(--navy-dark);
+    border-radius: 18px 18px 18px 4px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    border: 1px solid #f1f4f8;
+}
+
+.msg-bubble.sent {
+    background: var(--brand-blue);
+    color: white;
+    border-radius: 18px 18px 4px 18px;
+    box-shadow: 0 4px 15px rgba(47, 108, 237, 0.15);
+}
+
+.msg-time {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #a0aec0;
+    margin-top: 6px;
+    display: block;
+}
+
+/* Input Area "Fine" */
+.input-wrapper-fine {
+    background: #ffffff;
+    transition: border 0.3s;
+}
+
+.input-wrapper-fine:focus-within {
+    border-color: var(--brand-blue) !important;
+}
+
+.btn-send-fine {
+    background: none;
+    border: none;
+    color: var(--brand-blue);
+    font-size: 1rem;
+    padding: 5px;
+    transition: transform 0.2s;
+}
+
+.btn-send-fine:hover {
+    transform: scale(1.1);
+}
+
+/* Status Dot */
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-dot.online {
+    background-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+/*USER PRODUCTS*/
+/* --- MY PRODUCTS SPECIFIC STYLES --- */
+
+/* Sidebar Fija (Sincronizada con el resto) */
+.sidebar-stilnovo {
+    width: 280px !important;
+    min-width: 280px !important;
+    flex-shrink: 0 !important;
+    border-right: 1px solid #f1f4f8 !important;
+}
+
+/* Efecto hover en las tarjetas de producto */
+.clay-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.clay-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.05) !important;
+}
+
+/* Imagen de previsualización */
+.product-img-preview img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Botones de acción minimalistas */
+.btn-about:hover i {
+    color: var(--brand-blue);
+}
+
+.btn-about.text-danger:hover {
+    background-color: #fff5f5 !important;
+}
+
+/* Ajustes de scroll para móviles en filtros */
+.overflow-auto::-webkit-scrollbar {
+    display: none;
+}
+
+/* --- SALES & ORDERS STYLES --- */
+
+/* Indicadores de estado en los bordes de las tarjetas */
+.border-start-status-success { border-left: 5px solid #10b981 !important; }
+.border-start-status-warning { border-left: 5px solid #f59e0b !important; }
+
+/* LA CAJA VERDE DEL MAPA (Placeholder) */
+.green-map-box {
+    width: 100%;
+    height: 300px;
+    background-color: #f0fdf4; /* Verde muy claro */
+    border: 2px dashed #4caf50;  /* Borde verde punteado */
+    transition: all 0.3s ease;
+}
+
+.green-map-box:hover {
+    background-color: #dcfce7;
+    border-style: solid;
+}
+
+/* Timeline del envío */
+.timeline-simple {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+    padding-left: 10px;
+}
+
+.timeline-item-fine {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.timeline-item-fine i {
+    font-size: 0.9rem;
+    color: var(--brand-blue);
+    margin-top: 4px;
+}
+
+.timeline-item-fine.active i {
+    color: #10b981;
+}
+
+/*ADD PRODUCT*/
+/* --- FIX DEL INPUT DE IMAGEN --- */
+.image-upload-zone {
+    border: 2px dashed #e2e8f0;
+    background: #fbfcfd;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden; /* Evita que el input se salga */
+}
+
+/* Aseguramos que el main siempre tenga espacio para no cortarse */
+main.overflow-auto {
+    height: 100vh;
+    padding-bottom: 120px !important; /* Espacio extra al final */
+}
+
+/* Para que los inputs no hereden estilos raros */
+.search-box input {
+    background: transparent;
+    outline: none !important;
+}
+
+/* Los selects de bootstrap a veces dan problemas de sombra, los limpiamos */
+.form-select:focus {
+    box-shadow: none !important;
+    border-color: #e2e8f0;
+}
+
+/*EDIT PAGE*/
+/* --- FIX DE SCROLL Y SIDEBAR --- */
+
+.sidebar-stilnovo {
+    width: 280px !important;
+    min-width: 280px !important;
+    flex-shrink: 0 !important;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+}
+
+/* Forzar que el main tenga scroll y espacio debajo */
+main.overflow-auto {
+    height: 100vh;
+    padding-bottom: 150px !important; /* Espacio extra muy importante */
+}
+
+/* Fix para los inputs y el clic de imagen */
+.image-upload-zone {
+    cursor: pointer;
+    border: 2px dashed #eee;
+    transition: all 0.3s;
+}
+
+.image-upload-zone:hover {
+    border-color: var(--brand-blue);
+    background: #f4f8ff !important;
+}
+
+.search-box input:focus {
+    outline: none !important;
+}
+
+/*INFO OF PRODUCT*/
+/* --- PRODUCT INFO PAGE STYLES --- */
+
+/* Control de la imagen principal */
+.product-image-frame {
+    height: 550px; /* Altura fija elegante en desktop */
+    background-color: #fbfcfd;
+    border: 1px solid #f1f4f8;
+    box-shadow: 
+        inset 0 0 20px rgba(255,255,255,0.8),
+        0 10px 30px rgba(0,0,0,0.05) !important;
+}
+
+.main-product-image {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain; /* La imagen nunca se deforma */
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1)); /* Sombra realista al objeto */
+}
+
+/* Miniaturas */
+.thumb-frame {
+    transition: all 0.3s ease;
+}
+
+.thumb-frame:hover, .thumb-frame.active {
+    border-color: var(--brand-blue) !important;
+    transform: translateY(-2px);
+    opacity: 1 !important;
+}
+
+/* Botón de Favorito Circular */
+.btn-icon-circle {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-icon-circle:hover {
+    background-color: #fee2e2 !important; /* Rojo claro al pasar el ratón */
+    transform: scale(1.1);
+}
+
+/* Badges de atributos más limpios */
+.badge-attribute {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #4a5568;
+    background-color: #f1f4f8;
+    padding: 8px 12px;
+    border-radius: 50px;
+    border: 1px solid #e2e8f0;
+}
+
+/* Botón outline que se rellena al hover */
+.hover-fill:hover {
+    background-color: var(--brand-blue);
+    color: white !important;
+}
+
+/* Tarjeta del vendedor */
+.seller-card {
+    transition: all 0.3s;
+}
+
+.seller-card:hover {
+    background-color: #fff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    border-color: var(--brand-blue) !important;
+}
+
+/* Efecto de elevación para items sugeridos */
+.transition-up {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.transition-up:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+}
+
+/* Ajuste para móvil: imagen más pequeña */
+@media (max-width: 991px) {
+    .product-image-frame {
+        height: 350px;
+    }
+    .sticky-lg-top {
+        position: static !important; /* Ya no es sticky en móvil */
+    }
+}
+
+/*FAV PAGE*/
+.favorite-btn.active-fav .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    color: #f43f5e; /* Color rojo/rosa de favorito */
+}
+
+/* Por si acaso, reseteamos el botón para que no salgan "pestañas" negras */
+.favorite-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 2;
+}
+
+/*PAYMENT PAGE*/
+.main-wrapper {
+    min-height: calc(100vh - 70px);
+    display: flex;
+    align-items: center;
+}
+
+.navbar {
+    min-height: 70px;
+}
+
+/* Tarjeta de crédito visual (Ancho corregido) */
+.visual-card {
+    background: linear-gradient(135deg, #2f6ced 0%, #1a2a6c 100%);
+    width: 320px; /* AUMENTADO DE 280px A 320px */
+    height: 190px; /* Un poco más alta también para proporción */
+    border-radius: 20px;
+    padding: 25px;
+    color: white;
+    box-shadow: 0 15px 35px rgba(47, 108, 237, 0.4);
+    margin: 0 auto;
+    position: relative;
+    transform: perspective(1000px) rotateY(-10deg);
+    filter: blur(8px);
+    transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+    cursor: pointer;
+}
+
+.visual-card:hover {
+    transform: perspective(1000px) rotateY(0deg) scale(1.02);
+    filter: blur(0);
+    box-shadow: 0 20px 40px rgba(47, 108, 237, 0.5);
+}
+
+.chip {
+    width: 40px;
+    height: 30px;
+    background: linear-gradient(135deg, #ffd700, #b8860b);
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+/* Resto de estilos igual... */
+.alert-oversized {
+    background-color: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+.search-box input:focus {
+    outline: none !important;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 30px;
+}
+
+/*ADMIN CSS*/
+/* ADMIN PANEL */
+.btn-danger-clay {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: none;
+    border-bottom: 3px solid #fca5a5;
+    border-radius: 12px;
+    font-weight: 700;
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.btn-danger-clay:hover {
+    background-color: #fecaca;
+    transform: translateY(1px);
+    border-bottom-width: 2px;
+}
+
+.btn-danger-clay:active {
+    transform: translateY(3px);
+    border-bottom-width: 0px;
+}
+
+/* Badge de estado específico para admin */
+.badge-admin {
+    font-size: 0.75rem;
+    padding: 6px 12px;
+    border-radius: 30px;
+    font-weight: 700;
+}
+
+/* Ajuste de tabla para alinear avatares */
+.table-admin td {
+    vertical-align: middle;
+    padding: 1rem 0.5rem;
+}
+
+/*ADMIN USER MANAGMENT*/
+
+/* Badges de Estado "Clay" */
+.badge-status {
+        padding: 8px 12px;
+        border-radius: 30px;
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+}
+        .status-active { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .status-reported { background-color: #ffedd5; color: #9a3412; border: 1px solid #fed7aa; }
+        .status-banned { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+        /* Botones de Acción Admin */
+        .btn-action-admin {
+            border: none;
+            border-radius: 10px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-edit { background-color: #f1f5f9; color: #475569; }
+        .btn-edit:hover { background-color: #e2e8f0; color: #1e293b; }
+
+        .btn-ban { background-color: #fff7ed; color: #c2410c; }
+        .btn-ban:hover { background-color: #ffedd5; color: #9a3412; }
+
+        .btn-delete { background-color: #fef2f2; color: #ef4444; }
+        .btn-delete:hover { background-color: #fee2e2; color: #dc2626; }
+
+        /* Ajustes de Tabla Admin */
+        .table-admin th {
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #94a3b8;
+            font-weight: 800;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 15px;
+        }
+.table-admin td {
+    vertical-align: middle;
+    padding: 15px 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--navy-dark);
+}
+.user-id-mono {
+    font-family: 'Courier New', monospace;
+    color: #64748b;
+    font-weight: 700;
+}
+
+.pagination .page-link {
+    border: none;
+    color: var(--navy-dark);
+    font-weight: 700;
+    border-radius: 10px;
+    margin: 0 5px;
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+}
+.pagination .page-item.active .page-link {
+    background-color: var(--brand-blue);
+    color: white;
+    box-shadow: 0 4px 10px rgba(47, 108, 237, 0.3);
+}
+
+
+/*ADMIN GLOBAL INVENTORY*/
+/* --- ESTILOS DE INVENTARIO (Claymorphism) --- */
+
+        /* Badges de Categoría */
+        .badge-cat {
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .cat-cars { background-color: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd; }
+        .cat-home { background-color: #fce7f3; color: #be185d; border: 1px solid #fbcfe8; }
+        .cat-tech { background-color: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; }
+        .cat-fashion { background-color: #fef9c3; color: #a16207; border: 1px solid #fde047; }
+
+        /* Badges de Estado del Producto */
+        .status-pill {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .st-active { background-color: #dcfce7; color: #15803d; }
+        .st-sold { background-color: #e2e8f0; color: #64748b; text-decoration: line-through; }
+        .st-pending { background-color: #dbeafe; color: #1d4ed8; }
+
+        /* Botones de Acción */
+        .btn-icon-clay {
+            width: 32px; height: 32px;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 8px;
+            border: none;
+            transition: all 0.2s;
+            margin-right: 4px;
+        }
+        .btn-view { background-color: #f1f5f9; color: #475569; }
+        .btn-view:hover { background-color: #e2e8f0; color: #1e293b; }
+
+        .btn-delete-listing {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fca5a5;
+            border-radius: 8px;
+            font-weight: 700;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+        .btn-delete-listing:hover {
+            background-color: #dc2626;
+            color: white;
+            border-color: #dc2626;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        /* Ajustes de Tabla */
+        .product-img-thumb {
+            width: 50px; height: 50px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid #f1f5f9;
+        }
+        .ref-id {
+            font-family: 'Courier New', monospace;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-weight: 700;
+        }
+/*ADMIN GLOBAL TRANSACTIONS*/
+
+        /* Badges de Estado Financiero */
+        .badge-finance {
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .fin-completed { background-color: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .fin-pending { background-color: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; } /* Escrow */
+        .fin-dispute { background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+        .fin-refunded { background-color: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; text-decoration: line-through; }
+
+        /* Botones de Acción Financiera */
+        .btn-pdf {
+            background-color: #f8fafc;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 6px 10px;
+            transition: all 0.2s;
+        }
+        .btn-pdf:hover { background-color: #e2e8f0; color: #334155; }
+
+        .btn-refund {
+            background-color: #fff1f2;
+            color: #e11d48;
+            border: 1px solid #fda4af;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+        .btn-refund:hover {
+            background-color: #e11d48;
+            color: white;
+            box-shadow: 0 4px 10px rgba(225, 29, 72, 0.3);
+        }
+
+        /* Tipografía de Datos */
+        .trx-id {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: -0.5px;
+        }
+        .amount-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            color: var(--navy-dark);
+        }

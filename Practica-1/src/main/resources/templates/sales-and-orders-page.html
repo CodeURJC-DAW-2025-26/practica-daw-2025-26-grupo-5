@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales & Orders</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+    <div class="d-flex min-vh-100">
+        <aside class="sidebar-stilnovo p-4 d-none d-lg-flex flex-column" style="width: 280px !important; min-width: 280px !important; flex-shrink: 0;">
+            <div class="logo-wrapper mb-5">
+                <a href="index.html" class="text-decoration-none d-flex align-items-center gap-2">
+                    <img src="images/logo.png" alt="Stilnovo" class="logo-img">
+                    <span class="brand">Stilnovo</span>
+                </a>
+            </div>
+            
+            <nav class="nav flex-column gap-1">
+                <a class="nav-link-stilnovo" href="user-page.html"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                <a class="nav-link-stilnovo" href="user-products-page.html"><i class="fa-solid fa-box-open"></i> My Products</a>
+                <a class="nav-link-stilnovo" href="favorite-products-page.html"><i class="fa-solid fa-heart"></i> Favorites</a>
+                <a class="nav-link-stilnovo active" href="#"><i class="fa-solid fa-handshake"></i> Sales & Orders</a>
+                <a class="nav-link-stilnovo" href="statistics-page.html"><i class="fa-solid fa-magnifying-glass-chart"></i> Statistics</a>
+                <a class="nav-link-stilnovo" href="user-setting-page.html"><i class="fa-solid fa-user-gear"></i> Settings</a>
+                <a class="nav-link-stilnovo text-muted" href="help-center-page.html"><i class="fa-solid fa-circle-question"></i> Help Center</a>
+            </nav>
+        
+            <div class="mt-auto pt-4 border-top">
+                <a href="index.html" class="btn-sell w-100 d-flex align-items-center justify-content-center gap-2 text-decoration-none shadow-sm mb-3" style="height: 45px; font-size: 0.9rem;">
+                    <i class="fa-solid fa-shop"></i> Browse Market
+                </a>
+
+                <a href="index.html" class="nav-link-stilnovo logout-link">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-grow-1 p-4 p-md-5 overflow-auto">
+            <header class="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h1 class="fw-800 h2">Sales & Orders</h1>
+                    <p class="text-muted small">Manage your transactions and shipping logistics.</p>
+                </div>
+            
+                <div class="d-flex align-items-center gap-4">
+                    <a href="user-setting-page.html" class="text-decoration-none d-flex align-items-center gap-3 ps-2">
+                        <div class="position-relative">
+                            <img src="images/profile-photo.png" alt="User" class="rounded-circle border border-2 shadow-sm" width="48" height="48" style="object-fit: cover;">
+                            <span class="position-absolute bottom-0 end-0 badge border border-light rounded-circle bg-success p-1" style="width: 12px; height: 12px;"></span>
+                        </div>
+                    </a>
+                </div>
+            </header>
+
+            <div class="row g-4">
+                <div class="col-lg-7">
+                    <div class="d-flex gap-2 mb-4">
+                        <button class="btn btn-sm btn-dark rounded-pill px-3 fw-700">All Orders</button>
+                        <button class="btn btn-sm btn-outline-secondary border-0 bg-white rounded-pill px-3 fw-700">Unshipped</button>
+                        <button class="btn btn-sm btn-outline-secondary border-0 bg-white rounded-pill px-3 fw-700">Completed</button>
+                    </div>
+
+                    <div class="d-flex flex-column gap-3">
+                        <div class="clay-card p-4 border-start-status-success shadow-sm" style="border: 2px solid var(--brand-blue);">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <span class="x-small fw-800 opacity-50">ORDER #ST-9921</span>
+                                    <h5 class="fw-800 mb-0">Eames Lounge Chair</h5>
+                                </div>
+                                <span class="badge rounded-pill bg-success-subtle text-success x-small">Ready to Ship</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="avatar-sm bg-light rounded-circle d-flex align-items-center justify-content-center fw-800 small text-dark" style="width: 35px; height: 35px;">SJ</div>
+                                    <span class="small fw-700">Sarah Jenkins</span>
+                                </div>
+                                <p class="fw-800 mb-0" style="color: var(--brand-blue)">$6,450.00</p>
+                            </div>
+                        </div>
+
+                        <div class="clay-card p-4 border-start-status-warning">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <span class="x-small fw-800 opacity-50">ORDER #ST-9918</span>
+                                    <h5 class="fw-800 mb-0">Arco Floor Lamp</h5>
+                                </div>
+                                <span class="badge rounded-pill bg-secondary-subtle text-secondary x-small">Delivered</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-4">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="avatar-sm bg-light rounded-circle d-flex align-items-center justify-content-center fw-800 small text-dark" style="width: 35px; height: 35px;">MR</div>
+                                    <span class="small fw-700">Michael Ross</span>
+                                </div>
+                                <p class="fw-800 mb-0 opacity-50">$3,200.00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-5">
+                    <div class="clay-card p-4 h-100 d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="fw-800 h5 mb-0">Order Details</h3>
+                            <span class="x-small fw-800 opacity-50">#ST-9921</span>
+                        </div>
+                        
+                        <div class="p-3 bg-light rounded-4 mb-4">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <i class="fa-solid fa-location-dot text-danger opacity-50"></i>
+                                <span class="x-small fw-800 opacity-50">SHIPPING ADDRESS</span>
+                            </div>
+                            <p class="small fw-700 mb-0">Calle de Velázquez, 45, 3ºB</p>
+                            <p class="small fw-600 mb-0 text-muted">28001, Madrid, Spain</p>
+                        </div>
+
+                        <div class="shipping-details mb-4">
+                            <label class="label-categories mb-3">STATUS</label>
+                            <div class="timeline-simple">
+                                <div class="timeline-item-fine active">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    <div>
+                                        <p class="small fw-800 mb-0">Payment Verified</p>
+                                        <p class="x-small opacity-50">Oct 24, 10:30 AM</p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item-fine active">
+                                    <i class="fa-solid fa-box"></i>
+                                    <div>
+                                        <p class="small fw-800 mb-0">Label Created</p>
+                                        <p class="x-small opacity-50">Waiting for drop-off</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-auto pt-4 border-top d-grid gap-3">
+                            <button class="btn-sell w-100 py-3 d-flex align-items-center justify-content-center gap-2">
+                                <i class="fa-solid fa-print fa-lg"></i> Download Shipping Label
+                            </button>
+
+                            <button class="btn-about w-100 py-3 d-flex align-items-center justify-content-center gap-2">
+                                <i class="fa-solid fa-file-invoice fa-lg"></i> Download Invoice
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="py-5"></div>
+        </main>
+    </div>
+
+</body>
+</html>

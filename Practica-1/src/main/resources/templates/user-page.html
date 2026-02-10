@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+    <div class="d-flex min-vh-100">
+        <aside class="sidebar-stilnovo p-4 d-none d-lg-flex flex-column" style="width: 280px !important; min-width: 280px !important; flex-shrink: 0;">
+            <div class="logo-wrapper mb-5">
+                <a href="index.html" class="text-decoration-none d-flex align-items-center gap-2">
+                    <img src="images/logo.png" alt="Stilnovo" class="logo-img">
+                    <span class="brand">Stilnovo</span>
+                </a>
+            </div>
+            
+            <nav class="nav flex-column gap-1">
+                <a class="nav-link-stilnovo active" href="#"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                <a class="nav-link-stilnovo" href="user-products-page.html"><i class="fa-solid fa-box-open"></i> My Products</a>
+                <a class="nav-link-stilnovo" href="favorite-products-page.html"><i class="fa-solid fa-heart"></i> Favorites</a>
+                <a class="nav-link-stilnovo" href="sales-and-orders-page.html"><i class="fa-solid fa-handshake"></i> Sales & Orders</a>
+                <a class="nav-link-stilnovo" href="statistics-page.html"><i class="fa-solid fa-magnifying-glass-chart"></i> Statistics</a>
+                <a class="nav-link-stilnovo" href="user-setting-page.html"><i class="fa-solid fa-user-gear"></i> Settings</a>
+                <a class="nav-link-stilnovo text-muted" href="help-center-page.html"><i class="fa-solid fa-circle-question"></i> Help Center</a>
+            </nav>
+        
+            <div class="mt-auto pt-4 border-top">
+                <a href="index.html" class="btn-sell w-100 d-flex align-items-center justify-content-center gap-2 text-decoration-none shadow-sm mb-3" style="height: 45px; font-size: 0.9rem;">
+                    <i class="fa-solid fa-shop"></i> Browse Market
+                </a>
+
+                <a href="index.html" class="nav-link-stilnovo logout-link">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-grow-1 p-4 p-md-5 overflow-auto">
+            <header class="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h1 class="fw-800 h2">Analytics Overview</h1>
+                    <p class="text-muted small">Tracking your design treasures performance.</p>
+                </div>
+            
+                <div class="d-flex align-items-center gap-4">
+                    <div class="d-flex gap-3 d-none d-md-flex">
+                        <button class="btn-about py-2 px-3 small"><i class="fa-solid fa-calendar-day me-2"></i> Oct 2023</button>
+                        <button class="btn-sell py-2 px-3 small" style="height: auto;"><i class="fa-solid fa-file-export me-2"></i> Export PDF</button>
+                    </div>
+            
+                    <div class="vr opacity-10 d-none d-md-block" style="height: 40px;"></div>
+            
+                    <a href="user-setting-page.html" class="text-decoration-none d-flex align-items-center gap-3 ps-2">
+                        <div class="position-relative">
+                            <img src="images/profile-photo.png" alt="User" class="rounded-circle border border-2 shadow-sm" width="48" height="48" style="object-fit: cover;">
+                            <span class="position-absolute bottom-0 end-0 badge border border-light rounded-circle bg-success p-1" style="width: 12px; height: 12px;"></span>
+                        </div>
+                    </a>
+                </div>
+            </header>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="clay-card p-4">
+                        <p class="label-categories mb-1">TOTAL REVENUE</p>
+                        <h2 class="fw-800" style="color: var(--brand-blue)">$124,500</h2>
+                        <span class="text-success fw-700 small">+12% vs last month</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="clay-card p-4">
+                        <p class="label-categories mb-1">CURRENT BALANCE</p>
+                        <h2 class="fw-800" style="color: var(--navy-dark)">$8,240</h2>
+                        <span class="text-primary fw-700 small">+5% vs last month</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-lg-7">
+                    <div class="clay-card p-4 h-100">
+                        <h3 class="fw-800 h5 mb-4">Monthly Revenue Trend</h3>
+                        <div class="chart-container-css">
+                            <svg viewBox="0 0 500 150" class="svg-chart">
+                                <defs>
+                                    <linearGradient id="gradientBlue" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" style="stop-color:rgba(47, 108, 237, 0.2);stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:rgba(47, 108, 237, 0);stop-opacity:0" />
+                                    </linearGradient>
+                                </defs>
+                                <path d="M0,120 C80,140 150,60 250,80 C350,100 420,40 500,20 L500,150 L0,150 Z" 
+                                      fill="url(#gradientBlue)" />
+                                <path d="M0,120 C80,140 150,60 250,80 C350,100 420,40 500,20" 
+                                      fill="none" stroke="#2f6ced" stroke-width="4" stroke-linecap="round"/>
+                            </svg>
+                            <div class="d-flex justify-content-between mt-3 text-muted x-small fw-700 px-2">
+                                <span>JAN</span><span>MAR</span><span>MAY</span><span>JUL</span><span>SEP</span><span>NOV</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="clay-card p-4 h-100">
+                        <h3 class="fw-800 h5 mb-4">Sales by Category</h3>
+                        <div class="bar-chart-css d-flex align-items-end justify-content-around h-75">
+                            <div class="bar-item"><div class="bar-fill" style="height: 40%"></div><span>FASHION</span></div>
+                            <div class="bar-item"><div class="bar-fill" style="height: 80%"></div><span>HOME</span></div>
+                            <div class="bar-item"><div class="bar-fill" style="height: 30%"></div><span>TECH</span></div>
+                            <div class="bar-item"><div class="bar-fill" style="height: 60%"></div><span>SPORTS</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="clay-card p-4 mb-5">
+                <h3 class="fw-800 h5 mb-4">Recent Activity</h3>
+                <div class="table-responsive">
+                    <table class="table align-middle table-hover">
+                        <thead class="x-small text-muted fw-800 border-light">
+                            <tr>
+                                <th class="pb-3 ps-3">ITEM NAME</th>
+                                <th class="pb-3">DATE</th>
+                                <th class="pb-3">CUSTOMER</th>
+                                <th class="pb-3">AMOUNT</th>
+                                <th class="pb-3 pe-3">STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody class="fw-700 small">
+                            <tr>
+                                <td class="ps-3 py-3">Eames Lounge Chair</td>
+                                <td class="opacity-50">Oct 24, 2023</td>
+                                <td>Sarah Jenkins</td>
+                                <td style="color: var(--brand-blue)">$6,450.00</td>
+                                <td class="pe-3"><span class="badge rounded-pill bg-success-subtle text-success px-3 py-2">Completed</span></td>
+                            </tr>
+                            <tr>
+                                <td class="ps-3 py-3">Arco Floor Lamp</td>
+                                <td class="opacity-50">Oct 22, 2023</td>
+                                <td>Michael Ross</td>
+                                <td style="color: var(--brand-blue)">$3,200.00</td>
+                                <td class="pe-3"><span class="badge rounded-pill bg-primary-subtle text-primary px-3 py-2">Shipped</span></td>
+                            </tr>
+                            <tr>
+                                <td class="ps-3 py-3">Braun SK4 Record Player</td>
+                                <td class="opacity-50">Oct 20, 2023</td>
+                                <td>David Fincher</td>
+                                <td style="color: var(--brand-blue)">$1,850.00</td>
+                                <td class="pe-3"><span class="badge rounded-pill bg-warning-subtle text-warning px-3 py-2">Pending</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>

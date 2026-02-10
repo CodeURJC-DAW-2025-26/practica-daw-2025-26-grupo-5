@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Inventory</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+<body class="bg-light">
+
+    <div class="d-flex min-vh-100">
+        
+        <aside class="sidebar-stilnovo p-4 d-none d-lg-flex flex-column" style="width: 280px !important; min-width: 280px !important; flex-shrink: 0;">
+            <div class="logo-wrapper mb-5">
+                <a href="admin-panel-page.html" class="text-decoration-none d-flex align-items-center gap-2">
+                    <img src="images/logo.png" alt="Stilnovo" class="logo-img">
+                    <span class="brand">Stilnovo</span>
+                    <span class="badge bg-dark text-white x-small ms-1">ADMIN</span>
+                </a>
+            </div>
+            
+            <nav class="nav flex-column gap-1">
+                <a class="nav-link-stilnovo" href="admin-panel-page.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+                <a class="nav-link-stilnovo" href="admin-user-managment-page.html"><i class="fa-solid fa-users-gear"></i> User Management</a>
+                <a class="nav-link-stilnovo active" href="#"><i class="fa-solid fa-box-archive"></i> Global Inventory</a>
+                <a class="nav-link-stilnovo" href="admin-global-transac-page.html"><i class="fa-solid fa-money-bill-transfer"></i> Transactions</a>
+            </nav>
+        
+            <div class="mt-auto pt-4 border-top">
+                <a href="index.html" class="nav-link-stilnovo logout-link text-danger">
+                    <i class="fa-solid fa-power-off"></i> Secure Logout
+                </a>
+            </div>
+        </aside>
+
+        <main class="flex-grow-1 p-4 p-md-5 overflow-auto">
+            
+            <header class="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h1 class="fw-800 h2">Global Inventory</h1>
+                    <p class="text-muted small">Audit, edit, or remove any listing on the platform.</p>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="text-end d-none d-md-block">
+                        <p class="fw-800 mb-0 small text-dark">System Admin</p>
+                        <p class="x-small text-muted mb-0">Superuser Access</p>
+                    </div>
+                    <div class="position-relative">
+                        <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center fw-800 shadow-sm" style="width: 48px; height: 48px;">AD</div>
+                        <span class="position-absolute bottom-0 end-0 badge border border-light rounded-circle bg-success p-1" style="width: 12px; height: 12px;"></span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="row g-3 mb-4">
+                <div class="col-xl-5 col-lg-4">
+                    <div class="search-box w-100 py-2 px-3 bg-white shadow-sm" style="border-radius: 12px;">
+                        <i class="fa-solid fa-magnifying-glass text-muted small"></i>
+                        <input type="text" placeholder="Search product ID or title..." class="border-0 bg-transparent w-100 fw-600 ms-2 small" style="outline: none;">
+                    </div>
+                </div>
+                
+                <div class="col-xl-7 col-lg-8">
+                    <div class="d-flex gap-2">
+                        <div class="search-box w-100 py-2 px-3 bg-white shadow-sm" style="border-radius: 12px;">
+                            <span class="x-small fw-700 text-muted me-2">Category:</span>
+                            <select class="border-0 bg-transparent w-100 fw-700 small text-dark" style="outline: none; cursor: pointer;">
+                                <option value="all">All Categories</option>
+                                <option value="cars">Cars & Vehicles</option>
+                                <option value="home">Home & Decor</option>
+                                <option value="tech">Tech & Audio</option>
+                            </select>
+                        </div>
+
+                        <div class="search-box w-100 py-2 px-3 bg-white shadow-sm" style="border-radius: 12px;">
+                            <span class="x-small fw-700 text-muted me-2">Price:</span>
+                            <select class="border-0 bg-transparent w-100 fw-700 small text-dark" style="outline: none; cursor: pointer;">
+                                <option value="any">Any Price</option>
+                                <option value="low">Under 100€</option>
+                                <option value="high">Over 1,000€</option>
+                            </select>
+                        </div>
+
+                        <div class="search-box w-100 py-2 px-3 bg-white shadow-sm" style="border-radius: 12px;">
+                            <span class="x-small fw-700 text-muted me-2">Status:</span>
+                            <select class="border-0 bg-transparent w-100 fw-700 small text-dark" style="outline: none; cursor: pointer;">
+                                <option value="all">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="sold">Sold</option>
+                                <option value="pending">Pending Review</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="clay-card p-0 overflow-hidden shadow-sm">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light border-bottom">
+                            <tr>
+                                <th class="ps-4 py-3 x-small text-muted fw-800">PRODUCT DETAILS</th>
+                                <th class="py-3 x-small text-muted fw-800">SELLER INFO</th>
+                                <th class="py-3 x-small text-muted fw-800">CATEGORY</th>
+                                <th class="py-3 x-small text-muted fw-800">PRICE</th>
+                                <th class="py-3 x-small text-muted fw-800">STATUS</th>
+                                <th class="text-end pe-4 py-3 x-small text-muted fw-800">ADMIN ACTIONS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                            <tr>
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img src="images/coche.png" class="product-img-thumb bg-white">
+                                        <div>
+                                            <p class="fw-800 text-dark mb-0 small">Audi A3 Sportback</p>
+                                            <p class="ref-id mb-0">#ST-AUD-001</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar-sm bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-800 small" style="width: 30px; height: 30px;">MG</div>
+                                        <div>
+                                            <p class="fw-700 text-dark mb-0 x-small">Mario G.</p>
+                                            <span class="x-small text-warning"><i class="fa-solid fa-star"></i> 4.9</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge-cat cat-cars">Cars</span></td>
+                                <td><span class="fw-800 text-dark small">45.200 €</span></td>
+                                <td><span class="status-pill st-active"><i class="fa-solid fa-circle x-small" style="font-size: 6px;"></i> Active</span></td>
+                                <td class="text-end pe-4">
+                                    <button class="btn-icon-clay btn-view" title="View Listing"><i class="fa-solid fa-eye small"></i></button>
+                                    <button class="btn-icon-clay btn-view" title="Edit Details"><i class="fa-solid fa-pen small"></i></button>
+                                    <button class="btn-delete-listing ms-2"><i class="fa-solid fa-trash me-1"></i> Delete</button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="product-img-thumb bg-light d-flex align-items-center justify-content-center">
+                                            <i class="fa-solid fa-laptop text-muted"></i>
+                                        </div>
+                                        <div>
+                                            <p class="fw-800 text-dark mb-0 small">MacBook Pro M2</p>
+                                            <p class="ref-id mb-0">#ST-TEC-882</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar-sm bg-warning-subtle text-warning rounded-circle d-flex align-items-center justify-content-center fw-800 small" style="width: 30px; height: 30px;">SJ</div>
+                                        <div>
+                                            <p class="fw-700 text-dark mb-0 x-small">Sarah J.</p>
+                                            <span class="x-small text-warning"><i class="fa-solid fa-star"></i> 5.0</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge-cat cat-tech">Tech</span></td>
+                                <td><span class="fw-800 text-dark small">1.200 €</span></td>
+                                <td><span class="status-pill st-pending"><i class="fa-solid fa-clock x-small" style="font-size: 6px;"></i> Review</span></td>
+                                <td class="text-end pe-4">
+                                    <button class="btn-icon-clay btn-view"><i class="fa-solid fa-eye small"></i></button>
+                                    <button class="btn-icon-clay btn-view"><i class="fa-solid fa-pen small"></i></button>
+                                    <button class="btn-delete-listing ms-2"><i class="fa-solid fa-trash me-1"></i> Delete</button>
+                                </td>
+                            </tr>
+
+                            <tr class="opacity-75">
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="product-img-thumb bg-light d-flex align-items-center justify-content-center">
+                                            <i class="fa-solid fa-chair text-muted"></i>
+                                        </div>
+                                        <div>
+                                            <p class="fw-800 text-muted mb-0 small text-decoration-line-through">Eames Chair Original</p>
+                                            <p class="ref-id mb-0">#ST-HOM-104</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar-sm bg-secondary-subtle text-dark rounded-circle d-flex align-items-center justify-content-center fw-800 small" style="width: 30px; height: 30px;">DR</div>
+                                        <div>
+                                            <p class="fw-700 text-muted mb-0 x-small">David R.</p>
+                                            <span class="x-small text-muted"><i class="fa-solid fa-star"></i> 4.5</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge-cat cat-home opacity-50">Home</span></td>
+                                <td><span class="fw-800 text-muted small">850 €</span></td>
+                                <td>

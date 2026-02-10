@@ -1,4 +1,0 @@
-Aqui va todo el codigo de springboot
-- El archivo clave: El pom.xml (que gestiona las dependencias de Java) tiene que estar dentro de la carpeta backend, no en la raíz del proyecto.
-- Código Java: Aquí crearás tus carpetas para los @Controller, @Service y Repository
-- Base de Datos: Usarás MySQL y los datos de ejemplo los cargarás directamente desde el código Java.

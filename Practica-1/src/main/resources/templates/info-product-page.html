@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg bg-white py-3 border-bottom sticky-top shadow-sm px-4">
+        <div class="container-fluid">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+                <img src="images/logo.png" alt="Stilnovo" width="35">
+                <span class="brand" style="font-size: 1.2rem;">Stilnovo</span>
+            </a>
+            
+            <div class="d-flex align-items-center gap-4">
+                <a href="index.html" class="btn-about py-2 px-3 small text-decoration-none fw-700">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Back to Gallery
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+        <div class="row g-5 align-items-start">
+            
+            <div class="col-lg-7">
+                <div class="product-image-frame clay-card p-2 mb-4 bg-white d-flex align-items-center justify-content-center">
+                    <img src="images/coche.png" alt="Producto Principal" class="main-product-image img-fluid rounded-4">
+                </div>
+                
+                <div class="d-flex gap-3 mb-5 justify-content-start">
+                    <div class="thumb-frame active clay-card p-1" style="width: 80px; height: 80px; cursor: pointer;">
+                        <img src="images/coche-2.png" class="img-fluid rounded-3 w-100 h-100" style="object-fit: cover;" alt="view1">
+                    </div>
+                    <div class="thumb-frame opacity-50 border p-1 rounded-3" style="width: 80px; height: 80px; cursor: pointer; transition: all 0.3s;">
+                        <img src="images/coche-3.png" class="img-fluid rounded-2 w-100 h-100" style="object-fit: cover;" alt="view2">
+                    </div>
+                </div>
+
+                <div class="clay-card p-4 bg-white mt-4">
+                    <h4 class="fw-800 h5 mb-4">Technical Specifications</h4>
+                    <div class="row g-3">
+                        <div class="col-6 col-md-4">
+                            <p class="x-small fw-800 text-muted mb-1">BRAND</p>
+                            <p class="small fw-700">Audi</p>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <p class="x-small fw-800 text-muted mb-1">MODEL</p>
+                            <p class="small fw-700">A3 Sportback</p>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <p class="x-small fw-800 text-muted mb-1">YEAR</p>
+                            <p class="small fw-700">2023</p>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <p class="x-small fw-800 text-muted mb-1">FUEL</p>
+                            <p class="small fw-700">Hibrid</p>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <p class="x-small fw-800 text-muted mb-1">TRANSMISION</p>
+                            <p class="small fw-700">Automatic</p>
+                        </div>
+                        <div class="col-6 col-md-4">
+                            <p class="x-small fw-800 text-muted mb-1">POWER</p>
+                            <p class="small fw-700">150 CV</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5 sticky-lg-top" style="top: 100px; z-index: 1;">
+                <div class="clay-card p-4 p-md-5 bg-white shadow-sm">
+                    
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h1 class="fw-800 h3 mb-0 lh-sm">Audi A3 Sportback</h1>
+                        <button class="btn btn-icon-circle bg-light-subtle text-danger shadow-sm border-0" style="width: 45px; height: 45px; border-radius: 50%;">
+                            <i class="fa-regular fa-heart fa-lg"></i>
+                        </button>
+                    </div>
+
+                    <div class="mb-4">
+                        <h2 class="display-5 fw-800 mb-0" style="color: var(--brand-blue)">45.200 €</h2>
+                        <p class="small text-muted fw-700">Ref: ST-8821 • Posted 2 days ago</p>
+                    </div>
+                    
+                    <div class="d-flex flex-wrap gap-2 mb-5">
+                        <span class="badge-attribute"><i class="fa-solid fa-check-circle text-success me-1"></i> Excelent</span>
+                        <span class="badge-attribute"><i class="fa-solid fa-palette me-1 opacity-50"></i> Metallic Gray</span>
+                        <span class="badge-attribute"><i class="fa-solid fa-road me-1 opacity-50"></i> 15.000 km</span>
+                    </div>
+
+                    <div class="d-grid gap-3 mb-5">
+                        <a href="payment-page.html" class="btn-sell py-3 fw-800 shadow-lg rounded-pill d-flex align-items-center justify-content-center gap-2 border-0 text-decoration-none" style="font-size: 1.1rem;">
+                            <i class="fa-solid fa-bag-shopping"></i> Buy Now
+                        </a>
+                        <a href="contact-seller-page.html" class="btn btn-outline-primary py-3 fw-800 rounded-pill border-2 d-flex align-items-center justify-content-center gap-2">
+                            <i class="fa-regular fa-comment-dots fa-lg"></i> Send Message to Seller
+                        </a>
+                    </div>
+
+                    <div class="seller-card p-3 rounded-4 bg-light-subtle border d-flex align-items-center justify-content-between mb-4">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="position-relative">
+                                <img src="images/profile-photo.png" class="rounded-circle border border-white shadow-sm" width="55" height="55" style="object-fit: cover;">
+                                <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-white rounded-circle"></span>
+                            </div>
+                            <div>
+                                <p class="fw-800 mb-0 text-dark">Mario G.</p>
+                                <div class="d-flex align-items-center gap-1 small fw-700 text-muted">
+                                    <i class="fa-solid fa-star text-warning"></i> 4.9 (82 ratings)
+                                </div>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right opacity-25"></i>
+                    </div>
+
+                    <div class="accordion accordion-flush" id="accordionDetails">
+                        <div class="accordion-item bg-transparent">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button bg-transparent fw-800 px-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne">
+                                    Seller Description
+                                </button>
+                            </h2>
+                            <div id="flush-collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionDetails">
+                                <div class="accordion-body px-0 text-muted fw-600 small line-height-lg">
+                                    <p>Unique opportunity! Like-new Audi A3 Sportback. Always garaged, non-smoker. Fully equipped with sunroof and digital cockpit.</p>
+                                    <p class="mb-0"><i class="fa-solid fa-location-dot me-2 opacity-50"></i>Mostoles, Madrid</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <section class="mt-5 pt-5 border-top">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-800 mb-0 h5">You may also like</h4>
+                <a href="index.html" class="small fw-700 text-decoration-none">View All <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-6 col-md-3">
+                    <a href="#" class="text-decoration-none text-dark">
+                        <div class="clay-card p-2 h-100 shadow-sm border-0">
+                            <div class="rounded-3 overflow-hidden mb-3" style="height: 180px; background: #f8fafc;">
+                                <img src="images/movil.png" class="img-fluid w-100 h-100" style="object-fit: cover;" alt="related">
+                            </div>
+                            <div class="px-2 pb-2">
+                                <p class="fw-800 mb-1 text-dark">875€</p>
+                                <p class="x-small text-muted text-truncate fw-600">Iphone 14 pro</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                </div>
+        </section>
+    </main>
+
+    <div class="py-5"></div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

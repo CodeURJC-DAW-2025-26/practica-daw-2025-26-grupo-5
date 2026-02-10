@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Treasure</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+    <div class="d-flex min-vh-100">
+        <aside class="sidebar-stilnovo p-4 d-none d-lg-flex flex-column">
+            <div class="logo-wrapper mb-5">
+                <img src="images/logo.png" alt="Stilnovo" class="logo-img">
+                <span class="brand">Stilnovo</span>
+            </div>
+            <nav class="nav flex-column gap-1">
+                <a class="nav-link-stilnovo" href="user-page.html"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                <a class="nav-link-stilnovo active" href="user-products-page.html"><i class="fa-solid fa-box-open"></i> My Products</a>
+                <a class="nav-link-stilnovo" href="favorite-products-page.html"><i class="fa-solid fa-heart"></i> Favorites</a>
+                <a class="nav-link-stilnovo" href="sales-and-orders-page.html"><i class="fa-solid fa-handshake"></i> Sales & Orders</a>
+                <a class="nav-link-stilnovo" href="statistics-page.html"><i class="fa-solid fa-magnifying-glass-chart"></i> Statistics</a>
+                <a class="nav-link-stilnovo" href="user-setting-page.html"><i class="fa-solid fa-user-gear"></i> Settings</a>
+                <a class="nav-link-stilnovo text-muted" href="help-center-page.html"><i class="fa-solid fa-circle-question"></i> Help Center</a>
+            </nav>
+        </aside>
+
+        <main class="flex-grow-1 p-4 p-md-5 overflow-auto" style="padding-bottom: 100px !important;">
+            <header class="d-flex justify-content-between align-items-center mb-5">
+                <h1 class="fw-800 h2">Create Listing</h1>
+                <a href="user-products-page.html" class="btn-about py-2 px-3 small text-decoration-none border shadow-sm">
+                    <i class="fa-solid fa-xmark me-2"></i>Cancel
+                </a>
+            </header>
+
+            <div class="row justify-content-center">
+                <div class="col-xl-10">
+                    <div class="clay-card p-4 p-md-5">
+                        <form class="row g-5">
+                            
+                            <div class="col-lg-4">
+                                <label class="label-categories mb-3 d-block">PRODUCT VISUALS</label>
+                                <label for="file-upload" class="image-upload-zone rounded-4 d-flex flex-column align-items-center justify-content-center p-4 mb-4">
+                                    <i class="fa-solid fa-camera fa-2x mb-2 opacity-25"></i>
+                                    <p class="x-small fw-800 opacity-50 text-center mb-0">Upload high-res image</p>
+                                    <input type="file" id="file-upload" class="d-none">
+                                </label>
+                                
+                                <div class="p-3 rounded-4 bg-light border">
+                                    <label class="label-categories mb-2 d-block">LISTING STATUS</label>
+                                    <select class="form-select border-0 bg-transparent fw-800 small text-primary p-0">
+                                        <option value="active">● Active (Public)</option>
+                                        <option value="draft">○ Draft (Private)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-8">
+                                <div class="row g-4">
+                                    <div class="col-12">
+                                        <label class="label-categories mb-2 d-block">PRODUCT NAME</label>
+                                        <div class="search-box w-100 py-2 px-3 bg-light-subtle rounded-3">
+                                            <input type="text" placeholder="e.g. 1960s Arco Floor Lamp" class="w-100 border-0 fw-600 bg-transparent">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="label-categories mb-2 d-block">CATEGORY</label>
+                                        <select class="form-select border-0 bg-light-subtle py-2 fw-700 small rounded-3 shadow-none">
+                                            <option selected disabled>Choose type</option>
+                                            <option>Furniture</option>
+                                            <option>Lighting</option>
+                                            <option>Art</option>
+                                            <option>Fashion</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label class="label-categories mb-2 d-block">PRICE (EUR)</label>
+                                        <div class="search-box w-100 py-2 px-3 bg-light-subtle rounded-3 d-flex align-items-center">
+                                            <span class="me-2 fw-800 opacity-25">€</span>
+                                            <input type="number" placeholder="0.00" class="w-100 border-0 fw-700 bg-transparent">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <label class="label-categories mb-2 d-block">DESCRIPTION</label>
+                                        <textarea class="form-control border-0 bg-light-subtle p-3 fw-600 small rounded-4 shadow-none" rows="4" placeholder="Detailed specifications..."></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="mt-5">
+                                    <button type="submit" class="btn-sell w-100 py-3 shadow-lg justify-content-center rounded-4 border-0">
+                                        <i class="fa-solid fa-plus-circle me-2"></i>Create Product Entry
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+</body>
+</html>
