@@ -31,33 +31,54 @@ public class WebSecurityConfig {
 	}
 
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-		http.authenticationProvider(authenticationProvider());
+        http.authenticationProvider(authenticationProvider());
 
-		http
-				.authorizeHttpRequests(authorize -> authorize
-						// PUBLIC PAGES
-						.requestMatchers("/").permitAll()
-						.requestMatchers("/images/**").permitAll()
-						.requestMatchers("/books/**").permitAll()
-						.requestMatchers("/assets/**").permitAll() // Allow access to static resources
-						.requestMatchers("/favicon.ico").permitAll()
-						// PRIVATE PAGES
-						.requestMatchers("/newbook").hasAnyRole("USER")
-						.requestMatchers("/editbook").hasAnyRole("USER")
-						.requestMatchers("/editbook/*").hasAnyRole("USER")
-						.requestMatchers("/removebook/*").hasAnyRole("ADMIN"))
-				.formLogin(formLogin -> formLogin
-						.loginPage("/login")
-						.failureUrl("/loginerror")
-						.defaultSuccessUrl("/")
-						.permitAll())
-				.logout(logout -> logout
-						.logoutUrl("/logout")
-						.logoutSuccessUrl("/")
-						.permitAll());
+        http
+            .authorizeHttpRequests(authorize -> authorize
+                // PUBLIC PAGES: Essential for the index to load correctly
+                .requestMatchers("/", "/error").permitAll() 
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/favicon.ico").permitAll()
+                
+                // AUTHENTICATION PAGES: Login and Signup flows
+                .requestMatchers("/login-page", "/login-error-page").permitAll()
+                .requestMatchers("/signup-page", "/signup-error-page").permitAll()
+                
+				.requestMatchers("/product-images/**").permitAll()
+                // PRODUCT VIEWS: Public access to the marketplace and details
+                .requestMatchers("/info-product-page/**").permitAll()
+                .requestMatchers("/about-page/**").permitAll()
 
-		return http.build();
-	}
+                // PRIVATE PAGES: Restricted to registered users or admins
+				.requestMatchers("/payment-page/**").hasAnyRole("USER", "ADMIN")
+				.requestMatchers("/contact-seller-page/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/add-product-page/**").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/edit-product-page/**").hasAnyRole("USER", "ADMIN")
+				.requestMatchers("/sales-and-orders-page/**").hasAnyRole("USER", "ADMIN")
+				.requestMatchers("/statistics-page/**").hasAnyRole("USER", "ADMIN")
+				.requestMatchers("/user-page/**").hasAnyRole("USER", "ADMIN")
+				.requestMatchers("/user-products-page/**").hasAnyRole("USER", "ADMIN")
+				.requestMatchers("/user-setting-page/**").hasAnyRole("USER", "ADMIN")
+				.requestMatchers("/favorite-products-page/**").hasAnyRole("USER", "ADMIN")
+				.requestMatchers("/help-center-page/**").hasAnyRole("USER", "ADMIN")
+				.requestMatchers("/admin-panel-page/**").hasAnyRole("USER", "ADMIN")
+				.requestMatchers("/admin-global-invent-page/**").hasAnyRole("USER", "ADMIN")
+				.requestMatchers("/admin-global-transac-page/**").hasAnyRole("USER", "ADMIN")
+				.requestMatchers("/admin-user-managment-page/**").hasAnyRole("USER", "ADMIN")
+				
+                .anyRequest().authenticated()
+            )
+            .formLogin(formLogin -> formLogin
+                .loginPage("/login-page")
+                .failureUrl("/login-error-page")
+                .defaultSuccessUrl("/")
+                .permitAll())
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/")
+                .permitAll());
+
+        return http.build();
+    }
 }

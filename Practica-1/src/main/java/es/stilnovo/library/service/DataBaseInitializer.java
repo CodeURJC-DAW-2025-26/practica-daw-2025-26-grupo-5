@@ -1,9 +1,7 @@
-package main.java.es.stilnovo.library.service;
+package es.stilnovo.library.service;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,80 +10,82 @@ import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import es.codeurjc.daw.library.model.Book;
-import es.codeurjc.daw.library.model.Image;
-import es.codeurjc.daw.library.model.Shop;
-import es.codeurjc.daw.library.model.User;
-import es.codeurjc.daw.library.repository.UserRepository;
+import es.stilnovo.library.model.Image;
+import es.stilnovo.library.model.Product;
+import es.stilnovo.library.model.User;
+import es.stilnovo.library.repository.UserRepository;
 
 @Service
-public class DatabaseInitializer {
+public class DataBaseInitializer {
 
-	@Autowired
-	private BookService bookService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-	@Autowired
-	private ShopService shopService;
+    @Autowired
+    private ProductService productService; 
 
-	@Autowired
-	private ImageService imageService;
+    @Autowired 
+    private UserRepository userRepository;
 
-	@Autowired
-	private UserRepository userRepository;
+    @Autowired
+    private ImageService imageService;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+    /**
+     * Helper method to load an image from the classpath, convert it into a Blob 
+     * via ImageService, and associate the resulting entity with a product.
+     */
+    private void setProductImage(Product product, String classpathResource) throws IOException {
+        // Locate the physical file within the sample-images folder in resources
+        Resource imageRes = new ClassPathResource("sample-images/images/" + classpathResource);
+    
+        // ImageService handles the conversion to Blob and persists it in the 'image' table
+        Image createdImage = imageService.createImage(imageRes.getInputStream());
+    
+        // Link the persistent Image entity to the product's internal list
+        product.addImagen(createdImage);
+    }   
 
-	@PostConstruct
-	public void init() throws IOException, URISyntaxException {
+    @PostConstruct
+    public void init() throws IOException, URISyntaxException {
 
-		// Sample Shops
-		Shop shop1 = new Shop("Casa del libro", "C/ Falsa 123");
-		Shop shop2 = new Shop("FNAC", "C/ Falsa 456");
-		Shop shop3 = new Shop("Librería de la plaza", "C/ Falsa 012");
+        // 1. Define sample products for the Stilnovo marketplace
+        Product product1 = new Product("Audi A3 Sporback", "cars", 42500, "Excellent condition, S-Line edition.", "active");
+        Product product2 = new Product("iPhone 17 Pro", "tech", 1399, "Latest Apple smartphone with advanced AI features", "active");
+        Product product3 = new Product("Dell XPS 15 Laptop", "tech", 1899, "High-performance Dell laptop with 4K display", "active");
+        Product product4 = new Product("Leather Winter Coat", "fashion", 349, "Premium black leather coat for winter season", "active");
+        Product product5 = new Product("White Dining Table", "home", 499, "Modern white table made of solid wood", "active");
+        Product product6 = new Product("Modern LED Lamp", "home", 89, "Minimalist LED lamp with adjustable brightness", "active");
+        Product product7 = new Product("Lexus RX 500h", "cars", 68500, "Luxury hybrid SUV with advanced safety features", "active");
+        Product product8 = new Product("Italian Moka Coffee Maker", "home", 45, "Classic Italian stovetop coffee maker", "active");
+        Product product9 = new Product("BMW M3 Competition", "cars", 96500, "High-performance sports sedan with twin-turbo engine", "active");
+        Product product10 = new Product("Adidas", "fashion", 99, "A perfect shoes for daily use", "active");
+        
+        // 2. Associate specific images from /resources/sample-images/images/
+        setProductImage(product1, "Audi-a3-1.png");
+        setProductImage(product2, "Iphone-17-1.png");
+        setProductImage(product3, "ordenador-dell-1.png");
+        setProductImage(product4, "Abrigo-1.png");
+        setProductImage(product5, "Mesa-Blanca-1.png");
+        setProductImage(product6, "lampara-paja-1.png");
+        setProductImage(product7, "lexus-1.png");
+        setProductImage(product8, "cafetera-1.png");
+        setProductImage(product9, "bmw-1.png");
+        setProductImage(product10, "adidas-1.png");
 
-		shopService.save(shop1);
-		shopService.save(shop2);
-		shopService.save(shop3);
+        // 3. Persist all products into the MySQL database (Docker)
+        productService.save(product1);
+        productService.save(product2);
+        productService.save(product3);
+        productService.save(product4);
+        productService.save(product5);
+        productService.save(product6);
+        productService.save(product7);
+        productService.save(product8);
+        productService.save(product9);
+        productService.save(product10);
 
-		// Sample books
-
-		Book book1 = new Book("SUEÑOS DE ACERO Y NEON",
-				"Los personajes que protagonizan este relato sobreviven en una sociedad en decadencia a la que, no obstante, lograrán devolver la posibilidad de un futuro. Año 2484. En un mundo dominado por las grandes corporaciones, solo un hombre, Jordi Thompson, detective privado deslenguado y vividor, pero de gran talento y sentido d...",
-				new ArrayList<>(Arrays.asList(shop1, shop2)));
-
-		setBookImage(book1, "/sample_images/tus_zonas_erroneas.jpg");
-		bookService.save(book1);
-
-		Book book2 = new Book("LA VIDA SECRETA DE LA MENTE",
-				"La vida secreta de la mentees un viaje especular que recorre el cerebro y el pensamiento: se trata de descubrir nuestra mente para entendernos hasta en los más pequeños rincones que componen lo que somos, cómo forjamos las ideas en los primeros días de vida, cómo damos forma a las decisiones que nos constituyen, cómo soñamos y cómo imaginamos, por qué sentimos ciertas emociones hacia los demás, cómo los demás influyen en nosotros, y cómo el cerebro se transforma y, con él, lo que somos.",
-				new ArrayList<>(Arrays.asList(shop2)));
-
-		setBookImage(book2, "/sample_images/la_vida_secreta_de_la_mente.jpg");
-		bookService.save(book2);
-
-		bookService.save(new Book("CASI SIN QUERER",
-				"El amor algunas veces es tan complicado como impredecible. Pero al final lo que más valoramos son los detalles más simples, los más bonitos, los que llegan sin avisar. Y a la hora de escribir sobre sentimientos, no hay nada más limpio que hacerlo desde el corazón. Y eso hace Defreds en este libro.",
-				new ArrayList<>(Arrays.asList(shop1))));
-
-		bookService.save(new Book("TERMINAMOS Y OTROS POEMAS SIN TERMINAR",
-				"Recopilación de nuevos poemas, textos en prosa y pensamientos del autor. Un sabio dijo una vez: «Pocas cosas hipnotizan tanto en este mundo como una llama y como la luna, será porque no podemos cogerlas o porque nos iluminan en la penumbra». Realmente no sé si alguien dijo esta cita o me la acabo de inventar pero deberían de haberla escrito porque el poder hipnótico que ejercen esa mujer de rojo y esa dama blanca sobre el ser humano es digna de estudio.",
-				new ArrayList<>(Arrays.asList(shop2))));
-
-		bookService.save(new Book("LA LEGIÓN PERDIDA",
-				"En el año 53 a. C. el cónsul Craso cruzó el Éufrates para conquistar Oriente, pero su ejército fue destrozado en Carrhae. Una legión entera cayó prisionera de los partos. Nadie sabe a ciencia cierta qué pasó con aquella legión perdida.150 años después, Trajano está a punto de volver a cruzar el Éufrates. ...",
-				new ArrayList<>(Arrays.asList(shop1, shop2))));
-
-		// Sample users
-
-		userRepository.save(new User("user", passwordEncoder.encode("pass"), "USER"));
-		userRepository.save(new User("admin", passwordEncoder.encode("adminpass"), "USER", "ADMIN"));
-	}
-
-	public void setBookImage(Book book, String classpathResource) throws IOException {
-		Resource image = new ClassPathResource(classpathResource);
-
-		Image createdImage = imageService.createImage(image.getInputStream());
-		book.setImage(createdImage);
-	}
+        // 4. Initialize sample users with encrypted passwords and roles
+        userRepository.save(new User("user", passwordEncoder.encode("user"), "USER"));
+        userRepository.save(new User("admin", passwordEncoder.encode("admin"), "USER", "ADMIN"));
+    }
 }

@@ -9,20 +9,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/css/style.css">
+
 </head>
 <body class="auth-page">
 
     <header class="navbar container-fluid px-lg-5 py-3 header-border-line">
         <div class="logo-wrapper">
-            <a href="index.html" class="text-decoration-none d-flex align-items-center gap-2">
+            <a href="/" class="text-decoration-none d-flex align-items-center gap-2">
                 <img src="images/logo.png" alt="Stilnovo" class="logo-img">
                 <span class="brand">Stilnovo</span>
             </a>
         </div>
         <nav class="nav-actions">
             <span class="text-muted d-none d-sm-inline">Don't have an account?</span>
-            <a href="signup-page.html" class="link-login ms-2">Sign up</a>
+            <a href="/signup-page" class="link-login ms-2">Sign up</a>
         </nav>
     </header>
 
@@ -34,43 +35,48 @@
                     <p class="hero-subtitle">Log in to your treasure chest</p>
                 </div>
 
-                <form>
+                <!--LOGIN FORM-->
+                <form action="/login" method="post">
+
+                    <!--NAME INPUT-->
                     <div class="mb-4">
-                        <label class="form-label fw-700 small">Username or Email</label>
+                        <label class="form-label fw-700 small">Username</label>
                         <div class="search-box w-100 py-2">
                             <i class="fa-solid fa-user small"></i>
-                            <input type="text" placeholder="Enter your username" required>
+                            <input type="text" name="username" placeholder="Enter your username" required>
                         </div>
                     </div>
 
+                    <!--PASSWORD INPUT-->
                     <div class="mb-5">
                         <label class="form-label fw-700 small">Password</label>
                         <div class="search-box w-100 py-2">
                             <i class="fa-solid fa-lock small"></i>
-                            <input type="password" placeholder="Enter your password" required>
-                        </div>
-                        <div class="text-end mt-2">
-                            <a href="#" class="link-login small fw-700">Forgot password?</a>
+                            <input type="password" name="password" placeholder="Enter your password" required>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-sell w-100 justify-content-center mb-4">
-                        Login to My Account
-                    </button>
+                    <!--LOGIN BUTTON-->
+                    <button type="submit" class="btn-sell w-100 justify-content-center mb-4">Login to My Account</button>
+                    
+                    <!--Adds the hidden CSRF token to prevent cross-site request forgery attacks-->
+                    <input type="hidden" name="_csrf" value="{{token}}" />
 
                     <div class="text-center">
-                        <a href="index.html" class="text-muted small text-decoration-none fw-700">
+                        <a href="/" class="text-muted small text-decoration-none fw-700">
                             <i class="fa-solid fa-arrow-left me-2"></i>Back to Marketplace
                         </a>
                     </div>
                 </form>
+                <!--END OF LOGIN FORM-->
+
             </div>
         </main>
     </div>
 
-    <footer class="footer-divider container-fluid py-5 text-center">
-        <span>© STILNOVO 2026 - ALL RIGHTS RESERVED</span>
-    </footer>
+
+    {{>footer}}
+
 
 </body>
 </html>
