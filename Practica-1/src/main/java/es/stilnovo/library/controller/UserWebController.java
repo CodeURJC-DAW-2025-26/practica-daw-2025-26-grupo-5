@@ -1,5 +1,6 @@
 package es.stilnovo.library.controller;
 
+import java.security.Principal;
 import java.sql.SQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -10,8 +11,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import org.springframework.ui.Model;
 import es.stilnovo.library.model.User;
 import es.stilnovo.library.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 public class UserWebController {
@@ -42,5 +45,23 @@ public class UserWebController {
         
         // Return a 404 Not Found if the user exists but has no image
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/user-page/{id}")
+    public String showUserPage(Model model, @PathVariable long id, HttpServletRequest request) {
+    
+        // 1. Buscamos al usuario por su ID
+        User user = userRepository.findById(id).orElseThrow();
+    
+        // 2. Pasamos los datos del usuario a la plantilla user-page.html
+        model.addAttribute("user", user);
+    
+        // 3. Comprobamos si el que mira la página es el dueño del perfil
+        Principal principal = request.getUserPrincipal();
+        if (principal != null && principal.getName().equals(user.getName())) {
+        model.addAttribute("isOwner", true);
+        }
+
+        return "user-page"; 
     }
 }
