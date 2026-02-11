@@ -63,10 +63,8 @@ public class WebSecurityConfig {
 				.requestMatchers("/user-setting-page/**").hasAnyRole("USER", "ADMIN")
 				.requestMatchers("/favorite-products-page/**").hasAnyRole("USER", "ADMIN")
 				.requestMatchers("/help-center-page/**").hasAnyRole("USER", "ADMIN")
-				.requestMatchers("/admin-panel-page/**").hasAnyRole("USER", "ADMIN")
-				.requestMatchers("/admin-global-invent-page/**").hasAnyRole("USER", "ADMIN")
-				.requestMatchers("/admin-global-transac-page/**").hasAnyRole("USER", "ADMIN")
-				.requestMatchers("/admin-user-managment-page/**").hasAnyRole("USER", "ADMIN")
+				.requestMatchers("/admin/**").hasRole("ADMIN") //fix admin access
+
 				
                 .anyRequest().authenticated()
             )
