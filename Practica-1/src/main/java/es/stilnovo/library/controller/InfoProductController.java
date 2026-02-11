@@ -17,8 +17,8 @@ public class InfoProductController {
     private ProductService productService;
 
     @GetMapping("/info-product-page/{id}")
-public String showProduct(Model model, @PathVariable Long id) {
-    Optional<Product> product = productService.findById(id);
+    public String showProduct(Model model, @PathVariable Long id) {
+        Optional<Product> product = productService.findById(id);
 
         if (product.isPresent()) {
             Product p = product.get();

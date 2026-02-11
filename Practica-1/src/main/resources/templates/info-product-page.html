@@ -92,23 +92,30 @@
                         </a>
                     </div>
 
-                    {{#seller}}
-                    <div class="seller-card p-3 rounded-4 bg-light-subtle border d-flex align-items-center justify-content-between mb-4">
-                        <div class="d-flex align-items-center gap-3">
-                            <div class="position-relative">
-                                <img src="/user/{{id}}/profile-photo" class="rounded-circle border border-white shadow-sm" width="55" height="55" style="object-fit: cover;">
-                                <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-white rounded-circle"></span>
-                            </div>
-                            <div>
-                                <p class="fw-800 mb-0 text-dark">{{name}}</p>
-                                <div class="d-flex align-items-center gap-1 small fw-700 text-muted">
-                                    <i class="fa-solid fa-star text-warning"></i> {{rating}} (82 ratings)
-                                </div>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right opacity-25"></i>
+        <!--SELLER PROFILE ACCESS (ONLY FOR REGIS. USERS)-->
+        {{#seller}}
+        <a href="/seller-profile/{{userId}}" class="text-decoration-none">
+            <div class="seller-card p-3 rounded-4 bg-light-subtle border d-flex align-items-center justify-content-between mb-4 shadow-sm hover-card">
+                <div class="d-flex align-items-center gap-3">
+                <div class="position-relative">
+                        <img src="/user/{{userId}}/profile-photo" 
+                            class="rounded-circle border border-white shadow-sm" 
+                            width="55" height="55" 
+                            style="object-fit: cover;"
+                            onerror="this.src='/images/no-profile-picture.png'">
+                        <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-white rounded-circle"></span>
                     </div>
-                    {{/seller}}
+                    <div>
+                        <p class="fw-800 mb-0 text-dark">{{name}}</p>
+                        <div class="d-flex align-items-center gap-1 small fw-700 text-muted">
+                            <i class="fa-solid fa-star text-warning"></i> {{rating}} (82 ratings)
+                        </div>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right opacity-25 text-dark"></i>
+            </div>
+        </a>
+        {{/seller}}
 
                     <div class="accordion accordion-flush" id="accordionDetails">
                         <div class="accordion-item bg-transparent">

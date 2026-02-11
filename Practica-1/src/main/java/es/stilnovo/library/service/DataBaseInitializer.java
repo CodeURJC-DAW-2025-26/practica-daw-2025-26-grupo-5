@@ -58,8 +58,8 @@ public class DataBaseInitializer {
         Blob photoAdminBlob = BlobProxy.generateProxy(defaultAdminImage.getInputStream(), defaultAdminImage.contentLength());
 
         // 1. Initialize sample users with encrypted passwords and roles
-        User user = new User("user", passwordEncoder.encode("user"), "user@stilnovo.es", photoUserBlob, 4.7,"USER");
-        User admin = new User("admin", passwordEncoder.encode("admin"), "admin@stilnovo.es", photoAdminBlob, 5.0,"USER", "ADMIN");
+        User user = new User("user", passwordEncoder.encode("user"), "user@stilnovo.es", photoUserBlob, 4.7,"ROLE_USER");
+        User admin = new User("admin", passwordEncoder.encode("admin"), "admin@stilnovo.es", photoAdminBlob, 5.0,"ROLE_USER", "ROLE_ADMIN");
 
         userRepository.save(user);
         userRepository.save(admin);
@@ -69,7 +69,7 @@ public class DataBaseInitializer {
         Product product2 = new Product("iPhone 17 Pro", "tech", 1399, "The latest Apple smartphone, equipped with advanced AI-powered features, a next-generation professional camera system, and outstanding performance for everyday and professional use.", "active", user, "Mostoles, Madrid");
         Product product3 = new Product("Dell XPS 15 Laptop", "tech", 1899, "High-performance Dell XPS 15 laptop with a stunning 4K display, elegant design, and powerful hardware ideal for demanding tasks such as editing, development, and creative work.", "active", user, "Mostoles, Madrid");
         Product product4 = new Product("Leather Winter Coat", "fashion", 349, "Premium black leather winter coat designed to deliver elegance, durability, and excellent protection against cold weather during the winter season.", "active", user, "Mostoles, Madrid");
-        Product product5 = new Product("White Dining Table", "home", 499, "Modern white dining table made of solid wood, combining durability and style, perfect for adding brightness and sophistication to any dining space.", "active", user, "Mostoles, Madrid");
+        Product product5 = new Product("White Dining Table", "home", 499, "Modern white dining table made of solid wood, combining durability and style, perfect for adding brightness and sophistication to any dining space.", "active", admin, "Mostoles, Madrid");
         Product product6 = new Product("Modern LED Lamp", "home", 89, "Modern minimalist LED lamp with adjustable brightness, ideal for creating a comfortable and functional atmosphere in living or working spaces.", "active", user, "Mostoles, Madrid");
         Product product7 = new Product("Lexus RX 500h", "cars", 68500, "Luxury Lexus RX 500h hybrid SUV featuring advanced technology, premium materials, exceptional comfort, and state-of-the-art safety systems.", "active", user, "Mostoles, Madrid");
         Product product8 = new Product("Italian Moka Coffee Maker", "home", 45, "Classic Italian stovetop moka coffee maker, crafted for rich and authentic espresso-style coffee, combining traditional design with reliable performance.", "active", user, "Mostoles, Madrid");

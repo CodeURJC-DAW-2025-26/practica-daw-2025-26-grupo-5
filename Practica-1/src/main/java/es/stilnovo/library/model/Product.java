@@ -29,7 +29,7 @@ public class Product {
     private List<Image> images = new ArrayList<>();
 
     @ManyToOne
-    private User seller; // El dueño del producto
+    private User seller; // product owner
 
 
     public Product() {}

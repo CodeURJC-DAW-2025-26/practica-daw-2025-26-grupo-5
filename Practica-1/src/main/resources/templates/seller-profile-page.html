@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{seller.name}} | Seller</title>
+    <link rel="icon" type="image/png" href="/images/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css"> 
+
+</head>
+
+<body class="bg-light d-flex flex-column min-vh-100">
+
+    <header class="navbar container-fluid px-lg-5 py-3 sticky-top bg-white header-border-line">
+        <div class="logo-wrapper">
+            <a href="/" class="text-decoration-none d-flex align-items-center gap-2">
+                <img src="/images/logo.png" alt="Stilnovo" class="logo-img" width="35">
+                <span class="brand" style="font-size: 1.3rem;">Stilnovo</span>
+            </a>
+        </div>
+        
+        <nav class="nav-actions d-flex align-items-center gap-3">
+            {{#logged}}
+            <div class="dropdown">
+                <div class="d-flex align-items-center gap-3 cursor-pointer" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
+                    <div class="text-end d-none d-lg-block">
+                        <p class="mb-0 small fw-800 lh-1 text-dark">{{username}}</p>
+                        <p class="mb-0 x-small fw-700 text-muted lh-1 mt-1">My Account <i class="fa-solid fa-chevron-down ms-1" style="font-size: 0.6rem;"></i></p>
+                    </div>
+                    <div class="position-relative">
+                        <img src="/user/{{userId}}/profile-photo" 
+                            class="rounded-circle border border-2 border-white shadow-sm" 
+                            width="42" height="42" style="object-fit: cover;"
+                            onerror="this.src='/images/profile-photo.png'">
+                        <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-2 border-white rounded-circle"></span>
+                    </div>
+                </div>
+                <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2 mt-3 animate slideIn">
+                    <li><a class="dropdown-item rounded-3 py-2 fw-700 small" href="/user-page/{{userId}}"><i class="fa-regular  me-2 opacity-50"></i>View Profile</a></li>
+                    <li><a class="dropdown-item rounded-3 py-2 fw-700 small" href="/user-products-page/{{userId}}"><i class="fa-solid  me-2 opacity-50"></i>My Inventory</a></li>
+                    <li><hr class="dropdown-divider opacity-50"></li>
+                    <li>
+                        <form action="/logout" method="post" class="m-0">
+                            <input type="hidden" name="_csrf" value="{{token}}"/>
+                            <button type="submit" class="dropdown-item rounded-3 py-2 fw-700 small text-danger border-0 bg-transparent w-100 text-start">
+                                <i class="fa-solid  me-2"></i>Log out
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+            {{/logged}}
+    
+            {{^logged}}
+            <div class="d-flex align-items-center gap-2">
+                <a href="/login-page" class="link-login">Log in</a>
+                <a href="/signup-page" class="btn-signup">Sign up</a>
+            </div>
+            {{/logged}}
+        </nav>
+    </header>
+
+    <main class="flex-grow-1">
+        
+        <div class="container pt-5 pb-4">
+            <div class="seller-hero-card p-4 p-md-5 shadow-sm">
+                <div class="row align-items-center g-4">
+                    <div class="col-md-auto text-center text-md-start">
+                        <img src="/user/{{seller.userId}}/profile-photo" alt="{{seller.name}}" 
+                                class="rounded-circle border border-4 border-white shadow-sm" 
+                                width="125" height="125" style="object-fit: cover;"
+                                onerror="this.src='/images/no-profile-picture.png'">
+                    </div>
+                    <div class="col-md text-center text-md-start">
+                        <span class="x-small fw-800 text-uppercase text-muted mb-1 d-block">Verified Seller</span>
+                        <h1 class="fw-800 display-6 mb-3 text-dark">{{seller.name}}</h1>
+                        <div class="d-flex align-items-center justify-content-center justify-content-md-start gap-3">
+                            <div class="stat-pill"><span class="fw-800 text-primary">{{seller.rating}}</span> <span class="x-small fw-700 text-muted ms-1">SCORE</span></div>
+                            <div class="stat-pill"><span class="fw-800 text-primary">82</span> <span class="x-small fw-700 text-muted ms-1">REVIEWS</span></div>
+                        </div>
+                    </div>
+                    <div class="col-md-auto text-center">
+                        <a href="#" class="btn-sell py-3 px-5 fw-800 shadow-lg rounded-pill border-0 text-decoration-none d-inline-block text-white" style="background-color: var(--brand-blue);">
+                            Contact Seller
+                        </a>
+                    </div>
+                </div>
+                <div class="seller-bio-container">
+                    <span class="x-small fw-800 text-uppercase text-muted mb-2 d-block">Seller's Note</span>
+                    <p class="seller-bio-text mb-0">"Collector and enthusiast of 20th-century design. Authentic treasures for a new chapter."</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-divider-container my-4">
+            <div class="container">
+                <nav class="nav nav-stilnovo-tabs" id="sellerTabNav">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#items-pane">
+                        {{itemsCount}} Items for Sale
+                    </button>
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#reviews-pane">
+                        Latest Reviews
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <div class="tab-content container py-4">
+            
+            <div class="tab-pane fade show active" id="items-pane">
+                <div class="row g-4">
+                    {{#sellerProducts}}
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <a href="/info-product-page/{{id}}" class="text-decoration-none text-dark">
+                            <div class="clay-card p-2 h-100 shadow-sm border-0 bg-white">
+                                <div class="rounded-3 overflow-hidden mb-3" style="height: 180px; background: #f1f5f9;">
+                                    <img src="/product-images/{{images.0.id}}" class="img-fluid w-100 h-100" style="object-fit: cover;">
+                                </div>
+                                <div class="px-2 pb-2 text-center">
+                                    <p class="fw-800 h5 mb-1 text-dark">{{price}}€</p>
+                                    <p class="x-small text-muted text-truncate fw-600 mb-0">{{name}}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {{/sellerProducts}}
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="reviews-pane">
+                <div class="clay-card p-4 p-md-5 bg-white border-0 shadow-sm mx-auto" style="max-width: 900px;">
+                    <div class="review-item pb-4 mb-4 border-bottom">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="user-avatar-placeholder">AM</div>
+                                <div><h4 class="fw-800 h6 mb-0">Arthur Morgan</h4><span class="x-small text-muted fw-600">Verified Purchase</span></div>
+                            </div>
+                            <div class="text-warning small"><i class="fa-solid fa-star"></i> 5.0</div>
+                        </div>
+                        <p class="small text-muted italic mb-0">"The Eames chair arrived in flawless condition. Truly professional."</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    {{>footer}}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
