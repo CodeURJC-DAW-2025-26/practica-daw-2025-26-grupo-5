@@ -24,7 +24,7 @@
             <nav class="nav flex-column gap-1">
                 <a class="nav-link-stilnovo" href="/user-page/{{userId}}"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
                 <a class="nav-link-stilnovo" href="/user-products-page/{{userId}}"><i class="fa-solid fa-box-open"></i> My Products</a>
-                <a class="nav-link-stilnovo" href="/favorite-products-page/{{userId}}"><i class="fa-solid fa-heart"></i> Favorites</a>
+                <!--<a class="nav-link-stilnovo" href="/favorite-products-page/{{userId}}"><i class="fa-solid fa-heart"></i> Favorites</a>-->
                 <a class="nav-link-stilnovo active" href="#"><i class="fa-solid fa-handshake"></i> Sales & Orders</a>
                 <a class="nav-link-stilnovo" href="/statistics-page/{{userId}}"><i class="fa-solid fa-magnifying-glass-chart"></i> Statistics</a>
                 <a class="nav-link-stilnovo" href="/user-setting-page/{{userId}}"><i class="fa-solid fa-user-gear"></i> Settings</a>
@@ -52,7 +52,7 @@
                 <div class="d-flex align-items-center gap-4">
                     <a href="/user-setting-page/{{userId}}" class="text-decoration-none d-flex align-items-center gap-3 ps-2">
                         <div class="position-relative">
-                            <img src="/images/profile-photo.png" alt="User" class="rounded-circle border border-2 shadow-sm" width="48" height="48" style="object-fit: cover;">
+                            <img src="/user/{{userId}}/profile-photo" alt="User" class="rounded-circle border border-2 shadow-sm" width="48" height="48" style="object-fit: cover;">
                             <span class="position-absolute bottom-0 end-0 badge border border-light rounded-circle bg-success p-1" style="width: 12px; height: 12px;"></span>
                         </div>
                     </a>
@@ -61,16 +61,16 @@
 
             <div class="row g-4">
                 <div class="col-lg-7">
-                    <div class="d-flex gap-2 mb-4">
-                        <button class="btn btn-sm btn-dark rounded-pill px-3 fw-700">All Orders</button>
+                <!--<div class="d-flex gap-2 mb-4">
+                        <button class="btn btn-sm btn-dark rounded-pill px-3 fw-700">All</button>
                         <button class="btn btn-sm btn-outline-secondary border-0 bg-white rounded-pill px-3 fw-700">Unshipped</button>
                         <button class="btn btn-sm btn-outline-secondary border-0 bg-white rounded-pill px-3 fw-700">Completed</button>
-                    </div>
+                    </div>-->
 
                     <div class="d-flex flex-column gap-3">
                         {{#soldProducts}}
                         <a href="/sales-and-orders-page/{{userId}}?productId={{id}}" class="text-decoration-none text-reset">
-                            <div class="clay-card p-4 border-start-status-success shadow-sm" style="border: 2px solid var(--brand-blue);">
+                            <div class="clay-card p-4 border-start-status-success shadow-sm">
                                 <div class="d-flex justify-content-between align-items-start mb-3">
                                     <div>
                                         <span class="x-small fw-800 opacity-50">ORDER #{{id}}</span>

@@ -1404,3 +1404,25 @@ main.overflow-auto {
             color: white; border-radius: 50%; display: flex; 
             align-items: center; justify-content: center; font-weight: 800;
         }
+
+        /* Estilos para las tarjetas de pedido */
+.order-item-link .clay-card {
+    border: 2px solid transparent !important; /* Quitamos el borde fijo inicial */
+    transition: all 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+/* Efecto Hover: se oscurece un poco y se eleva */
+.order-item-link:hover .clay-card {
+    background-color: #f1f5fe !important; 
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(47, 108, 237, 0.12) !important;
+    border-color: rgba(47, 108, 237, 0.3) !important;
+}
+
+/* Clase para la selección persistente (vía JS rápido) */
+.selected-order .clay-card {
+    border: 2px solid var(--brand-blue) !important;
+    background-color: #f8fbff !important;
+    box-shadow: inset 0 0 0 1px rgba(47, 108, 237, 0.1) !important;
+}
