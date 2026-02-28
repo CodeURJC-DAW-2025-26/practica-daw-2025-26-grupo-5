@@ -226,123 +226,99 @@ Mapa visual que organiza la navegación por colores (Azul: Todos los Usuarios, A
 
 #### **Capturas de Pantalla Actualizadas**
 
-#### **1. Página Principal / Home**
-![Página Principal](Readme-Images/README-FOTOS/main-photo.png)
-
-**Descripción:**
-Punto de entrada principal que presenta la propuesta de valor y permite la navegación hacia el catálogo y los formularios de acceso.
-
-#### **2. Catálogo Público (Featured Treasures) / Home**
-![Página Principal](Readme-Images/README-FOTOS/main-photo-2.png)
-
-**Descripción:**
-Visualización de la entidad Producto con datos de ejemplo representativos, permitiendo al usuario anónimo consultar el stock disponible.
-
-#### **3. Detalle de Producto**
-![Detalle de Producto](Readme-Images/README-FOTOS/user-moreInfo-product-1.png)
-
-**Descripción:**
-Vista completa de la entidad con especificaciones técnicas, precio y acceso a la tecnología de contacto por email.
-
-#### **4. Detalle Técnico y Motor de Recomendaciones**
-![Detalle Técnico y Motor de Recomendaciones](Readme-Images/README-FOTOS/user-moreInfo-pro-2.png)
-
-**Descripción:**
-Parte inferior de la ficha de producto que muestra las especificaciones y la descripción del vendedor. Destaca la sección "You may also like", que es la representación visual del Algoritmo Avanzado: el sistema consulta la base de datos para sugerir dinámicamente artículos de categorías afines o complementarias al producto actual.
-
-#### **5. Interfaz de Autenticación**
-![Interfaz de Autentificacion](Readme-Images/README-FOTOS/user-login.png)
-
-**Descripción:**
-Formulario de acceso gestionado por roles para discriminar entre el panel de usuario y el panel de administración.
-
-#### **6. Registro de Usuarios**
-![Interfaz de Autentificacion](Readme-Images/README-FOTOS/user-signup.png)
-
-**Descripción:**
-Interfaz que permite la creación de nuevas cuentas en la base de datos para interactuar con el marketplace.
-
 #### **Área Privada (Usuario Registrado)**
 
-#### **7. Panel de Actividad (Analytics Overview)**
-![Panel de Actividad](Readme-Images/README-FOTOS/user-dashboard.png)
+#### **1. Panel de Actividad (Dashboard)**
+![Panel de Actividad](Readme-Images/README-FOTOS/DashboardP1.png)
 
 **Descripción:**
-Vista personalizada que utiliza gráficos para monitorizar los ingresos y las ventas del usuario.
+Vista personalizada del usuario que muestra estadísticas financieras en tiempo real, incluyendo balance actual, ingresos totales, y resumen de ventas. Permite al usuario monitorizar su rendimiento comercial en la plataforma.
 
-#### **8. Gestión de Inventario Propio**
-![Inventario Propio](Readme-Images/README-FOTOS/user-myproducts.png)
-
-**Descripción:**
-Listado de la entidad Producto donde el dueño puede visualizar sus anuncios y acceder a las opciones de borrado o edición.
-
-#### **9. Formulario de Publicación**
-![Formulario de Publicación](Readme-Images/README-FOTOS/user-create-product.png)
+#### **2. Gestión de Inventario Propio (My Products)**
+![Inventario Propio](Readme-Images/README-FOTOS/MyProductsP1.png)
 
 **Descripción:**
-Interfaz para la creación de nuevos elementos en la base de datos, incluyendo la subida de imágenes.
+Listado completo de productos publicados por el usuario, con opciones de edición, eliminación y gestión del estado de cada artículo. Visualización de la entidad Producto donde el dueño tiene control total sobre sus anuncios.
 
-#### **10. Formulario de Edición**
-![Formulario de Edición](Readme-Images/README-FOTOS/user-edit.png)
-
-**Descripción:**
-Interfaz para la edición de elementos en la base de datos, incluyendo la cambio de imágenes.
-
-#### **11. Productos Favoritos**
-![Productos Favoritos](Readme-Images/README-FOTOS/user-favs.png)
+#### **3. Formulario de Publicación de Producto (New Product)**
+![Formulario de Publicación](Readme-Images/README-FOTOS/NewProductP1.png)
 
 **Descripción:**
-Listado de la entidad Producto donde el dueño podrá visualizar productos agregados como "Favoritos".
+Interfaz para la creación de nuevos artículos en el marketplace, incluyendo nombre, categoría, precio, ubicación, descripción detallada y subida de imágenes. Validación de campos obligatorios antes del envío.
 
-#### **12. Historial de Transacciones**
-![Historial de Transacciones](Readme-Images/README-FOTOS/user-sales-orders.png)
-
-**Descripción:**
-Registro de compras y ventas que integra la Tecnología Complementaria de generación de facturas en PDF.
-
-
-#### **13. Análisis de Datos G1 y G2**
-![Análisis de Datos G1 y G2](Readme-Images/README-FOTOS/user-statistics.png)
+#### **4. Formulario de Edición de Producto (Edit Product)**
+![Formulario de Edición](Readme-Images/README-FOTOS/EditProductP1.png)
 
 **Descripción:**
-Implementación de gráficos de líneas y tarta para visualizar la evolución de ingresos y ventas por categoría.
+Interfaz de modificación de productos existentes con todos los campos editables, incluyendo la posibilidad de cambiar las imágenes asociadas. Mantiene la integridad de los datos del producto.
 
-#### **14. Gráfico de Interés G3**
-![Gráfico de Interés G3](Readme-Images/README-FOTOS/user-statistics-2.png)
-
-**Descripción:**
-Gráfico de barras avanzado que compara visitas frente a interacciones reales por categoría de producto.
-
-#### **15. Perfil y Verificación**
-![Perfil y Verificación](Readme-Images/README-FOTOS/user-setting-1.png)
+#### **5. Historial de Ventas y Pedidos (Sales & Orders)**
+![Historial de Transacciones](Readme-Images/README-FOTOS/SalesOrdersP1.png)
 
 **Descripción:**
-Gestión de datos personales y visualización de la Digital Seller Card para transacciones seguras.
+Registro completo de compras y ventas realizadas por el usuario. Incluye detalles de transacciones, fechas, importes y estado de cada operación. Integra la Tecnología Complementaria de generación de facturas en PDF descargables.
 
-#### **Administrador**
-#### **16. Monitor Global de la Plataforma**
-![Monitor Global de la Plataforma](Readme-Images/README-FOTOS/admin-dashboars.png)
-
-**Descripción:**
-Dashboard exclusivo con KPIs de sistema, usuarios reportados y volumen total de anuncios.
-
-#### **17. Gestión de Usuarios**
-![Gestión de Usuarios](Readme-Images/README-FOTOS/admin-user-managme.png)
+#### **6. Análisis de Ventas por Categoría y Evolución de Ingresos (Statistics)**
+![Análisis de Datos G1 y G2](Readme-Images/README-FOTOS/StatisticsP1.png)
 
 **Descripción:**
-Herramienta de moderación que permite al administrador realizar acciones de baneo o purga de datos sobre cualquier perfil.
+Implementación de gráficos avanzados (Gráfico 1: Donut Chart de distribución por categoría y Gráfico 2: Line Chart de evolución temporal) para visualizar el rendimiento comercial del usuario a través de datos históricos.
 
-#### **18. Inventario Global**
-![Inventario Global](Readme-Images/README-FOTOS/admin-global-invento.png)
-
-**Descripción:**
-Registro maestro de todos los productos del marketplace, con permisos para editar o eliminar cualquier anuncio fraudulento.
-
-#### **19. Auditoría Financiera**
-![Auditoría Financiera](Readme-Images/README-FOTOS/admin-transactions.png)
+#### **7. Gráfico de Interés y Visitas (Statistics - Bar Chart)**
+![Gráfico de Interés G3](Readme-Images/README-FOTOS/Statistics2P1.png)
 
 **Descripción:**
-Vista de la entidad Transacción a nivel global para gestionar disputas y reembolsos.
+Gráfico de barras comparativo (Gráfico 3) que mide el tráfico recibido versus las interacciones reales (favoritos/compras) por cada categoría de producto, permitiendo identificar patrones de comportamiento del usuario.
+
+#### **8. Configuración de Perfil de Usuario (Edit Profile)**
+![Perfil y Verificación](Readme-Images/README-FOTOS/EditProfileP1.png)
+
+**Descripción:**
+Gestión completa de datos personales del usuario, incluyendo nombre de usuario, correo electrónico, avatar, biografía, información de tarjeta de crédito y visualización de la Digital Seller Card con código QR para verificación de identidad.
+
+#### **9. Mis Valoraciones Recibidas (My Valorations)**
+![Mis Valoraciones](Readme-Images/README-FOTOS/MyValorationsP1.png)
+
+**Descripción:**
+Vista de todas las valoraciones y comentarios recibidos por el usuario como vendedor. Muestra la puntuación en estrellas, comentarios de compradores, producto valorado y fecha de cada review, permitiendo gestionar la reputación en la plataforma.
+
+#### **10. Editar Valoración (Edit Valoration)**
+![Editar Valoración](Readme-Images/README-FOTOS/EditValorationP1.png)
+
+**Descripción:**
+Interfaz para modificar una valoración previamente emitida, permitiendo actualizar la puntuación en estrellas y el comentario asociado a una transacción completada. Mantiene la trazabilidad de las reviews.
+
+#### **Área de Administración**
+
+#### **11. Monitor Global de la Plataforma (Admin Dashboard)**
+![Monitor Global de la Plataforma](Readme-Images/README-FOTOS/AdminDashboardP1.png)
+
+**Descripción:**
+Dashboard exclusivo del administrador con KPIs de sistema: total de usuarios registrados, productos activos, transacciones realizadas, ingresos globales y alertas de moderación. Vista centralizada para la supervisión de la plataforma.
+
+#### **12. Gestión Global de Usuarios (Admin User Management)**
+![Gestión de Usuarios](Readme-Images/README-FOTOS/AdminUserManagP1.png)
+
+**Descripción:**
+Herramienta de moderación que permite al administrador visualizar todos los usuarios registrados, sus datos de contacto, estado de la cuenta y realizar acciones administrativas como baneos, desbaneos o eliminación de perfiles.
+
+#### **13. Inventario Global de Productos (Admin Global Inventory)**
+![Inventario Global](Readme-Images/README-FOTOS/AdminGlobalInvetP1.png)
+
+**Descripción:**
+Registro maestro de todos los productos publicados en el marketplace, con información detallada del vendedor, categoría, precio y estado. Permite al administrador editar o eliminar cualquier anuncio que infrinja las normas de la plataforma.
+
+#### **14. Auditoría Financiera Global (Admin Global Transactions)**
+![Auditoría Financiera](Readme-Images/README-FOTOS/AdminGlobalTransP1.png)
+
+**Descripción:**
+Vista completa de todas las transacciones realizadas en la plataforma, incluyendo comprador, vendedor, producto, fecha, importe y estado. Herramienta para auditoría financiera, gestión de disputas y análisis de volumen de negocio.
+
+#### **15. Gestión Global de Valoraciones (Admin Global Valorations)**
+![Gestión de Valoraciones](Readme-Images/README-FOTOS/AdminGlobalValorationsP1.png)
+
+**Descripción:**
+Panel administrativo para supervisar todas las valoraciones realizadas en la plataforma. Permite identificar reviews fraudulentas, gestionar reportes y mantener la integridad del sistema de reputación de vendedores.
 
 ### **Instrucciones de Ejecución**
 
