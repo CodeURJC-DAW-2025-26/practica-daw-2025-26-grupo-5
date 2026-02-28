@@ -2,6 +2,7 @@ package es.stilnovo.library.controller;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -163,8 +164,13 @@ public class AdminController {
     @GetMapping("/global-inventory")
     public String showGlobalInventory(Model model, HttpServletRequest request) {
 
-        List<Product> products = adminService.getAllProducts();
-        model.addAttribute("products", products);
+        List<Product> allProducts = adminService.getAllProducts();
+
+        List<Product> productsToDisplay = allProducts.stream()
+                .filter(p -> !"Sold".equalsIgnoreCase(p.getStatus()))
+                .collect(Collectors.toList());
+
+        model.addAttribute("products", productsToDisplay);
 
         CsrfToken csrf = (CsrfToken) request.getAttribute("_csrf");
         if (csrf != null) {

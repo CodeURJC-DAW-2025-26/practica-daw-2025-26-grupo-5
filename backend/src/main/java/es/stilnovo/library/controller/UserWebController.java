@@ -59,8 +59,13 @@ public class UserWebController {
     private TransactionService transactionService;
 
     @GetMapping("/about-page")
-	public String login() {
+	public String showAboutPage() {
 		return "about-page";
+	}
+
+    @GetMapping("/help-center-page")
+	public String showHelpPage() {
+		return "help-center-page";
 	}
     
     /**
