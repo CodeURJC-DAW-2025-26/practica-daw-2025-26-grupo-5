@@ -3,15 +3,11 @@ package es.stilnovo.library.controller;
 import java.io.IOException;
 import java.security.Principal;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
+import es.stilnovo.library.service.UserService.BarChartData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -30,12 +26,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.model.User;
-import es.stilnovo.library.model.UserInteraction;
-import es.stilnovo.library.repository.UserInteractionRepository;
 import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.TransactionService;
 import es.stilnovo.library.service.UserService;
-import es.stilnovo.library.service.UserService.BarChartData;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -64,9 +57,6 @@ public class UserWebController {
 
     @Autowired
     private TransactionService transactionService;
-
-    @Autowired
-    private UserInteractionRepository interactionRepository;
 
     @GetMapping("/about-page")
 	public String login() {
