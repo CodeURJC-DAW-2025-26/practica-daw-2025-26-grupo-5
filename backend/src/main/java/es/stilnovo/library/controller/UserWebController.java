@@ -197,6 +197,7 @@ public class UserWebController {
         model.addAttribute("user", user);
         model.addAttribute("isOwner", true);
         model.addAttribute("date", formattedDate);
+        model.addAttribute("userSales", sales);
         model.addAttribute("barLabels", mapper.writeValueAsString(barLabels));
         model.addAttribute("visitsData", mapper.writeValueAsString(visitsData));
         model.addAttribute("interestData", mapper.writeValueAsString(interestData));
@@ -249,17 +250,15 @@ public class UserWebController {
      */
     @GetMapping("/user-products-page")
     public String userProducts(Model model, Principal principal) {
-
-        // 1. Delegate data retrieval to the Service Layer using the secure Principal name [cite: 744, 942]
+    
+        // 1. Get the user and their products directly
         User user = productService.getAuthenticatedUserWithProducts(principal.getName());
-
-        // 2. Populate the model with user data and their 1:N related products
-        // The 'userProducts' list is accessed directly via the bidirectional JPA relationship
+    
+        // 2. Add the raw list. Mustache will now use the getIs... methods automatically
         model.addAttribute("user", user); 
         model.addAttribute("userProducts", user.getProducts());
         model.addAttribute("itemsCount", user.getProducts().size());
-
-        // 3. Return the specific view template without exposing sensitive ID parameters in the address bar
+    
         return "user-products-page";
     }
 

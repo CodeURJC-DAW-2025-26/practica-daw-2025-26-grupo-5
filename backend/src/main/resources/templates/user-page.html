@@ -142,12 +142,12 @@
                         <tbody class="fw-700 small">
                             {{#userSales}}
                             <tr>
-                                <td class="ps-3 py-3">{{name}}</td>
-                                <td class="opacity-50">{{category}}</td>
-                                <td style="color: var(--brand-blue)">{{price}} €</td>
+                                <td class="ps-3 py-3">{{product.name}}</td>
+                                <td class="opacity-50">{{product.category}}</td>
+                                <td style="color: var(--brand-blue)">{{product.price}} €</td>
                                 <td class="pe-3">
                                     <span class="badge rounded-pill bg-success-subtle text-success px-3 py-2">
-                                        {{status}}
+                                        {{product.status}}
                                     </span>
                                 </td>
                             </tr>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="height: 100%;">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,12 +9,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
-    
 </head>
-<body class="bg-light">
+<body class="bg-light layout-dashboard">
 
-    <div class="d-flex min-vh-100">
-        
+    <div class="d-flex h-100">
         <aside class="sidebar-stilnovo p-4 d-none d-lg-flex flex-column" style="width: 280px !important; min-width: 280px !important; flex-shrink: 0;">
             <div class="logo-wrapper mb-5">
                 <a href="/" class="text-decoration-none d-flex align-items-center gap-2">
@@ -23,7 +21,6 @@
                     <span class="badge bg-dark text-white x-small ms-1">ADMIN</span>
                 </a>
             </div>
-            
             <nav class="nav flex-column gap-1">
                 <a class="nav-link-stilnovo" href="/admin/panel"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
                 <a class="nav-link-stilnovo" href="/admin/users"><i class="fa-solid fa-users-gear"></i> User Management</a>
@@ -31,12 +28,10 @@
                 <a class="nav-link-stilnovo" href="/admin/transactions"><i class="fa-solid fa-money-bill-transfer"></i> Transactions</a>
                 <a class="nav-link-stilnovo" href="/admin/valorations"><i class="fa-solid fa-star"></i> Global Valorations</a>
             </nav>
-        
             <div class="mt-auto pt-4 border-top">
-                <a href="/" class="btn-sell w-100 d-flex align-items-center justify-content-center gap-2 text-decoration-none shadow-sm mb-3" style="height: 45px; font-size: 0.9rem;">
+                <a href="/" class="btn-sell w-100 d-flex align-items-center justify-content-center gap-2 text-decoration-none shadow-sm mb-3" style="height: 45px;">
                     <i class="fa-solid fa-shop"></i> Browse Market
                 </a>
-
                 <form action="/logout" method="post" class="m-0">
                     <input type="hidden" name="_csrf" value="{{token}}"/>
                     <button type="submit" class="nav-link-stilnovo logout-link border-0 bg-transparent w-100 text-start">
@@ -46,8 +41,7 @@
             </div>
         </aside>
 
-        <main class="flex-grow-1 p-4 p-md-5 overflow-auto">
-            
+        <main class="flex-grow-1 p-4 p-md-5 pb-5 overflow-y-auto">
             <header class="d-flex justify-content-between align-items-center mb-5">
                 <div>
                     <h1 class="fw-800 h2">Global Inventory</h1>
@@ -58,130 +52,186 @@
                         <p class="fw-800 mb-0 small text-dark">System Admin</p>
                         <p class="x-small text-muted mb-0">Superuser Access</p>
                     </div>
-                    <div class="position-relative">
-                        <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center fw-800 shadow-sm" style="width: 48px; height: 48px;">AD</div>
-                        <span class="position-absolute bottom-0 end-0 badge border border-light rounded-circle bg-success p-1" style="width: 12px; height: 12px;"></span>
-                    </div>
+                    <div class="bg-dark text-white rounded-circle d-flex align-items-center justify-content-center fw-800 shadow-sm" style="width: 48px; height: 48px;">AD</div>
                 </div>
             </header>
 
-            <div class="row g-3 mb-4">
-                <div class="col-xl-5 col-lg-4">
-                    <div class="search-box w-100 py-2 px-3 bg-white shadow-sm" style="border-radius: 12px;">
-                        <i class="fa-solid fa-magnifying-glass text-muted small"></i>
-                        <input type="text" placeholder="Search product ID or title..." class="border-0 bg-transparent w-100 fw-600 ms-2 small" style="outline: none;">
-                    </div>
-                </div>
-                
-                <div class="col-xl-7 col-lg-8">
-                    <div class="d-flex gap-2">
-                        <div class="search-box w-100 py-2 px-3 bg-white shadow-sm" style="border-radius: 12px;">
-                            <span class="x-small fw-700 text-muted me-2">Category:</span>
-                            <select class="border-0 bg-transparent w-100 fw-700 small text-dark" style="outline: none; cursor: pointer;">
-                                <option value="all">All Categories</option>
-                                <option value="cars">Cars & Vehicles</option>
-                                <option value="home">Home & Decor</option>
-                                <option value="tech">Tech & Audio</option>
-                            </select>
-                        </div>
-
-                        <div class="search-box w-100 py-2 px-3 bg-white shadow-sm" style="border-radius: 12px;">
-                            <span class="x-small fw-700 text-muted me-2">Price:</span>
-                            <select class="border-0 bg-transparent w-100 fw-700 small text-dark" style="outline: none; cursor: pointer;">
-                                <option value="any">Any Price</option>
-                                <option value="low">Under 100€</option>
-                                <option value="high">Over 1,000€</option>
-                            </select>
-                        </div>
-
-                        <div class="search-box w-100 py-2 px-3 bg-white shadow-sm" style="border-radius: 12px;">
-                            <span class="x-small fw-700 text-muted me-2">Status:</span>
-                            <select class="border-0 bg-transparent w-100 fw-700 small text-dark" style="outline: none; cursor: pointer;">
-                                <option value="all">All Status</option>
-                                <option value="active">Active</option>
-                                <option value="sold">Sold</option>
-                                <option value="pending">Pending Review</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="clay-card p-0 overflow-hidden shadow-sm">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+            <div class="clay-card p-0 shadow-sm bg-white mb-5" style="border-radius: 20px;">
+                <div class="table-responsive" style="overflow: visible;">
+                    <table class="table table-hover align-middle mb-0 table-custom-rounded">
                         <thead class="bg-light border-bottom">
                             <tr>
-                                <th class="ps-4 py-3 x-small text-muted fw-800">PRODUCT DETAILS</th>
-                                <th class="py-3 x-small text-muted fw-800">SELLER INFO</th>
-                                <th class="py-3 x-small text-muted fw-800">CATEGORY</th>
-                                <th class="py-3 x-small text-muted fw-800">PRICE</th>
-                                <th class="py-3 x-small text-muted fw-800">STATUS</th>
-                                <th class="text-end pe-4 py-3 x-small text-muted fw-800">ADMIN ACTIONS</th>
+                                <th class="ps-4 py-3 x-small text-muted fw-800 border-0">PRODUCT DETAILS</th>
+                                <th class="py-3 x-small text-muted fw-800 border-0">SELLER INFO</th>
+                                <th class="py-3 x-small text-muted fw-800 border-0">CATEGORY</th>
+                                <th class="py-3 x-small text-muted fw-800 border-0">PRICE</th>
+                                <th class="py-3 x-small text-muted fw-800 border-0">STATUS</th>
+                                <th class="text-end pe-4 py-3 x-small text-muted fw-800 border-0">ADMIN ACTIONS</th>
                             </tr>
                         </thead>
                         <tbody>
-{{#products}}
-<tr>
-    <td class="ps-4 py-3">
-        <div class="d-flex align-items-center gap-3">
-            <img src="/product-images/{{id}}" class="product-img-thumb bg-white">
-            <div>
-                <p class="fw-800 text-dark mb-0 small">{{name}}</p>
-                <p class="ref-id mb-0">#ST-{{id}}</p>
-            </div>
-        </div>
-    </td>
-
-    <td>
-        <div class="d-flex align-items-center gap-2">
-            <div class="avatar-sm bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center fw-800 small"
-                 style="width: 30px; height: 30px;">
-                {{seller.name}}
-            </div>
-            <div>
-                <p class="fw-700 text-dark mb-0 x-small">{{seller.name}}</p>
-            </div>
-        </div>
-    </td>
-
-    <td>
-        <span class="badge-cat">{{category}}</span>
-    </td>
-
-    <td>
-        <span class="fw-800 text-dark small">{{price}} €</span>
-    </td>
-
-    <td>
-        <span class="status-pill">{{status}}</span>
-    </td>
-
-    <td class="text-end pe-4">
-        <a href="/info-product-page/{{id}}" class="btn-icon-clay btn-view">
-            <i class="fa-solid fa-eye small"></i>
-        </a>
-        <form action="/admin/products/edit/{{id}}" method="get" style="display:inline;">
-            <button class="btn-icon-clay btn-view" type="submit">
-                <i class="fa-solid fa-pen small"></i>
-            </button>
-        </form>
-        <form action="/admin/products/delete/{{id}}" method="post" style="display:inline;">
-            <input type="hidden" name="_csrf" value="{{token}}">
-            <button class="btn-delete-listing ms-2" type="submit">
-                <i class="fa-solid fa-trash me-1"></i> Delete
-            </button>
-        </form>
-    </td>
-</tr>
-{{/products}}
-</tbody>
+                            {{#products}}
+                            <tr>
+                                <td class="ps-4 py-3">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <img src="/product-images/{{id}}" class="product-img-thumb bg-white rounded border" width="45" height="45" style="object-fit: cover;" onerror="this.src='/images/no-product-image.png'">
+                                        <div>
+                                            <p class="fw-800 text-dark mb-0 small">{{name}}</p>
+                                            <p class="user-id-mono x-small mb-0">#ST-{{id}}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <p class="fw-700 text-dark mb-0 x-small">{{seller.name}}</p>
+                                    <span class="text-muted x-small">#{{seller.userId}}</span>
+                                </td>
+                                <td><span class="badge-cat">{{category}}</span></td>
+                                <td><span class="fw-800 text-dark small">{{price}} €</span></td>
+                                <td><span class="status-pill">{{status}}</span></td>
+                                <td class="text-end pe-4">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a href="/info-product-page/{{id}}" class="btn-icon-clay btn-view" title="View Detail"><i class="fa-solid fa-eye small"></i></a>
+                                        <button class="btn-icon-clay btn-view" type="button" data-bs-toggle="modal" data-bs-target="#editProductModal{{id}}">
+                                            <i class="fa-solid fa-pen small"></i>
+                                        </button>
+                                        <button type="button" class="btn-delete-listing" 
+                                                data-bs-toggle="modal" data-bs-target="#confirmDeleteProductModal"
+                                                data-prod-id="{{id}}" data-prod-name="{{name}}">
+                                            <i class="fa-solid fa-trash me-1"></i> Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {{/products}}
+                        </tbody>
                     </table>
                 </div>
             </div>
-
         </main>
     </div>
 
+    {{#products}}
+    <div class="modal fade" id="editProductModal{{id}}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="clay-card modal-content p-4 border-0 shadow-lg bg-white" style="border-radius: 24px;">
+                <div class="modal-header border-0 pb-0">
+                    <h3 class="fw-800 h5 mb-0">Edit Product: {{name}}</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <form action="/admin/products/edit/{{id}}" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="_csrf" value="{{token}}"/>
+                    <div class="modal-body">
+                        <div class="row g-4">
+                            <div class="col-md-5 border-end text-center">
+                                <div class="mx-auto mb-3 overflow-hidden rounded-4 border border-4 border-light shadow-sm" style="width: 180px; height: 180px;">
+                                    <img id="prevProd{{id}}" src="/product-images/{{id}}" class="img-fluid w-100 h-100" style="object-fit:cover;" onerror="this.src='/images/no-product-image.png'">
+                                </div>
+                                <label class="btn btn-outline-primary btn-sm rounded-pill fw-700 px-3">
+                                    <i class="fa-solid fa-camera me-1"></i> Update Image
+                                    <input type="file" name="imageField" accept="image/*" hidden onchange="previewProd(this, 'prevProd{{id}}')">
+                                </label>
+                                <div class="mt-4 text-start">
+                                    <label class="label-categories x-small mb-2 d-block fw-800 opacity-50">DESCRIPTION</label>
+                                    <textarea name="description" class="form-control bg-light border-0 p-3 modal-textarea-fix" rows="4">{{description}}</textarea>
+                                </div>
+                            </div>
+
+                            <div class="col-md-7 text-start">
+                                <p class="label-categories mb-3 opacity-50 fw-800 x-small text-uppercase">Listing Details</p>
+                                <div class="mb-3">
+                                    <label class="label-categories x-small mb-1 d-block fw-700">PRODUCT NAME</label>
+                                    <input type="text" name="name" value="{{name}}" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" required>
+                                </div>
+                                <div class="row g-2 mb-3">
+                                    <div class="col-6">
+                                        <label class="label-categories x-small mb-1 d-block fw-700">PRICE (€)</label>
+                                        <input type="number" step="0.01" name="price" value="{{price}}" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="label-categories x-small mb-1 d-block fw-700">CATEGORY</label>
+                                        <select name="category" class="form-select bg-light border-0 py-2 px-3" style="border-radius: 12px;">
+                                            <option value="{{category}}" selected>{{category}} (Current)</option>
+                                            <option value="FASHION">FASHION</option>
+                                            <option value="HOME">HOME</option>
+                                            <option value="TECH">TECH</option>
+                                            <option value="CARS">CARS</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="label-categories x-small mb-1 d-block fw-700">STATUS</label>
+                                    <select name="status" class="form-select bg-light border-0 py-2 px-3" style="border-radius: 12px;">
+                                        <option value="Active" {{#isActive}}selected{{/isActive}}>Active</option>
+                                        <option value="Blocked" {{#isBlocked}}selected{{/isBlocked}}>Blocked</option>
+                                        <option value="Sold" {{#isSold}}selected{{/isSold}}>Sold</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="label-categories x-small mb-1 d-block fw-700">LOCATION</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-0 text-muted" style="border-radius: 12px 0 0 12px;"><i class="fa-solid fa-location-dot"></i></span>
+                                        <input type="text" name="location" value="{{location}}" class="form-control bg-light border-0 py-2" style="border-radius: 0 12px 12px 0;" placeholder="e.g. Madrid, Spain">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-3">
+                        <button type="button" class="btn btn-light fw-700 rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-dark fw-700 rounded-pill px-4 shadow-sm">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {{/products}}
+
+    <div class="modal fade" id="confirmDeleteProductModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="clay-card modal-content border-0 shadow-lg p-3 bg-white" style="border-radius: 20px;">
+                <div class="modal-header border-0 pt-3 text-center d-block">
+                    <div class="bg-danger-subtle text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                        <i class="fa-solid fa-trash-can fa-2x"></i>
+                    </div>
+                    <h5 class="fw-800 mb-0">Confirm Deletion</h5>
+                </div>
+                <div class="modal-body text-center">
+                    <p id="delMsg" class="text-muted mb-0"></p>
+                    <p class="x-small text-danger fw-700 mt-2">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer border-0 pb-3 justify-content-center">
+                    <form id="delForm" method="post" action="">
+                        <input type="hidden" name="_csrf" value="{{token}}">
+                        <button type="button" class="btn btn-light fw-700 rounded-pill px-4 me-2" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger fw-700 rounded-pill px-4 shadow-sm">Delete Listing</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/admin-global-invent-page.js"></script>
+    <script>
+        function previewProd(input, id) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) { document.getElementById(id).src = e.target.result; }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            var delModal = document.getElementById('confirmDeleteProductModal');
+            if(delModal) {
+                delModal.addEventListener('show.bs.modal', function (event) {
+                    var btn = event.relatedTarget;
+                    var id = btn.getAttribute('data-prod-id');
+                    var name = btn.getAttribute('data-prod-name');
+                    document.getElementById('delForm').action = '/admin/products/delete/' + id;
+                    document.getElementById('delMsg').innerHTML = "Delete <strong>" + name + "</strong> from the inventory?";
+                });
+            }
+        });
+    </script>
+</body>
+</html>

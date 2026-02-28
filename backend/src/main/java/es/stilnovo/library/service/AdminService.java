@@ -95,30 +95,47 @@ public class AdminService {
     }
 
     @Transactional
-    public void updateProductAsAdmin(long id,
-                                    Product updatedData,
-                                    MultipartFile imageFile) throws IOException {
-
+    public void updateProductAsAdmin(long id, Product updatedData, MultipartFile imageFile) throws IOException {
+    
+        // 1. Retrieve the existing product from the database
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
-
-        // Sin verificación de propietario (admin puede todo)
-
-        existingProduct.setName(updatedData.getName());
-        existingProduct.setPrice(updatedData.getPrice());
-        existingProduct.setDescription(updatedData.getDescription());
-        existingProduct.setCategory(updatedData.getCategory());
-        existingProduct.setLocation(updatedData.getLocation());
-        existingProduct.setStatus(updatedData.getStatus());
-
+    
+        // 2. Update fields only if new data is provided and not blank (prevents accidental deletion)
+        if (updatedData.getName() != null && !updatedData.getName().isBlank()) {
+            existingProduct.setName(updatedData.getName());
+        }
+    
+        // Update price only if it's a valid positive value
+        if (updatedData.getPrice() > 0) {
+            existingProduct.setPrice(updatedData.getPrice());
+        }
+    
+        if (updatedData.getDescription() != null && !updatedData.getDescription().isBlank()) {
+            existingProduct.setDescription(updatedData.getDescription());
+        }
+    
+        if (updatedData.getCategory() != null && !updatedData.getCategory().isBlank()) {
+            existingProduct.setCategory(updatedData.getCategory());
+        }
+    
+        if (updatedData.getLocation() != null && !updatedData.getLocation().isBlank()) {
+            existingProduct.setLocation(updatedData.getLocation());
+        }
+    
+        if (updatedData.getStatus() != null && !updatedData.getStatus().isBlank()) {
+            existingProduct.setStatus(updatedData.getStatus());
+        }
+    
+        // 3. Handle image update only if a new file was actually uploaded
         if (imageFile != null && !imageFile.isEmpty()) {
-
+            // Create new image blob and link it to the existing product
             Image newImage = imageService.createImage(imageFile.getInputStream());
-
             existingProduct.setImage(newImage);
             newImage.setProduct(existingProduct);
         }
-
+    
+        // 4. Save the updated product back to the repository
         productRepository.save(existingProduct);
     }
 

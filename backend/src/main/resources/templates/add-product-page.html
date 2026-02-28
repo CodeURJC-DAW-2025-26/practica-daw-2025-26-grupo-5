@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Treasure</title>
+    <title>Create Treasure - Stilnovo</title>
     <link rel="icon" type="image/png" href="/images/logo.png">
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&display=swap" rel="stylesheet">
@@ -22,7 +22,6 @@
             <nav class="nav flex-column gap-1">
                 <a class="nav-link-stilnovo" href="/user-page"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
                 <a class="nav-link-stilnovo active" href="/user-products-page"><i class="fa-solid fa-box-open"></i> My Products</a>
-                <!--<a class="nav-link-stilnovo" href="/favorite-products-page/{{userId}}"><i class="fa-solid fa-heart"></i> Favorites</a>-->
                 <a class="nav-link-stilnovo" href="/sales-and-orders-page"><i class="fa-solid fa-handshake"></i> Sales & Orders</a>
                 <a class="nav-link-stilnovo" href="/statistics-page"><i class="fa-solid fa-magnifying-glass-chart"></i> Statistics</a>
                 <a class="nav-link-stilnovo" href="/user-setting-page"><i class="fa-solid fa-user-gear"></i> Settings</a>
@@ -49,51 +48,50 @@
                         {{/error}}
 
                         <form action="/add-product" method="post" enctype="multipart/form-data" class="row g-5">
-                            
                             <input type="hidden" name="_csrf" value="{{token}}"/>
                             
                             <div class="col-lg-4">
-                                <label class="label-categories mb-3 d-block">PRODUCT VISUALS</label>
+                                <label class="label-categories mb-3 d-block text-uppercase opacity-50 fw-800 x-small">Product Visuals</label>
+                                
                                 <label for="file-upload" class="image-upload-zone rounded-4 d-flex flex-column align-items-center justify-content-center mb-4 shadow-sm" 
-                                    style="cursor: pointer; border: 2px dashed #dee2e6; min-height: 220px; position: relative; overflow: hidden; padding: 0;">
+                                    style="cursor: pointer; border: 2px dashed #dee2e6; height: 250px; position: relative; overflow: hidden; background-color: #f8f9fa; transition: all 0.3s ease; padding: 0;">
                                     
                                     <div id="upload-placeholder" class="d-flex flex-column align-items-center justify-content-center p-4">
-                                        <i class="fa-solid fa-camera fa-2x mb-2 opacity-25"></i>
-                                        <p class="x-small fw-800 opacity-50 text-center mb-0">Upload image</p>
+                                        <div class="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                                            <i class="fa-solid fa-camera fa-lg text-primary"></i>
+                                        </div>
+                                        <p class="small fw-800 mb-0">Click to upload</p>
                                     </div>
 
                                     <img id="preview-product" src="#" 
-                                        style="display: none; width: 100%; height: 220px; object-fit: cover; border-radius: 1rem;">
+                                        style="display: none; width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">
 
-                                    <input type="file" name="productPhoto" id="file-upload" class="d-none" accept="image/*" onchange="previewProductImage(this)">
+                                    <input type="file" name="productPhoto" id="file-upload" class="d-none" accept="image/*" onchange="previewProductImage(this)" required>
                                 </label>
                                 
                                 <div class="p-3 rounded-4 bg-light border">
-                                    <label class="label-categories mb-2 d-block">LISTING STATUS</label>
-                                    
-                                    <input type="hidden" name="status" value="Active">
-                                    
-                                    <div class="d-flex align-items-center gap-2 text-success fw-800 small">
+                                    <label class="label-categories mb-2 d-block text-uppercase opacity-50 fw-800 x-small">Visibility</label>
+                                    <div class="d-flex align-items-center gap-2 text-success fw-800 small ps-1">
                                         <i class="fa-solid fa-circle-check"></i>
-                                        <span>Active (Public)</span>
+                                        <span>Active (Visible on market)</span>
                                     </div>
+                                    <input type="hidden" name="status" value="Active">
                                 </div>
-                                
                             </div>
                         
                             <div class="col-lg-8">
                                 <div class="row g-4">
                                     <div class="col-12">
                                         <label class="label-categories mb-2 d-block">PRODUCT NAME</label>
-                                        <div class="search-box w-100 py-2 px-3 bg-light-subtle rounded-3">
-                                            <input type="text" name="productName" placeholder="e.g. 1960s Arco Floor Lamp" class="w-100 border-0 fw-600 bg-transparent" required>
+                                        <div class="search-box w-100 py-2 px-3 bg-light rounded-3 border">
+                                            <input type="text" name="productName" placeholder="e.g. Vintage Eames Lounge Chair" class="w-100 border-0 fw-600 bg-transparent" required>
                                         </div>
                                     </div>
                         
                                     <div class="col-md-6">
                                         <label class="label-categories mb-2 d-block">CATEGORY</label>
-                                        <select name="category" class="form-select border-0 bg-light-subtle py-2 fw-700 small rounded-3 shadow-none">
-                                            <option selected disabled>Choose type</option>
+                                        <select name="category" class="form-select border bg-light py-2 fw-700 small rounded-3 shadow-none" required>
+                                            <option selected disabled value="">Choose category</option>
                                             <option value="Fashion">Fashion</option>
                                             <option value="Technology">Technology</option>
                                             <option value="Cars">Cars</option>
@@ -103,7 +101,7 @@
                         
                                     <div class="col-md-6">
                                         <label class="label-categories mb-2 d-block">PRICE (EUR)</label>
-                                        <div class="search-box w-100 py-2 px-3 bg-light-subtle rounded-3 d-flex align-items-center">
+                                        <div class="search-box w-100 py-2 px-3 bg-light rounded-3 border d-flex align-items-center">
                                             <span class="me-2 fw-800 opacity-25">€</span>
                                             <input type="number" step="0.01" name="price" placeholder="0.00" class="w-100 border-0 fw-700 bg-transparent" required>
                                         </div>
@@ -111,14 +109,15 @@
 
                                     <div class="col-12">
                                         <label class="label-categories mb-2 d-block">LOCATION</label>
-                                        <div class="search-box w-100 py-2 px-3 bg-light-subtle rounded-3">
+                                        <div class="search-box w-100 py-2 px-3 bg-light rounded-3 border d-flex align-items-center">
+                                            <i class="fa-solid fa-location-dot me-2 opacity-25"></i>
                                             <input type="text" name="location" placeholder="e.g. Madrid, Spain" class="w-100 border-0 fw-600 bg-transparent" required>
                                         </div>
                                     </div>
                         
                                     <div class="col-12">
                                         <label class="label-categories mb-2 d-block">DESCRIPTION</label>
-                                        <textarea name="description" class="form-control border-0 bg-light-subtle p-3 fw-600 small rounded-4 shadow-none" rows="4" placeholder="Detailed specifications..."></textarea>
+                                        <textarea name="description" class="form-control border bg-light p-3 fw-600 small rounded-4 shadow-none" rows="4" placeholder="Describe your item..." required style="resize: none;"></textarea>
                                     </div>
                                 </div>
                         
@@ -134,18 +133,23 @@
             </div>
         </main>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Handles real-time image updates
         function previewProductImage(input) {
+            const preview = document.getElementById('preview-product');
+            const placeholder = document.getElementById('upload-placeholder');
+            
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
                 reader.onload = function(e) {
-                    document.getElementById('preview-product').src = e.target.result;
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                    placeholder.style.display = 'none';
                 }
                 reader.readAsDataURL(input.files[0]);
             }
         }
     </script>
-
 </body>
 </html>

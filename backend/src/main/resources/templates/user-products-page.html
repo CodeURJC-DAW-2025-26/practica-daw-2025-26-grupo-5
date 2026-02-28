@@ -66,7 +66,6 @@
 
             <div class="d-flex gap-2 mb-5">
                 <button class="btn btn-sm btn-dark rounded-pill px-4 fw-700 shadow-sm">All ({{itemsCount}})</button>
-                <button class="btn btn-sm btn-outline-secondary border-0 bg-white rounded-pill px-4 fw-700 shadow-sm">Active ({{itemsCount}})</button>
             </div>
 
             <div class="d-flex flex-column gap-3">
@@ -81,17 +80,25 @@
                             <h4 class="fw-800 h6 mb-1">{{name}}</h4>
                             <p class="x-small text-muted mb-2">Ref: #ST-0{{id}}</p>
                             
-                            {{#isActive}}
-                            <span class="badge rounded-pill bg-success-subtle text-success x-small px-3">
-                                <i class="fa-solid fa-circle-check me-1"></i> {{status}}
-                            </span>
-                            {{/isActive}}
+                            <div class="mb-1">
+                                {{#isActive}}
+                                <span class="badge rounded-pill bg-success-subtle text-success x-small px-3">
+                                    <i class="fa-solid fa-circle-check me-1"></i> Active
+                                </span>
+                                {{/isActive}}
 
-                            {{^isActive}}
-                            <span class="badge rounded-pill bg-danger-subtle text-danger x-small px-3">
-                                <i class="fa-solid fa-circle-xmark me-1"></i> {{status}}
-                            </span>
-                            {{/isActive}}
+                                {{#isBlocked}}
+                                <span class="badge rounded-pill bg-warning-subtle text-warning x-small px-3" style="color: #fd7e14 !important;">
+                                    <i class="fa-solid fa-ban me-1"></i> Blocked by Admin
+                                </span>
+                                {{/isBlocked}}
+
+                                {{#isSold}}
+                                <span class="badge rounded-pill bg-danger-subtle text-danger x-small px-3">
+                                    <i class="fa-solid fa-circle-xmark me-1"></i> Sold
+                                </span>
+                                {{/isSold}}
+                            </div>
                         </div>
                     </div>
                     
@@ -107,6 +114,12 @@
                                 <i class="fa-solid fa-pen-to-square"></i>
                             </a>
                             {{/isActive}}
+
+                            {{#isBlocked}}
+                            <button class="btn-about p-2 rounded-3 text-muted border-0 bg-white shadow-sm opacity-50" title="This item is blocked and cannot be edited" disabled>
+                                <i class="fa-solid fa-lock"></i>
+                            </button>
+                            {{/isBlocked}}
 
                             <button type="button" class="btn-about p-2 rounded-3 text-danger border-0 bg-white shadow-sm" 
                                     title="Delete" data-bs-toggle="modal" data-bs-target="#deleteProductModal{{id}}">

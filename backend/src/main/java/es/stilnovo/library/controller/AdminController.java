@@ -255,7 +255,6 @@ public class AdminController {
         Product product = productService.findById(id).orElseThrow();
 
         model.addAttribute("product", product);
-        model.addAttribute("isAdminEditing", true);
 
         CsrfToken csrf = (CsrfToken) request.getAttribute("_csrf");
         if (csrf != null) {
@@ -265,12 +264,17 @@ public class AdminController {
         return "edit-product-page";
     }
 
+    /**
+     * Updates an existing product's details.
+     * The imageField is optional to allow editing text fields without re-uploading photos.
+     */
     @PostMapping("/products/edit/{id}")
     public String updateProductAsAdmin(@PathVariable long id,
                                     Product updatedProduct,
-                                    @RequestParam MultipartFile newProfilePhoto) throws IOException {
+                                    @RequestParam MultipartFile imageField) throws IOException {
 
-        adminService.updateProductAsAdmin(id, updatedProduct, newProfilePhoto);
+        // Delegate update logic to AdminService
+        adminService.updateProductAsAdmin(id, updatedProduct, imageField);
 
         return "redirect:/admin/global-inventory";
     }

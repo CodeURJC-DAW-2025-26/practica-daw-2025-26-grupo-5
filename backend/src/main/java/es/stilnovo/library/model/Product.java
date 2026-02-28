@@ -127,9 +127,30 @@ public class Product {
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
     
-    /** Check if product is currently active/available for purchase */
-    public boolean isActive() {
+    // Inside Product.java class
+
+    /**
+     * Checks if the product is active.
+     * Used by Mustache templates via {{isActive}}
+     */
+    public boolean getIsActive() {
         return "Active".equalsIgnoreCase(this.status);
+    }
+
+    /**
+     * Checks if the product is blocked.
+     * Used by Mustache templates via {{isBlocked}}
+     */
+    public boolean getIsBlocked() {
+        return "Blocked".equalsIgnoreCase(this.status);
+    }
+
+    /**
+     * Checks if the product is sold.
+     * Used by Mustache templates via {{isSold}}
+     */
+    public boolean getIsSold() {
+        return "Sold".equalsIgnoreCase(this.status);
     }
 
 }   
