@@ -19,7 +19,6 @@ document.addEventListener("DOMContentLoaded", function() {
             barLabels = chartData.barLabels;
             visitsData = chartData.visitsData;
             interestData = chartData.interestData;
-            alert(interestData);
 
         } catch (error) {
             console.error("Error at the chart data parsing:", error);

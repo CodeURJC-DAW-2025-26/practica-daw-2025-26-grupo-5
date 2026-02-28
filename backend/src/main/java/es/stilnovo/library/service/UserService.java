@@ -2,13 +2,18 @@ package es.stilnovo.library.service;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.engine.jdbc.proxy.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import es.stilnovo.library.model.User;
+import es.stilnovo.library.model.UserInteraction;
 import es.stilnovo.library.model.Valoration;
 import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.TransactionRepository;
@@ -336,5 +342,59 @@ public class UserService {
     public List<Product> getSales(String username) {
         // Asumimos que "Sold" es el estado para productos ya comprados
         return productRepository.findBySellerNameAndStatus(username, "Sold");
+    }
+
+    public Map<String, Long> getSalesByCategory(List<Transaction> transactions) {
+        return transactions.stream()
+            .collect(Collectors.groupingBy(
+                t -> t.getProduct().getCategory(), 
+                Collectors.counting()  
+            ));
+    }
+    
+    public List<String> getMonthLabels() {
+        return List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+    }
+
+    public List<Double> getRevenueByMonth(List<Transaction> transactions) {
+        Map<Integer, Double> revenueByMonth = new TreeMap<>(); 
+        for (int i = 1; i <= 12; i++) revenueByMonth.put(i, 0.0);
+
+        for (Transaction t : transactions) {
+            if (t.getCreatedAt() != null) {
+                int month = t.getCreatedAt().getMonthValue();
+                revenueByMonth.put(month, revenueByMonth.get(month) + t.getFinalPrice());
+            }
+        }
+
+        return new ArrayList<>(revenueByMonth.values());
+    }
+
+    public record BarChartData(
+        List<String> labels,
+        Map<String, Long> visitsByCategory,
+        Map<String, Long> interestByCategory
+    ) {}
+
+    public BarChartData getBarChartData(User user) {
+        List<UserInteraction> sellerInteractions = interactionRepository.findByProductSeller(user);
+        Map<String, Long> visitsByCategory = new HashMap<>();
+        Map<String, Long> interestByCategory = new HashMap<>();
+        Set<String> allCategories = new HashSet<>();
+
+        for (UserInteraction interaction : sellerInteractions) {
+            String category = interaction.getProduct().getCategory();
+            allCategories.add(category);
+            
+            // If it's a VIEW, it counts as a visit; if it's a LIKE or BUY, it counts as interest
+            if (interaction.getType() == UserInteraction.InteractionType.VIEW) {
+                visitsByCategory.put(category, visitsByCategory.getOrDefault(category, 0L) + 1);
+            } else {
+                interestByCategory.put(category, interestByCategory.getOrDefault(category, 0L) + 1);
+            }
+        }
+        List<String> barLabels = new ArrayList<>(allCategories);
+        return new BarChartData(barLabels, visitsByCategory, interestByCategory);
+
     }
 }

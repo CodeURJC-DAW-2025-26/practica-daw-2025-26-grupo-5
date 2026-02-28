@@ -35,6 +35,7 @@ import es.stilnovo.library.repository.UserInteractionRepository;
 import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.TransactionService;
 import es.stilnovo.library.service.UserService;
+import es.stilnovo.library.service.UserService.BarChartData;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -159,52 +160,22 @@ public class UserWebController {
         // Obtain the transactions where the user is the seller to show purchase history
         List<Transaction> sales = transactionService.getSellerTransactions(principal.getName());
 
-        Map<String, Long> salesByCategory = sales.stream()
-            .collect(Collectors.groupingBy(
-                t -> t.getProduct().getCategory(), 
-                Collectors.counting()  
-            ));
+        // First graph: Sales by category
+        Map<String, Long> salesByCategory = userService.getSalesByCategory(sales);
 
-        Map<Integer, Double> revenueByMonth = new TreeMap<>(); 
-            for (int i = 1; i <= 12; i++) revenueByMonth.put(i, 0.0);
+        // Second graph: Monthly revenue
+        List<String> monthLabels = userService.getMonthLabels();
+        List<Double> monthlyRevenues = userService.getRevenueByMonth(sales);
 
-            for (Transaction t : sales) {
-                if (t.getCreatedAt() != null) {
-                    int month = t.getCreatedAt().getMonthValue();
-                    revenueByMonth.put(month, revenueByMonth.get(month) + t.getFinalPrice());
-                }
-            }
+        BarChartData chartData = userService.getBarChartData(user);
 
-        List<String> monthLabels = List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
-        List<Double> monthlyRevenues = new ArrayList<>(revenueByMonth.values());
-
-        // Logic for the new graph: We will analyze the UserInteractions related to the products sold by this user.
-        List<UserInteraction> sellerInteractions = interactionRepository.findByProductSeller(user);
-        Map<String, Long> visitsByCategory = new HashMap<>();
-        Map<String, Long> interestByCategory = new HashMap<>();
-        Set<String> allCategories = new HashSet<>();
-
-        for (UserInteraction interaction : sellerInteractions) {
-            String category = interaction.getProduct().getCategory();
-            allCategories.add(category);
-            
-            // If it's a VIEW, it counts as a visit; if it's a LIKE or BUY, it counts as interest
-            if (interaction.getType() == UserInteraction.InteractionType.VIEW) {
-                visitsByCategory.put(category, visitsByCategory.getOrDefault(category, 0L) + 1);
-            } else {
-                interestByCategory.put(category, interestByCategory.getOrDefault(category, 0L) + 1);
-            }
-        }
-
-        List<String> barLabels = new ArrayList<>(allCategories);
-        List<Long> visitsData = new ArrayList<>();
-        List<Long> interestData = new ArrayList<>();
-
-        for (String category : barLabels) {
-            visitsData.add(visitsByCategory.getOrDefault(category, 0L));
-            interestData.add(interestByCategory.getOrDefault(category, 0L));
-        }
-
+        List<String> barLabels = chartData.labels();
+        List<Long> visitsData = barLabels.stream()
+            .map(cat -> chartData.visitsByCategory().getOrDefault(cat, 0L))
+            .toList();
+        List<Long> interestData = barLabels.stream()
+            .map(cat -> chartData.interestByCategory().getOrDefault(cat, 0L))
+            .toList();
 
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -471,11 +442,7 @@ public class UserWebController {
         // Obtain the transactions where the user is the seller to show purchase history
         List<Transaction> sales = transactionService.getSellerTransactions(principal.getName());
 
-        Map<String, Long> salesByCategory = sales.stream()
-            .collect(Collectors.groupingBy(
-                t -> t.getProduct().getCategory(), 
-                Collectors.counting()  
-            ));
+        Map<String, Long> salesByCategory = userService.getSalesByCategory(sales);
 
         Map<Integer, Double> revenueByMonth = new TreeMap<>(); 
             for (int i = 1; i <= 12; i++) revenueByMonth.put(i, 0.0);
@@ -487,35 +454,18 @@ public class UserWebController {
                 }
             }
 
-        List<String> monthLabels = List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
-        List<Double> monthlyRevenues = new ArrayList<>(revenueByMonth.values());
+        List<String> monthLabels = userService.getMonthLabels();
+        List<Double> monthlyRevenues = userService.getRevenueByMonth(sales);
 
-        // Logic for the new graph: We will analyze the UserInteractions related to the products sold by this user.
-        List<UserInteraction> sellerInteractions = interactionRepository.findByProductSeller(user);
-        Map<String, Long> visitsByCategory = new HashMap<>();
-        Map<String, Long> interestByCategory = new HashMap<>();
-        Set<String> allCategories = new HashSet<>();
+        BarChartData chartData = userService.getBarChartData(user);
 
-        for (UserInteraction interaction : sellerInteractions) {
-            String category = interaction.getProduct().getCategory();
-            allCategories.add(category);
-            
-            // If it's a VIEW, it counts as a visit; if it's a LIKE or BUY, it counts as interest
-            if (interaction.getType() == UserInteraction.InteractionType.VIEW) {
-                visitsByCategory.put(category, visitsByCategory.getOrDefault(category, 0L) + 1);
-            } else {
-                interestByCategory.put(category, interestByCategory.getOrDefault(category, 0L) + 1);
-            }
-        }
-
-        List<String> barLabels = new ArrayList<>(allCategories);
-        List<Long> visitsData = new ArrayList<>();
-        List<Long> interestData = new ArrayList<>();
-
-        for (String category : barLabels) {
-            visitsData.add(visitsByCategory.getOrDefault(category, 0L));
-            interestData.add(interestByCategory.getOrDefault(category, 0L));
-        }
+        List<String> barLabels = chartData.labels();
+        List<Long> visitsData = barLabels.stream()
+            .map(cat -> chartData.visitsByCategory().getOrDefault(cat, 0L))
+            .toList();
+        List<Long> interestData = barLabels.stream()
+            .map(cat -> chartData.interestByCategory().getOrDefault(cat, 0L))
+            .toList();
 
         ObjectMapper mapper = new ObjectMapper();
         try {
