@@ -455,7 +455,7 @@ Responsable de implementar la generación automática de 3 tipos de documentos P
 
 ---
 
-#### **Alumno 4 - [Nombre Completo]**
+#### **Alumno 4 - Gabriele Antonio Ricucci**
 
 [Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
 
