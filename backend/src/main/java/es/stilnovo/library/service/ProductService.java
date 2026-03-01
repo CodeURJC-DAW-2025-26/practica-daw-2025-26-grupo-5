@@ -178,6 +178,7 @@ public class ProductService {
         existingProduct.setName(updatedData.getName());
         existingProduct.setPrice(updatedData.getPrice());
         existingProduct.setDescription(updatedData.getDescription());
+        existingProduct.setLocation(updatedData.getLocation());
         existingProduct.setCategory(updatedData.getCategory());
 
         // 4. Image Processing: Use imageService to get an Image object, NOT a Blob
