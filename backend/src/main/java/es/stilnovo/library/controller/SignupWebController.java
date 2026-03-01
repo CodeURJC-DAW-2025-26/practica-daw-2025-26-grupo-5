@@ -73,6 +73,21 @@ public class SignupWebController {
         if (!password.equals(confirmPassword)) {
             model.addAttribute("error", "Passwords do not match!");
             model.addAttribute("username", username);
+            model.addAttribute("email", email);
+            return "signup-page";
+        }
+        
+        // Check the user is not already registered
+        if (userService.usernameExists(username)) {
+            model.addAttribute("error", "The username is already taken!");
+            model.addAttribute("email", email);
+            return "signup-page";
+        }
+
+        // Check the email is not already registered
+        if (userService.emailExists(email)) {
+            model.addAttribute("error", "El correo electrónico ya está registrado.");
+            model.addAttribute("username", username);
             return "signup-page";
         }
 
