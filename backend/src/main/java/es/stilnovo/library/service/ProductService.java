@@ -95,7 +95,6 @@ public class ProductService {
         return productRepository.findBySeller(seller);
     }
 
-    // --- FIX: Aggiunto metodo mancante per UserWebController ---
     public long getProductCount(User seller) {
         return productRepository.countBySeller(seller);
     }
