@@ -69,33 +69,33 @@ public class AdminController {
      */
     @GetMapping({ "", "/", "/panel" })
     public String showAdminPanel(Model model, HttpServletRequest request) {
-
+        // STEP 1: Fetch system-wide statistics from service
         int numUsers = adminService.getNumTotalUsers();
         int numBanneds = adminService.getNumBanneds();
-
         model.addAttribute("numUsers", numUsers);
         model.addAttribute("numBanneds", numBanneds);
         
+        // STEP 2: Get recent users preview (limit to 3)
         List<User> allUsers = userService.findAll();
         List<User> dashboardUsers = allUsers.stream()
                                             .limit(3)
                                             .toList();
-        
         model.addAttribute("users", dashboardUsers);
 
-        
+        // STEP 3: Get recent products preview (limit to 3)
         List<Product> allProducts = productService.findAll();
         List<Product> dashboardProducts = allProducts.stream()
                                                     .limit(3)
                                                     .toList();
-
         model.addAttribute("products", dashboardProducts);
 
+        // STEP 4: Extract CSRF token for form submissions
         CsrfToken csrf = (CsrfToken) request.getAttribute("_csrf");
         if (csrf != null) {
             model.addAttribute("token", csrf.getToken());
         }
 
+        // STEP 5: Calculate and display current memory usage
         long usedMemory = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024);
         model.addAttribute("memoryUsage", usedMemory + " MB");
 
@@ -108,11 +108,12 @@ public class AdminController {
      */
     @GetMapping("/users")
     public String listUsers(Model model, HttpServletRequest request) {
-        // Use service layer instead of direct repository access
+        // STEP 1: Fetch complete list of users from database
         List<User> users = userService.findAll();
         model.addAttribute("users", users);
 
-        // Add CSRF token object to model so Mustache section {{#_csrf}} works
+        // STEP 2: Extract CSRF token for delete/ban form operations
+        // STEP 3: Make token available to Mustache templates via _csrf object
         CsrfToken csrf = (CsrfToken) request.getAttribute("_csrf");
         if (csrf != null) {
             model.addAttribute("_csrf", csrf);

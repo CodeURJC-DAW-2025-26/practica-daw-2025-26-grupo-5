@@ -74,10 +74,11 @@ public class AdminService {
                                 String cardCvv,
                                 String cardExpiringDate,
                                 String description) throws IOException {
-
+        // STEP 1: Fetch the user to be updated from database
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
+        // STEP 2: Update profile photo if admin provided a new one
         if (newProfilePhoto != null && !newProfilePhoto.isEmpty()) {
             user.setProfileImage(BlobProxy.generateProxy(
                     newProfilePhoto.getInputStream(),
@@ -85,12 +86,14 @@ public class AdminService {
             ));
         }
 
+        // STEP 3: Conditionally update billing and profile fields (only if not blank)
         if (email != null && !email.trim().isEmpty()) user.setEmail(email);
         if (cardNumber != null && !cardNumber.trim().isEmpty()) user.setCardNumber(cardNumber);
         if (cardCvv != null && !cardCvv.trim().isEmpty()) user.setCardCvv(cardCvv);
         if (cardExpiringDate != null && !cardExpiringDate.trim().isEmpty()) user.setCardExpiringDate(cardExpiringDate);
         if (description != null && !description.trim().isEmpty()) user.setUserDescription(description);
 
+        // STEP 4: Persist updated user to database
         userRepository.save(user);
     }
 

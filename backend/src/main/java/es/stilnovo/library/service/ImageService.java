@@ -37,23 +37,28 @@ public class ImageService {
     }
 
     public Image createImage(InputStream inputStream) throws IOException {
-
+        // STEP 1: Create new Image entity
         Image image = new Image();
 
         try {
+            // STEP 2: Read binary data from input stream
+            // STEP 3: Convert bytes to SerialBlob (database-compatible format)
             image.setImageFile(new SerialBlob(inputStream.readAllBytes()));
         } catch (Exception e) {
             throw new IOException("Failed to create image", e);
         }
 
+        // STEP 4: Return image (not yet persisted, caller should save)
         return image;
     }
 
     public Resource getImageFile(long id) throws SQLException {
-
+        // STEP 1: Fetch image from database by ID
         Image image = imageRepository.findById(id).orElseThrow();
 
+        // STEP 2: Check if image blob exists
         if (image.getImageFile() != null) {
+            // STEP 3: Convert blob to stream resource for HTTP response
             return new InputStreamResource(image.getImageFile().getBinaryStream());
         } else {
             throw new RuntimeException("Image file not found");

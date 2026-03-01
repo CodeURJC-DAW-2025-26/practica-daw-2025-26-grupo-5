@@ -34,18 +34,22 @@ public class RepositoryUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
+        // STEP 1: Query database for user by username
         User user = userRepository.findByName(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
+        // STEP 2: Security gate - block banned users
         if (user.isBanned()) {
             throw new UsernameNotFoundException("User is banned");
         }
 
+        // STEP 3: Convert user roles to Spring Security authorities
         List<GrantedAuthority> roles = new ArrayList<>();
         for (String role : user.getRoles()) {
             roles.add(new SimpleGrantedAuthority(role));
         }
 
+        // STEP 4: Return UserDetails object for authentication
         return new org.springframework.security.core.userdetails.User(
                 user.getName(),
                 user.getEncodedPassword(),

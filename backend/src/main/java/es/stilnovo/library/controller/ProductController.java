@@ -41,12 +41,15 @@ public class ProductController {
                             @RequestParam(required = false) String category,
                             Principal principal,
                             Model model) {
-        
+        // STEP 1: Get user context from session (null if anonymous)
         User user = mainService.getUserContext(principal != null ? principal.getName() : null);
+        // STEP 2: Fetch products matching search/category filters
         List<Product> products = new ArrayList<>(mainService.searchProducts(query, category));
         
+        // STEP 3: Detect if user is performing a search or just browsing
         boolean isSearching = (query != null && !query.isEmpty()) || (category != null && !category.isEmpty());
 
+        // STEP 4: Exclude recommended products when browsing (not searching)
         if (!isSearching) {
             List<Product> recommendedProducts = productService.getRecommendations(user);
             if (recommendedProducts != null && !recommendedProducts.isEmpty()) {
@@ -55,16 +58,20 @@ public class ProductController {
             }
         }
 
+        // STEP 5: Paginate results (10 items per batch)
         int pageSize = 10;
         int endIndex = Math.min(offset + pageSize, products.size());
         
+        // STEP 6: Extract page slice
         List<Product> moreProducts = new ArrayList<>();
         if (offset < products.size()) {
             moreProducts = products.subList(offset, endIndex);
         }
 
+        // STEP 7: Check if this is the last page
         boolean isLast = (endIndex >= products.size());
 
+        // STEP 8: Pass data to template
         model.addAttribute("products", moreProducts);
         model.addAttribute("isLast", isLast);
         

@@ -55,11 +55,14 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
+        // STEP 1: Register authentication provider
         http.authenticationProvider(authenticationProvider());
 
+        // STEP 2: Configure authorization rules
         http
             .authorizeHttpRequests(authorize -> authorize
 
+                // Public endpoints - no authentication required
                 .requestMatchers("/", "/error").permitAll()
                 .requestMatchers("/css/**", "/javascript/**", "/images/**", "/favicon.ico").permitAll()
                 .requestMatchers("/banned").permitAll()
@@ -70,8 +73,10 @@ public class WebSecurityConfig {
 
                 .requestMatchers("/user/me/profile-photo").permitAll()
 
+                // Anonymous browsing allowed
                 .requestMatchers("/load-more-products").permitAll()
 
+                // User/Admin endpoints - requires authentication and proper role
                 .requestMatchers(
                     "/payment-page/**",
                     "/contact-seller-page/**",
@@ -88,8 +93,10 @@ public class WebSecurityConfig {
                     "/api/v1/notifications/**"
                 ).hasAnyRole("USER", "ADMIN")
 
+                // Admin only endpoints
                 .requestMatchers("/admin/**").hasRole("ADMIN")
 
+                // Everything else requires authentication
                 .anyRequest().authenticated()
             )
 

@@ -102,35 +102,40 @@ public class ProductService {
 
     // ALGORITHM METHODS
     public List<Product> getRecommendations(User user) {
-        //If there is no user, show nothing
+        // STEP 1: Handle null user (anonymous browsing)
         if (user == null) { 
             return Collections.emptyList(); 
         }
 
+        // STEP 2: Query database for recommended products based on user interaction history
         List<Product> recommendations = productRepository.findRecommendedProducts(user.getUserId());
 
+        // STEP 3: Return filtered recommendations
         return recommendations;
     }
 
     public void saveInteraction(User user, Product product, UserInteraction.InteractionType type) {
+        // STEP 1: Validate inputs before recording interaction
         if (user != null && product != null) {
+            // STEP 2: Create and persist interaction record
             UserInteraction interaction = new UserInteraction(user, product, type);
             userInteractionRepository.save(interaction);
         }
-        // Make sure this method exists in your ProductRepository!
-        //return productRepository.findByNameContainingIgnoreCase(query);
     }
 
     public void recordView(User user, Product product) {
+        // STEP 1: Create view interaction record
         UserInteraction interaction = new UserInteraction(user, product, UserInteraction.InteractionType.VIEW);
+        // STEP 2: Persist to database for recommendation algorithm
         userInteractionRepository.save(interaction);
     }
     
     public List<Product> findByQueryCategory(String query) {
+        // STEP 1: Handle empty query - return all products
         if (query == null || query.isEmpty()) {
             return productRepository.findAll();
         }
-        // Make sure this method exists in your ProductRepository!
+        // STEP 2: Search products by category (case-insensitive)
         return productRepository.findByCategoryContainingIgnoreCase(query);
     }
 

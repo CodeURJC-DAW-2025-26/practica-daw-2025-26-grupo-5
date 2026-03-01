@@ -44,17 +44,18 @@ public class ValorationController {
      */
     @GetMapping("/user-valorations-page")
     public String showValorationDashboard(Model model, Principal principal) {
-        
-        // 1. Identity Verification via Session
+        // STEP 1: Get authenticated user from security principal
         User user = userService.getFullUserProfile(principal.getName());
         model.addAttribute("user", user);
 
-        // 2. Fetch processed data from Service
+        // STEP 2: Fetch all transactions awaiting buyer's review
         List<Transaction> pending = valorationService.getPendingTransactions(user);
         
-        // 3. Populate Model for UI badges and lists
+        // STEP 3: Populate model with pending reviews and count for UI badges
         model.addAttribute("pendingValorations", pending);
         model.addAttribute("pendingCount", pending.size());
+        
+        // STEP 4: Fetch buyer's complete rating history
         model.addAttribute("myValorations", valorationService.getBuyerHistory(user));
 
         return "user-valorations-page"; 
@@ -69,14 +70,13 @@ public class ValorationController {
                                     @RequestParam long transactionId,
                                     @RequestParam int stars,
                                     @RequestParam String comment) {
-
-        // 1. Identify current buyer
+        // STEP 1: Get the authenticated user (buyer) from session
         User buyer = userService.getFullUserProfile(principal.getName());
 
-        // 2. Delegate secure storage and rating update to the Service
+        // STEP 2: Delegate validation, persistence, and rating calculation to service
         valorationService.saveAndUpdateSellerRating(transactionId, stars, comment, buyer);
 
-        // 3. Secure Redirect: No ID leak in URL
+        // STEP 3: Redirect to dashboard without exposing internal IDs in URL
         return "redirect:/user-valorations-page";
     }
 
@@ -86,14 +86,13 @@ public class ValorationController {
      */
     @PostMapping("/valoration/delete/{id}")
     public String deleteValoration(@PathVariable long id, Principal principal) {
-        
-        // 1. Identify the authenticated user
+        // STEP 1: Get the authenticated user performing the deletion
         User user = userService.getFullUserProfile(principal.getName());
 
-        // 2. Execute deletion via Service
+        // STEP 2: Call service to delete the review (includes ownership validation)
         valorationService.deleteValoration(id, user);
 
-        // 3. Redirect back to the dashboard
+        // STEP 3: Redirect back to dashboard
         return "redirect:/user-valorations-page";
     }
 

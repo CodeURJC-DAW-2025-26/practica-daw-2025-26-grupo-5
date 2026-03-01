@@ -28,12 +28,16 @@ public class MailService {
      */
     public void sendHtml(String to, String subject, String htmlBody) {
         try {
+            // STEP 1: Create MIME message
             MimeMessage message = mailSender.createMimeMessage();
+            // STEP 2: Configure email headers and encoding
             MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
             helper.setFrom(fromAddress);
             helper.setTo(to);
             helper.setSubject(subject);
+            // STEP 3: Set HTML body with true flag for HTML support
             helper.setText(htmlBody, true);
+            // STEP 4: Send email via SMTP
             mailSender.send(message);
         } catch (MessagingException ex) {
             throw new IllegalStateException("Failed to build email", ex);

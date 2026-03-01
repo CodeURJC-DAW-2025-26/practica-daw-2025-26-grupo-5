@@ -40,34 +40,31 @@ public class InfoProductController {
 
     @GetMapping("/info-product-page/{id}")
     public String infoProduct(Model model, @PathVariable long id, Principal principal) {
-        
-        // 1. Get the current authenticated user context
+        // STEP 1: Get the authenticated user context if logged in
         User user = (principal != null) ? mainService.getUserContext(principal.getName()) : null;
 
-        // 2. Fetch the product by ID or throw a 404 exception if it doesn't exist
-        // This removes the need for extra null checks later
+        // STEP 2: Fetch product by ID from database (throws 404 if not found)
         Product product = productService.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
 
-        // 3. Business Logic: Record a 'VIEW' interaction if the user is logged in
-        // We delegate the implementation details to the Service layer
+        // STEP 3: Record user view interaction for analytics if logged in
         if (user != null) {
             productService.recordView(user, product);
         }
 
-        // 4. Fetch personalized recommendations for the user
+        // STEP 4: Get personalized product recommendations for user
         List<Product> recommendations = productService.getRecommendations(user);
         
-        // 5. UX Improvement: Remove the current product from the recommendations list
+        // STEP 5: Remove current product from recommendations to avoid duplication
         if (recommendations != null) {
             recommendations.removeIf(p -> p.getId().equals(id));
         }
 
-        // To render or not the you may also like secction
+        // STEP 6: Determine if recommendations section should be displayed
         boolean showSection = (recommendations != null && !recommendations.isEmpty());
         model.addAttribute("haveRecoProds", showSection);
 
-        // 6. Populate the model for the Mustache template
+        // STEP 7: Populate model with all data for template rendering
         model.addAttribute("product", product);
         model.addAttribute("recommendedProducts", recommendations);
         model.addAttribute("logged", user != null);

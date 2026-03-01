@@ -49,8 +49,11 @@ public class ValorationService {
      */
     @Transactional(readOnly = true)
     public List<Transaction> getPendingTransactions(User buyer) {
+        // STEP 1: Fetch all transactions where user is the buyer
         List<Transaction> allOrders = transactionRepository.findByBuyerUserId(buyer.getUserId());
         
+        // STEP 2: Filter out transactions that already have a rating
+        // STEP 3: Return only unrated transactions (pending reviews)
         return allOrders.stream()
                 .filter(trans -> !valorationRepository.existsByTransaction(trans))
                 .collect(Collectors.toList());
@@ -66,24 +69,25 @@ public class ValorationService {
      */
     @Transactional
     public void saveAndUpdateSellerRating(long transactionId, int stars, String comment, User buyer) {
-        // 1. Validate Transaction ownership and existence
+        // STEP 1: Fetch transaction and validate it exists
         Transaction transaction = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
 
+        // STEP 2: Security check - buyer can only rate their own purchases
         if (!transaction.getBuyer().getUserId().equals(buyer.getUserId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only rate your own purchases");
         }
 
-        // 2. Prevent duplicate ratings for the same transaction
+        // STEP 3: Prevent duplicate ratings - a transaction can only be rated once
         if (valorationRepository.existsByTransaction(transaction)) {
             throw new IllegalStateException("This transaction has already been rated");
         }
         
-        // 3. Persist the new review
+        // STEP 4: Create and persist the new review
         Valoration valoration = new Valoration(transaction, stars, comment);
         valorationRepository.save(valoration);
 
-        // 4. Trigger statistical update for the seller
+        // STEP 5: Update seller's average rating and review count
         updateSellerStats(transaction.getSeller());
     }
 

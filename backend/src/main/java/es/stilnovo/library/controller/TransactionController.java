@@ -48,22 +48,21 @@ public class TransactionController {
      */
     @PostMapping("/transactions/confirm/{productId}")
     public String confirmPayment(@PathVariable long productId, Principal principal) {
-        
-        // 1. Context Retrieval: Fetch full entities via Service Layer
+        // STEP 1: Fetch buyer and product entities from services
         User buyer = userService.getFullUserProfile(principal.getName());
         Product product = productService.findById(productId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
 
-        // 2. Security Check: Prevent self-buying
+        // STEP 2: Security validation - prevent seller from buying their own product
         if (product.getSeller().getUserId().equals(buyer.getUserId())) {
             return "redirect:/info-product-page/" + productId + "?error=self_purchase";
         }
 
         try {
-            // 3. Execution: Delegate database updates to the Service Layer
+            // STEP 3: Execute purchase transaction (updates inventory, balances, records transaction)
             transactionService.executePurchase(product, buyer);
 
-            // 4. Notification: Send professional confirmation email with logo
+            // STEP 4: Prepare confirmation email with logo
             Resource logoResource = resourceLoader.getResource("classpath:static/images/logo.png");
             String logoCid = "stilnovoLogo";
             String htmlBody = createPurchaseConfirmationEmail(
@@ -75,6 +74,7 @@ public class TransactionController {
             );
             
             try {
+                // STEP 5: Send confirmation email to buyer
                 mailService.sendHtmlWithInline(
                     buyer.getEmail(), 
                     "Stilnovo: Purchase Confirmation - " + product.getName(), 
@@ -83,7 +83,7 @@ public class TransactionController {
                     logoResource
                 );
                 
-                // Also send notification email to the seller
+                // STEP 6: Send sale notification email to seller
                 String sellerHtmlBody = createSellerSaleNotificationEmail(
                     product.getName(),
                     product.getPrice(),
@@ -104,7 +104,7 @@ public class TransactionController {
                 System.err.println("Failed to send confirmation emails: " + ex.getMessage());
             }
 
-            // 5. Clean Redirect: No IDs in the URL for the user's dashboard
+            // STEP 7: Redirect to orders page with clean URL
             return "redirect:/sales-and-orders-page";
 
         } catch (IllegalStateException e) {

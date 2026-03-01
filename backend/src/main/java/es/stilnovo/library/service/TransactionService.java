@@ -47,11 +47,12 @@ public class TransactionService {
      */
     @Transactional
     public Transaction executePurchase(Product product, User buyer) {
-        
+        // STEP 1: Validate product is available for sale
         if (!"active".equalsIgnoreCase(product.getStatus())) {
             throw new IllegalStateException("Product is no longer available for sale.");
         }
 
+        // STEP 2: Create transaction record with buyer, seller, and product details
         Transaction transaction = new Transaction(
             product.getSeller(),
             buyer,
@@ -59,6 +60,7 @@ public class TransactionService {
             "Completed"
         );
 
+        // STEP 3: Calculate new seller financial balance
         User seller = product.getSeller();
         Double productPrice = product.getPrice();
         Double sellerBalance = seller.getBalance();
@@ -67,16 +69,19 @@ public class TransactionService {
         sellerBalance += productPrice;
         sellerTotalRevenue += productPrice;
         
+        // STEP 4: Persist updated seller financial information
         seller.setBalance(sellerBalance);
         seller.setTotalRevenue(sellerTotalRevenue);
 
         userRepository.save(seller);
 
+        // STEP 5: Mark product as sold and record interaction
         product.setStatus("Sold");
         productRepository.save(product);
         UserInteraction buyInteraction = new UserInteraction(buyer, product, UserInteraction.InteractionType.BUY);
         interactionRepository.save(buyInteraction);
 
+        // STEP 6: Persist transaction and return
         return transactionRepository.save(transaction);
     }
 

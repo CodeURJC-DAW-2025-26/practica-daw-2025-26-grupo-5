@@ -41,30 +41,34 @@ public class ContactSellerController {
                                     @RequestParam(required = false) String sent,
                                     @RequestParam(required = false) String error,
                                     @RequestParam(required = false) String cooldown) {
-        
+        // STEP 1: Check buyer is authenticated
         if (principal == null) {
             return "redirect:/login-page";
         }
 
+        // STEP 2: Fetch product and its seller
         Product product = productService.findById(id).orElseThrow();
         User seller = product.getSeller();
+        
+        // STEP 3: Get current buyer from security context
         User buyer = userService.findByName(principal.getName()).orElseThrow();
 
+        // STEP 4: Prevent seller from sending inquiry about their own product
         if (seller.getUserId().equals(buyer.getUserId())) {
             return "redirect:/info-product-page/" + id + "?error=self_purchase";
         }
 
+        // STEP 5: Populate model with product and seller information
         model.addAttribute("product", product);
         model.addAttribute("seller", seller);
+        
+        // STEP 6: Pre-fill buyer's contact information for convenience
+        userService.findByName(principal.getName()).ifPresent(user -> {
+            model.addAttribute("buyerName", user.getName());
+            model.addAttribute("buyerEmail", user.getEmail());
+        });
 
-        if (principal != null) {
-            // Use service layer instead of direct repository access
-            userService.findByName(principal.getName()).ifPresent(user -> {
-                model.addAttribute("buyerName", user.getName());
-                model.addAttribute("buyerEmail", user.getEmail());
-            });
-        }
-
+        // STEP 7: Pass status flags to template (sent, error, cooldown messages)
         model.addAttribute("sent", "true".equalsIgnoreCase(sent));
         model.addAttribute("error", error);
         model.addAttribute("cooldownMinutes", cooldown);

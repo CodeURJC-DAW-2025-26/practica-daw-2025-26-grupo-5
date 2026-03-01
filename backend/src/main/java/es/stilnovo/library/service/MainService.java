@@ -32,15 +32,19 @@ public class MainService {
      * Executes product search based on query or category.
      */
     public List<Product> searchProducts(String query, String category) {
+        // STEP 1: Define search filter (only active products)
         String status = "Active";
 
+        // STEP 2: Check if user searched by query text
         if(query != null && !query.isEmpty()){
             return productService.findByQuery(query);
         }
+        // STEP 3: Check if user filtered by category
         if (category != null && !category.isEmpty()) {
             return productService.findByQueryCategory(category);
         } 
         
+        // STEP 4: Return all active products (default browse)
         return productService.findProductsByStatus(status);
     }
 

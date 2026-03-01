@@ -43,29 +43,28 @@ public class PaymentController {
      */
     @GetMapping("/payment-page/{id}")
     public String showPaymentPage(Model model, @PathVariable long id, Principal principal) {
-
-        // 1. Authentication guard
+        // STEP 1: Authentication check - redirect to login if not authenticated
         if (principal == null) {
             return "redirect:/login-page";
         }
 
-        // 2. Fetch target product via Service Layer
+        // STEP 2: Fetch product from database via service layer
         Product product = productService.findById(id).orElseThrow();
 
-        // 3. Fetch current logged-in user (the buyer) via Service Layer
+        // STEP 3: Get current buyer user information from security context
         User buyer = userService.findByName(principal.getName()).orElseThrow();
 
-        // 4. BUSINESS RULE: Prevent sellers from buying their own items
+        // STEP 4: Security validation - prevent sellers from buying their own products
         if (product.getSeller().getUserId().equals(buyer.getUserId())) {
             return "redirect:/info-product-page/" + id + "?error=self_purchase";
         }
 
-        // 5. STATUS CHECK: Ensure the product is still available for sale
+        // STEP 5: Check product is still available (active status)
         if (!"active".equalsIgnoreCase(product.getStatus())) {
             return "redirect:/info-product-page/" + id + "?error=not_available";
         }
 
-        // 6. Map attributes for Mustache template rendering
+        // STEP 6: Populate model with product and buyer data for payment form
         model.addAttribute("product", product);
         model.addAttribute("user", buyer);
 

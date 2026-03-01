@@ -37,13 +37,16 @@ public class InquiryService {
      * @return Optional containing the last inquiry, or empty if none found
      */
     public Optional<Inquiry> getLastInquiry(Long buyerId, Long productId) {
+        // STEP 1: Load buyer and product entities from database
         User buyer = userRepository.findById(buyerId).orElse(null);
         Product product = productRepository.findById(productId).orElse(null);
         
+        // STEP 2: Return empty if either entity doesn't exist
         if (buyer == null || product == null) {
             return Optional.empty();
         }
         
+        // STEP 3: Query most recent inquiry for spam/cooldown detection
         Inquiry lastInquiry = inquiryRepository.findTopByBuyerAndProductOrderByCreatedAtDesc(buyer, product);
         return Optional.ofNullable(lastInquiry);
     }
@@ -76,11 +79,14 @@ public class InquiryService {
                                     String sellerEmail, Long buyerId, String buyerName, 
                                     String buyerEmail, String buyerPhone, String inquiryType, 
                                     String message, String status) {
+        // STEP 1: Create new inquiry entity
         Inquiry inquiry = new Inquiry();
         
+        // STEP 2: Fetch related entities (product and buyer) from database
         Product product = productRepository.findById(productId).orElse(null);
         User buyer = userRepository.findById(buyerId).orElse(null);
         
+        // STEP 3: Populate inquiry with all provided data
         inquiry.setProduct(product);
         inquiry.setBuyer(buyer);
         inquiry.setProductName(productName);
@@ -93,6 +99,7 @@ public class InquiryService {
         inquiry.setCreatedAt(LocalDateTime.now());
         inquiry.setStatus(status);
         
+        // STEP 4: Persist inquiry to database and return
         return inquiryRepository.save(inquiry);
     }
 }

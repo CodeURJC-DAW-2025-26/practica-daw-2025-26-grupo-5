@@ -103,13 +103,19 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public double getAverageRatingForSeller(String username) {
+        // STEP 1: Query for seller by username
         User seller = userRepository.findByName(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
+        // STEP 2: Fetch all ratings/reviews for this seller
         java.util.List<Valoration> valorations = valorationRepository.findBySeller(seller);
+        
+        // STEP 3: Handle case where seller has no ratings yet
         if (valorations.isEmpty()) {
             return 0.0;
         }
+        
+        // STEP 4: Calculate and return average star rating
         return valorations.stream()
                 .mapToInt(Valoration::getStars)
                 .average()
@@ -166,26 +172,27 @@ public class UserService {
      */
     @Transactional
     public void deleteUserById(Long userId) {
+        // STEP 1: Fetch user from database (throws 404 if not found)
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        // Security Check: Block admin deletion
+        // STEP 2: Security check - prevent deletion of administrators
         if (user.getRoles().contains("ROLE_ADMIN")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot delete an administrator.");
         }
 
-        // 1. Clear Valorations and Transactions
+        // STEP 3: Delete all ratings and transactions involving the user
         List<Transaction> userTransactions = transactionRepository.findByBuyerOrSeller(user, user);
         if (!userTransactions.isEmpty()) {
             valorationRepository.deleteByTransactionIn(userTransactions);
             transactionRepository.deleteAll(userTransactions);
         }
 
-        // 2. Clear Interactions 
+        // STEP 4: Delete all user interaction records (views, likes, etc)
         interactionRepository.deleteByUser(user);
         interactionRepository.deleteByProductSeller(user);
 
-        // 3. Final Delete (Cascade handles products)
+        // STEP 5: Delete user (cascade deletes products)
         userRepository.delete(user);
     }
 

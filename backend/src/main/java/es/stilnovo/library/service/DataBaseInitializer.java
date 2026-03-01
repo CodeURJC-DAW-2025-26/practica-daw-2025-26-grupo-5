@@ -52,19 +52,22 @@ public class DataBaseInitializer {
 
     @PostConstruct
     public void init() throws IOException, URISyntaxException {
-
+        // STEP 1: Load default profile images for users and admin
         Resource defaultUserImage = new ClassPathResource("static/images/no-profile-picture.png");
         Blob photoUserBlob = BlobProxy.generateProxy(defaultUserImage.getInputStream(), defaultUserImage.contentLength());
 
         Resource defaultAdminImage = new ClassPathResource("static/images/admin-profile-picture.png");
         Blob photoAdminBlob = BlobProxy.generateProxy(defaultAdminImage.getInputStream(), defaultAdminImage.contentLength());
 
+        // STEP 2: Create default user and admin accounts with sample data
         User user = new User("user", passwordEncoder.encode("user"), "user@stilnovo.es", photoUserBlob, 4.7, "1234 5678 9012 3456", "123", "09/27", 0, 129.10, 1872.87, "I am a default user","ROLE_USER");
         User admin = new User("admin", passwordEncoder.encode("admin"), "admin@stilnovo.es", photoAdminBlob, 5.0, "3456 7890 1234 5678", "456", "07/26", 0, 34.89, 899.76, "I am the administrator of the Stilnovo Ecosistem","ROLE_USER", "ROLE_ADMIN");
 
+        // STEP 3: Persist users to database
         userRepository.save(user);
         userRepository.save(admin);
         
+        // STEP 4: Create 10 sample products in various categories
         Product product1 = new Product("Audi A3 Sportback", "cars", 42500, "Audi A3 Sportback in excellent condition, S-Line edition, featuring sporty finishes, a well-maintained interior, and a perfect balance between comfort, performance, and premium design.", "Active", user, "Mostoles, Madrid");
         Product product2 = new Product("iPhone 17 Pro", "tech", 1399, "The latest Apple smartphone, equipped with advanced AI-powered features, a next-generation professional camera system, and outstanding performance for everyday and professional use.", "Active", user, "Calle de Velazquez 45, 28001 Madrid");
         Product product3 = new Product("Dell XPS 15 Laptop", "tech", 1899, "High-performance Dell XPS 15 laptop with a stunning 4K display, elegant design, and powerful hardware ideal for demanding tasks such as editing, development, and creative work.", "Active", user, "Calle de Alcala 120, 28009 Madrid");
@@ -76,56 +79,19 @@ public class DataBaseInitializer {
         Product product9 = new Product("BMW M3 Competition", "cars", 96500, "High-performance BMW M3 Competition sports sedan with a twin-turbo engine, aggressive styling, and precision engineering for an exhilarating driving experience.", "Active", user, "Mostoles, Madrid");
         Product product10 = new Product("Adidas Campus", "fashion", 99, "Adidas Campus sneakers designed for everyday wear, offering a timeless design, comfortable fit, and durable materials suitable for daily use.", "Active", user, "Mostoles, Madrid");
         
-        // 3. Associate specific images from /resources/sample-images/images/
+        // STEP 5: Associate product images from classpath resources
         setProductImage(product1, "Audi-a3-1.png");
-        /*setProductImage(product1, "Audi-a3-2.png");
-        setProductImage(product1, "Audi-a3-3.png");
-        setProductImage(product1, "Audi-a3-4.png");*/
-
         setProductImage(product2, "Iphone-17-1.png");
-        /*setProductImage(product2, "Iphone-17-2.png");
-        setProductImage(product2, "Iphone-17-3.png");
-        setProductImage(product2, "Iphone-17-4.png");*/
-
-
         setProductImage(product3, "ordenador-dell-1.png");
-        /*setProductImage(product3, "ordenador-dell-2.png");
-        setProductImage(product3, "ordenador-dell-3.png");*/
-
         setProductImage(product4, "Abrigo-1.png");
-        /*setProductImage(product4, "Abrigo-2.png");
-        setProductImage(product4, "Abrigo-3.png");
-        setProductImage(product4, "Abrigo-4.png");*/
-
         setProductImage(product5, "Mesa-Blanca-1.png");
-        /*setProductImage(product5, "Mesa-Blanca-2.png");
-        setProductImage(product5, "Mesa-Blanca-3.png");
-        setProductImage(product5, "Mesa-Blanca-4.png");*/
-
         setProductImage(product6, "lampara-paja-1.png");
-        /*setProductImage(product6, "lampara-paja-2.png");*/
-
         setProductImage(product7, "lexus-1.png");
-        /*setProductImage(product7, "lexus-2.png");
-        setProductImage(product7, "lexus-3.png");
-        setProductImage(product7, "lexus-4.png");*/
-
-
         setProductImage(product8, "cafetera-1.png");
-        /*setProductImage(product8, "cafetera-2.png");*/
-
         setProductImage(product9, "bmw-1.png");
-        /*setProductImage(product9, "bmw-2.png");
-        setProductImage(product9, "bmw-3.png");
-        setProductImage(product9, "bmw-4.png");*/
-
-
         setProductImage(product10, "adidas-1.png");
-        /*setProductImage(product10, "adidas-2.png");
-        setProductImage(product10, "adidas-3.png");*/
 
-
-        // 4. Persist all products into the MySQL database (Docker)
+        // STEP 6: Persist all products to database
         productService.save(product1);
         productService.save(product2);
         productService.save(product3);
@@ -136,6 +102,5 @@ public class DataBaseInitializer {
         productService.save(product8);
         productService.save(product9);
         productService.save(product10);
-
     }
 }
