@@ -71,87 +71,89 @@
             <div class="d-flex flex-column gap-3">
                 
                 {{#userProducts}}
-                <div class="clay-card p-3 d-flex align-items-center justify-content-between flex-wrap gap-3">
-                    <div class="d-flex align-items-center gap-4">
-                        <div class="product-img-preview rounded-4 bg-white d-flex align-items-center justify-content-center overflow-hidden shadow-inner" style="width: 80px; height: 80px; border: 1px solid #f1f4f8;">
-                            <img src="/product-images/{{id}}" alt="{{name}}" class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
+                <a href="/info-product-page/{{id}}" class="d-flex align-items-center gap-4 text-decoration-none text-dark">
+                    <div class="clay-card p-3 d-flex align-items-center justify-content-between flex-wrap gap-3">
+                        <div class="d-flex align-items-center gap-4">
+                            <div class="product-img-preview rounded-4 bg-white d-flex align-items-center justify-content-center overflow-hidden shadow-inner" style="width: 80px; height: 80px; border: 1px solid #f1f4f8;">
+                                <img src="/product-images/{{id}}" alt="{{name}}" class="img-fluid" style="width: 100%; height: 100%; object-fit: cover;">
+                            </div>
+                            <div>
+                                <h4 class="fw-800 h6 mb-1">{{name}}</h4>
+                                <p class="x-small text-muted mb-2">Ref: #ST-0{{id}}</p>
+                                
+                                <div class="mb-1">
+                                    {{#isActive}}
+                                    <span class="badge rounded-pill bg-success-subtle text-success x-small px-3">
+                                        <i class="fa-solid fa-circle-check me-1"></i> Active
+                                    </span>
+                                    {{/isActive}}
+
+                                    {{#isBlocked}}
+                                    <span class="badge rounded-pill bg-warning-subtle text-warning x-small px-3" style="color: #fd7e14 !important;">
+                                        <i class="fa-solid fa-ban me-1"></i> Blocked by Admin
+                                    </span>
+                                    {{/isBlocked}}
+
+                                    {{#isSold}}
+                                    <span class="badge rounded-pill bg-danger-subtle text-danger x-small px-3">
+                                        <i class="fa-solid fa-circle-xmark me-1"></i> Sold
+                                    </span>
+                                    {{/isSold}}
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <h4 class="fw-800 h6 mb-1">{{name}}</h4>
-                            <p class="x-small text-muted mb-2">Ref: #ST-0{{id}}</p>
+                        
+                        <div class="d-flex align-items-center gap-5">
+                            <div class="text-end d-none d-md-block">
+                                <p class="x-small opacity-50 mb-0 fw-800">Listing Price</p>
+                                <p class="fw-800 h5 mb-0" style="color: var(--brand-blue)">{{price}}€</p>
+                            </div>
                             
-                            <div class="mb-1">
+                            <div class="d-flex gap-2">
                                 {{#isActive}}
-                                <span class="badge rounded-pill bg-success-subtle text-success x-small px-3">
-                                    <i class="fa-solid fa-circle-check me-1"></i> Active
-                                </span>
+                                <a href="/edit-product-page/{{id}}" class="btn-about p-2 rounded-3 text-dark text-decoration-none shadow-sm" title="Edit Item">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
                                 {{/isActive}}
 
                                 {{#isBlocked}}
-                                <span class="badge rounded-pill bg-warning-subtle text-warning x-small px-3" style="color: #fd7e14 !important;">
-                                    <i class="fa-solid fa-ban me-1"></i> Blocked by Admin
-                                </span>
+                                <button class="btn-about p-2 rounded-3 text-muted border-0 bg-white shadow-sm opacity-50" title="This item is blocked and cannot be edited" disabled>
+                                    <i class="fa-solid fa-lock"></i>
+                                </button>
                                 {{/isBlocked}}
 
-                                {{#isSold}}
-                                <span class="badge rounded-pill bg-danger-subtle text-danger x-small px-3">
-                                    <i class="fa-solid fa-circle-xmark me-1"></i> Sold
-                                </span>
-                                {{/isSold}}
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="d-flex align-items-center gap-5">
-                        <div class="text-end d-none d-md-block">
-                            <p class="x-small opacity-50 mb-0 fw-800">Listing Price</p>
-                            <p class="fw-800 h5 mb-0" style="color: var(--brand-blue)">{{price}}€</p>
-                        </div>
-                        
-                        <div class="d-flex gap-2">
-                            {{#isActive}}
-                            <a href="/edit-product-page/{{id}}" class="btn-about p-2 rounded-3 text-dark text-decoration-none shadow-sm" title="Edit Item">
-                                <i class="fa-solid fa-pen-to-square"></i>
-                            </a>
-                            {{/isActive}}
-
-                            {{#isBlocked}}
-                            <button class="btn-about p-2 rounded-3 text-muted border-0 bg-white shadow-sm opacity-50" title="This item is blocked and cannot be edited" disabled>
-                                <i class="fa-solid fa-lock"></i>
-                            </button>
-                            {{/isBlocked}}
-
-                            <button type="button" class="btn-about p-2 rounded-3 text-danger border-0 bg-white shadow-sm" 
-                                    title="Delete" data-bs-toggle="modal" data-bs-target="#deleteProductModal{{id}}">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="modal fade" id="deleteProductModal{{id}}" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="clay-card modal-content p-4 border-0 shadow-lg text-center">
-                            <div class="bg-danger-subtle text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 60px; height: 60px;">
-                                <i class="fa-solid fa-triangle-exclamation fa-2x"></i>
-                            </div>
-                            <h3 class="fw-800 h5 mb-2 text-danger">Confirm Deletion</h3>
-                            <p class="small text-muted fw-700 mb-4">Are you sure you want to remove <strong>{{name}}</strong>? This action cannot be undone.</p>
-                            
-                            <div class="d-grid gap-2">
-                                <form action="/delete-product/{{id}}" method="post" class="m-0">
-                                    <input type="hidden" name="_csrf" value="{{token}}"/>
-                                    <button type="submit" class="btn btn-danger w-100 py-3 rounded-pill fw-800 shadow-sm border-0">
-                                        Delete Forever
-                                    </button>
-                                </form>
-                                <button type="button" class="btn btn-light w-100 py-3 rounded-pill fw-800 border-0" data-bs-dismiss="modal">
-                                    Cancel
+                                <button type="button" class="btn-about p-2 rounded-3 text-danger border-0 bg-white shadow-sm" 
+                                        title="Delete" data-bs-toggle="modal" data-bs-target="#deleteProductModal{{id}}">
+                                    <i class="fa-solid fa-trash-can"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
-                </div>
+
+                    <div class="modal fade" id="deleteProductModal{{id}}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="clay-card modal-content p-4 border-0 shadow-lg text-center">
+                                <div class="bg-danger-subtle text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-3 mx-auto" style="width: 60px; height: 60px;">
+                                    <i class="fa-solid fa-triangle-exclamation fa-2x"></i>
+                                </div>
+                                <h3 class="fw-800 h5 mb-2 text-danger">Confirm Deletion</h3>
+                                <p class="small text-muted fw-700 mb-4">Are you sure you want to remove <strong>{{name}}</strong>? This action cannot be undone.</p>
+                                
+                                <div class="d-grid gap-2">
+                                    <form action="/delete-product/{{id}}" method="post" class="m-0">
+                                        <input type="hidden" name="_csrf" value="{{token}}"/>
+                                        <button type="submit" class="btn btn-danger w-100 py-3 rounded-pill fw-800 shadow-sm border-0">
+                                            Delete Forever
+                                        </button>
+                                    </form>
+                                    <button type="button" class="btn btn-light w-100 py-3 rounded-pill fw-800 border-0" data-bs-dismiss="modal">
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
                 {{/userProducts}}
 
             </div>
