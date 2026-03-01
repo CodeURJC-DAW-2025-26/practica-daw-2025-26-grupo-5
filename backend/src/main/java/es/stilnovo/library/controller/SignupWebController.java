@@ -22,7 +22,19 @@ import org.springframework.ui.Model;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-/** Controller for user registration/signup */
+/**
+ * SignupWebController: Handles user registration and account creation
+ * 
+ * This controller manages:
+ * - Signup form display
+ * - User registration validation
+ * - Password confirmation checking
+ * - Profile picture upload (with default fallback)
+ * - New user account creation with default values
+ * - Redirect to login after successful signup
+ * 
+ * Uses: UserService, PasswordEncoder
+ */
 @Controller
 public class SignupWebController {
 
@@ -37,9 +49,10 @@ public class SignupWebController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /** Display signup form with CSRF protection */
     @GetMapping("/signup-page")
     public String signup(Model model, HttpServletRequest request) {
-        // Obtenemos el token para que el formulario sea seguro
+        // STEP 1: Extract CSRF token for secure form submission
         CsrfToken token = (CsrfToken) request.getAttribute("_csrf");
         if (token != null) {
             model.addAttribute("token", token.getToken());
@@ -48,6 +61,7 @@ public class SignupWebController {
         return "signup-page"; 
     }
 
+    /** Process account creation with validation */
     @PostMapping("/signup-page")
     public String createAccount(Model model, 
                                 @RequestParam MultipartFile profilePicture, 
@@ -55,39 +69,36 @@ public class SignupWebController {
                                 @RequestParam String email,
                                 @RequestParam String password,
                                 @RequestParam String confirmPassword) throws IOException{
-
-        // 1. Validamos que las contraseñas sean idénticas
+        // STEP 1: Validate passwords match
         if (!password.equals(confirmPassword)) {
             model.addAttribute("error", "Passwords do not match!");
-            // Opcional: pasar el nombre de usuario de vuelta para que no tenga que escribirlo otra vez
             model.addAttribute("username", username);
-            return "signup-page"; // Volvemos al formulario con el error
+            return "signup-page";
         }
 
+        // STEP 2: Encrypt password using BCrypt
         String encodedPassword = passwordEncoder.encode(password);
 
-        // 2. We process the image if it was uploaded
+        // STEP 3: Process profile picture or assign default image
         Blob imageBlob = null;
         if (profilePicture != null && !profilePicture.isEmpty()) {
             imageBlob = BlobProxy.generateProxy(
                 profilePicture.getInputStream(), 
                 profilePicture.getSize()
             );
-        }else{ //asign a default image
-
+        }else{
             Resource defaultUserImage = new ClassPathResource("static/images/no-profile-picture.png");
             Blob photoUserBlob = BlobProxy.generateProxy(defaultUserImage.getInputStream(), defaultUserImage.contentLength());
             imageBlob = photoUserBlob;
         }
         
-        // 3. We create the user with default values (rating 5.0, 0 reviews)
-        // We add ROLE_USER so they can log in later
+        // STEP 4: Create new user entity with default values (5.0 rating, ROLE_USER)
         User newUser = new User(username, encodedPassword, email, imageBlob, 5.0, null, null, null , 0, 0.0, 0.0, null, "ROLE_USER");
 
-        // 4. Save to database via Service Layer
+        // STEP 5: Persist user to database via service layer
         userService.save(newUser);
 
-        //If signup ok, redirect
+        // STEP 6: Redirect to login page after successful registration
         return "redirect:/login-page";
     }
 }

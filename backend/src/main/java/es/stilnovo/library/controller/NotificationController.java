@@ -21,7 +21,18 @@ import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.UserService;
 import jakarta.mail.MessagingException;
 
-/** Controller for handling customer inquiries and notifications to sellers */
+/**
+ * NotificationController: Handles buyer-to-seller inquiry emails
+ * 
+ * This controller manages:
+ * - Inquiry form submission validation
+ * - Spam prevention with cooldown periods (30 minutes)
+ * - Email notification to seller about new inquiry
+ * - Confirmation email to buyer
+ * - Inquiry persistence with status tracking (SENT/FAILED_MAIL)
+ * 
+ * Uses: ProductService, MailService, UserService, InquiryService
+ */
 @Controller
 public class NotificationController {
 
@@ -40,29 +51,25 @@ public class NotificationController {
     @Autowired
     private ResourceLoader resourceLoader; // To load the logo from classpath
 
-    //  MAL--> /api/v1/notifications/send-inquiry
-    //  BIEN --> /notifications/send-inquiry
+    /** Process inquiry submission with spam prevention and email notifications */
     @PostMapping("/notifications/send-inquiry")
     public String sendInquiry(@RequestParam long productId,
                                 @RequestParam(required = false) String phone,
                                 @RequestParam String type,
                                 @RequestParam String message,
                                 Principal principal) {
-        
-        // 1. Validate Product and User authentication
+        // STEP 1: Validate product exists and user is authenticated
         Product product = productService.findById(productId).orElseThrow();
         if (principal == null) {
             return "redirect:/contact-seller-page/" + productId + "?error=auth";
         }
 
-        // Use service layer instead of direct repository access
         User buyer = userService.findByName(principal.getName()).orElse(null);
         if (buyer == null) {
             return "redirect:/contact-seller-page/" + productId + "?error=auth";
         }
 
-        // 2. Cooldown Logic: Prevent spam (30 minutes wait)
-        // Use service layer instead of direct repository access
+        // STEP 2: Check spam cooldown (30 minutes between inquiries)
         Inquiry lastInquiry = inquiryService.getLastInquiry(buyer.getUserId(), product.getId()).orElse(null);
         if (lastInquiry != null) {
             long secondsSince = Duration.between(lastInquiry.getCreatedAt(), LocalDateTime.now()).getSeconds();
@@ -73,25 +80,24 @@ public class NotificationController {
             }
         }
 
-        // 3. Prepare Email Resources (Logo)
+        // STEP 3: Prepare email resources and template data
         Resource logoResource = resourceLoader.getResource("classpath:static/images/logo.png");
         String logoCid = "stilnovoLogo";
         String sellerEmail = product.getSeller().getEmail();
         String phoneValue = (phone == null || phone.isBlank()) ? "Not provided" : phone;
 
-        // 4. Generate Professional HTML Templates
+        // STEP 4: Generate HTML email templates for seller and buyer
         String sellerHtml = MailTemplates.proSellerInquiry(
                 product.getId(), product.getName(), type, message, 
                 buyer.getName(), buyer.getEmail(), phoneValue, logoCid
         );
         String buyerHtml = MailTemplates.buyerConfirmation(product.getName(), type, message, logoCid);
 
-        // 5. Send Emails and Save Status via Service Layer
+        // STEP 5: Send emails and persist inquiry with appropriate status
         try {
             mailService.sendHtmlWithInline(sellerEmail, "New Inquiry: " + product.getName(), sellerHtml, logoCid, logoResource);
             mailService.sendHtmlWithInline(buyer.getEmail(), "Confirmation: Message sent to seller", buyerHtml, logoCid, logoResource);
             
-            // Use service to create and save the inquiry
             inquiryService.createInquiry(
                 product.getId(),
                 product.getName(),
@@ -108,7 +114,6 @@ public class NotificationController {
             return "redirect:/contact-seller-page/" + productId + "?sent=true";
 
         } catch (MailException | MessagingException ex) {
-            // Save inquiry with failed status
             inquiryService.createInquiry(
                 product.getId(),
                 product.getName(),

@@ -44,56 +44,55 @@ public class MainController {
                         @RequestParam(required = false) String query,
                         @RequestParam(required = false) String category,
                         Principal principal) {
-
-        // 1. Get typed data from Service
+        // STEP 1: Get authenticated user context (null if not logged in)
         User user = mainService.getUserContext(principal != null ? principal.getName() : null);
 
         List<Product> products;
         List<Product> recommendedProducts = null; 
         
-        // Check if the user is performing a search
+        // STEP 2: Determine if user is searching or browsing homepage
         boolean isSearching = (query != null && !query.isEmpty()) || (category != null && !category.isEmpty());
 
         if (isSearching) {
+            // STEP 3a: Search mode - get filtered products only
             products = new ArrayList<>(mainService.searchProducts(query, category));
         } else {
-            // if not searching, show all products and recommendations
-            // 1. all products (or filtered by category if category is selected)
+            // STEP 3b: Browse mode - get all products and recommendations
             products = new ArrayList<>(mainService.searchProducts(query, category)); 
             
-            // 2. your recommendations based on user preferences and history
+            // STEP 4: Get personalized recommendations based on user history
             recommendedProducts = productService.getRecommendations(user);
 
-            // 3. Filter: removing recommended products from the main list to avoid duplicates
+            // STEP 5: Remove duplicates between recommendations and main product list
             if (recommendedProducts != null && !recommendedProducts.isEmpty()) {
-                // extracting IDs of recommended products for efficient lookup
                 List<Long> recommendedIds = recommendedProducts.stream().map(Product::getId).toList();
-                // removing products that are in the recommended list
                 products.removeIf(p -> recommendedIds.contains(p.getId()));
             }
         }
 
 
-        // 2. Populate Model
+        // STEP 6: Calculate pagination and display limits
         boolean logged = (user != null);
         boolean isAdmin = mainService.isUserAdmin(user);
         
         int recSize = (recommendedProducts != null) ? recommendedProducts.size() : 0;
         int maxItems = 10;
         
-        // Calculate how many regular products we can show in the first view
+        // STEP 7: Calculate how many regular products fit in first page (max 10 total)
         int regularLimit = Math.max(0, maxItems - recSize);
         
-        // It is the last page if the sum of recommended and regular products is <= 10
+        // STEP 8: Determine if this is the last page (all products fit in view)
         boolean isLast = (recSize + products.size()) <= maxItems;
         
         int nextOffset = products.size(); 
 
+        // STEP 9: Trim product list to fit pagination limit
         if (products.size() > regularLimit) {
             products = products.subList(0, regularLimit);
-            nextOffset = regularLimit; // Save the index where we left off
+            nextOffset = regularLimit;
         }
                 
+        // STEP 10: Populate model with all data for template rendering
         model.addAttribute("products", products);
         model.addAttribute("recommendedProducts", recommendedProducts);
         model.addAttribute("user", user);
@@ -102,9 +101,9 @@ public class MainController {
         model.addAttribute("query", (query != null) ? query : (category != null ? category : ""));
         model.addAttribute("searching", isSearching);
         model.addAttribute("isLast", isLast);
-        model.addAttribute("nextOffset", nextOffset); // Added for the JS
+        model.addAttribute("nextOffset", nextOffset);
 
-        // 3. Navigation Logic
+        // STEP 11: Auto-redirect if search returned only one product
         if (products.size() == 1 && isSearching) {
             return "redirect:/info-product-page/" + products.get(0).getId();
         }

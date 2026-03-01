@@ -113,9 +113,12 @@ public class UserWebController {
     @GetMapping("/seller-profile/{id}")
     public String showPublicSellerProfile(@PathVariable long id, Model model, Principal principal) {
         
+        // STEP 1: Fetch seller from database by ID
         // 1. Fetch the specific seller data using the ID
         User seller = userService.getPublicProfileById(id);
         
+        
+        // STEP 2: Populate model with seller profile data
         // 2. Populate the model with seller information
         model.addAttribute("seller", seller);
         model.addAttribute("sellerValorations", seller.getValorations());
@@ -123,6 +126,8 @@ public class UserWebController {
         model.addAttribute("itemsCount", seller.getProducts().size());
         model.addAttribute("fullStars", productService.calculateFullStars(seller));
 
+
+        // STEP 3: Check if viewer is the seller (for edit button visibility)
         // 3. Security logic: Check if the viewer is the owner to show/hide edit buttons
         boolean isOwner = (principal != null && principal.getName().equals(seller.getName()));
         model.addAttribute("isOwner", isOwner);
@@ -143,27 +148,36 @@ public class UserWebController {
     @GetMapping("/user-page")
     public String showUserPage(Model model, Principal principal) throws JsonProcessingException {
         
+        // STEP 1: Validate user session exists
         // Safety Check: If the user session is lost, redirect to login
         if (principal == null) {
             return "redirect:/login-page";
         }
 
+
+        // STEP 2: Fetch user profile and transaction data
         // Data Retrieval: Fetch the full user entity using the secure Principal name
         User user = userService.getFullUserProfile(principal.getName());
         String formattedDate = userService.getFormattedDate();
 
-        // Obtain the transactions where the user is the seller to show purchase history
+            // Obtain the transactions where the user is the seller to show purchase history
         List<Transaction> sales = transactionService.getSellerTransactions(principal.getName());
 
+
+        // STEP 3: Calculate sales statistics by category
         // First graph: Sales by category
         Map<String, Long> salesByCategory = userService.getSalesByCategory(sales);
 
+
+        // STEP 4: Calculate monthly revenue data for chart
         // Second graph: Monthly revenue
         List<String> monthLabels = userService.getMonthLabels();
         List<Double> monthlyRevenues = userService.getRevenueByMonth(sales);
 
+        // STEP 5: Get user interaction data (visits vs interest)
         BarChartData chartData = userService.getBarChartData(user);
 
+        // STEP 6: Transform chart data into arrays for visualization
         List<String> barLabels = chartData.labels();
         List<Long> visitsData = barLabels.stream()
             .map(cat -> chartData.visitsByCategory().getOrDefault(cat, 0L))
@@ -172,6 +186,7 @@ public class UserWebController {
             .map(cat -> chartData.interestByCategory().getOrDefault(cat, 0L))
             .toList();
 
+        // STEP 7: Serialize chart data to JSON for JavaScript
         ObjectMapper mapper = new ObjectMapper();
         try {
             // Graph for sales by category
@@ -187,6 +202,7 @@ public class UserWebController {
             model.addAttribute("revenueValues", "[]");
         }
 
+        // STEP 8: Populate model with all user dashboard data
         // Ownership Logic: Since this route is ID-less and bound to the Principal,
         // the visitor is ALWAYS the owner of this specific page.
         model.addAttribute("user", user);
@@ -210,10 +226,13 @@ public class UserWebController {
     public String showSalesAndOrders(Model model, Principal principal,
                                     @RequestParam(required = false) Long transactionId) {
 
+        // STEP 1: Get authenticated user profile
         // 1. Get the full profile for the sidebar/header
         User user = userService.getFullUserProfile(principal.getName());
         model.addAttribute("user", user);
 
+
+        // STEP 2: Fetch sales and orders dashboard data (includes transaction lists and selected transaction)
         // 2. Delegate business logic to the OrderService
         Map<String, Object> dashboardData = userService.getSalesAndOrdersDashboard(principal.getName(), transactionId);
         model.addAllAttributes(dashboardData);
@@ -246,9 +265,12 @@ public class UserWebController {
     @GetMapping("/user-products-page")
     public String userProducts(Model model, Principal principal) {
     
+        // STEP 1: Get user with their product inventory from database
         // 1. Get the user and their products directly
         User user = productService.getAuthenticatedUserWithProducts(principal.getName());
     
+    
+        // STEP 2: Populate model with user products list and count
         // 2. Add the raw list. Mustache will now use the getIs... methods automatically
         model.addAttribute("user", user); 
         model.addAttribute("userProducts", user.getProducts());
@@ -262,9 +284,12 @@ public class UserWebController {
     @GetMapping("/edit-product-page/{id}")
     public String showEditForm(Model model, @PathVariable long id, Principal principal) {
     
+        // STEP 1: Fetch product and validate ownership
         // 1. Find the product by its ID using the service
         Product product = productService.getProductForEditing(id, principal.getName());
 
+
+        // STEP 2: Pre-fill form fields with existing product data
         // 3. Add the product to the model so the form fields can be pre-filled
         model.addAttribute("product", product);
     
@@ -274,9 +299,12 @@ public class UserWebController {
     @PostMapping("/edit-product/{id}")
     public String updateProduct(@PathVariable long id, Product updatedProduct, Principal principal, @RequestParam MultipartFile newProfilePhoto) throws IOException {
     
+        // STEP 1: Update product with new data (service validates ownership)
         //Delegate: Send the base product and the product with changes
         productService.updateProductSafely(id, updatedProduct, principal.getName(), newProfilePhoto);
 
+
+        // STEP 2: Redirect to inventory page
         //Redirect back to the inventory page
         return "redirect:/user-products-page";
     } 
@@ -288,6 +316,7 @@ public class UserWebController {
     @GetMapping("/add-product-page")
     public String showAddForm(Model model, Principal principal) {
         
+        // STEP 1: Load user data for sidebar/navbar if authenticated
         // 1. Identity Check: If logged in, provide user data to the template
         if (principal != null) {
             // Reuse your service to get the full profile (avatar, balance, etc.)
@@ -309,6 +338,7 @@ public class UserWebController {
                             @RequestParam String location,
                             @RequestParam String status) throws IOException {
 
+        // STEP 1: Validate product photo is uploaded
         // 1. Initial UI Validation: Ensure at least one photo is uploaded
         if (productPhoto == null || productPhoto.isEmpty()) {
             // ERROR HANDLING: Return to the form and preserve user input to improve UX
@@ -323,10 +353,14 @@ public class UserWebController {
             return "add-product-page"; 
         }
 
+
+        // STEP 2: Create product and associate with authenticated user
         // 2. Service Delegation: Transfer execution to the Service Layer
         // Now passing a single MultipartFile instead of an array.
         productService.addProduct(principal, productPhoto, productName, category, description, price, location, status);
 
+
+        // STEP 3: Redirect to inventory page
         // 3. SECURE REDIRECT: Redirect back to the inventory page
         return "redirect:/user-products-page";
     }
@@ -339,9 +373,12 @@ public class UserWebController {
     @PostMapping("/delete-product/{id}")
     public String deleteProduct(@PathVariable long id, Principal principal) {
         
+        // STEP 1: Delete product from database (service validates ownership)
         // 1. Execute deletion via Service Layer using the secure Principal name [cite: 650]
         productService.deleteProduct(id, principal.getName());
 
+
+        // STEP 2: Redirect to inventory page
         // 2. SECURE REDIRECT: Returns to the inventory view without exposing User IDs [cite: 124, 157]
         return "redirect:/user-products-page";
     }
@@ -355,19 +392,26 @@ public class UserWebController {
     @GetMapping("/user-setting-page")
     public String showUserSettings(Model model, Principal principal) {
 
+        // STEP 1: Validate session exists
         // 1. Safety check: Redirect to login if the session has expired [cite: 410]
         if (principal == null) {
             return "redirect:/login-page";
         }
 
+
+        // STEP 2: Fetch full user profile from database
         // 2. Fetch the full User entity from the Service (NOT just the Principal)
         // The Principal only provides the name; we need the full JPA entity for the view 
         User loggedInUser = userService.getFullUserProfile(principal.getName());
         
+        
+        // STEP 3: Check if user is admin (admins cannot delete account)
         //If is admin, we not show delete form
         boolean isAdmin = loggedInUser.getRoles().contains("ROLE_ADMIN");
         model.addAttribute("isAdmin", isAdmin);
         
+        
+        // STEP 4: Pre-fill settings form with current user data
         // 3. Add the complete User object to the model for the Mustache template
         model.addAttribute("user", loggedInUser);
 
@@ -387,10 +431,13 @@ public class UserWebController {
                                 @RequestParam(required = false) String newCardExpiringDate, 
                                 @RequestParam(required = false) String newDescription) throws IOException {
         
+        // STEP 1: Update user profile with new data (only updates non-null fields)
         // 1. Delegate everything to the Service Layer using the secure session identity
         userService.updateUserSettings(principal.getName(), newProfilePhoto, newEmail, 
                                     newCardNumber, newCardCvv, newCardExpiringDate, newDescription);
 
+
+        // STEP 2: Redirect to settings page to show updated data
         // 2. Redirect to the settings page (the clean GET route we created before)
         return "redirect:/user-setting-page";
     }
@@ -403,13 +450,18 @@ public class UserWebController {
     public String deleteUserInSettings(Principal principal, HttpServletRequest request) throws ServletException {
 
 
+        // STEP 1: Delete user and all associated data from database
         // 1. Delete the user from the database via the service layer
         userService.deleteUserSelf(principal.getName());
 
+
+        // STEP 2: Invalidate session and clear security context
         // 2. request.logout() invalidates the session and 
         // clears the SecurityContext in Spring Security.
         request.logout();
 
+
+        // STEP 3: Redirect to homepage as anonymous user
         // 3. Redirect to the home page as an anonymous guest
         return "redirect:/";
     }
@@ -422,22 +474,27 @@ public class UserWebController {
     @GetMapping("/statistics-page")
     public String showStatisticsPage(Model model, Principal principal) throws JsonProcessingException {
         
+        // STEP 1: Get authenticated user from database
         // 1. Use Service Layer to get the authenticated user (secure identification via Principal)
         User user = userService.findByName(principal.getName()).orElseThrow(
             () -> new IllegalStateException("User not found: " + principal.getName())
         );
 
+
+        // STEP 2: Fetch all seller transactions for statistics calculation
         // 2. Get all seller transactions for this user
         List<Transaction> transactions = transactionService.getSellerTransactions(principal.getName());
 
-        // Data Retrieval: Fetch the full user entity using the secure Principal name
-        String formattedDate = userService.getFormattedDate();
+            // Data Retrieval: Fetch the full user entity using the secure Principal name
 
-        // Obtain the transactions where the user is the seller to show purchase history
+            // Obtain the transactions where the user is the seller to show purchase history
+        String formattedDate = userService.getFormattedDate();
         List<Transaction> sales = transactionService.getSellerTransactions(principal.getName());
 
+        // STEP 3: Calculate sales distribution by product category
         Map<String, Long> salesByCategory = userService.getSalesByCategory(sales);
 
+        // STEP 4: Calculate monthly revenue for the year
         Map<Integer, Double> revenueByMonth = new TreeMap<>(); 
             for (int i = 1; i <= 12; i++) revenueByMonth.put(i, 0.0);
 
@@ -451,6 +508,7 @@ public class UserWebController {
         List<String> monthLabels = userService.getMonthLabels();
         List<Double> monthlyRevenues = userService.getRevenueByMonth(sales);
 
+        // STEP 5: Get user interaction data (visits vs interest by category)
         BarChartData chartData = userService.getBarChartData(user);
 
         List<String> barLabels = chartData.labels();
@@ -461,6 +519,7 @@ public class UserWebController {
             .map(cat -> chartData.interestByCategory().getOrDefault(cat, 0L))
             .toList();
 
+        // STEP 6: Serialize chart data to JSON for JavaScript rendering
         ObjectMapper mapper = new ObjectMapper();
         try {
             // Graph for sales by category
@@ -476,6 +535,7 @@ public class UserWebController {
             model.addAttribute("revenueValues", "[]");
         }
 
+        // STEP 7: Calculate key business metrics (total sales, items sold, avg rating)
         // Calculate statistics from real transaction data
         double totalSales = transactions.stream()
             .mapToDouble(Transaction::getFinalPrice)
@@ -487,6 +547,7 @@ public class UserWebController {
         double avgRating = userService.getAverageRatingForSeller(principal.getName());
         
 
+        // STEP 8: Populate model with all statistics and chart data
         // Add statistics and user to model for template rendering
         model.addAttribute("user", user);
         model.addAttribute("userId", user.getUserId());
@@ -498,6 +559,7 @@ public class UserWebController {
         model.addAttribute("barLabels", mapper.writeValueAsString(barLabels));
         model.addAttribute("visitsData", mapper.writeValueAsString(visitsData));
         model.addAttribute("interestData", mapper.writeValueAsString(interestData));
+
 
         // 6. Render the statistics page template
         return "statistics-page";
