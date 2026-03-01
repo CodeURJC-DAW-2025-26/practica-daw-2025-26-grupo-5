@@ -95,7 +95,6 @@ public class ProductService {
         return productRepository.findBySeller(seller);
     }
 
-    // --- FIX: Aggiunto metodo mancante per UserWebController ---
     public long getProductCount(User seller) {
         return productRepository.countBySeller(seller);
     }
@@ -178,6 +177,7 @@ public class ProductService {
         existingProduct.setName(updatedData.getName());
         existingProduct.setPrice(updatedData.getPrice());
         existingProduct.setDescription(updatedData.getDescription());
+        existingProduct.setLocation(updatedData.getLocation());
         existingProduct.setCategory(updatedData.getCategory());
 
         // 4. Image Processing: Use imageService to get an Image object, NOT a Blob
