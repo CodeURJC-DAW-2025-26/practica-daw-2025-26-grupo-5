@@ -104,7 +104,7 @@ public class WebSecurityConfig {
                 .loginPage("/login-page")
                 .failureUrl("/login-error")
                 .failureHandler(failureHandler)
-                .defaultSuccessUrl("/")
+                .defaultSuccessUrl("/", true)
                 .permitAll()
             )
             .logout(logout -> logout

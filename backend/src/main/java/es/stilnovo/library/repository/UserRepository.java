@@ -32,4 +32,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return number of users with this status
      */
     int countByBanned(boolean banned);
+
+    /**
+     * Check if a user exists by their username
+     * @param username the username to check
+     * @return true if a user with the username exists, false otherwise
+     */
+    boolean existsByName(String name);
+
+    /**
+     * Check if a user exists by their email address
+     * @param email the email to check
+     * @return true if a user with the email exists, false otherwise
+     */
+    boolean existsByEmail(String email);
 }

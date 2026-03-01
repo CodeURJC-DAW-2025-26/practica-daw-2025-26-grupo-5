@@ -404,4 +404,12 @@ public class UserService {
         return new BarChartData(barLabels, visitsByCategory, interestByCategory);
 
     }
+
+    public boolean usernameExists(String username) {
+        return userRepository.existsByName(username);
+    }
+
+    public boolean emailExists(String email) {
+        return userRepository.existsByEmail(email);
+    }
 }
