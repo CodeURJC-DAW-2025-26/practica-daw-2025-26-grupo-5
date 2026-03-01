@@ -217,7 +217,7 @@ Vista de la entidad Transacción a nivel global para gestionar disputas y reembo
 ### **Navegación y Capturas de Pantalla**
 
 #### **Diagrama de Navegación**
-Diagrama que muestra cómo se navega entre las diferentes páginas de la aplicación:
+Diagrama actualizado que muestra cómo se navega entre las diferentes páginas de la aplicación:
 
 ![Diagrama de Navegación](Readme-Images/README-FOTOS/Stilnovo-Diagrama-Navegacion-2.png)
 
