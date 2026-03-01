@@ -282,11 +282,11 @@ Gestión completa de datos personales del usuario, incluyendo nombre de usuario,
 **Descripción:**
 Vista de todas las valoraciones enviadas por el usuario como comprador. Muestra la puntuación en estrellas, comentarios de compradore y producto valorado además de las valoraciones en estado pendiente de valorar, permitiendo gestionar la reputación en la plataforma.
 
-#### **10. Valoración en Sales & Orders (Sales&Orders Valoration)**
-![Editar Valoración](Readme-Images/README-FOTOS/valoration-in-sales.png)
+#### **10. Valoración en Sales & Orders (Sales & Orders Valoration)**
+![Valoración](Readme-Images/README-FOTOS/valoration-in-sales.png)
 
 **Descripción:**
-Interfaz para modificar una valoración previamente emitida, permitiendo actualizar la puntuación en estrellas y el comentario asociado a una transacción completada. Mantiene la trazabilidad de las reviews.
+Interfaz que muestra una valoración pendiente en Sales & Orders.
 
 #### **11. Editar Valoración (Edit Valoration)**
 ![Editar Valoración](Readme-Images/README-FOTOS/EditValorationP1.png)
