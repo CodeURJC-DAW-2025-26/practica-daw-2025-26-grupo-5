@@ -457,15 +457,15 @@ Responsable de implementar la generación automática de 3 tipos de documentos P
 
 #### **Alumno 4 - Gabriele Antonio Ricucci**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+Responsable del diseño e implementación del motor de recomendaciones (Algoritmo Avanzado), definiendo el modelo de seguimiento de interacciones de usuario y la lógica de negocio subyacente. He desarrollado la lógica de búsqueda de productos, el filtrado dinámico en la vista principal para evitar duplicidades entre recomendaciones y catálogo. Además, he gestionado la integración de estas características complejas en los controladores principales y las vistas.
 
 | Nº    | Commits      | Files      |
 |:------------: |:------------:| :------------:|
-|1| [Descripción commit 1](URL_commit_1)  | [Archivo1](URL_archivo_1)   |
-|2| [Descripción commit 2](URL_commit_2)  | [Archivo2](URL_archivo_2)   |
-|3| [Descripción commit 3](URL_commit_3)  | [Archivo3](URL_archivo_3)   |
-|4| [Descripción commit 4](URL_commit_4)  | [Archivo4](URL_archivo_4)   |
-|5| [Descripción commit 5](URL_commit_5)  | [Archivo5](URL_archivo_5)   |
+|1| [Add UserInteraction model and repository method for product recommendations](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/d24f00d25cf986163ff9b4b087c5cbada3f69fac)  | [UserInteraction.java / ProductRepository.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/model/UserInteraction.java / https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/repository/ProductRepository.java)   |
+|2| [implement recommendation algorithm and refactor product service](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/16f5a3bc622f8461a9c46a63694642e76f4e491b)  | [UserInteraction.java / ProductService.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/model/UserInteraction.java / https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/service/ProductService.java)   |
+|3| [fix: enhance product search logic and integrate recommendations](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/327ddacac49cd04fc093eba75c74d7518cda39ff)  | [MainController.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/MainController.java)   |
+|4| [feat: enhance product listing by filtering out recommended products from main search results](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/38358b1ca156b1b9ec5915ae57c3a56aec1eec99)  | [MainController.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/MainController.java)   |
+|5| [refactor MainController and User model; add favorite products functionality](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/b7baac40766dee2f394bb960be349e1205f91e54)  | [MainController.java / Product.java / User.java / UserService.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/MainController.java / https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/model/Product.java / https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/model/User.java / https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/service/UserService.java)   |
 
 ---
 
