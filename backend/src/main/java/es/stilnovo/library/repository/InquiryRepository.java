@@ -6,14 +6,6 @@ import es.stilnovo.library.model.Inquiry;
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
 
-package es.stilnovo.library.repository;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import es.stilnovo.library.model.Inquiry;
-import es.stilnovo.library.model.Product;
-import es.stilnovo.library.model.User;
-
 /**
  * InquiryRepository interface for Inquiry entity database operations
  * Manages buyer-to-seller contact inquiries and messages
