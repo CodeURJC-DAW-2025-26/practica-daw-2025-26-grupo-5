@@ -276,49 +276,92 @@ Gráfico de barras comparativo (Gráfico 3) que mide el tráfico recibido versus
 **Descripción:**
 Gestión completa de datos personales del usuario, incluyendo nombre de usuario, correo electrónico, avatar, biografía, información de tarjeta de crédito y visualización de la Digital Seller Card con código QR para verificación de identidad.
 
-#### **9. Mis Valoraciones Recibidas (My Valorations)**
+#### **9. Mis Valoraciones Enviadas y Pendientes (My Valorations)**
 ![Mis Valoraciones](Readme-Images/README-FOTOS/MyValorationsP1.png)
 
 **Descripción:**
-Vista de todas las valoraciones y comentarios recibidos por el usuario como vendedor. Muestra la puntuación en estrellas, comentarios de compradores, producto valorado y fecha de cada review, permitiendo gestionar la reputación en la plataforma.
+Vista de todas las valoraciones enviadas por el usuario como comprador. Muestra la puntuación en estrellas, comentarios de compradore y producto valorado además de las valoraciones en estado pendiente de valorar, permitiendo gestionar la reputación en la plataforma.
 
-#### **10. Editar Valoración (Edit Valoration)**
+#### **10. Valoración en Sales & Orders (Sales&Orders Valoration)**
+![Editar Valoración](Readme-Images/README-FOTOS/valoration-in-sales.png)
+
+**Descripción:**
+Interfaz para modificar una valoración previamente emitida, permitiendo actualizar la puntuación en estrellas y el comentario asociado a una transacción completada. Mantiene la trazabilidad de las reviews.
+
+#### **11. Editar Valoración (Edit Valoration)**
 ![Editar Valoración](Readme-Images/README-FOTOS/EditValorationP1.png)
 
 **Descripción:**
 Interfaz para modificar una valoración previamente emitida, permitiendo actualizar la puntuación en estrellas y el comentario asociado a una transacción completada. Mantiene la trazabilidad de las reviews.
 
+#### **12. Área de ayuda al usuario (Help Center)**
+![Ayuda Usuario](Readme-Images/README-FOTOS/HelpCenter.png)
+
+**Descripción:**
+Interfaz de preguntas frecuentes y acceso a información de contacto a Stilnovo.
+
+#### **13. Perfil del Vendedor (Seller Profile)**
+![Perfil Vendedor](Readme-Images/README-FOTOS/seller-profile.png)
+
+**Descripción:**
+Interfaz de donde se muestra la información de un vendedor, esta información es; valoración media, número de valoraciones recibidas, nombre, su descripción y sus productos.
+
+#### **14. Valoraciones del Vendedor (Seller Valorations)**
+![Valoración Vendedor](Readme-Images/README-FOTOS/seller-valorations.png)
+
+**Descripción:**
+Interfaz de donde se muestra las valoraciones recibidas de un vendedor; se muestra una lista de las valoraciones a ese vendedor por parte de otros usuarios que compraron un producto de este vendedor. Esto ayuda a los usuarios a saber que reputaciñon tiene dicho vendedor. 
+
 #### **Área de Administración**
 
-#### **11. Monitor Global de la Plataforma (Admin Dashboard)**
+#### **15. Monitor Global de la Plataforma (Admin Dashboard)**
 ![Monitor Global de la Plataforma](Readme-Images/README-FOTOS/AdminDashboardP1.png)
 
 **Descripción:**
 Dashboard exclusivo del administrador con KPIs de sistema: total de usuarios registrados, productos activos, transacciones realizadas, ingresos globales y alertas de moderación. Vista centralizada para la supervisión de la plataforma.
 
-#### **12. Gestión Global de Usuarios (Admin User Management)**
+#### **16. Gestión Global de Usuarios (Admin User Management)**
 ![Gestión de Usuarios](Readme-Images/README-FOTOS/AdminUserManagP1.png)
 
 **Descripción:**
 Herramienta de moderación que permite al administrador visualizar todos los usuarios registrados, sus datos de contacto, estado de la cuenta y realizar acciones administrativas como baneos, desbaneos o eliminación de perfiles.
 
-#### **13. Inventario Global de Productos (Admin Global Inventory)**
+#### **17. Inventario Global de Productos (Admin Global Inventory)**
 ![Inventario Global](Readme-Images/README-FOTOS/AdminGlobalInvetP1.png)
 
 **Descripción:**
 Registro maestro de todos los productos publicados en el marketplace, con información detallada del vendedor, categoría, precio y estado. Permite al administrador editar o eliminar cualquier anuncio que infrinja las normas de la plataforma.
 
-#### **14. Auditoría Financiera Global (Admin Global Transactions)**
+#### **18. Auditoría Financiera Global (Admin Global Transactions)**
 ![Auditoría Financiera](Readme-Images/README-FOTOS/AdminGlobalTransP1.png)
 
 **Descripción:**
 Vista completa de todas las transacciones realizadas en la plataforma, incluyendo comprador, vendedor, producto, fecha, importe y estado. Herramienta para auditoría financiera, gestión de disputas y análisis de volumen de negocio.
 
-#### **15. Gestión Global de Valoraciones (Admin Global Valorations)**
+#### **19. Gestión Global de Valoraciones (Admin Global Valorations)**
 ![Gestión de Valoraciones](Readme-Images/README-FOTOS/AdminGlobalValorationsP1.png)
 
 **Descripción:**
 Panel administrativo para supervisar todas las valoraciones realizadas en la plataforma. Permite identificar reviews fraudulentas, gestionar reportes y mantener la integridad del sistema de reputación de vendedores.
+
+#### **20. Baneo de un Usuario (User Ban)**
+![Usuario baneado](Readme-Images/README-FOTOS/UserBanned.png)
+
+**Descripción:**
+Cuando el administrador bloquee a un usuario en **Stilnovo**, si este intenta iniciar sesión, el sistema le mostrará una página informativa indicando que su cuenta ha sido suspendida de la plataforma.
+
+
+#### **21. Footer**
+![Editar Valoración](Readme-Images/README-FOTOS/new-footer.png)
+
+**Descripción:**
+Interfaz de donde se muestra el nuevo diseño del pie de página de Stilnovo, este incluye modales informativos, enlaces a redes sociales y la posibilidad de crear una cuenta nueva.
+
+#### **22. Usuario Baneado (Banned User)**
+![Modal Footer](Readme-Images/README-FOTOS/modal-footer.png)
+
+**Descripción:**
+Aqui se muestra un ejemplo de modal del footer.
 
 ### **Instrucciones de Ejecución**
 
