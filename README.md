@@ -469,6 +469,20 @@ Responsable del diseño e implementación del motor de recomendaciones (Algoritm
 
 ---
 
+#### **Alumno 5 - Ariel Rodriguez Lozano**
+
+Responsable de la implementación completa del sistema de administración de la plataforma. He desarrollado todas las funcionalidades especiales del panel de administracion, incluyendo el Dashboard con métricas del sistema, la gestión global de usuarios con control total de ban/unban, eliminar permanentemente a usuario y edición, el inventario global con permisos de edición y borrado total, la supervisión de transacciones y el control de valoraciones. Además, he refactorizado la seguridad de las rutas administrativas mediante Spring Security para garantizar un aislamiento por roles, implementado la restricción de acceso para usuarios baneados en el flujo de login, la pagina de login incorrecto por credenciales erroneas y mejorado diversos detalles de diseño y coherencia visual en todas las vistas del panel de administración. 
+
+| Nº    | Commits      | Files      |
+|:------------: |:------------:| :------------:|
+|1| [Admin user managment: ban/unban, delete, banned page](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/eb431d7147a4053e67c5a069d70324f2831b18f5)  | [AdminController.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/AdminController.java)   |
+|2| [Merge main + admin ban/delete preserved](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/52fd6b8046b6cf9b292fb98dd532ec1d833d92fa)  | [AdminService.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/service/AdminService.java)   |
+|3| [admin edits user working](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/d2c20491c78687d860385143cd2f35b536e4ab4f)  | [admin-panel-page.html](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/resources/templates/admin-panel-page.html)   |
+|4| [Admin editing products from global inventory](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/7a36e48ab3c78e118b9db9a9465a7acdcca10f46)  | [admin-global-invent-page.html](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/resources/templates/admin-global-invent-page.html)   |
+|5| [align admin routes and remove public user ID access](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/06d43aff7b95904a4a4f9ccf3efbda7fcfe2ee85)  | [WebSecurityConfig.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/security/WebSecurityConfig.java)   |
+
+---
+
 ## 🛠 **Práctica 2: Incorporación de una API REST a la aplicación web, despliegue con Docker y despliegue remoto**
 
 ### **Vídeo de Demostración**
