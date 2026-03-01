@@ -86,7 +86,7 @@ public class SignupWebController {
 
         // Check the email is not already registered
         if (userService.emailExists(email)) {
-            model.addAttribute("error", "El correo electrónico ya está registrado.");
+            model.addAttribute("error", "The email is already registered!");
             model.addAttribute("username", username);
             return "signup-page";
         }
