@@ -406,7 +406,7 @@ public class UserService {
     }
 
     public boolean usernameExists(String username) {
-        return userRepository.existsByUsername(username);
+        return userRepository.existsByName(username);
     }
 
     public boolean emailExists(String email) {
