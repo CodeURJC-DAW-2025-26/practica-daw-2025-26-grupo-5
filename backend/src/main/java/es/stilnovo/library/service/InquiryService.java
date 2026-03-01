@@ -13,7 +13,10 @@ import es.stilnovo.library.repository.InquiryRepository;
 import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.UserRepository;
 
-/** Service for handling customer inquiries and questions about products */
+/**
+ * InquiryService for managing buyer-to-seller inquiries
+ * Handles creation, retrieval, and management of product inquiries
+ */
 @Service
 public class InquiryService {
 
@@ -75,7 +78,6 @@ public class InquiryService {
                                     String message, String status) {
         Inquiry inquiry = new Inquiry();
         
-        // Set product and buyer using the relationships
         Product product = productRepository.findById(productId).orElse(null);
         User buyer = userRepository.findById(buyerId).orElse(null);
         

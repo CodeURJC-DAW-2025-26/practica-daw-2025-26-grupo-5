@@ -25,7 +25,16 @@ public class ProductController {
     @Autowired
     private MainService mainService;
 
-    /** Load more products via AJAX for infinite scroll */
+    /**
+     * Load next batch of products via AJAX for infinite scroll feature
+     * Handles search filtering, category filtering, and pagination
+     * @param offset number of products to skip
+     * @param query optional search text
+     * @param category optional category filter
+     * @param principal current user session
+     * @param model UI data model
+     * @return product_items template fragment
+     */
     @GetMapping("/load-more-products")
     public String loadMore(@RequestParam int offset, 
                             @RequestParam(required = false) String query,
@@ -38,7 +47,6 @@ public class ProductController {
         
         boolean isSearching = (query != null && !query.isEmpty()) || (category != null && !category.isEmpty());
 
-        // Exclude recommended only if we are NOT searching (same as in MainController)
         if (!isSearching) {
             List<Product> recommendedProducts = productService.getRecommendations(user);
             if (recommendedProducts != null && !recommendedProducts.isEmpty()) {

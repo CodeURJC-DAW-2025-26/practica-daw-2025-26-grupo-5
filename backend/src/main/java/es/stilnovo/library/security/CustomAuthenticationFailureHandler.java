@@ -13,13 +13,25 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-/** Handles authentication failures - redirects banned users to banned page. */
+/**
+ * CustomAuthenticationFailureHandler for login attempt failures
+ * Checks if user is banned before redirecting to appropriate error page
+ */
 @Component
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Handle authentication failure by redirecting to appropriate page
+     * Banned users go to /banned, others to /login-error
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @param exception the authentication exception
+     * @throws IOException if response write fails
+     * @throws ServletException if servlet operation fails
+     */
     @Override
     public void onAuthenticationFailure(
             HttpServletRequest request,
@@ -38,7 +50,6 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
             }
         }
 
-        // Default: wrong password / user not found
         response.sendRedirect("/login-error");
     }
 }

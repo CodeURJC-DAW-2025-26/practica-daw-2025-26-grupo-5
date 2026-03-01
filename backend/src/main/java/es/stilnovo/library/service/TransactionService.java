@@ -18,6 +18,10 @@ import es.stilnovo.library.repository.UserInteractionRepository;
 import es.stilnovo.library.repository.UserRepository;
 import es.stilnovo.library.repository.ValorationRepository;
 
+/**
+ * TransactionService for managing purchase transactions
+ * Handles payment processing, transaction recording, and financial updates
+ */
 @Service
 public class TransactionService {
 
@@ -44,12 +48,10 @@ public class TransactionService {
     @Transactional
     public Transaction executePurchase(Product product, User buyer) {
         
-        // 1. Business Rule: Product must be 'active'
         if (!"active".equalsIgnoreCase(product.getStatus())) {
             throw new IllegalStateException("Product is no longer available for sale.");
         }
 
-        // 2. Create and configure the Transaction object
         Transaction transaction = new Transaction(
             product.getSeller(),
             buyer,
@@ -70,13 +72,11 @@ public class TransactionService {
 
         userRepository.save(seller);
 
-        // 3. Mark the product as 'Sold' in the database
         product.setStatus("Sold");
         productRepository.save(product);
         UserInteraction buyInteraction = new UserInteraction(buyer, product, UserInteraction.InteractionType.BUY);
         interactionRepository.save(buyInteraction);
 
-        // 4. Save the transaction and return it
         return transactionRepository.save(transaction);
     }
 
@@ -92,7 +92,6 @@ public class TransactionService {
         Transaction transaction = transactionRepository.findById(transactionId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
         
-        // Security check: User must be either buyer or seller
         boolean isBuyer = transaction.getBuyer().getName().equals(username);
         boolean isSeller = transaction.getSeller().getName().equals(username);
         
@@ -115,7 +114,6 @@ public class TransactionService {
         Transaction transaction = transactionRepository.findById(transactionId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
         
-        // Security check: User must be the seller
         if (!transaction.getSeller().getName().equals(username)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
@@ -174,36 +172,29 @@ public class TransactionService {
      */
     @Transactional
     public void deleteTransacction(Long transactionId) {
-        // 1. Retrieve the transaction or throw exception if not found
         Transaction transaction = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new RuntimeException("Transaction not found"));
 
-        // 2. Remove associated valorations (ratings) to avoid Foreign Key constraint errors
         valorationRepository.deleteByTransactionIn(List.of(transaction));
 
         User seller = transaction.getSeller();
         Product product = transaction.getProduct();
 
-        // 3. Revert product state: Make it available for sale again
         if (product != null) {
             product.setStatus("Active");
-            product.setSeller(seller); // Ensure it remains linked to the original owner
+            product.setSeller(seller);
         }
 
-        // 4. Financial rollback: Subtract the price from seller's balance
         if (seller != null && product != null) {
             double price = product.getPrice();
-            // Using Math.round to fix floating-point precision issues (e.g., 129.1100000000000)
             double newBalance = seller.getBalance() - price;
             seller.setBalance(Math.round(newBalance * 100.0) / 100.0);
         }
 
-        // 5. Detach relationships to prevent persistence/cache collisions
         transaction.setBuyer(null);
         transaction.setSeller(null);
         transaction.setProduct(null);
 
-        // 6. Permanent deletion from the repository
         transactionRepository.delete(transaction);
     }
 }

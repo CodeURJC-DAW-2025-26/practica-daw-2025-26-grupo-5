@@ -11,40 +11,41 @@ import es.stilnovo.library.model.User;
 import java.util.List;
 
 /**
- * Repository interface for Valoration entity.
- * Provides abstracted data access for user feedback and reputation management.
+ * ValorationRepository interface for Valoration entity database operations
+ * Manages user feedback, ratings and reputation information
  */
 @Repository
-/**
- * Repository for Valoration (review/rating) CRUD operations
- */
 public interface ValorationRepository extends JpaRepository<Valoration, Long> {
 
     /**
-     * Checks if a valoration already exists for a specific transaction.
-     * This is used to prevent duplicate reviews for the same purchase.
-     * * @param transaction The completed purchase to check.
-     * @return true if the transaction has already been rated, false otherwise.
+     * Check if a transaction has already been rated
+     * Prevents duplicate reviews for the same purchase
+     * @param transaction the completed transaction
+     * @return true if transaction has a rating, false otherwise
      */
     boolean existsByTransaction(Transaction transaction);
 
     /**
-     * Retrieves all valorations received by a specific seller.
-     * Used to calculate the average reputation score.
-     * * @param seller The user who received the ratings.
-     * @return A list of valorations for the seller.
+     * Get all ratings received by a seller
+     * Used to calculate seller's reputation score
+     * @param seller the seller user
+     * @return list of ratings for this seller
      */
     List<Valoration> findBySeller(User seller);
 
     /**
-     * Retrieves all valorations submitted by a specific buyer.
-     * Used to display the user's review history.
-     * * @param buyer The user who wrote the reviews.
-     * @return A list of valorations authored by the buyer.
+     * Get all ratings submitted by a buyer
+     * Shows the user's review history
+     * @param buyer the user who wrote the reviews
+     * @return list of ratings authored by this buyer
      */
     List<Valoration> findByBuyer(User buyer);
 
-    // Deletes all valorations associated with a list of transactions in one go
+    /**
+     * Delete all ratings associated with specific transactions
+     * Bulk deletion when transactions are removed
+     * @param transactions list of transactions to delete ratings for
+     */
     @Modifying
     @Query("DELETE FROM Valoration v WHERE v.transaction IN :transactions")
     void deleteByTransactionIn(List<Transaction> transactions);

@@ -18,7 +18,10 @@ import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
 import es.stilnovo.library.repository.UserRepository;
 
-/** Initializes database with sample data on application startup */
+/**
+ * DataBaseInitializer service
+ * Automatically populates database with sample data on application startup
+ */
 @Service
 public class DataBaseInitializer {
 
@@ -35,20 +38,15 @@ public class DataBaseInitializer {
     private ImageService imageService;
 
     /**
-     * Helper method to load an image from the classpath, convert it into a Blob 
-     * via ImageService, and associate the resulting entity with a product.
+     * Helper method to load an image from classpath, convert to Blob, and associate with product
+     * @param product the product to attach the image to
+     * @param classpathResource the resource path to the image file
+     * @throws IOException if image read fails
      */
     private void setProductImage(Product product, String classpathResource) throws IOException {
-        // Locate the physical file within the sample-images folder in resources
         Resource imageRes = new ClassPathResource("sample-images/images/" + classpathResource);
-    
-        // ImageService handles the conversion to Blob and persists it in the 'image' table
         Image createdImage = imageService.createImage(imageRes.getInputStream());
-    
-        // Link the persistent Image entity to the product's internal list
-        //product -> image
         product.setImage(createdImage);
-        //image -> product
         createdImage.setProduct(product);
     }   
 
@@ -61,16 +59,12 @@ public class DataBaseInitializer {
         Resource defaultAdminImage = new ClassPathResource("static/images/admin-profile-picture.png");
         Blob photoAdminBlob = BlobProxy.generateProxy(defaultAdminImage.getInputStream(), defaultAdminImage.contentLength());
 
-        // 1. Initialize sample users with encrypted passwords and roles
-        //ABOUT THE CARD INFORMATION: IT MUST BE ENCODED IN THE FUTURE. FOR NOW ITS JUST TO SEE FUNCIONALITY
-        //We have to encode card infromation
         User user = new User("user", passwordEncoder.encode("user"), "user@stilnovo.es", photoUserBlob, 4.7, "1234 5678 9012 3456", "123", "09/27", 0, 129.10, 1872.87, "I am a default user","ROLE_USER");
         User admin = new User("admin", passwordEncoder.encode("admin"), "admin@stilnovo.es", photoAdminBlob, 5.0, "3456 7890 1234 5678", "456", "07/26", 0, 34.89, 899.76, "I am the administrator of the Stilnovo Ecosistem","ROLE_USER", "ROLE_ADMIN");
 
         userRepository.save(user);
         userRepository.save(admin);
         
-        // 2. Define sample products for the Stilnovo marketplace
         Product product1 = new Product("Audi A3 Sportback", "cars", 42500, "Audi A3 Sportback in excellent condition, S-Line edition, featuring sporty finishes, a well-maintained interior, and a perfect balance between comfort, performance, and premium design.", "Active", user, "Mostoles, Madrid");
         Product product2 = new Product("iPhone 17 Pro", "tech", 1399, "The latest Apple smartphone, equipped with advanced AI-powered features, a next-generation professional camera system, and outstanding performance for everyday and professional use.", "Active", user, "Calle de Velazquez 45, 28001 Madrid");
         Product product3 = new Product("Dell XPS 15 Laptop", "tech", 1899, "High-performance Dell XPS 15 laptop with a stunning 4K display, elegant design, and powerful hardware ideal for demanding tasks such as editing, development, and creative work.", "Active", user, "Calle de Alcala 120, 28009 Madrid");

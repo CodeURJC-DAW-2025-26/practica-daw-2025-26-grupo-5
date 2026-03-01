@@ -14,21 +14,29 @@ import org.springframework.stereotype.Service;
 import es.stilnovo.library.model.User;
 import es.stilnovo.library.repository.UserRepository;
 
-/** Service to load user details from database for Spring Security authentication.
- *  Handles role conversion and banned user detection. */
+/**
+ * RepositoryUserDetailsService for Spring Security user authentication
+ * Loads user credentials from database and converts to Spring Security format
+ */
 @Service
 public class RepositoryUserDetailsService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Load user details from database for authentication
+     * Blocks banned users from gaining access
+     * @param username the username to look up
+     * @return UserDetails with credentials and authorities
+     * @throws UsernameNotFoundException if user not found or is banned
+     */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         User user = userRepository.findByName(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        // BLOCK BANNED USERS
         if (user.isBanned()) {
             throw new UsernameNotFoundException("User is banned");
         }

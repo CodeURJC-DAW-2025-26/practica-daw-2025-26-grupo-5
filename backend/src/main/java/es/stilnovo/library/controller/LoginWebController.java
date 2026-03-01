@@ -22,7 +22,12 @@ import jakarta.servlet.http.HttpServletRequest;
 @Controller
 public class LoginWebController {
 
-    /** Show login form */
+    /**
+     * Display login form with CSRF token
+     * @param model UI data model
+     * @param request HTTP request
+     * @return login-page template
+     */
     @GetMapping("/login-page")
     public String login(Model model, HttpServletRequest request) {
 
@@ -34,7 +39,12 @@ public class LoginWebController {
         return "login-page";
     }
 
-    /** Show login form with error message after failed login */
+    /**
+     * Display login form with error message after failed authentication
+     * @param model UI data model
+     * @param request HTTP request
+     * @return login-page template with error flag
+     */
     @GetMapping("/login-error")
     public String loginError(Model model, HttpServletRequest request) {
 
@@ -47,7 +57,10 @@ public class LoginWebController {
         return "login-page";
     }
 
-    /** Show banned user page */
+    /**
+     * Display banned account notification page
+     * @return banned-page template
+     */
     @GetMapping("/banned")
     public String bannedPage() {
         return "banned-page";

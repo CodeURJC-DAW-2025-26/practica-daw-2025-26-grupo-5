@@ -10,8 +10,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-/** Spring Security configuration for the application.
- *  Defines access rules, authentication, password encoding, and CSRF protection. */
+/**
+ * WebSecurityConfig for Spring Security setup
+ * Configures URL access rules, authentication, and CSRF protection
+ */
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
@@ -22,11 +24,20 @@ public class WebSecurityConfig {
     @Autowired
     RepositoryUserDetailsService userDetailsService;
 
+    /**
+     * Create BCrypt password encoder bean
+     * @return PasswordEncoder configured with BCrypt
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Create authentication provider bean
+     * Uses database-backed user details service and BCrypt password encoding
+     * @return DaoAuthenticationProvider configured with user service and password encoder
+     */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
@@ -34,17 +45,21 @@ public class WebSecurityConfig {
         return authProvider;
     }
 
+    /**
+     * Configure Spring Security filter chain
+     * Defines authorization rules for public, user, and admin endpoints
+     * @param http the HttpSecurity configuration object
+     * @return SecurityFilterChain configured with access rules and login/logout
+     * @throws Exception if configuration fails
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http.authenticationProvider(authenticationProvider());
 
-        // Keep CSRF enabled (default)
-
         http
             .authorizeHttpRequests(authorize -> authorize
 
-                // PUBLIC
                 .requestMatchers("/", "/error").permitAll()
                 .requestMatchers("/css/**", "/javascript/**", "/images/**", "/favicon.ico").permitAll()
                 .requestMatchers("/banned").permitAll()
@@ -53,13 +68,10 @@ public class WebSecurityConfig {
                 .requestMatchers("/info-product-page/**").permitAll()
                 .requestMatchers("/about-page/**").permitAll()
 
-                // profile photos (nuevo sistema)
                 .requestMatchers("/user/me/profile-photo").permitAll()
 
-                // You can scroll without login
                 .requestMatchers("/load-more-products").permitAll()
 
-                // USER / ADMIN
                 .requestMatchers(
                     "/payment-page/**",
                     "/contact-seller-page/**",
@@ -76,7 +88,6 @@ public class WebSecurityConfig {
                     "/api/v1/notifications/**"
                 ).hasAnyRole("USER", "ADMIN")
 
-                // ADMIN
                 .requestMatchers("/admin/**").hasRole("ADMIN")
 
                 .anyRequest().authenticated()
@@ -84,8 +95,8 @@ public class WebSecurityConfig {
 
             .formLogin(formLogin -> formLogin
                 .loginPage("/login-page")
-                .failureUrl("/login-error")              // moved to failureHandler to keep banned logic
-                .failureHandler(failureHandler)          // mantiene lógica de baneados
+                .failureUrl("/login-error")
+                .failureHandler(failureHandler)
                 .defaultSuccessUrl("/")
                 .permitAll()
             )

@@ -10,7 +10,10 @@ import org.springframework.stereotype.Service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
-/** Service for sending email notifications to users */
+/**
+ * MailService for sending email notifications
+ * Handles email delivery using Spring Mail (JavaMailSender)
+ */
 @Service
 public class MailService {
 
@@ -45,7 +48,6 @@ public class MailService {
                                 String contentId, Resource inlineResource) throws MessagingException {
         
         MimeMessage message = mailSender.createMimeMessage();
-        // 'true' flag indicates a multipart message (HTML + Attachments/Inline)
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
         
         helper.setFrom(fromAddress);
@@ -53,7 +55,6 @@ public class MailService {
         helper.setSubject(subject);
         helper.setText(htmlBody, true);
         
-        // Add the image to the email body using its Content-ID
         helper.addInline(contentId, inlineResource);
         
         mailSender.send(message);

@@ -14,24 +14,59 @@ import es.stilnovo.library.model.User;
 
 
 /**
- * Repository for Product CRUD operations and custom search queries
+ * ProductRepository interface for Product entity database operations
+ * Provides CRUD and custom search queries for product management
  */
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    // Spring generates the SQL automatically: SELECT * FROM Product WHERE user_id = ?
+    /**
+     * Get all products offered by a specific seller
+     * @param seller the seller user
+     * @return list of products by this seller
+     */
     List<Product> findBySeller(User seller);
 
-    // Efficiently counts only the number of products associated with this seller
+    /**
+     * Count the number of products offered by a seller
+     * @param seller the seller user
+     * @return count of seller's products
+     */
     long countBySeller(User seller);
 
-    // Finds products whose name contains the query string, ignoring case
+    /**
+     * Search products by name (case-insensitive)
+     * @param name product name or partial name
+     * @return list of matching products
+     */
     List<Product> findByNameContainingIgnoreCase(String name);
 
+    /**
+     * Filter products by category (case-insensitive)
+     * @param category product category
+     * @return list of products in this category
+     */
     List<Product> findByCategoryContainingIgnoreCase(String category);
 
+    /**
+     * Get products by seller username and status
+     * @param username the seller's username
+     * @param status product status (Active, Sold, Inactive)
+     * @return list of products matching criteria
+     */
     List<Product> findBySellerNameAndStatus(String username, String status);
 
+    /**
+     * Get 10 most recent products
+     * @return list of latest products
+     */
     List<Product> findTop10ByOrderByIdDesc();
     
+    /**
+     * Find recommended products based on user interaction history
+     * Scores categories by user interactions (BUY=5, LIKE=3, VIEW=1)
+     * Returns products from preferred categories excluding user's own products and sold items
+     * @param userId the user to get recommendations for
+     * @return list of 4 recommended products
+     */
     @Query(value = """
         SELECT p.* FROM product_table p
         JOIN (
@@ -54,8 +89,19 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         """, nativeQuery = true)
     List<Product> findRecommendedProducts(@Param("userId") Long userId);
     
+    /**
+     * Get all products with a specific status
+     * @param status product status
+     * @return list of products with this status
+     */
     List<Product> findByStatus(String status);
 
+    /**
+     * Get paginated products by status
+     * @param status product status
+     * @param pageable pagination parameters
+     * @return page of products with this status
+     */
     Page<Product> findByStatus(String status, Pageable pageable);
 
 }
