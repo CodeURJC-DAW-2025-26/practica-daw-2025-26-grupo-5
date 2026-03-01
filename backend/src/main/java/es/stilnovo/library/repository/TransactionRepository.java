@@ -1,6 +1,8 @@
 package es.stilnovo.library.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.model.User;
 import java.util.List;
@@ -39,4 +41,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
      * @return list of transactions involving this user
      */
     List<Transaction> findByBuyerOrSeller(User buyer, User seller);
+
+    // Finds all transactions where this specific product was involved
+    List<Transaction> findByProduct(Product product);
 }

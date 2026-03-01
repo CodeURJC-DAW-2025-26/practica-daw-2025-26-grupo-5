@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
 import es.stilnovo.library.model.UserInteraction;
 
@@ -30,4 +31,6 @@ public interface UserInteractionRepository extends JpaRepository<UserInteraction
      * @return list of interactions with this seller's products
      */
     List<UserInteraction> findByProductSeller(User seller);
+
+    void deleteByProduct(Product product);
 }

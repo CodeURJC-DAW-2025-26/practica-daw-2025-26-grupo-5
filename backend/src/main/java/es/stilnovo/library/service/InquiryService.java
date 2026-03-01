@@ -12,6 +12,7 @@ import es.stilnovo.library.model.User;
 import es.stilnovo.library.repository.InquiryRepository;
 import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.UserRepository;
+import jakarta.transaction.Transactional;
 
 /**
  * InquiryService for managing buyer-to-seller inquiries
@@ -36,6 +37,7 @@ public class InquiryService {
      * @param productId The ID of the product
      * @return Optional containing the last inquiry, or empty if none found
      */
+    @Transactional
     public Optional<Inquiry> getLastInquiry(Long buyerId, Long productId) {
         // STEP 1: Load buyer and product entities from database
         User buyer = userRepository.findById(buyerId).orElse(null);
@@ -56,6 +58,7 @@ public class InquiryService {
      * @param inquiry The inquiry to save
      * @return The saved inquiry with generated ID
      */
+    @Transactional
     public Inquiry saveInquiry(Inquiry inquiry) {
         return inquiryRepository.save(inquiry);
     }
@@ -75,6 +78,7 @@ public class InquiryService {
      * @param status The status (e.g., "SENT", "FAILED_MAIL")
      * @return The saved inquiry
      */
+    @Transactional
     public Inquiry createInquiry(Long productId, String productName, Long sellerId, 
                                     String sellerEmail, Long buyerId, String buyerName, 
                                     String buyerEmail, String buyerPhone, String inquiryType, 
@@ -102,4 +106,12 @@ public class InquiryService {
         // STEP 4: Persist inquiry to database and return
         return inquiryRepository.save(inquiry);
     }
+
+    @Transactional
+    public void deleteInquiry(Inquiry inquiry) {
+        if (inquiry != null) {
+            inquiryRepository.delete(inquiry);
+        }
+    }
 }
+

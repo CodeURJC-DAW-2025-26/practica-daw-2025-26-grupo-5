@@ -27,6 +27,7 @@ import org.springframework.web.server.ResponseStatusException;
 import es.stilnovo.library.model.User;
 import es.stilnovo.library.model.UserInteraction;
 import es.stilnovo.library.model.Valoration;
+import es.stilnovo.library.repository.InquiryRepository;
 import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.TransactionRepository;
 import es.stilnovo.library.repository.UserInteractionRepository;
@@ -35,6 +36,7 @@ import es.stilnovo.library.repository.ValorationRepository;
 
 import org.springframework.core.io.Resource;
 
+import es.stilnovo.library.model.Inquiry;
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.Transaction;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,6 +64,12 @@ public class UserService {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private InquiryRepository inquiryRepository;
+
+    @Autowired
+    private InquiryService inquiryService;
 
     /** Saves or updates a user in the database */
     public void save(User user) {
@@ -172,27 +180,42 @@ public class UserService {
      */
     @Transactional
     public void deleteUserById(Long userId) {
-        // STEP 1: Fetch user from database (throws 404 if not found)
+        // 1. Fetch user
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        // STEP 2: Security check - prevent deletion of administrators
+        // 2. Security check
         if (user.getRoles().contains("ROLE_ADMIN")) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Cannot delete an administrator.");
         }
 
-        // STEP 3: Delete all ratings and transactions involving the user
+        // 3. CLEAN INQUIRIES
+        // A. Delete inquiries where this user is the BUYER
+        List<Inquiry> sentInquiries = inquiryRepository.findByBuyer(user);
+        for (Inquiry inq : sentInquiries) {
+            inquiryService.deleteInquiry(inq);
+        }
+
+        // B. Delete inquiries where this user is the SELLER (via their products)
+        if (user.getProducts() != null && !user.getProducts().isEmpty()) {
+            List<Inquiry> receivedInquiries = inquiryRepository.findByProductIn(user.getProducts());
+            for (Inquiry inq : receivedInquiries) {
+                inquiryService.deleteInquiry(inq);
+            }
+        }
+
+        // 4. Clean Transactions and Interactions
         List<Transaction> userTransactions = transactionRepository.findByBuyerOrSeller(user, user);
         if (!userTransactions.isEmpty()) {
             valorationRepository.deleteByTransactionIn(userTransactions);
             transactionRepository.deleteAll(userTransactions);
         }
 
-        // STEP 4: Delete all user interaction records (views, likes, etc)
         interactionRepository.deleteByUser(user);
         interactionRepository.deleteByProductSeller(user);
 
-        // STEP 5: Delete user (cascade deletes products)
+        // 5. FINAL STEP: Delete User
+        // Now there are no Inquiries pointing to this user or their products
         userRepository.delete(user);
     }
 

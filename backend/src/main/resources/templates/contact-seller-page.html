@@ -40,7 +40,13 @@
                             </div>
 
                             <div class="p-3 bg-light rounded-4 d-flex align-items-center gap-3 mb-4">
-                                <div class="avatar-sm bg-white rounded-circle d-flex align-items-center justify-content-center fw-800 shadow-sm" style="width: 45px; height: 45px;">MG</div>
+                                <div class="position-relative">
+                                    <img src="/user/{{seller.userId}}/profile-photo" 
+                                        class="rounded-circle border border-white shadow-sm" 
+                                        width="55" height="55" 
+                                        style="object-fit: cover;"
+                                        onerror="this.src='/images/no-profile-picture.png'">
+                                </div>
                                 <div>
                                     <p class="x-small fw-800 text-muted mb-0">Seller</p>
                                     <p class="fw-700 mb-0">{{seller.name}}</p>

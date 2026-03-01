@@ -11,8 +11,12 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import es.stilnovo.library.model.Product;
+import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.model.User;
+import es.stilnovo.library.repository.InquiryRepository;
 import es.stilnovo.library.repository.ProductRepository;
+import es.stilnovo.library.repository.TransactionRepository;
+import es.stilnovo.library.repository.UserInteractionRepository;
 import es.stilnovo.library.repository.UserRepository;
 import java.util.List;
 import es.stilnovo.library.model.Image;
@@ -45,6 +49,15 @@ public class AdminService {
 
     @Autowired
     private ImageService imageService;
+
+    @Autowired
+    private InquiryRepository inquiryRepository;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
+
+    @Autowired
+    private UserInteractionRepository interactionRepository;
 
     @Transactional
     public void deleteUser(Long userId) {
@@ -144,10 +157,30 @@ public class AdminService {
 
     @Transactional
     public void deleteProductAsAdmin(Long id) {
-
+        // STEP 1: Find the product or throw 404 if it doesn't exist
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
 
+        // STEP 2: Clear child records (Inquiries and Interactions)
+        // This removes all messages sent to the seller about this specific product
+        inquiryRepository.deleteByProduct(product);
+
+        // This removes all likes, views, or bookmarks associated with this product
+        interactionRepository.deleteByProduct(product);
+
+        // STEP 3: Handle Transactions (Sales history)
+        // We search for transactions linked to this product
+        List<Transaction> transactions = transactionRepository.findByProduct(product);
+        if (!transactions.isEmpty()) {
+            for (Transaction t : transactions) {
+                // We unlink the product to maintain the financial history without the physical item
+                t.setProduct(null); 
+                transactionRepository.save(t);
+            }
+        }
+
+        // STEP 4: Final deletion
+        // Now that no Inquiries or Interactions point to this ID, SQL allows the deletion
         productRepository.delete(product);
     }
 

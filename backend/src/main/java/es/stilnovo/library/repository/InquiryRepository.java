@@ -1,5 +1,7 @@
 package es.stilnovo.library.repository;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import es.stilnovo.library.model.Inquiry;
@@ -18,4 +20,15 @@ public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
      * @return the most recent inquiry, or null if none exists
      */
     Inquiry findTopByBuyerAndProductOrderByCreatedAtDesc(User buyer, Product product);
+    
+    // Find inquiries sent by a specific buyer
+    List<Inquiry> findByBuyer(User buyer);
+    
+    // Find inquiries related to a list of products
+    List<Inquiry> findByProductIn(List<Product> products);
+        
+    // Direct delete by product
+    void deleteByProductIn(List<Product> products);
+
+    void deleteByProduct(Product product);
 }
