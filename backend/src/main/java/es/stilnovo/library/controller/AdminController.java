@@ -210,7 +210,7 @@ public class AdminController {
     @PostMapping("/transactions/delete/{id}")
     public String deleteTransaction(@PathVariable Long id) {
 
-        transactionService.deleteTransacction(id);
+        transactionService.deleteTransaction(id);
         
         return "redirect:/admin/transactions";
     }

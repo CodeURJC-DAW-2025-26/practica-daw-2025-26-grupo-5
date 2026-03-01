@@ -176,7 +176,7 @@ public class TransactionService {
      * @throws RuntimeException if the transaction does not exist in the database
      */
     @Transactional
-    public void deleteTransacction(Long transactionId) {
+    public void deleteTransaction(Long transactionId) {
         Transaction transaction = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new RuntimeException("Transaction not found"));
 
