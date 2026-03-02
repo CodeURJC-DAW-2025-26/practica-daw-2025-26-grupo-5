@@ -476,11 +476,11 @@ Responsable de el botón de load-more gestionado mediante un archivo JavaScript 
 
 | Nº    | Commits      | Files      |
 |:------------: |:------------:| :------------:|
-|1| [Descripción commit 1](URL_commit_1)  | [Archivo1](URL_archivo_1)   |
-|2| [Descripción commit 2](URL_commit_2)  | [Archivo2](URL_archivo_2)   |
-|3| [Descripción commit 3](URL_commit_3)  | [Archivo3](URL_archivo_3)   |
-|4| [Descripción commit 4](URL_commit_4)  | [Archivo4](URL_archivo_4)   |
-|5| [Descripción commit 5](URL_commit_5)  | [Archivo5](URL_archivo_5)   |
+|1| [Button load more correct](https://github.com/alonsoo-cmd/practica-daw-2025-26-grupo-5/commit/d06f29e149b58e125f89c6f7ec527f8d2e32126d)  | [MainController.java](https://github.com/alonsoo-cmd/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/MainController.java)   |
+|2| [Fix delete product problem](https://github.com/alonsoo-cmd/practica-daw-2025-26-grupo-5/commit/f80eab54e8342f1bd154f466f2733b6326826a30)  | [ProductService.java](https://github.com/alonsoo-cmd/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/service/ProductService.java)   |
+|3| [Donut chart at dashboard](https://github.com/alonsoo-cmd/practica-daw-2025-26-grupo-5/commit/302d00518055e584018041ed5d4b7dc69a783a46)  | [dashboard-charts.js](https://github.com/alonsoo-cmd/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/resources/static/javascript/dashboard-charts.js)   |
+|4| [Graph about monthly revenue and add graphs at statistics-page](https://github.com/alonsoo-cmd/practica-daw-2025-26-grupo-5/commit/31c1f423cf1de189b015544a040efa106342d060)  | [UserWebController.java](https://github.com/alonsoo-cmd/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/UserWebController.java)   |
+|5| [Interaction graph](https://github.com/alonsoo-cmd/practica-daw-2025-26-grupo-5/commit/849c80d0ac753eb46fa4fa4e3bec9846199250c7)  | [user-page.html](https://github.com/alonsoo-cmd/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/resources/templates/user-page.html)   |
 
 ---
 
