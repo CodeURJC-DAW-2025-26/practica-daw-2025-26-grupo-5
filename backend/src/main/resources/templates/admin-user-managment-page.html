@@ -98,7 +98,7 @@
                                 </button>
                                 {{^isAdmin}}
                                 <form action="/admin/users/ban/{{userId}}" method="post" style="display:inline;">
-                                    <input type="hidden" name="_csrf" value="{{_csrf.token}}">
+                                    <input type="hidden" name="_csrf" value="{{token}}">
                                     <button class="btn-action-admin btn-ban me-1" type="submit"><i class="fa-solid fa-ban"></i></button>
                                 </form>
                                 <button type="button" class="btn-action-admin btn-delete" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-user-id="{{userId}}" data-user-name="{{name}}">
@@ -129,7 +129,7 @@
                 </div>
                 
                 <form action="/admin/users/edit/{{userId}}" method="post" enctype="multipart/form-data">
-                    <input type="hidden" name="_csrf" value="{{_csrf.token}}"/>
+                    <input type="hidden" name="_csrf" value="{{token}}"/>
                     <div class="modal-body">
                         <div class="row g-4">
                             <div class="col-md-5 border-end">
@@ -154,18 +154,29 @@
                                     <label class="label-categories x-small mb-1 d-block fw-700">EMAIL ADDRESS</label>
                                     <input type="email" name="newEmail" value="{{email}}" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" required>
                                 </div>
+
                                 <div class="mb-3">
                                     <label class="label-categories x-small mb-1 d-block fw-700">CARD NUMBER</label>
-                                    <input type="text" name="newCardNumber" value="{{cardNumber}}" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" maxlength="16">
+                                    <input type="text" name="newCardNumber" 
+                                        value="{{#cardNumber}}{{cardNumber}}{{/cardNumber}}" 
+                                        class="form-control bg-light border-0 py-2 px-3" 
+                                        style="border-radius: 12px;" maxlength="16" placeholder="Not provided">
                                 </div>
+
                                 <div class="row g-2">
                                     <div class="col-7">
                                         <label class="label-categories x-small mb-1 d-block fw-700">EXPIRING DATE</label>
-                                        <input type="text" name="newCardExpiringDate" value="{{cardExpiringDate}}" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;">
+                                        <input type="text" name="newCardExpiringDate" 
+                                            value="{{#cardExpiringDate}}{{cardExpiringDate}}{{/cardExpiringDate}}" 
+                                            class="form-control bg-light border-0 py-2 px-3" 
+                                            style="border-radius: 12px;" placeholder="MM/YY">
                                     </div>
                                     <div class="col-5">
                                         <label class="label-categories x-small mb-1 d-block fw-700">CVV</label>
-                                        <input type="text" name="newCardCvv" value="{{cardCvv}}" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" maxlength="3">
+                                        <input type="text" name="newCardCvv" 
+                                            value="{{#cardCvv}}{{cardCvv}}{{/cardCvv}}" 
+                                            class="form-control bg-light border-0 py-2 px-3" 
+                                            style="border-radius: 12px;" maxlength="3" placeholder="000">
                                     </div>
                                 </div>
                             </div>
@@ -193,7 +204,7 @@
                 </div>
                 
                 <form id="confirmDeleteForm" action="" method="post">
-                    <input type="hidden" name="_csrf" value="{{_csrf.token}}"/>
+                    <input type="hidden" name="_csrf" value="{{token}}"/>
                     
                     <div class="mb-4">
                         <div class="p-3 bg-light rounded-4">
@@ -236,7 +247,6 @@
                     var userId = button.getAttribute('data-user-id');
                     var name = button.getAttribute('data-user-name');
                     
-                    // Actualizamos la acción del formulario y el mensaje
                     document.getElementById('confirmDeleteForm').action = '/admin/users/delete/' + userId;
                     document.getElementById('confirmDeleteMessage').innerHTML = "¿Are you sure you want to delete <strong>" + name + "</strong>? This action is permanent.";
                 });
