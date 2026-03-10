@@ -7,7 +7,7 @@
 | Victor Hugo Oliveira Petroceli | vh.deoliveira.2023@alumnos.urjc.es | @CodVictor |
 | Raúl Tejada Merinero | r.tejada.2023@alumnos.urjc.es | @raultejada24 |
 | Ariel Rodríguez Lozano | a.rodriguezl.2023@alumnos.urjc.es | @Ariel1725 |
-| Alonso Gutierrez Sánchez | a.gutierrez.2023@alumnos.urjc.es | @Alon345 |
+| Alonso Gutierrez Sánchez | a.gutierrez.2023@alumnos.urjc.es | @alonsoo-cmd |
 
 ---
 
