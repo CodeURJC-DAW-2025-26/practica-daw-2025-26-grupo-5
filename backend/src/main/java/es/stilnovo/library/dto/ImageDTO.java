@@ -1,4 +1,4 @@
-package es.stilnovo.library.DTOs;
+package es.stilnovo.library.dto;
 
 public record ImageDTO(
     Long id
