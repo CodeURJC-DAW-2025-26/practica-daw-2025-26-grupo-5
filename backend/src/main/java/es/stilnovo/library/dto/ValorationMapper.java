@@ -1,4 +1,4 @@
-package es.stilnovo.library.DTOs;
+package es.stilnovo.library.dto;
 
 import org.mapstruct.Mapper;
 import java.util.List;
