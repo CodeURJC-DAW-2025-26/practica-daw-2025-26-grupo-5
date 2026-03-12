@@ -1,4 +1,4 @@
-package es.stilnovo.library.controller.Auth;
+package es.stilnovo.library.controller;
 
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
