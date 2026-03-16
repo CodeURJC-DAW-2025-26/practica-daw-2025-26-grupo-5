@@ -13,25 +13,25 @@ import org.springframework.web.bind.annotation.RestController;
 import com.lowagie.text.DocumentException;
 
 @RestController
-@RequestMapping("/api/v1/pdfs")
+@RequestMapping("/api/v1")
 public class PdfRestController {
 
 	@Autowired
 	private PdfController pdfController;
 
-	@GetMapping("/invoice/{transactionId}")
+	@GetMapping("/transactions/{transactionId}/invoice")
 	public ResponseEntity<byte[]> exportInvoice(@PathVariable long transactionId, Principal principal)
 			throws DocumentException, IOException {
 		return pdfController.exportInvoice(transactionId, principal);
 	}
 
-	@GetMapping("/shipping-label/{transactionId}")
+	@GetMapping("/transactions/{transactionId}/shipping-label")
 	public ResponseEntity<byte[]> exportShippingLabel(@PathVariable long transactionId, Principal principal)
 			throws DocumentException, IOException {
 		return pdfController.exportShippingLabel(transactionId, principal);
 	}
 
-	@GetMapping("/statistics")
+	@GetMapping("/users/me/statistics-report")
 	public ResponseEntity<byte[]> exportStatistics(Principal principal) throws DocumentException, IOException {
 		return pdfController.exportStatistics(principal);
 	}

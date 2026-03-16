@@ -15,7 +15,7 @@
             "header": [
               { "key": "Content-Type", "value": "application/json" }
             ],
-            "url": "{{baseUrl}}/api/v1/auth/login",
+            "url": "{{baseUrl}}/api/v1/sessions",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
@@ -26,14 +26,14 @@
           "name": "Refresh Token",
           "request": {
             "method": "POST",
-            "url": "{{baseUrl}}/api/v1/auth/refresh"
+            "url": "{{baseUrl}}/api/v1/sessions/refresh"
           }
         },
         {
           "name": "Logout",
           "request": {
-            "method": "POST",
-            "url": "{{baseUrl}}/api/v1/auth/logout"
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/sessions/current"
           }
         }
       ]
@@ -48,7 +48,7 @@
             "header": [
               { "key": "Content-Type", "value": "application/json" }
             ],
-            "url": "{{baseUrl}}/api/v1/signup",
+            "url": "{{baseUrl}}/api/v1/users",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"username\": \"newuser\",\n  \"email\": \"newuser@example.com\",\n  \"password\": \"Password123!\",\n  \"confirmPassword\": \"Password123!\"\n}"
@@ -64,7 +64,7 @@
           "name": "Home Data",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/v1/main?query=&category=&page=0&size=10"
+            "url": "{{baseUrl}}/api/v1/catalog?query=&category=&page=0&size=10"
           }
         }
       ]
@@ -90,7 +90,7 @@
           "name": "Get Product By ID",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/v1/products/1"
+            "url": "{{baseUrl}}/api/v1/products/1/summary"
           }
         },
         {
@@ -146,7 +146,7 @@
           "name": "Info Product By ID",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/v1/info-products/1"
+            "url": "{{baseUrl}}/api/v1/products/1"
           }
         }
       ]
@@ -158,7 +158,7 @@
           "name": "List Product Images",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/v1/images/products/1"
+            "url": "{{baseUrl}}/api/v1/products/1/images"
           }
         },
         {
@@ -179,7 +179,7 @@
                 { "key": "files", "type": "file", "src": [] }
               ]
             },
-            "url": "{{baseUrl}}/api/v1/images/products/1"
+            "url": "{{baseUrl}}/api/v1/products/1/images"
           }
         }
       ]
@@ -198,7 +198,7 @@
           "name": "Seller Profile",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/v1/users/1/seller-profile"
+            "url": "{{baseUrl}}/api/v1/users/1/profile"
           }
         },
         {
@@ -212,7 +212,7 @@
                 { "key": "newDescription", "value": "Updated profile from REST", "type": "text" }
               ]
             },
-            "url": "{{baseUrl}}/api/v1/users/me/settings"
+            "url": "{{baseUrl}}/api/v1/users/me/profile"
           }
         },
         {
@@ -252,7 +252,7 @@
           "name": "Seller Transactions",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/v1/transactions/seller"
+            "url": "{{baseUrl}}/api/v1/transactions/sales"
           }
         }
       ]
@@ -264,7 +264,7 @@
           "name": "Get Payment Data",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/v1/payments/1"
+            "url": "{{baseUrl}}/api/v1/products/1/checkout"
           }
         }
       ]
@@ -276,7 +276,7 @@
           "name": "Get Contact Data",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/v1/contact-seller/1"
+            "url": "{{baseUrl}}/api/v1/products/1/contact"
           }
         }
       ]
@@ -307,14 +307,14 @@
           "name": "Get All Valorations",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/v1/valorations/"
+            "url": "{{baseUrl}}/api/v1/reviews"
           }
         },
         {
           "name": "Get Valoration By ID",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/v1/valorations/1"
+            "url": "{{baseUrl}}/api/v1/reviews/1"
           }
         },
         {
@@ -324,7 +324,7 @@
             "header": [
               { "key": "Content-Type", "value": "application/json" }
             ],
-            "url": "{{baseUrl}}/api/v1/valorations/",
+            "url": "{{baseUrl}}/api/v1/reviews",
             "body": {
               "mode": "raw",
               "raw": "{\n  \"id\": null,\n  \"stars\": 5,\n  \"comment\": \"Muy buen vendedor\",\n  \"buyerName\": \"buyer\",\n  \"transactionId\": 1\n}"
@@ -340,21 +340,21 @@
           "name": "Invoice PDF",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/v1/pdfs/invoice/1"
+            "url": "{{baseUrl}}/api/v1/transactions/1/invoice"
           }
         },
         {
           "name": "Shipping Label PDF",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/v1/pdfs/shipping-label/1"
+            "url": "{{baseUrl}}/api/v1/transactions/1/shipping-label"
           }
         },
         {
           "name": "Statistics PDF",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/v1/pdfs/statistics"
+            "url": "{{baseUrl}}/api/v1/users/me/statistics-report"
           }
         }
       ]
@@ -364,7 +364,7 @@
       "item": [
         {
           "name": "Panel",
-          "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/admin/panel" }
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/admin/summary" }
         },
         {
           "name": "Users Page",
@@ -406,11 +406,11 @@
         },
         {
           "name": "Valorations Page",
-          "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/admin/valorations?page=0&size=10" }
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/admin/reviews?page=0&size=10" }
         },
         {
           "name": "Delete Valoration",
-          "request": { "method": "DELETE", "url": "{{baseUrl}}/api/v1/admin/valorations/1" }
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/api/v1/admin/reviews/1" }
         }
       ]
     }

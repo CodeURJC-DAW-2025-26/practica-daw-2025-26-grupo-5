@@ -44,7 +44,7 @@ public class TransactionRestController {
         return transactionMapper.toDTO(transactionService.getTransactionForInvolvedUser(id, principal.getName()));
     }
 
-    @GetMapping("/seller")
+    @GetMapping("/sales")
     public List<TransactionDTO> getSellerTransactions(Principal principal) {
         return transactionMapper.toDTOs(transactionService.getSellerTransactions(principal.getName()));
     }

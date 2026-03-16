@@ -267,6 +267,6 @@ public class AdminController {
     }
 
     private String formatInt(int value) {
-        return NumberFormat.getIntegerInstance(new Locale("es", "ES")).format(value);
+        return NumberFormat.getIntegerInstance(Locale.forLanguageTag("es-ES")).format(value);
     }
 }

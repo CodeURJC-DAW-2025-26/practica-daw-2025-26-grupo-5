@@ -19,7 +19,7 @@ import es.stilnovo.library.dto.UserMapper;
 import es.stilnovo.library.service.SignupService;
 
 @RestController
-@RequestMapping("/api/v1/signup")
+@RequestMapping("/api/v1/users")
 public class SignupWebRestController {
 
 	@Autowired
@@ -38,7 +38,7 @@ public class SignupWebRestController {
 				request.confirmPassword()));
 
 		URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-				.path("/api/v1/users/{id}/seller-profile")
+				.path("/api/v1/users/{id}/profile")
 				.buildAndExpand(created.id())
 				.toUri();
 

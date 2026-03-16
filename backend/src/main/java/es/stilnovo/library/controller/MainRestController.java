@@ -16,7 +16,7 @@ import es.stilnovo.library.dto.UserMapper;
 import es.stilnovo.library.service.MainService;
 
 @RestController
-@RequestMapping("/api/v1/main")
+@RequestMapping("/api/v1/catalog")
 public class MainRestController {
 
     @Autowired

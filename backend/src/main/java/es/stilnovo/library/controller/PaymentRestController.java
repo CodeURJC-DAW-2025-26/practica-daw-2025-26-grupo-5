@@ -14,7 +14,7 @@ import es.stilnovo.library.dto.UserMapper;
 import es.stilnovo.library.service.PaymentService;
 
 @RestController
-@RequestMapping("/api/v1/payments")
+@RequestMapping("/api/v1/products")
 public class PaymentRestController {
 
     @Autowired
@@ -26,7 +26,7 @@ public class PaymentRestController {
     @Autowired
     private UserMapper userMapper;
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/checkout")
     public CheckoutDTO getCheckout(@PathVariable long id, Principal principal) {
         var checkoutData = paymentService.prepareCheckout(id, principal != null ? principal.getName() : null);
         return new CheckoutDTO(

@@ -19,7 +19,7 @@ import es.stilnovo.library.service.MainService;
 import es.stilnovo.library.service.ProductService;
 
 @RestController
-@RequestMapping("/api/v1/info-products")
+@RequestMapping("/api/v1/products")
 public class InfoProductRestController {
 
     @Autowired

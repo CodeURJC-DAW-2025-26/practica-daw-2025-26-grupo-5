@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1/valorations") // Todas las URLs de la API empezarán así
+@RequestMapping("/api/v1/reviews") // Todas las URLs de la API empezarán así
 public class ValorationRestController {
 
     @Autowired

@@ -14,7 +14,7 @@ import es.stilnovo.library.dto.UserMapper;
 import es.stilnovo.library.service.ContactSellerService;
 
 @RestController
-@RequestMapping("/api/v1/contact-seller")
+@RequestMapping("/api/v1/products")
 public class ContactSellerRestController {
 
 	@Autowired
@@ -26,7 +26,7 @@ public class ContactSellerRestController {
 	@Autowired
 	private UserMapper userMapper;
 
-	@GetMapping("/{id}")
+	@GetMapping("/{id}/contact")
 	public ContactSellerPageDTO getContactSellerData(@PathVariable long id, Principal principal) {
 		var pageData = contactSellerService.getContactSellerPageData(id, principal.getName());
 		return new ContactSellerPageDTO(

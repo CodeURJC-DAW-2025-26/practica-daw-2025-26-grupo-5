@@ -47,7 +47,7 @@ public class UserWebRestController {
         return userMapper.toDTO(userService.getFullUserProfile(principal.getName()));
     }
 
-    @GetMapping("/{id}/seller-profile")
+    @GetMapping("/{id}/profile")
     public SellerProfileDTO getSellerProfile(@PathVariable long id, Principal principal) {
         var seller = userService.getPublicProfileById(id);
         boolean owner = principal != null && principal.getName().equals(seller.getName());
@@ -59,7 +59,7 @@ public class UserWebRestController {
                 owner);
     }
 
-    @PutMapping(value = "/me/settings", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/me/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public UserDTO updateMySettings(@ModelAttribute UserSettingsUpdateDTO request, Principal principal) throws IOException {
         userService.updateUserSettings(
                 principal.getName(),
