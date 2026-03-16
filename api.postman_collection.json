@@ -252,7 +252,7 @@
           "name": "Seller Transactions",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/v1/transactions/sales"
+            "url": "{{baseUrl}}/api/v1/transactions/sales?page=0&size=10"
           }
         }
       ]
@@ -285,6 +285,13 @@
       "name": "Notifications",
       "item": [
         {
+          "name": "Get Inquiry By ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/notifications/inquiries/1"
+          }
+        },
+        {
           "name": "Send Inquiry",
           "request": {
             "method": "POST",
@@ -307,7 +314,7 @@
           "name": "Get All Valorations",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/v1/reviews"
+            "url": "{{baseUrl}}/api/v1/reviews?page=0&size=10"
           }
         },
         {

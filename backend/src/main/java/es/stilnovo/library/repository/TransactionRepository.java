@@ -2,6 +2,9 @@ package es.stilnovo.library.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.model.User;
@@ -33,7 +36,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
      * @return list of sales by this seller
      */
     List<Transaction> findBySeller(User seller);
-    
+
+    Page<Transaction> findBySeller(User seller, Pageable pageable);
+
     /**
      * Find all transactions involving a user as either buyer or seller
      * @param buyer the user as buyer

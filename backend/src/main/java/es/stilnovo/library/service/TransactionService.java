@@ -3,6 +3,8 @@ package es.stilnovo.library.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
@@ -165,6 +167,12 @@ public class TransactionService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         
         return transactionRepository.findBySeller(seller);
+    }
+
+    public Page<Transaction> getSellerTransactions(String username, Pageable pageable) {
+        User seller = userRepository.findByName(username)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return transactionRepository.findBySeller(seller, pageable);
     }
 
     /**
