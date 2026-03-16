@@ -51,7 +51,7 @@ public class AdminRestController {
 	@Autowired
 	private ValorationService valorationService;
 
-	@GetMapping("/panel")
+	@GetMapping("/summary")
 	public AdminSummaryDTO getAdminPanel() {
 		var panelData = adminService.getAdminPanelData();
 		return new AdminSummaryDTO(
@@ -100,13 +100,13 @@ public class AdminRestController {
 		transactionService.deleteTransaction(id);
 	}
 
-	@GetMapping("/valorations")
+	@GetMapping("/reviews")
 	public PagedResponse<ValorationDTO> getValorations(@PageableDefault(size = 10) Pageable pageable) {
 		var page = adminService.getValorationsPage(pageable);
 		return new PagedResponse<>(valorationMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(), page.getTotalElements(), page.isLast());
 	}
 
-	@DeleteMapping("/valorations/{id}")
+	@DeleteMapping("/reviews/{id}")
 	public void deleteValoration(@PathVariable Long id) {
 		valorationService.deleteById(id);
 	}

@@ -1,9 +1,13 @@
 package es.stilnovo.library.controller;
 
+import es.stilnovo.library.dto.PagedResponse;
 import es.stilnovo.library.dto.ValorationDTO;
+import es.stilnovo.library.dto.ValorationMapper;
 import es.stilnovo.library.service.ValorationService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -11,11 +15,9 @@ import es.stilnovo.library.service.UserService;
 
 import java.security.Principal;
 import java.net.URI;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/v1/valorations") // Todas las URLs de la API empezarán así
+@RequestMapping("/api/v1/reviews") // Todas las URLs de la API empezarán así
 public class ValorationRestController {
 
     @Autowired
@@ -24,17 +26,19 @@ public class ValorationRestController {
     @Autowired
     private UserService userService;
 
-    // Obtener todas las valoraciones (Versión API)
+    @Autowired
+    private ValorationMapper valorationMapper;
+
     @GetMapping
-    public List<ValorationDTO> getAllValorations() {
-        return valorationService.findAll().stream()
-                .map(ValorationDTO::new)
-                .collect(Collectors.toList());
+    public PagedResponse<ValorationDTO> getAllValorations(@PageableDefault(size = 10) Pageable pageable) {
+        var page = valorationService.findAll(pageable);
+        return new PagedResponse<>(valorationMapper.toDTOs(page.getContent()),
+                page.getNumber(), page.getSize(), page.getTotalElements(), page.isLast());
     }
 
     @GetMapping("/{id}")
     public ValorationDTO getValoration(@PathVariable Long id) {
-        return new ValorationDTO(valorationService.findById(id));
+        return valorationMapper.toDTO(valorationService.findById(id));
     }
 
     // Crear una valoración nueva

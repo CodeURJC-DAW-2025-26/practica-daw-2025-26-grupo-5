@@ -27,7 +27,7 @@ import es.stilnovo.library.service.ImageService;
 import es.stilnovo.library.service.ProductService;
 
 @RestController
-@RequestMapping("/api/v1/images")
+@RequestMapping("/api/v1")
 public class ImageRestController {
 
 	@Autowired
@@ -42,23 +42,23 @@ public class ImageRestController {
 	@Autowired
 	private ProductMapper productMapper;
 
-	@GetMapping("/products/{productId}")
+	@GetMapping("/products/{productId}/images")
 	public List<ImageDTO> getProductImages(@PathVariable long productId) {
 		return imageService.getProductImages(productId).stream().map(imageMapper::toDTO).toList();
 	}
 
-	@GetMapping(value = "/{imageId}/file", produces = MediaType.IMAGE_JPEG_VALUE)
+	@GetMapping(value = "/images/{imageId}/file", produces = MediaType.IMAGE_JPEG_VALUE)
 	public ResponseEntity<Resource> getImageFile(@PathVariable long imageId) throws SQLException {
 		return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageService.getImageFile(imageId));
 	}
 
-	@PostMapping("/products/{productId}")
+	@PostMapping("/products/{productId}/images")
 	public ResponseEntity<ProductDTO> addProductImages(@PathVariable long productId,
 									   @RequestParam("files") List<MultipartFile> files,
 									   Principal principal) throws IOException {
 		var product = productMapper.toDTO(productService.addImages(productId, principal.getName(), files));
 		URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-				.path("/api/v1/images/products/{productId}")
+				.path("/api/v1/products/{productId}/images")
 				.buildAndExpand(productId)
 				.toUri();
 		return ResponseEntity.created(location).body(product);

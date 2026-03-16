@@ -66,7 +66,7 @@ public class ProductRestController {
         return productMapper.toDTOs(productService.getRecommendations(user));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/summary")
     public ProductDTO getProduct(@PathVariable long id) {
         return productService.findById(id)
                 .map(productMapper::toDTO)

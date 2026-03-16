@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -209,6 +211,11 @@ public class ValorationService {
     @Transactional(readOnly = true)
     public List<Valoration> findAll() {
         return valorationRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Valoration> findAll(Pageable pageable) {
+        return valorationRepository.findAll(pageable);
     }
 
     /**

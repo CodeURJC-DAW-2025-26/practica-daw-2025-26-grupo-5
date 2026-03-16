@@ -157,7 +157,7 @@ public class UserWebController {
     }
 
     private String formatCurrency(double value) {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("es", "ES"));
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.forLanguageTag("es-ES"));
         symbols.setGroupingSeparator('.');
         symbols.setDecimalSeparator(',');
         DecimalFormat decimalFormat = new DecimalFormat("#,##0.00", symbols);

@@ -60,9 +60,17 @@ public class WebSecurityConfig {
 
         http.authorizeHttpRequests(auth -> auth
             // Public API
-            .requestMatchers("/api/v1/auth/**", "/api/v1/signup/**").permitAll()
-            .requestMatchers(HttpMethod.GET, "/api/v1/main/**", "/api/v1/products/**", "/api/v1/images/**").permitAll()
-            .requestMatchers(HttpMethod.GET, "/api/v1/users/*/seller-profile").permitAll()
+            .requestMatchers("/api/v1/sessions/**").permitAll()
+            .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
+            .requestMatchers(HttpMethod.GET,
+                    "/api/v1/catalog/**",
+                    "/api/v1/products",
+                    "/api/v1/products/*",
+                    "/api/v1/products/*/summary",
+                    "/api/v1/products/recommendations",
+                    "/api/v1/products/*/images",
+                    "/api/v1/images/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/users/*/profile").permitAll()
             
             // Protected API
             .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")

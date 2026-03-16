@@ -5,6 +5,8 @@ import java.util.List;
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import es.stilnovo.library.dto.PagedResponse;
 import es.stilnovo.library.dto.TransactionCreateRequestDTO;
 import es.stilnovo.library.dto.TransactionDTO;
 import es.stilnovo.library.dto.TransactionMapper;
@@ -44,8 +47,11 @@ public class TransactionRestController {
         return transactionMapper.toDTO(transactionService.getTransactionForInvolvedUser(id, principal.getName()));
     }
 
-    @GetMapping("/seller")
-    public List<TransactionDTO> getSellerTransactions(Principal principal) {
-        return transactionMapper.toDTOs(transactionService.getSellerTransactions(principal.getName()));
+    @GetMapping("/sales")
+    public PagedResponse<TransactionDTO> getSellerTransactions(Principal principal,
+            @PageableDefault(size = 10) Pageable pageable) {
+        var page = transactionService.getSellerTransactions(principal.getName(), pageable);
+        return new PagedResponse<>(transactionMapper.toDTOs(page.getContent()),
+                page.getNumber(), page.getSize(), page.getTotalElements(), page.isLast());
     }
 }
