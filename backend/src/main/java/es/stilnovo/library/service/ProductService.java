@@ -163,6 +163,7 @@ public class ProductService {
      */
     @Transactional
     public void updateProductSafely(long id, Product updatedData, String username, List<MultipartFile> imageFiles) throws IOException {
+        List<MultipartFile> uploadedFiles = imageFiles == null ? List.of() : imageFiles;
         
         // 1. Domain Logic: Search for the original product in the database
         Product existingProduct = productRepository.findById(id)
@@ -184,10 +185,10 @@ public class ProductService {
         existingProduct.setCategory(updatedData.getCategory());
 
         // 4. Image Processing: replace gallery only when new images are provided
-        boolean hasNewImages = imageFiles != null && imageFiles.stream().anyMatch(file -> file != null && !file.isEmpty());
+        boolean hasNewImages = uploadedFiles.stream().anyMatch(file -> file != null && !file.isEmpty());
         if (hasNewImages) {
             existingProduct.clearImages();
-            for (MultipartFile imageFile : imageFiles) {
+            for (MultipartFile imageFile : uploadedFiles) {
                 if (imageFile == null || imageFile.isEmpty()) {
                     continue;
                 }
