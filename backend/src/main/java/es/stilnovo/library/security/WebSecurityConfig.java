@@ -3,20 +3,19 @@ package es.stilnovo.library.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.http.HttpMethod;
+import jakarta.servlet.http.HttpServletResponse;
 
-/**
- * WebSecurityConfig for Spring Security setup
- * Configures URL access rules, authentication, and CSRF protection
- */
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
@@ -25,12 +24,8 @@ public class WebSecurityConfig {
     private CustomAuthenticationFailureHandler failureHandler;
 
     @Autowired
-    RepositoryUserDetailsService userDetailsService;
+    private RepositoryUserDetailsService userDetailsService;
 
-    /**
-     * Create BCrypt password encoder bean
-     * @return PasswordEncoder configured with BCrypt
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -49,94 +44,76 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
     }
 
     /**
-     * Configure Spring Security filter chain
-     * Defines authorization rules for public, user, and admin endpoints
-     * @param http the HttpSecurity configuration object
-     * @return SecurityFilterChain configured with access rules and login/logout
-     * @throws Exception if configuration fails
+     * API Security Configuration (Stateless)
      */
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @Order(1)
+    public SecurityFilterChain apiFilterChain(HttpSecurity http) throws Exception {
+        http.securityMatcher("/api/v1/**");
 
-        // STEP 1: Register authentication provider
+        http.csrf(csrf -> csrf.disable()); // APIs are typically stateless
+
+        http.authorizeHttpRequests(auth -> auth
+            // Public API
+            .requestMatchers("/api/v1/auth/**", "/api/v1/signup/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/main/**", "/api/v1/products/**", "/api/v1/images/**").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/users/*/seller-profile").permitAll()
+            
+            // Protected API
+            .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+            .anyRequest().hasAnyRole("USER", "ADMIN")
+        );
+
+        // No session for API
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        // Return 401 instead of redirecting to login-page
+        http.exceptionHandling(e -> e.authenticationEntryPoint((request, response, authException) -> {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+        }));
+
+        return http.build();
+    }
+
+    /**
+     * Web Security Configuration (Stateful)
+     */
+    @Bean
+    public SecurityFilterChain webFilterChain(HttpSecurity http) throws Exception {
         http.authenticationProvider(authenticationProvider());
 
-        http.csrf(csrf -> csrf.ignoringRequestMatchers("/api/v1/**"));
+        http.authorizeHttpRequests(auth -> auth
+            // Public Web
+            .requestMatchers("/", "/error", "/banned").permitAll()
+            .requestMatchers("/css/**", "/javascript/**", "/images/**", "/favicon.ico").permitAll()
+            .requestMatchers("/login-page", "/login-error", "/signup-page").permitAll()
+            .requestMatchers("/product-images/**", "/info-product-page/**", "/about-page/**").permitAll()
+            .requestMatchers("/user/me/profile-photo", "/load-more-products").permitAll()
 
-        // STEP 2: Configure authorization rules
-        http
-            .authorizeHttpRequests(authorize -> authorize
+            // Protected Web
+            .requestMatchers("/admin/**").hasRole("ADMIN")
+            .anyRequest().hasAnyRole("USER", "ADMIN")
+        );
 
-                // Public endpoints - no authentication required
-                .requestMatchers("/", "/error").permitAll()
-                .requestMatchers("/css/**", "/javascript/**", "/images/**", "/favicon.ico").permitAll()
-                .requestMatchers("/banned").permitAll()
-                .requestMatchers("/login-page", "/login-error", "/signup-page").permitAll()
-                .requestMatchers("/product-images/**").permitAll()
-                .requestMatchers("/info-product-page/**").permitAll()
-                .requestMatchers("/about-page/**").permitAll()
-                .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/api/v1/signup/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/main/**", "/api/v1/products/**", "/api/v1/info-products/**", "/api/v1/images/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/users/*/seller-profile").permitAll()
+        http.formLogin(form -> form
+            .loginPage("/login-page")
+            .failureUrl("/login-error")
+            .failureHandler(failureHandler)
+            .defaultSuccessUrl("/", true)
+            .permitAll()
+        );
 
-                .requestMatchers("/user/me/profile-photo").permitAll()
-
-                // Anonymous browsing allowed
-                .requestMatchers("/load-more-products").permitAll()
-
-                // User/Admin endpoints - requires authentication and proper role
-                .requestMatchers(
-                    "/payment-page/**",
-                    "/contact-seller-page/**",
-                    "/add-product-page/**",
-                    "/edit-product-page/**",
-                    "/sales-and-orders-page/**",
-                    "/statistics-page/**",
-                    "/user-page",
-                    "/user-products-page",
-                    "/user-setting-page",
-                    "/favorite-products-page/**",
-                    "/help-center-page/**",
-                    "/pdf/**",
-                    "/api/v1/payments/**",
-                    "/api/v1/transactions/**",
-                    "/api/v1/users/me",
-                    "/api/v1/users/me/**",
-                    "/api/v1/products/**",
-                    "/api/v1/images/products/**",
-                    "/api/v1/contact-seller/**",
-                    "/api/v1/notifications/**",
-                    "/api/v1/pdfs/**",
-                    "/api/v1/valorations/**"
-                ).hasAnyRole("USER", "ADMIN")
-
-                // Admin only endpoints
-                .requestMatchers("/admin/**", "/api/v1/admin/**").hasRole("ADMIN")
-
-                // Everything else requires authentication
-                .anyRequest().authenticated()
-            )
-
-            .formLogin(formLogin -> formLogin
-                .loginPage("/login-page")
-                .failureUrl("/login-error")
-                .failureHandler(failureHandler)
-                .defaultSuccessUrl("/", true)
-                .permitAll()
-            )
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
-                .permitAll()
-            );
+        http.logout(logout -> logout
+            .logoutUrl("/logout")
+            .logoutSuccessUrl("/")
+            .permitAll()
+        );
 
         return http.build();
     }
 }
-
