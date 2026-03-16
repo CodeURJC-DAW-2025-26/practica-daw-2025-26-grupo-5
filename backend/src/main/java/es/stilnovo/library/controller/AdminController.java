@@ -1,8 +1,9 @@
 package es.stilnovo.library.controller;
 
 import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -16,13 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import es.stilnovo.library.model.Product;
-import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.model.User;
-import es.stilnovo.library.model.Valoration;
 import es.stilnovo.library.service.AdminService;
-import es.stilnovo.library.service.TransactionService;
 import es.stilnovo.library.service.UserService;
-import es.stilnovo.library.service.ValorationService;
 import jakarta.servlet.http.HttpServletRequest;
 import es.stilnovo.library.service.ProductService;
 
@@ -54,12 +51,6 @@ public class AdminController {
 
     @Autowired
     private ProductService productService;
-    
-    @Autowired
-    private TransactionService transactionService;
-
-    @Autowired
-    private ValorationService valorationService;
 
     
 
@@ -69,25 +60,13 @@ public class AdminController {
      */
     @GetMapping({ "", "/", "/panel" })
     public String showAdminPanel(Model model, HttpServletRequest request) {
-        // STEP 1: Fetch system-wide statistics from service
-        int numUsers = adminService.getNumTotalUsers();
-        int numBanneds = adminService.getNumBanneds();
-        model.addAttribute("numUsers", numUsers);
-        model.addAttribute("numBanneds", numBanneds);
-        
-        // STEP 2: Get recent users preview (limit to 3)
-        List<User> allUsers = userService.findAll();
-        List<User> dashboardUsers = allUsers.stream()
-                                            .limit(3)
-                                            .toList();
-        model.addAttribute("users", dashboardUsers);
-
-        // STEP 3: Get recent products preview (limit to 3)
-        List<Product> allProducts = productService.findAll();
-        List<Product> dashboardProducts = allProducts.stream()
-                                                    .limit(3)
-                                                    .toList();
-        model.addAttribute("products", dashboardProducts);
+        var panelData = adminService.getAdminPanelData();
+        model.addAttribute("numUsers", panelData.numUsers());
+        model.addAttribute("numBanneds", panelData.numBanneds());
+        model.addAttribute("formattedNumUsers", formatInt(panelData.numUsers()));
+        model.addAttribute("formattedNumBanneds", formatInt(panelData.numBanneds()));
+        model.addAttribute("users", panelData.users());
+        model.addAttribute("products", panelData.products());
 
         // STEP 4: Extract CSRF token for form submissions
         CsrfToken csrf = (CsrfToken) request.getAttribute("_csrf");
@@ -95,9 +74,7 @@ public class AdminController {
             model.addAttribute("token", csrf.getToken());
         }
 
-        // STEP 5: Calculate and display current memory usage
-        long usedMemory = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024);
-        model.addAttribute("memoryUsage", usedMemory + " MB");
+        model.addAttribute("memoryUsage", panelData.memoryUsage());
 
         return "admin-panel-page";
     }
@@ -108,8 +85,7 @@ public class AdminController {
      */
     @GetMapping("/users")
     public String listUsers(Model model, HttpServletRequest request) {
-        // STEP 1: Fetch complete list of users from database
-        List<User> users = userService.findAll();
+        List<User> users = adminService.getUsersPage(org.springframework.data.domain.Pageable.unpaged()).getContent();
         model.addAttribute("users", users);
 
         // STEP 2: Extract CSRF token for delete/ban form operations
@@ -164,14 +140,8 @@ public class AdminController {
      */
     @GetMapping("/global-inventory")
     public String showGlobalInventory(Model model, HttpServletRequest request) {
-
-        List<Product> allProducts = adminService.getAllProducts();
-
-        List<Product> productsToDisplay = allProducts.stream()
-                .filter(p -> !"Sold".equalsIgnoreCase(p.getStatus()))
-                .collect(Collectors.toList());
-
-        model.addAttribute("products", productsToDisplay);
+        model.addAttribute("products", adminService.getInventoryPage(org.springframework.data.domain.Pageable.unpaged()).getContent());
+        model.addAttribute("allUsers", userService.findAll());
 
         CsrfToken csrf = (CsrfToken) request.getAttribute("_csrf");
         if (csrf != null) {
@@ -179,6 +149,19 @@ public class AdminController {
         }
 
         return "admin-global-invent-page";
+    }
+
+    @PostMapping("/products/add")
+    public String createProductAsAdmin(@RequestParam Long sellerId,
+                                       @RequestParam("productPhotos") List<MultipartFile> productPhotos,
+                                       @RequestParam String productName,
+                                       @RequestParam String category,
+                                       @RequestParam String description,
+                                       @RequestParam double price,
+                                       @RequestParam String location,
+                                       @RequestParam(defaultValue = "Active") String status) throws IOException {
+        adminService.createProductAsAdmin(sellerId, productName, category, description, price, location, status, productPhotos);
+        return "redirect:/admin/global-inventory";
     }
 
 
@@ -197,20 +180,19 @@ public class AdminController {
 
     @GetMapping("/transactions")
     public String showTransactions(Model model, HttpServletRequest request) { // Añade el request aquí
-        
-        model.addAttribute("totalRevenue", transactionService.getTotalRevenue());
-        model.addAttribute("numTransactions", transactionService.getTotalNumOfTransactions());
-
-        List<Transaction> globalTransactions = transactionService.getAllTransactions();
-        model.addAttribute("globalTransactions", globalTransactions);
+        var transactionsData = adminService.getAdminTransactionsData();
+        model.addAttribute("totalRevenue", transactionsData.totalRevenue());
+        model.addAttribute("numTransactions", transactionsData.numTransactions());
+        model.addAttribute("formattedTotalRevenue", formatInt(transactionsData.totalRevenue()));
+        model.addAttribute("formattedNumTransactions", formatInt(transactionsData.numTransactions()));
+        model.addAttribute("globalTransactions", transactionsData.globalTransactions());
         
         return "admin-global-transac-page";
     }
 
     @PostMapping("/transactions/delete/{id}")
     public String deleteTransaction(@PathVariable Long id) {
-
-        transactionService.deleteTransaction(id);
+        adminService.deleteTransaction(id);
         
         return "redirect:/admin/transactions";
     }
@@ -219,27 +201,17 @@ public class AdminController {
     // Ban / Unban user (toggle)
     @PostMapping("/users/ban/{id}")
     public String toggleBanUser(@PathVariable Long id) {
-
-        // Use service layer instead of direct repository access
-        User user = userService.findById(id).orElseThrow();
-
-        user.setBanned(!user.isBanned()); // TOGGLE
-
-        userService.save(user);
+        adminService.toggleBanUser(id);
 
         return "redirect:/admin/users";
     }
 
     @GetMapping("/valorations")
     public String showGlobalValorations(Model model, HttpServletRequest request) {
-        
-        List<Valoration> valorations = valorationService.findAll(); // O el método que tengas para listar todas
-        model.addAttribute("globalValorations", valorations);
-        model.addAttribute("numValorations", valorations.size());
-        
-        // Opcional: Calcular media global de la plataforma
-        double avg = valorations.stream().mapToInt(Valoration::getStars).average().orElse(0.0);
-        model.addAttribute("avgRating", Math.round(avg * 10.0) / 10.0);
+        var valorationsData = adminService.getAdminValorationsData();
+        model.addAttribute("globalValorations", valorationsData.globalValorations());
+        model.addAttribute("numValorations", valorationsData.numValorations());
+        model.addAttribute("avgRating", valorationsData.avgRating());
 
         // Seguridad CSRF
         CsrfToken csrf = (CsrfToken) request.getAttribute("_csrf");
@@ -252,7 +224,7 @@ public class AdminController {
 
     @PostMapping("/valorations/delete/{id}")
     public String deleteValoration(@PathVariable Long id) {
-        valorationService.deleteById(id);
+        adminService.deleteValoration(id);
         return "redirect:/admin/valorations";
     }
 
@@ -292,5 +264,9 @@ public class AdminController {
         adminService.deleteProductAsAdmin(id);
 
         return "redirect:/admin/global-inventory";
+    }
+
+    private String formatInt(int value) {
+        return NumberFormat.getIntegerInstance(new Locale("es", "ES")).format(value);
     }
 }

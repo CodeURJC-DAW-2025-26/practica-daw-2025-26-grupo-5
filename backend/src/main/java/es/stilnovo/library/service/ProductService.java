@@ -7,12 +7,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.data.domain.Pageable;
 
 import es.stilnovo.library.model.Image;
 import es.stilnovo.library.model.Product;
@@ -161,7 +162,7 @@ public class ProductService {
      * @param imageFile The new image file (optional).
      */
     @Transactional
-    public void updateProductSafely(long id, Product updatedData, String username, MultipartFile imageFile) throws IOException {
+    public void updateProductSafely(long id, Product updatedData, String username, List<MultipartFile> imageFiles) throws IOException {
         
         // 1. Domain Logic: Search for the original product in the database
         Product existingProduct = productRepository.findById(id)
@@ -173,6 +174,8 @@ public class ProductService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the owner of this product");
         }
 
+        validatePositivePrice(updatedData.getPrice());
+
         // 3. Field Synchronization: Apply text changes
         existingProduct.setName(updatedData.getName());
         existingProduct.setPrice(updatedData.getPrice());
@@ -180,12 +183,17 @@ public class ProductService {
         existingProduct.setLocation(updatedData.getLocation());
         existingProduct.setCategory(updatedData.getCategory());
 
-        // 4. Image Processing: Use imageService to get an Image object, NOT a Blob
-        if (imageFile != null && !imageFile.isEmpty()) {
-            // This method returns the 'Image' entity that your Product expects
-            Image newImage = imageService.createImage(imageFile.getInputStream());
-            
-            existingProduct.setImage(newImage); 
+        // 4. Image Processing: replace gallery only when new images are provided
+        boolean hasNewImages = imageFiles != null && imageFiles.stream().anyMatch(file -> file != null && !file.isEmpty());
+        if (hasNewImages) {
+            existingProduct.clearImages();
+            for (MultipartFile imageFile : imageFiles) {
+                if (imageFile == null || imageFile.isEmpty()) {
+                    continue;
+                }
+                Image newImage = imageService.createImage(imageFile.getInputStream());
+                existingProduct.addImage(newImage);
+            }
         }
 
         // 5. Persistence: Explicit save for clarity
@@ -197,9 +205,11 @@ public class ProductService {
      * @Transactional ensures that the product and its image are saved as a single atomic operation.
      */
     @Transactional
-    public void addProduct(Principal principal, MultipartFile productPhoto, 
+    public void addProduct(Principal principal, List<MultipartFile> productPhotos,
                                 String productName, String category, String description,
                                 double price, String location, String status) throws IOException {
+
+        validatePositivePrice(price);
 
         // 1. Security: Identify the authenticated seller
         User seller = userRepository.findByName(principal.getName())
@@ -208,18 +218,81 @@ public class ProductService {
         // 2. Domain Logic: Initialize the new Product entity
         Product newProduct = new Product(productName, category, price, description, status, seller, location);
 
-        // 3. Image Processing: Use ImageService for the single "Hero" image
-        if (productPhoto != null && !productPhoto.isEmpty()) {
-            // We call the service that handles Blob conversion and entity creation
-            Image img = imageService.createImage(productPhoto.getInputStream());
-            
-            // Link the persistent Image entity directly to the product
-            newProduct.setImage(img); 
-            img.setProduct(newProduct);
+        // 3. Image Processing: Create full gallery from uploaded images
+        if (productPhotos != null) {
+            for (MultipartFile productPhoto : productPhotos) {
+                if (productPhoto == null || productPhoto.isEmpty()) {
+                    continue;
+                }
+
+                Image img = imageService.createImage(productPhoto.getInputStream());
+                newProduct.addImage(img);
+            }
         }
 
         // 4. Persistence: Save the product. Cascading handles the Image entity
         productRepository.save(newProduct);
+    }
+
+    @Transactional
+    public Product createProduct(String username,
+                                 String productName,
+                                 String category,
+                                 String description,
+                                 double price,
+                                 String location,
+                                 String status,
+                                 List<MultipartFile> productPhotos) throws IOException {
+
+        validatePositivePrice(price);
+
+        User seller = userRepository.findByName(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Authenticated user not found"));
+
+        Product newProduct = new Product(productName, category, price, description, status, seller, location);
+
+        if (productPhotos != null) {
+            for (MultipartFile productPhoto : productPhotos) {
+                if (productPhoto == null || productPhoto.isEmpty()) {
+                    continue;
+                }
+                Image img = imageService.createImage(productPhoto.getInputStream());
+                newProduct.addImage(img);
+            }
+        }
+
+        return productRepository.save(newProduct);
+    }
+
+    private void validatePositivePrice(double price) {
+        if (price <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Price must be greater than 0");
+        }
+    }
+
+    @Transactional
+    public Product addImages(long productId, String username, List<MultipartFile> imageFiles) throws IOException {
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+
+        boolean isOwner = product.getSeller().getUserId().equals(user.getUserId());
+        boolean isAdmin = user.getRoles() != null && user.getRoles().contains("ROLE_ADMIN");
+
+        if (!isOwner && !isAdmin) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unauthorized: You do not own this product");
+        }
+
+        for (MultipartFile imageFile : imageFiles) {
+            if (imageFile == null || imageFile.isEmpty()) {
+                continue;
+            }
+            product.addImage(imageService.createImage(imageFile.getInputStream()));
+        }
+
+        return productRepository.save(product);
     }
 
     /**
@@ -297,5 +370,38 @@ public class ProductService {
     
         // Here we call the new method combining status and pagination
         return productRepository.findByStatus(status, pageable).getContent();
+    }
+
+    public Page<Product> findActiveProducts(String query, String category, Pageable pageable) {
+        if (query != null && !query.isBlank()) {
+            return productRepository.findByStatusIgnoreCaseAndNameContainingIgnoreCase("Active", query, pageable);
+        }
+        if (category != null && !category.isBlank()) {
+            return productRepository.findByStatusIgnoreCaseAndCategoryContainingIgnoreCase("Active", category, pageable);
+        }
+        return productRepository.findByStatusIgnoreCase("Active", pageable);
+    }
+
+    public CatalogPageResult getCatalogPage(String query, String category, User user, Pageable pageable) {
+        boolean searching = (query != null && !query.isBlank()) || (category != null && !category.isBlank());
+        Page<Product> page;
+
+        if (searching) {
+            page = findActiveProducts(query, category, pageable);
+        } else {
+            List<Long> recommendedIds = getRecommendations(user).stream().map(Product::getId).toList();
+            if (recommendedIds.isEmpty()) {
+                page = productRepository.findByStatusIgnoreCase("Active", pageable);
+            } else {
+                page = productRepository.findByStatusIgnoreCaseAndIdNotIn("Active", recommendedIds, pageable);
+            }
+        }
+
+        return new CatalogPageResult(
+                page.getContent(),
+                page.isLast(),
+                page.getTotalElements(),
+                page.getNumber(),
+                page.getSize());
     }
 }

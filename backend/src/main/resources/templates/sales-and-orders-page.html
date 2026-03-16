@@ -46,7 +46,30 @@
             </div>
         </aside>
 
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="userSalesMobileMenu" aria-labelledby="userSalesMobileMenuLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title fw-800" id="userSalesMobileMenuLabel">My Menu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <nav class="nav flex-column gap-1">
+                    <a class="nav-link-stilnovo" href="/user-page"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                    <a class="nav-link-stilnovo" href="/user-products-page"><i class="fa-solid fa-box-open"></i> My Products</a>
+                    <a class="nav-link-stilnovo active" href="/sales-and-orders-page"><i class="fa-solid fa-handshake"></i> Sales & Orders</a>
+                    <a class="nav-link-stilnovo" href="/user-valorations-page"><i class="fa-solid fa-star"></i> My Valorations</a>
+                    <a class="nav-link-stilnovo" href="/statistics-page"><i class="fa-solid fa-magnifying-glass-chart"></i> Statistics</a>
+                    <a class="nav-link-stilnovo" href="/user-setting-page"><i class="fa-solid fa-user-gear"></i> Settings</a>
+                    <a class="nav-link-stilnovo" href="/help-center-page"><i class="fa-solid fa-circle-question"></i> Help Center</a>
+                </nav>
+            </div>
+        </div>
+
         <main class="flex-grow-1 p-4 p-md-5 overflow-auto">
+            <div class="mobile-menu-trigger d-lg-none">
+                <button class="btn btn-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#userSalesMobileMenu" aria-controls="userSalesMobileMenu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
             <header class="d-flex justify-content-between align-items-center mb-5">
                 <div>
                     <h1 class="fw-800 h2">Sales & Orders</h1>

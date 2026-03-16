@@ -3,11 +3,12 @@ package es.stilnovo.library.controller;
 import java.io.IOException;
 import java.security.Principal;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.TreeMap;
 
-import es.stilnovo.library.service.UserService.BarChartData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -20,14 +21,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import es.stilnovo.library.model.Product;
-import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.model.User;
 import es.stilnovo.library.service.ProductService;
-import es.stilnovo.library.service.TransactionService;
 import es.stilnovo.library.service.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,9 +50,6 @@ public class UserWebController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private TransactionService transactionService;
 
     @GetMapping("/about-page")
 	public String showAboutPage() {
@@ -112,25 +105,14 @@ public class UserWebController {
      */
     @GetMapping("/seller-profile/{id}")
     public String showPublicSellerProfile(@PathVariable long id, Model model, Principal principal) {
-        
-        // STEP 1: Fetch seller from database by ID
-        // 1. Fetch the specific seller data using the ID
-        User seller = userService.getPublicProfileById(id);
-        
-        
-        // STEP 2: Populate model with seller profile data
-        // 2. Populate the model with seller information
-        model.addAttribute("seller", seller);
-        model.addAttribute("sellerValorations", seller.getValorations());
-        model.addAttribute("sellerProducts", seller.getProducts());
-        model.addAttribute("itemsCount", seller.getProducts().size());
-        model.addAttribute("fullStars", productService.calculateFullStars(seller));
+        var sellerProfileData = userService.getSellerProfilePageData(id, principal != null ? principal.getName() : null);
 
-
-        // STEP 3: Check if viewer is the seller (for edit button visibility)
-        // 3. Security logic: Check if the viewer is the owner to show/hide edit buttons
-        boolean isOwner = (principal != null && principal.getName().equals(seller.getName()));
-        model.addAttribute("isOwner", isOwner);
+        model.addAttribute("seller", sellerProfileData.seller());
+        model.addAttribute("sellerValorations", sellerProfileData.sellerValorations());
+        model.addAttribute("sellerProducts", sellerProfileData.sellerProducts());
+        model.addAttribute("itemsCount", sellerProfileData.itemsCount());
+        model.addAttribute("fullStars", sellerProfileData.fullStars());
+        model.addAttribute("isOwner", sellerProfileData.owner());
 
         return "seller-profile-page";
     }
@@ -146,7 +128,7 @@ public class UserWebController {
      * @return The user profile view template.
      */
     @GetMapping("/user-page")
-    public String showUserPage(Model model, Principal principal) throws JsonProcessingException {
+    public String showUserPage(Model model, Principal principal) {
         
         // STEP 1: Validate user session exists
         // Safety Check: If the user session is lost, redirect to login
@@ -155,65 +137,31 @@ public class UserWebController {
         }
 
 
-        // STEP 2: Fetch user profile and transaction data
-        // Data Retrieval: Fetch the full user entity using the secure Principal name
-        User user = userService.getFullUserProfile(principal.getName());
-        String formattedDate = userService.getFormattedDate();
+        var dashboardData = userService.getUserDashboardData(principal.getName());
 
-            // Obtain the transactions where the user is the seller to show purchase history
-        List<Transaction> sales = transactionService.getSellerTransactions(principal.getName());
-
-
-        // STEP 3: Calculate sales statistics by category
-        // First graph: Sales by category
-        Map<String, Long> salesByCategory = userService.getSalesByCategory(sales);
-
-
-        // STEP 4: Calculate monthly revenue data for chart
-        // Second graph: Monthly revenue
-        List<String> monthLabels = userService.getMonthLabels();
-        List<Double> monthlyRevenues = userService.getRevenueByMonth(sales);
-
-        // STEP 5: Get user interaction data (visits vs interest)
-        BarChartData chartData = userService.getBarChartData(user);
-
-        // STEP 6: Transform chart data into arrays for visualization
-        List<String> barLabels = chartData.labels();
-        List<Long> visitsData = barLabels.stream()
-            .map(cat -> chartData.visitsByCategory().getOrDefault(cat, 0L))
-            .toList();
-        List<Long> interestData = barLabels.stream()
-            .map(cat -> chartData.interestByCategory().getOrDefault(cat, 0L))
-            .toList();
-
-        // STEP 7: Serialize chart data to JSON for JavaScript
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            // Graph for sales by category
-            model.addAttribute("chartLabels", mapper.writeValueAsString(salesByCategory.keySet()));
-            model.addAttribute("chartValues", mapper.writeValueAsString(salesByCategory.values()));
-            // Graph for monthly revenue
-            model.addAttribute("revenueLabels", mapper.writeValueAsString(monthLabels));
-            model.addAttribute("revenueValues", mapper.writeValueAsString(monthlyRevenues));
-        } catch (Exception e) {
-            model.addAttribute("chartLabels", "[]");
-            model.addAttribute("chartValues", "[]");
-            model.addAttribute("revenueLabels", "[]");
-            model.addAttribute("revenueValues", "[]");
-        }
-
-        // STEP 8: Populate model with all user dashboard data
-        // Ownership Logic: Since this route is ID-less and bound to the Principal,
-        // the visitor is ALWAYS the owner of this specific page.
-        model.addAttribute("user", user);
+        model.addAttribute("user", dashboardData.user());
         model.addAttribute("isOwner", true);
-        model.addAttribute("date", formattedDate);
-        model.addAttribute("userSales", sales);
-        model.addAttribute("barLabels", mapper.writeValueAsString(barLabels));
-        model.addAttribute("visitsData", mapper.writeValueAsString(visitsData));
-        model.addAttribute("interestData", mapper.writeValueAsString(interestData));
+        model.addAttribute("date", dashboardData.date());
+        model.addAttribute("userSales", dashboardData.userSales());
+        model.addAttribute("chartLabels", dashboardData.chartLabels());
+        model.addAttribute("chartValues", dashboardData.chartValues());
+        model.addAttribute("revenueLabels", dashboardData.revenueLabels());
+        model.addAttribute("revenueValues", dashboardData.revenueValues());
+        model.addAttribute("barLabels", dashboardData.barLabels());
+        model.addAttribute("visitsData", dashboardData.visitsData());
+        model.addAttribute("interestData", dashboardData.interestData());
+        model.addAttribute("formattedTotalRevenue", formatCurrency(dashboardData.user().getTotalRevenue()));
+        model.addAttribute("formattedBalance", formatCurrency(dashboardData.user().getBalance()));
 
         return "user-page"; 
+    }
+
+    private String formatCurrency(double value) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols(new Locale("es", "ES"));
+        symbols.setGroupingSeparator('.');
+        symbols.setDecimalSeparator(',');
+        DecimalFormat decimalFormat = new DecimalFormat("#,##0.00", symbols);
+        return decimalFormat.format(value);
     }
     
 
@@ -228,8 +176,7 @@ public class UserWebController {
 
         // STEP 1: Get authenticated user profile
         // 1. Get the full profile for the sidebar/header
-        User user = userService.getFullUserProfile(principal.getName());
-        model.addAttribute("user", user);
+        model.addAttribute("user", userService.getFullUserProfile(principal.getName()));
 
 
         // STEP 2: Fetch sales and orders dashboard data (includes transaction lists and selected transaction)
@@ -297,11 +244,21 @@ public class UserWebController {
     }
     
     @PostMapping("/edit-product/{id}")
-    public String updateProduct(@PathVariable long id, Product updatedProduct, Principal principal, @RequestParam MultipartFile newProfilePhoto) throws IOException {
+    public String updateProduct(@PathVariable long id,
+                                Product updatedProduct,
+                                Principal principal,
+                                Model model,
+                                @RequestParam(name = "productPhotos", required = false) List<MultipartFile> productPhotos) throws IOException {
+
+        if (updatedProduct.getPrice() <= 0) {
+            model.addAttribute("product", productService.getProductForEditing(id, principal.getName()));
+            model.addAttribute("error", "Price must be greater than 0.");
+            return "edit-product-page";
+        }
     
         // STEP 1: Update product with new data (service validates ownership)
         //Delegate: Send the base product and the product with changes
-        productService.updateProductSafely(id, updatedProduct, principal.getName(), newProfilePhoto);
+        productService.updateProductSafely(id, updatedProduct, principal.getName(), productPhotos);
 
 
         // STEP 2: Redirect to inventory page
@@ -330,7 +287,7 @@ public class UserWebController {
 
     @PostMapping("/add-product")
     public String newProduct(Model model, Principal principal, 
-                            @RequestParam("productPhoto") MultipartFile productPhoto, 
+                            @RequestParam("productPhotos") List<MultipartFile> productPhotos,
                             @RequestParam String productName,
                             @RequestParam String category,
                             @RequestParam String description,
@@ -338,11 +295,25 @@ public class UserWebController {
                             @RequestParam String location,
                             @RequestParam String status) throws IOException {
 
+        if (price <= 0) {
+            model.addAttribute("error", "Price must be greater than 0.");
+            model.addAttribute("productName", productName);
+            model.addAttribute("category", category);
+            model.addAttribute("price", price);
+            model.addAttribute("location", location);
+            model.addAttribute("description", description);
+            model.addAttribute("status", status);
+            return "add-product-page";
+        }
+
         // STEP 1: Validate product photo is uploaded
         // 1. Initial UI Validation: Ensure at least one photo is uploaded
-        if (productPhoto == null || productPhoto.isEmpty()) {
+        boolean hasAtLeastOnePhoto = productPhotos != null
+                && productPhotos.stream().anyMatch(file -> file != null && !file.isEmpty());
+
+        if (!hasAtLeastOnePhoto) {
             // ERROR HANDLING: Return to the form and preserve user input to improve UX
-            model.addAttribute("error", "You must upload a product photo.");
+            model.addAttribute("error", "You must upload at least one product photo.");
             model.addAttribute("productName", productName);
             model.addAttribute("category", category);
             model.addAttribute("price", price);
@@ -356,8 +327,7 @@ public class UserWebController {
 
         // STEP 2: Create product and associate with authenticated user
         // 2. Service Delegation: Transfer execution to the Service Layer
-        // Now passing a single MultipartFile instead of an array.
-        productService.addProduct(principal, productPhoto, productName, category, description, price, location, status);
+        productService.addProduct(principal, productPhotos, productName, category, description, price, location, status);
 
 
         // STEP 3: Redirect to inventory page
@@ -472,107 +442,25 @@ public class UserWebController {
      * Calculates real statistics from transaction data.
      */
     @GetMapping("/statistics-page")
-    public String showStatisticsPage(Model model, Principal principal) throws JsonProcessingException {
-        
-        // STEP 1: Get authenticated user from database
-        // 1. Use Service Layer to get the authenticated user (secure identification via Principal)
-        User user = userService.findByName(principal.getName()).orElseThrow(
-            () -> new IllegalStateException("User not found: " + principal.getName())
-        );
+    public String showStatisticsPage(Model model, Principal principal) {
+        var statisticsData = userService.getUserStatisticsData(principal.getName());
 
+        model.addAttribute("user", statisticsData.user());
+        model.addAttribute("userId", statisticsData.user().getUserId());
+        model.addAttribute("totalSales", statisticsData.totalSales());
+        model.addAttribute("itemsSold", statisticsData.itemsSold());
+        model.addAttribute("avgRating", statisticsData.avgRating());
+        model.addAttribute("inventoryValue", statisticsData.inventoryValue());
+        model.addAttribute("date", statisticsData.date());
+        model.addAttribute("chartLabels", statisticsData.chartLabels());
+        model.addAttribute("chartValues", statisticsData.chartValues());
+        model.addAttribute("revenueLabels", statisticsData.revenueLabels());
+        model.addAttribute("revenueValues", statisticsData.revenueValues());
+        model.addAttribute("barLabels", statisticsData.barLabels());
+        model.addAttribute("visitsData", statisticsData.visitsData());
+        model.addAttribute("interestData", statisticsData.interestData());
 
-        // STEP 2: Fetch all seller transactions for statistics calculation
-        // 2. Get all seller transactions for this user
-        List<Transaction> transactions = transactionService.getSellerTransactions(principal.getName());
-
-            // Data Retrieval: Fetch the full user entity using the secure Principal name
-
-            // Obtain the transactions where the user is the seller to show purchase history
-        String formattedDate = userService.getFormattedDate();
-        List<Transaction> sales = transactionService.getSellerTransactions(principal.getName());
-
-        // STEP 3: Calculate sales distribution by product category
-        Map<String, Long> salesByCategory = userService.getSalesByCategory(sales);
-
-        // STEP 4: Calculate monthly revenue for the year
-        Map<Integer, Double> revenueByMonth = new TreeMap<>(); 
-            for (int i = 1; i <= 12; i++) revenueByMonth.put(i, 0.0);
-
-            for (Transaction t : sales) {
-                if (t.getCreatedAt() != null) {
-                    int month = t.getCreatedAt().getMonthValue();
-                    revenueByMonth.put(month, revenueByMonth.get(month) + t.getFinalPrice());
-                }
-            }
-
-        List<String> monthLabels = userService.getMonthLabels();
-        List<Double> monthlyRevenues = userService.getRevenueByMonth(sales);
-
-        // STEP 5: Get user interaction data (visits vs interest by category)
-        BarChartData chartData = userService.getBarChartData(user);
-
-        List<String> barLabels = chartData.labels();
-        List<Long> visitsData = barLabels.stream()
-            .map(cat -> chartData.visitsByCategory().getOrDefault(cat, 0L))
-            .toList();
-        List<Long> interestData = barLabels.stream()
-            .map(cat -> chartData.interestByCategory().getOrDefault(cat, 0L))
-            .toList();
-
-        // STEP 6: Serialize chart data to JSON for JavaScript rendering
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            // Graph for sales by category
-            model.addAttribute("chartLabels", mapper.writeValueAsString(salesByCategory.keySet()));
-            model.addAttribute("chartValues", mapper.writeValueAsString(salesByCategory.values()));
-            // Graph for monthly revenue
-            model.addAttribute("revenueLabels", mapper.writeValueAsString(monthLabels));
-            model.addAttribute("revenueValues", mapper.writeValueAsString(monthlyRevenues));
-        } catch (Exception e) {
-            model.addAttribute("chartLabels", "[]");
-            model.addAttribute("chartValues", "[]");
-            model.addAttribute("revenueLabels", "[]");
-            model.addAttribute("revenueValues", "[]");
-        }
-
-        // STEP 7: Calculate key business metrics (total sales, items sold, avg rating)
-        // Calculate statistics from real transaction data
-        double totalSales = transactions.stream()
-            .mapToDouble(Transaction::getFinalPrice)
-            .sum();
-        
-        int itemsSold = transactions.size();
-        
-        // Calculate average rating (example: average from all ratings received)
-        double avgRating = userService.getAverageRatingForSeller(principal.getName());
-        
-
-        // STEP 8: Populate model with all statistics and chart data
-        // Add statistics and user to model for template rendering
-        model.addAttribute("user", user);
-        model.addAttribute("userId", user.getUserId());
-        model.addAttribute("totalSales", String.format("%.2f", totalSales));
-        model.addAttribute("itemsSold", itemsSold);
-        model.addAttribute("avgRating", String.format("%.1f", avgRating));
-        model.addAttribute("inventoryValue", calculateInventoryValue(user));
-        model.addAttribute("date", formattedDate);
-        model.addAttribute("barLabels", mapper.writeValueAsString(barLabels));
-        model.addAttribute("visitsData", mapper.writeValueAsString(visitsData));
-        model.addAttribute("interestData", mapper.writeValueAsString(interestData));
-
-
-        // 6. Render the statistics page template
         return "statistics-page";
-    }
-
-    /**
-     * Helper method to calculate the total value of user's inventory.
-     */
-    private String calculateInventoryValue(User user) {
-        double total = user.getProducts().stream()
-            .mapToDouble(Product::getPrice)
-            .sum();
-        return String.format("%.2f", total);
     }
 
 }

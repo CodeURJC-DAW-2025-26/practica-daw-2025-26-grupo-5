@@ -3,10 +3,15 @@ package es.stilnovo.library.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.MailException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import jakarta.mail.MessagingException;
 
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.Transaction;
@@ -40,6 +45,12 @@ public class TransactionService {
     @Autowired
     private UserInteractionRepository interactionRepository;
 
+    @Autowired
+    private MailService mailService;
+
+    @Autowired
+    private ResourceLoader resourceLoader;
+
 
     /**
      * Executes the business logic for a purchase.
@@ -49,7 +60,7 @@ public class TransactionService {
     public Transaction executePurchase(Product product, User buyer) {
         // STEP 1: Validate product is available for sale
         if (!"active".equalsIgnoreCase(product.getStatus())) {
-            throw new IllegalStateException("Product is no longer available for sale.");
+            throw new IllegalStateException("not_available");
         }
 
         // STEP 2: Create transaction record with buyer, seller, and product details
@@ -83,6 +94,23 @@ public class TransactionService {
 
         // STEP 6: Persist transaction and return
         return transactionRepository.save(transaction);
+    }
+
+    @Transactional
+    public Transaction confirmPurchase(long productId, String buyerUsername) {
+        User buyer = userRepository.findByName(buyerUsername)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+
+        if (product.getSeller().getUserId().equals(buyer.getUserId())) {
+            throw new IllegalStateException("self_purchase");
+        }
+
+        Transaction transaction = executePurchase(product, buyer);
+        sendPurchaseEmails(product, buyer);
+        return transaction;
     }
 
     /**
@@ -201,5 +229,112 @@ public class TransactionService {
         transaction.setProduct(null);
 
         transactionRepository.delete(transaction);
+    }
+
+    private void sendPurchaseEmails(Product product, User buyer) {
+        try {
+            Resource logoResource = resourceLoader.getResource("classpath:static/images/logo.png");
+            String logoCid = "stilnovoLogo";
+            String buyerHtml = createPurchaseConfirmationEmail(
+                    product.getName(),
+                    product.getPrice(),
+                    product.getSeller().getName(),
+                    buyer.getName(),
+                    logoCid);
+
+            mailService.sendHtmlWithInline(
+                    buyer.getEmail(),
+                    "Stilnovo: Purchase Confirmation - " + product.getName(),
+                    buyerHtml,
+                    logoCid,
+                    logoResource);
+
+            String sellerHtml = createSellerSaleNotificationEmail(
+                    product.getName(),
+                    product.getPrice(),
+                    buyer.getName(),
+                    buyer.getEmail(),
+                    logoCid);
+
+            mailService.sendHtmlWithInline(
+                    product.getSeller().getEmail(),
+                    "Stilnovo: Your product sold! - " + product.getName(),
+                    sellerHtml,
+                    logoCid,
+                    logoResource);
+        } catch (MailException | MessagingException ex) {
+            System.err.println("Failed to send confirmation emails: " + ex.getMessage());
+        }
+    }
+
+    private String createPurchaseConfirmationEmail(String productName, Double price,
+            String sellerName, String buyerName, String logoCid) {
+        return """
+            <!DOCTYPE html>
+            <html>
+            <body style="margin: 0; padding: 0; background-color: #f4f7f6;">
+                <div style="font-family: Arial, sans-serif; color: #1a1f2e; max-width: 600px; margin: 20px auto; border: 1px solid #e6e9f2; border-radius: 16px; background-color: #ffffff; overflow: hidden;">
+                    <div style="background-color: #ffffff; padding: 30px; text-align: center; border-bottom: 1px solid #f0f0f0;">
+                        <img src="cid:%s" alt="Stilnovo" width="60" style="display: block; margin: 0 auto;">
+                        <h1 style="color: #2f6ced; margin: 15px 0 0; font-size: 24px;">Purchase Successful!</h1>
+                    </div>
+                    <div style="padding: 30px;">
+                        <p style="font-size: 16px;">Congratulations %s! Your purchase has been confirmed.</p>
+                        <h2 style="margin: 10px 0; font-size: 20px; color: #1a1f2e;">%s</h2>
+                        
+                        <div style="background-color: #eef4ff; padding: 20px; border-radius: 12px; margin: 25px 0;">
+                            <p style="margin: 0 0 10px 0; font-weight: bold; color: #2f6ced;">Purchase Details:</p>
+                            <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 1.8;">
+                                <li><strong>Price:</strong> €%.2f</li>
+                                <li><strong>Seller:</strong> %s</li>
+                                <li><strong>Status:</strong> Completed</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """.formatted(logoCid, escape(buyerName), escape(productName), price, escape(sellerName));
+    }
+
+    private String createSellerSaleNotificationEmail(String productName, Double price,
+            String buyerName, String buyerEmail, String logoCid) {
+        return """
+            <!DOCTYPE html>
+            <html>
+            <body style="margin: 0; padding: 0; background-color: #f4f7f6;">
+                <div style="font-family: Arial, sans-serif; color: #1a1f2e; max-width: 600px; margin: 20px auto; border: 1px solid #e6e9f2; border-radius: 16px; background-color: #ffffff; overflow: hidden;">
+                    <div style="background-color: #ffffff; padding: 30px; text-align: center; border-bottom: 1px solid #f0f0f0;">
+                        <img src="cid:%s" alt="Stilnovo" width="60" style="display: block; margin: 0 auto;">
+                        <h1 style="color: #2f6ced; margin: 15px 0 0; font-size: 24px;">Great News! Product Sold!</h1>
+                    </div>
+                    <div style="padding: 30px;">
+                        <p style="font-size: 16px;">Excellent work! Your product has been purchased by a buyer.</p>
+                        <h2 style="margin: 10px 0; font-size: 20px; color: #1a1f2e;">%s</h2>
+                        
+                        <div style="background-color: #eef4ff; padding: 20px; border-radius: 12px; margin: 25px 0;">
+                            <p style="margin: 0 0 10px 0; font-weight: bold; color: #2f6ced;">Sale Details:</p>
+                            <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 1.8;">
+                                <li><strong>Sale Price:</strong> €%.2f</li>
+                                <li><strong>Buyer Name:</strong> %s</li>
+                                <li><strong>Buyer Email:</strong> %s</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """.formatted(logoCid, escape(productName), price, escape(buyerName), escape(buyerEmail));
+    }
+
+    private String escape(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
     }
 }

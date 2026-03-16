@@ -1,9 +1,13 @@
 package es.stilnovo.library.service;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.hibernate.engine.jdbc.proxy.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +22,8 @@ import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.TransactionRepository;
 import es.stilnovo.library.repository.UserInteractionRepository;
 import es.stilnovo.library.repository.UserRepository;
-import java.util.List;
 import es.stilnovo.library.model.Image;
+import es.stilnovo.library.model.Valoration;
 
 
 
@@ -59,6 +63,35 @@ public class AdminService {
     @Autowired
     private UserInteractionRepository interactionRepository;
 
+        @Autowired
+        private TransactionService transactionService;
+
+        @Autowired
+        private ValorationService valorationService;
+
+        public record AdminPanelData(
+            int numUsers,
+            int numBanneds,
+            List<User> users,
+            List<Product> products,
+            String memoryUsage
+        ) {
+        }
+
+        public record AdminTransactionsData(
+            int totalRevenue,
+            int numTransactions,
+            List<Transaction> globalTransactions
+        ) {
+        }
+
+        public record AdminValorationsData(
+            List<Valoration> globalValorations,
+            int numValorations,
+            double avgRating
+        ) {
+        }
+
     @Transactional
     public void deleteUser(Long userId) {
         // Delegate all responsability to userService
@@ -77,6 +110,83 @@ public class AdminService {
 
     public List<Product> getAllProducts() {
         return productRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public AdminPanelData getAdminPanelData() {
+        List<User> dashboardUsers = userService.findAll().stream().limit(3).toList();
+        List<Product> dashboardProducts = productRepository.findAll().stream().limit(3).toList();
+        long usedMemory = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024);
+        return new AdminPanelData(
+                getNumTotalUsers(),
+                getNumBanneds(),
+                dashboardUsers,
+                dashboardProducts,
+                usedMemory + " MB");
+    }
+
+    @Transactional(readOnly = true)
+    public Page<User> getUsersPage(Pageable pageable) {
+        return toPage(userService.findAll(), pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Product> getInventoryPage(Pageable pageable) {
+        List<Product> productsToDisplay = getAllProducts().stream()
+                .filter(p -> !"Sold".equalsIgnoreCase(p.getStatus()))
+                .toList();
+        return toPage(productsToDisplay, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public AdminTransactionsData getAdminTransactionsData() {
+        return new AdminTransactionsData(
+                transactionService.getTotalRevenue(),
+                transactionService.getTotalNumOfTransactions(),
+                transactionService.getAllTransactions());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Transaction> getTransactionsPage(Pageable pageable) {
+        return toPage(transactionService.getAllTransactions(), pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public AdminValorationsData getAdminValorationsData() {
+        List<Valoration> valorations = valorationService.findAll();
+        double avg = valorations.stream().mapToInt(Valoration::getStars).average().orElse(0.0);
+        return new AdminValorationsData(valorations, valorations.size(), Math.round(avg * 10.0) / 10.0);
+    }
+
+    @Transactional
+    public void deleteTransaction(Long id) {
+        transactionService.deleteTransaction(id);
+    }
+
+    @Transactional
+    public void deleteValoration(Long id) {
+        valorationService.deleteById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Valoration> getValorationsPage(Pageable pageable) {
+        return toPage(valorationService.findAll(), pageable);
+    }
+
+    @Transactional
+    public User toggleBanUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        user.setBanned(!user.isBanned());
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public User setBanStatus(Long id, boolean banned) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        user.setBanned(banned);
+        return userRepository.save(user);
     }
 
     @Transactional
@@ -122,10 +232,10 @@ public class AdminService {
             existingProduct.setName(updatedData.getName());
         }
     
-        // Update price only if it's a valid positive value
-        if (updatedData.getPrice() > 0) {
-            existingProduct.setPrice(updatedData.getPrice());
+        if (updatedData.getPrice() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Price must be greater than 0");
         }
+        existingProduct.setPrice(updatedData.getPrice());
     
         if (updatedData.getDescription() != null && !updatedData.getDescription().isBlank()) {
             existingProduct.setDescription(updatedData.getDescription());
@@ -148,11 +258,41 @@ public class AdminService {
             // Create new image blob and link it to the existing product
             Image newImage = imageService.createImage(imageFile.getInputStream());
             existingProduct.setImage(newImage);
-            newImage.setProduct(existingProduct);
         }
     
         // 4. Save the updated product back to the repository
         productRepository.save(existingProduct);
+    }
+
+    @Transactional
+    public Product createProductAsAdmin(Long sellerId,
+                                        String productName,
+                                        String category,
+                                        String description,
+                                        double price,
+                                        String location,
+                                        String status,
+                                        List<MultipartFile> productPhotos) throws IOException {
+        if (price <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Price must be greater than 0");
+        }
+
+        User seller = userRepository.findById(sellerId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        Product newProduct = new Product(productName, category, price, description, status, seller, location);
+
+        if (productPhotos != null) {
+            for (MultipartFile productPhoto : productPhotos) {
+                if (productPhoto == null || productPhoto.isEmpty()) {
+                    continue;
+                }
+                Image img = imageService.createImage(productPhoto.getInputStream());
+                newProduct.addImage(img);
+            }
+        }
+
+        return productRepository.save(newProduct);
     }
 
     @Transactional
@@ -182,6 +322,21 @@ public class AdminService {
         // STEP 4: Final deletion
         // Now that no Inquiries or Interactions point to this ID, SQL allows the deletion
         productRepository.delete(product);
+    }
+
+    private <T> Page<T> toPage(List<T> source, Pageable pageable) {
+        if (pageable == null || pageable.isUnpaged()) {
+            return new PageImpl<>(source);
+        }
+
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), source.size());
+
+        if (start >= source.size()) {
+            return new PageImpl<>(List.of(), pageable, source.size());
+        }
+
+        return new PageImpl<>(source.subList(start, end), pageable, source.size());
     }
 
 }

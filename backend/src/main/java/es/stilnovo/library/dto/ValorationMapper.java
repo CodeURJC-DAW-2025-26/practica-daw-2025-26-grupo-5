@@ -1,17 +1,22 @@
 package es.stilnovo.library.dto;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import java.util.List;
 
 import es.stilnovo.library.model.Valoration;
 
-// Añadimos los mappers de las entidades relacionadas para que MapStruct los use automáticamente
-@Mapper(componentModel = "spring", uses = {UserMapper.class, TransactionMapper.class})
+@Mapper(componentModel = "spring")
 public interface ValorationMapper {
 
+    @Mapping(source = "buyer.name", target = "buyerName")
+    @Mapping(source = "transaction.transactionId", target = "transactionId")
     ValorationDTO toDTO(Valoration valoration);
     
     List<ValorationDTO> toDTOs(List<Valoration> valorations);
 
+    @Mapping(target = "transaction", ignore = true)
+    @Mapping(target = "seller", ignore = true)
+    @Mapping(target = "buyer", ignore = true)
     Valoration toEntity(ValorationDTO valorationDTO);
 }

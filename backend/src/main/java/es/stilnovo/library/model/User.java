@@ -46,6 +46,10 @@ public class User {
         return userId;
     }
 
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
     /** Username for login */
     private String name;
 
@@ -249,6 +253,10 @@ public class User {
 
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public void setUserDescription(String description) {

@@ -92,6 +92,34 @@ public class ValorationService {
     }
 
     /**
+     * Creates and persists a new valoration for a completed transaction.
+     * Returns the managed entity so callers can build a Location header.
+     */
+    @Transactional
+    public Valoration createValoration(long transactionId, int stars, String comment, User buyer) {
+        Transaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
+
+        if (!transaction.getBuyer().getUserId().equals(buyer.getUserId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only rate your own purchases");
+        }
+
+        if (valorationRepository.existsByTransaction(transaction)) {
+            throw new IllegalStateException("This transaction has already been rated");
+        }
+
+        Valoration valoration = valorationRepository.save(new Valoration(transaction, stars, comment));
+        updateSellerStats(transaction.getSeller());
+        return valoration;
+    }
+
+    @Transactional(readOnly = true)
+    public Valoration findById(Long id) {
+        return valorationRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Valoration not found"));
+    }
+
+    /**
      * Re-calculates the average rating and total review count for a seller.
      */
     private void updateSellerStats(User seller) {

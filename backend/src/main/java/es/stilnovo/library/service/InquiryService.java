@@ -12,6 +12,8 @@ import es.stilnovo.library.model.User;
 import es.stilnovo.library.repository.InquiryRepository;
 import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.UserRepository;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 import jakarta.transaction.Transactional;
 
 /**
@@ -61,6 +63,12 @@ public class InquiryService {
     @Transactional
     public Inquiry saveInquiry(Inquiry inquiry) {
         return inquiryRepository.save(inquiry);
+    }
+
+    @Transactional
+    public Inquiry findById(Long id) {
+        return inquiryRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Inquiry not found"));
     }
 
     /**

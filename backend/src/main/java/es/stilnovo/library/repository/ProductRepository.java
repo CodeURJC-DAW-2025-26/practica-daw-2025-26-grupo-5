@@ -96,6 +96,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
      */
     List<Product> findByStatus(String status);
 
+    Page<Product> findByStatusIgnoreCase(String status, Pageable pageable);
+
+    Page<Product> findByStatusIgnoreCaseAndNameContainingIgnoreCase(String status, String name, Pageable pageable);
+
+    Page<Product> findByStatusIgnoreCaseAndCategoryContainingIgnoreCase(String status, String category, Pageable pageable);
+
+    Page<Product> findByStatusIgnoreCaseAndIdNotIn(String status, List<Long> excludedIds, Pageable pageable);
+
     /**
      * Get paginated products by status
      * @param status product status

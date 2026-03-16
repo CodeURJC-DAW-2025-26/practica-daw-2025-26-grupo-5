@@ -1,7 +1,10 @@
 package es.stilnovo.library.service;
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import es.stilnovo.library.model.Product;
@@ -58,5 +61,35 @@ public class MainService {
 
     public boolean isUserAdmin(User user) {
         return user != null && user.getRoles().contains("ROLE_ADMIN");
+    }
+
+    public HomePageData getHomePageData(String query, String category, String username, int maxItems) {
+        return getHomePageData(query, category, username, PageRequest.of(0, maxItems));
+    }
+
+    public HomePageData getHomePageData(String query, String category, String username, Pageable pageable) {
+        User user = getUserContext(username);
+        boolean searching = (query != null && !query.isBlank()) || (category != null && !category.isBlank());
+        boolean isFirstPage = pageable.getPageNumber() == 0;
+        List<Product> recommendedProducts = (searching || !isFirstPage) ? List.of() : productService.getRecommendations(user);
+
+        int recommendedSize = recommendedProducts.size();
+        int regularLimit = Math.max(0, pageable.getPageSize() - recommendedSize);
+        CatalogPageResult catalogPage = regularLimit > 0
+                ? productService.getCatalogPage(query, category, user, PageRequest.of(pageable.getPageNumber(), regularLimit))
+                : new CatalogPageResult(List.of(), true, 0, 0, 0);
+
+        String normalizedQuery = query != null ? query : (category != null ? category : "");
+
+        return new HomePageData(
+                catalogPage.products(),
+                recommendedProducts,
+                user,
+                user != null,
+                isUserAdmin(user),
+                normalizedQuery,
+                searching,
+                catalogPage.last(),
+                catalogPage.products().size());
     }
 }

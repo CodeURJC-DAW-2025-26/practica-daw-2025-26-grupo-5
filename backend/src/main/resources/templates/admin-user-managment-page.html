@@ -41,7 +41,28 @@
             </div>
         </aside>
 
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="adminUsersMobileMenu" aria-labelledby="adminUsersMobileMenuLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title fw-800" id="adminUsersMobileMenuLabel">Admin Menu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <nav class="nav flex-column gap-1">
+                    <a class="nav-link-stilnovo" href="/admin/panel"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+                    <a class="nav-link-stilnovo active" href="/admin/users"><i class="fa-solid fa-users-gear"></i> User Management</a>
+                    <a class="nav-link-stilnovo" href="/admin/global-inventory"><i class="fa-solid fa-box-archive"></i> Global Inventory</a>
+                    <a class="nav-link-stilnovo" href="/admin/transactions"><i class="fa-solid fa-money-bill-transfer"></i> Transactions</a>
+                    <a class="nav-link-stilnovo" href="/admin/valorations"><i class="fa-solid fa-star"></i> Global Valorations</a>
+                </nav>
+            </div>
+        </div>
+
         <main class="flex-grow-1 p-4 p-md-5 overflow-auto">
+            <div class="mobile-menu-trigger d-lg-none">
+                <button class="btn btn-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminUsersMobileMenu" aria-controls="adminUsersMobileMenu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
             <header class="d-flex justify-content-between align-items-center mb-5">
                 <div>
                     <h1 class="fw-800 h2">User Management</h1>

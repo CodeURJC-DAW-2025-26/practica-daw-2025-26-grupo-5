@@ -78,6 +78,7 @@ public class Transaction {
     // --- GETTERS AND SETTERS ---
     
     public Long getTransactionId() { return transactionId; }
+    public void setTransactionId(Long transactionId) { this.transactionId = transactionId; }
 
     public User getSeller() { return seller; }
     public void setSeller(User seller) { this.seller = seller; }

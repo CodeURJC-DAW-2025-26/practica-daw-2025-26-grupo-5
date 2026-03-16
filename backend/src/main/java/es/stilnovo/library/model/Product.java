@@ -2,6 +2,7 @@ package es.stilnovo.library.model;
 
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,7 +18,7 @@ import java.util.List;
  * 
  * Relationships:
  * - ManyToOne: User (the seller)
- * - OneToOne: Image (product photo)
+ * - OneToMany: Image (product gallery)
  * - OneToMany: UserInteraction (views, likes, purchases)
  * 
  * Transient field 'favorite' is used by UI for real-time display
@@ -51,14 +52,10 @@ public class Product {
     /** Product status: Active, Inactive, or Sold */
     private String status; // active, inactive
     
-    /** Primary image associated with this product */
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Image image;
-
-    /* To be implemented 
-    //1 Product = N Images
-    @OneToMany(cascade  = CascadeType.ALL)
-    private List<Image> images;*/
+    /** Product images gallery. The first image acts as the primary image for legacy views. */
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderColumn(name = "image_order")
+    private List<Image> images = new ArrayList<>();
 
     /** The seller (User) who owns this product */
     @ManyToOne
@@ -114,15 +111,46 @@ public class Product {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public Image getImage() {return image;}
-    public void setImage(Image image){this.image = image;}
+    public Image getImage() {
+        return images.isEmpty() ? null : images.get(0);
+    }
 
-    /* To be implemented 
-    public List<Image> getImages() {return images;}
-    public void setImages(List<Image> images){this.images = images;} */
+    public void setImage(Image image) {
+        clearImages();
+        if (image != null) {
+            addImage(image);
+        }
+    }
+
+    public List<Image> getImages() {
+        return images;
+    }
+
+    public void setImages(List<Image> images) {
+        clearImages();
+        if (images != null) {
+            images.forEach(this::addImage);
+        }
+    }
+
+    public void addImage(Image image) {
+        if (image == null) {
+            return;
+        }
+        this.images.add(image);
+        image.setProduct(this);
+    }
+
+    public void clearImages() {
+        images.forEach(existingImage -> existingImage.setProduct(null));
+        images.clear();
+    }
 
     public User getSeller() { return seller; }
     public void setSeller(User seller) { this.seller = seller; }
+
+    public List<UserInteraction> getInteractions() { return interactions; }
+    public void setInteractions(List<UserInteraction> interactions) { this.interactions = interactions; }
 
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }

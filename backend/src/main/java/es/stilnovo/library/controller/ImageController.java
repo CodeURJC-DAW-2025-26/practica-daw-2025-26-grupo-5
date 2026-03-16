@@ -44,5 +44,27 @@ public class ImageController {
         return ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/product-images/{productId}/{imageId}")
+    public ResponseEntity<Object> getProductGalleryImage(@PathVariable long productId, @PathVariable long imageId) throws SQLException {
+        Product product = productService.findById(productId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        Image img = product.getImages().stream()
+                .filter(image -> image.getId() != null && image.getId().equals(imageId))
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        if (img.getImageFile() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Resource file = new InputStreamResource(img.getImageFile().getBinaryStream());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, "image/jpeg")
+                .contentLength(img.getImageFile().length())
+                .body(file);
+    }
+
     
 }

@@ -18,6 +18,6 @@ WORKDIR /usr/src/app/
 # Copiamos el archivo .jar generado en el paso anterior [cite: 204, 273]
 COPY --from=builder /project/target/*.jar /usr/src/app/app.jar
 
-EXPOSE 8080
+EXPOSE 8443
 # Comando para arrancar la aplicación [cite: 208, 277]
 CMD [ "java", "-jar", "app.jar" ]

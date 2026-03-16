@@ -10,6 +10,28 @@
 body { font-family: 'Montserrat', sans-serif; color: var(--navy-dark); background-color: white; }
 .fw-800 { font-weight: 800; }
 
+.mobile-menu-trigger {
+    display: none;
+}
+
+@media (max-width: 991.98px) {
+    .mobile-menu-trigger {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .mobile-menu-trigger .btn {
+        width: 46px;
+        height: 46px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+    }
+}
+
 /* --- NAVBAR ADJUSTMENTS --- */
 .link-login { 
     text-decoration: none !important; 

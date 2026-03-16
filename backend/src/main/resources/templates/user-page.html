@@ -50,7 +50,31 @@
             </div>
         </aside>
 
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="userMobileMenu" aria-labelledby="userMobileMenuLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title fw-800" id="userMobileMenuLabel">My Menu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <nav class="nav flex-column gap-1">
+                    <a class="nav-link-stilnovo active" href="/user-page"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                    <a class="nav-link-stilnovo" href="/user-products-page"><i class="fa-solid fa-box-open"></i> My Products</a>
+                    <a class="nav-link-stilnovo" href="/sales-and-orders-page"><i class="fa-solid fa-handshake"></i> Sales & Orders</a>
+                    <a class="nav-link-stilnovo" href="/user-valorations-page"><i class="fa-solid fa-star"></i> My Valorations</a>
+                    <a class="nav-link-stilnovo" href="/statistics-page"><i class="fa-solid fa-magnifying-glass-chart"></i> Statistics</a>
+                    <a class="nav-link-stilnovo" href="/user-setting-page"><i class="fa-solid fa-user-gear"></i> Settings</a>
+                    <a class="nav-link-stilnovo" href="/help-center-page"><i class="fa-solid fa-circle-question"></i> Help Center</a>
+                    <a class="nav-link-stilnovo" href="/"><i class="fa-solid fa-house"></i> Home Page</a>
+                </nav>
+            </div>
+        </div>
+
         <main class="flex-grow-1 p-4 p-md-5 overflow-auto">
+            <div class="mobile-menu-trigger d-lg-none">
+                <button class="btn btn-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#userMobileMenu" aria-controls="userMobileMenu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
             <header class="d-flex justify-content-between align-items-center mb-5">
                 <div>
                     <h1 class="fw-800 h2">Hello, {{username}}!</h1>
@@ -64,15 +88,23 @@
             
                     <div class="vr opacity-10 d-none d-md-block" style="height: 40px;"></div>
             
-                    <a href="/user-page" class="text-decoration-none d-flex align-items-center gap-3 ps-2">
-                        <div class="position-relative">
-                            <img src="/user/me/profile-photo" alt="User" 
-                                class="rounded-circle border border-2 shadow-sm" width="48" height="48" 
-                                style="object-fit: cover;"
-                                onerror="this.src='/images/profile-photo.png'">
-                            <span class="position-absolute bottom-0 end-0 badge border border-light rounded-circle bg-success p-1" style="width: 12px; height: 12px;"></span>
-                        </div>
-                    </a>
+                    <div class="dropdown">
+                        <button class="btn p-0 border-0 bg-transparent" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="position-relative">
+                                <img src="/user/me/profile-photo" alt="User" 
+                                    class="rounded-circle border border-2 shadow-sm" width="48" height="48" 
+                                    style="object-fit: cover;"
+                                    onerror="this.src='/images/profile-photo.png'">
+                                <span class="position-absolute bottom-0 end-0 badge border border-light rounded-circle bg-success p-1" style="width: 12px; height: 12px;"></span>
+                            </div>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 p-2 mt-2">
+                            <li><a class="dropdown-item rounded-3 fw-700" href="/">Home Page</a></li>
+                            <li><a class="dropdown-item rounded-3 fw-700" href="/user-products-page">My Inventory</a></li>
+                            <li><a class="dropdown-item rounded-3 fw-700" href="/user-valorations-page">My Valorations</a></li>
+                            <li><a class="dropdown-item rounded-3 fw-700" href="/user-setting-page">Settings</a></li>
+                        </ul>
+                    </div>
                 </div>
             </header>
 
@@ -81,14 +113,14 @@
                 <div class="col-md-6">
                     <div class="clay-card p-4">
                         <p class="label-categories mb-1 text-uppercase">Total Revenue</p>
-                        <h2 class="fw-800" style="color: var(--brand-blue)">{{totalRevenue}} €</h2>
+                        <h2 class="fw-800" style="color: var(--brand-blue)">{{formattedTotalRevenue}} €</h2>
                         <span class="text-success fw-700 small">Keep going!</span> <!--+12% vs last month-->
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="clay-card p-4">
                         <p class="label-categories mb-1 text-uppercase">Current Balance</p>
-                        <h2 class="fw-800" style="color: var(--navy-dark)">{{balance}} €</h2>
+                        <h2 class="fw-800" style="color: var(--navy-dark)">{{formattedBalance}} €</h2>
                         <span class="text-primary fw-700 small">Wow!</span> <!--+5% vs last month-->
                     </div>
                 </div>
@@ -166,6 +198,7 @@
             </div>
         </main>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script id="chart-data" type="application/json">

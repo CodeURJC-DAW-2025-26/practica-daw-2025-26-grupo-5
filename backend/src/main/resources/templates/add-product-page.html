@@ -32,7 +32,30 @@
             </nav>
         </aside>
 
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="userAddProductMobileMenu" aria-labelledby="userAddProductMobileMenuLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title fw-800" id="userAddProductMobileMenuLabel">My Menu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <nav class="nav flex-column gap-1">
+                    <a class="nav-link-stilnovo" href="/user-page"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                    <a class="nav-link-stilnovo active" href="/user-products-page"><i class="fa-solid fa-box-open"></i> My Products</a>
+                    <a class="nav-link-stilnovo" href="/sales-and-orders-page"><i class="fa-solid fa-handshake"></i> Sales & Orders</a>
+                    <a class="nav-link-stilnovo" href="/user-valorations-page"><i class="fa-solid fa-star"></i> My Valorations</a>
+                    <a class="nav-link-stilnovo" href="/statistics-page"><i class="fa-solid fa-magnifying-glass-chart"></i> Statistics</a>
+                    <a class="nav-link-stilnovo" href="/user-setting-page"><i class="fa-solid fa-user-gear"></i> Settings</a>
+                    <a class="nav-link-stilnovo" href="/help-center-page"><i class="fa-solid fa-circle-question"></i> Help Center</a>
+                </nav>
+            </div>
+        </div>
+
         <main class="flex-grow-1 p-4 p-md-5 overflow-auto" style="padding-bottom: 100px !important;">
+            <div class="mobile-menu-trigger d-lg-none">
+                <button class="btn btn-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#userAddProductMobileMenu" aria-controls="userAddProductMobileMenu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
             <header class="d-flex justify-content-between align-items-center mb-5">
                 <h1 class="fw-800 h2">Create Listing</h1>
                 <a href="/user-products-page" class="btn-about py-2 px-3 small text-decoration-none border shadow-sm">
@@ -69,8 +92,10 @@
                                     <img id="preview-product" src="#" 
                                         style="display: none; width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0;">
 
-                                    <input type="file" name="productPhoto" id="file-upload" class="d-none" accept="image/*" onchange="previewProductImage(this)" required>
+                                    <input type="file" name="productPhotos" id="file-upload" class="d-none" accept="image/*" onchange="previewProductImage(this)" multiple required>
                                 </label>
+
+                                <p id="selected-images-text" class="small text-muted fw-700 mb-4">0 images selected</p>
                                 
                                 <div class="p-3 rounded-4 bg-light border">
                                     <label class="label-categories mb-2 d-block text-uppercase opacity-50 fw-800 x-small">Visibility</label>
@@ -106,7 +131,7 @@
                                         <label class="label-categories mb-2 d-block">PRICE (EUR)</label>
                                         <div class="search-box w-100 py-2 px-3 bg-light rounded-3 border d-flex align-items-center">
                                             <span class="me-2 fw-800 opacity-25">€</span>
-                                            <input type="number" step="0.01" name="price" placeholder="0.00" class="w-100 border-0 fw-700 bg-transparent" required>
+                                            <input type="number" step="0.01" min="0.01" name="price" placeholder="0.00" class="w-100 border-0 fw-700 bg-transparent" required>
                                         </div>
                                     </div>
 
@@ -142,6 +167,7 @@
         function previewProductImage(input) {
             const preview = document.getElementById('preview-product');
             const placeholder = document.getElementById('upload-placeholder');
+            const selectedImagesText = document.getElementById('selected-images-text');
             
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
@@ -149,8 +175,13 @@
                     preview.src = e.target.result;
                     preview.style.display = 'block';
                     placeholder.style.display = 'none';
+                    selectedImagesText.textContent = input.files.length + (input.files.length === 1 ? ' image selected' : ' images selected');
                 }
                 reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.style.display = 'none';
+                placeholder.style.display = 'flex';
+                selectedImagesText.textContent = '0 images selected';
             }
         }
     </script>

@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "app.public-base-url",
+      "type": "java.lang.String",
+      "description": "Public base URL used to build absolute links in emails and external callbacks.",
+      "defaultValue": "https://localhost:8443"
+    }
+  ]
+}

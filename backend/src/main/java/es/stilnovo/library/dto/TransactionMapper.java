@@ -3,6 +3,7 @@ package es.stilnovo.library.dto;
 import java.util.List;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import es.stilnovo.library.model.Transaction;
 
@@ -13,5 +14,6 @@ public interface TransactionMapper {
 
     List<TransactionDTO> toDTOs(List<Transaction> transactions);
 
+    @Mapping(source = "transactionId", target = "transactionId")
     Transaction toEntity(TransactionDTO transactionDTO);
 }

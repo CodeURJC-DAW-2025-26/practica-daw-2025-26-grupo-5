@@ -1,0 +1,418 @@
+{
+  "info": {
+    "name": "Stilnovo API v1",
+    "description": "Coleccion de ejemplo para probar la API REST de la Practica 2. Configura la variable de entorno {{baseUrl}} (por ejemplo: https://localhost:8443).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/refresh"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/v1/auth/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Signup",
+      "item": [
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/v1/signup",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"newuser\",\n  \"email\": \"newuser@example.com\",\n  \"password\": \"Password123!\",\n  \"confirmPassword\": \"Password123!\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Main",
+      "item": [
+        {
+          "name": "Home Data",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/main?query=&category=&page=0&size=10"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "List Products",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/products?query=&category=&page=0&size=10"
+          }
+        },
+        {
+          "name": "Recommendations",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/products/recommendations"
+          }
+        },
+        {
+          "name": "Get Product By ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/products/1"
+          }
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Desk Lamp", "type": "text" },
+                { "key": "category", "value": "home", "type": "text" },
+                { "key": "price", "value": "49.99", "type": "text" },
+                { "key": "location", "value": "Madrid", "type": "text" },
+                { "key": "description", "value": "Modern lamp", "type": "text" },
+                { "key": "status", "value": "Active", "type": "text" },
+                { "key": "files", "type": "file", "src": [] }
+              ]
+            },
+            "url": "{{baseUrl}}/api/v1/products"
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Desk Lamp Updated", "type": "text" },
+                { "key": "category", "value": "home", "type": "text" },
+                { "key": "price", "value": "59.99", "type": "text" },
+                { "key": "location", "value": "Madrid", "type": "text" },
+                { "key": "description", "value": "Updated description", "type": "text" },
+                { "key": "status", "value": "Active", "type": "text" }
+              ]
+            },
+            "url": "{{baseUrl}}/api/v1/products/1"
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/products/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Product Info",
+      "item": [
+        {
+          "name": "Info Product By ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/info-products/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Images",
+      "item": [
+        {
+          "name": "List Product Images",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/images/products/1"
+          }
+        },
+        {
+          "name": "Get Image Binary",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/images/1/file"
+          }
+        },
+        {
+          "name": "Upload Product Images",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "files", "type": "file", "src": [] },
+                { "key": "files", "type": "file", "src": [] }
+              ]
+            },
+            "url": "{{baseUrl}}/api/v1/images/products/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get Me",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/users/me"
+          }
+        },
+        {
+          "name": "Seller Profile",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/users/1/seller-profile"
+          }
+        },
+        {
+          "name": "Update My Settings",
+          "request": {
+            "method": "PUT",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "newEmail", "value": "user1@stilnovo.es", "type": "text" },
+                { "key": "newDescription", "value": "Updated profile from REST", "type": "text" }
+              ]
+            },
+            "url": "{{baseUrl}}/api/v1/users/me/settings"
+          }
+        },
+        {
+          "name": "Delete My Account",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/api/v1/users/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "item": [
+        {
+          "name": "Create Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/v1/transactions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Transaction By ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/transactions/1"
+          }
+        },
+        {
+          "name": "Seller Transactions",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/transactions/seller"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Get Payment Data",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/payments/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Contact Seller",
+      "item": [
+        {
+          "name": "Get Contact Data",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/contact-seller/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Send Inquiry",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/v1/notifications/inquiries",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": 1,\n  \"phone\": \"+34600111222\",\n  \"type\": \"QUESTION\",\n  \"message\": \"Hola, sigue disponible?\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Valorations",
+      "item": [
+        {
+          "name": "Get All Valorations",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/valorations/"
+          }
+        },
+        {
+          "name": "Get Valoration By ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/valorations/1"
+          }
+        },
+        {
+          "name": "Create Valoration",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/v1/valorations/",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": null,\n  \"stars\": 5,\n  \"comment\": \"Muy buen vendedor\",\n  \"buyerName\": \"buyer\",\n  \"transactionId\": 1\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "PDF",
+      "item": [
+        {
+          "name": "Invoice PDF",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/pdfs/invoice/1"
+          }
+        },
+        {
+          "name": "Shipping Label PDF",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/pdfs/shipping-label/1"
+          }
+        },
+        {
+          "name": "Statistics PDF",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/pdfs/statistics"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Panel",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/admin/panel" }
+        },
+        {
+          "name": "Users Page",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/admin/users?page=0&size=10" }
+        },
+        {
+          "name": "Update Ban User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/api/v1/admin/users/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"banned\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/api/v1/admin/users/1" }
+        },
+        {
+          "name": "Products Page",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/admin/products?page=0&size=10" }
+        },
+        {
+          "name": "Delete Product",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/api/v1/admin/products/1" }
+        },
+        {
+          "name": "Transactions Page",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/admin/transactions?page=0&size=10" }
+        },
+        {
+          "name": "Delete Transaction",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/api/v1/admin/transactions/1" }
+        },
+        {
+          "name": "Valorations Page",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/v1/admin/valorations?page=0&size=10" }
+        },
+        {
+          "name": "Delete Valoration",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/api/v1/admin/valorations/1" }
+        }
+      ]
+    }
+  ]
+}

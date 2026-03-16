@@ -41,13 +41,38 @@
             </div>
         </aside>
 
+        <div class="offcanvas offcanvas-start" tabindex="-1" id="adminMobileMenuInv" aria-labelledby="adminMobileMenuInvLabel">
+            <div class="offcanvas-header">
+                <h5 class="offcanvas-title fw-800" id="adminMobileMenuInvLabel">Admin Menu</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+            </div>
+            <div class="offcanvas-body">
+                <nav class="nav flex-column gap-1">
+                    <a class="nav-link-stilnovo" href="/admin/panel"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+                    <a class="nav-link-stilnovo" href="/admin/users"><i class="fa-solid fa-users-gear"></i> User Management</a>
+                    <a class="nav-link-stilnovo active" href="/admin/global-inventory"><i class="fa-solid fa-box-archive"></i> Global Inventory</a>
+                    <a class="nav-link-stilnovo" href="/admin/transactions"><i class="fa-solid fa-money-bill-transfer"></i> Transactions</a>
+                    <a class="nav-link-stilnovo" href="/admin/valorations"><i class="fa-solid fa-star"></i> Global Valorations</a>
+                    <a class="nav-link-stilnovo" href="/"><i class="fa-solid fa-house"></i> Home Page</a>
+                </nav>
+            </div>
+        </div>
+
         <main class="flex-grow-1 p-4 p-md-5 pb-5 overflow-y-auto">
+            <div class="mobile-menu-trigger d-lg-none">
+                <button class="btn btn-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#adminMobileMenuInv" aria-controls="adminMobileMenuInv">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
             <header class="d-flex justify-content-between align-items-center mb-5">
                 <div>
                     <h1 class="fw-800 h2">Global Inventory</h1>
                     <p class="text-muted small">Audit, edit, or remove any listing on the platform.</p>
                 </div>
                 <div class="d-flex align-items-center gap-3">
+                    <button class="btn-sell py-2 px-3 border-0 d-none d-md-inline-flex" type="button" data-bs-toggle="modal" data-bs-target="#addProductAsAdminModal">
+                        <i class="fa-solid fa-plus me-2"></i>Add Product
+                    </button>
                     <div class="text-end d-none d-md-block">
                         <p class="fw-800 mb-0 small text-dark">System Admin</p>
                         <p class="x-small text-muted mb-0">Superuser Access</p>
@@ -110,6 +135,65 @@
         </main>
     </div>
 
+    <div class="modal fade" id="addProductAsAdminModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="clay-card modal-content p-4 border-0 shadow-lg bg-white" style="border-radius: 24px;">
+                <div class="modal-header border-0 pb-0">
+                    <h3 class="fw-800 h5 mb-0">Create Product For Any User</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="/admin/products/add" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="_csrf" value="{{token}}"/>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="label-categories x-small mb-1 d-block fw-700">SELLER</label>
+                                <select name="sellerId" class="form-select bg-light border-0 py-2 px-3" style="border-radius: 12px;" required>
+                                    <option selected disabled value="">Select user</option>
+                                    {{#allUsers}}
+                                    <option value="{{userId}}">{{name}} (#{{userId}})</option>
+                                    {{/allUsers}}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="label-categories x-small mb-1 d-block fw-700">PRODUCT NAME</label>
+                                <input type="text" name="productName" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="label-categories x-small mb-1 d-block fw-700">CATEGORY</label>
+                                <input type="text" name="category" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="label-categories x-small mb-1 d-block fw-700">PRICE (€)</label>
+                                <input type="number" step="0.01" min="0.01" name="price" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="label-categories x-small mb-1 d-block fw-700">LOCATION</label>
+                                <input type="text" name="location" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="label-categories x-small mb-1 d-block fw-700">STATUS</label>
+                                <input type="text" name="status" value="Active" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="label-categories x-small mb-1 d-block fw-700">DESCRIPTION</label>
+                                <textarea name="description" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" rows="3" required></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="label-categories x-small mb-1 d-block fw-700">IMAGES</label>
+                                <input type="file" name="productPhotos" class="form-control" accept="image/*" multiple required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 pt-3">
+                        <button type="button" class="btn btn-light fw-700 rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-dark fw-700 rounded-pill px-4 shadow-sm">Create Product</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     {{#products}}
     <div class="modal fade" id="editProductModal{{id}}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -146,7 +230,7 @@
                                 <div class="row g-2 mb-3">
                                     <div class="col-6">
                                         <label class="label-categories x-small mb-1 d-block fw-700">PRICE (€)</label>
-                                        <input type="number" step="0.01" name="price" value="{{price}}" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" required>
+                                        <input type="number" step="0.01" min="0.01" name="price" value="{{price}}" class="form-control bg-light border-0 py-2 px-3" style="border-radius: 12px;" required>
                                     </div>
                                     <div class="col-6">
                                         <label class="label-categories x-small mb-1 d-block fw-700">CATEGORY</label>

@@ -15,6 +15,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.engine.jdbc.proxy.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -55,6 +56,47 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class UserService {
+
+    public record SellerProfilePageData(
+        User seller,
+        List<Valoration> sellerValorations,
+        List<Product> sellerProducts,
+        int itemsCount,
+        int fullStars,
+        boolean owner
+    ) {
+    }
+
+    public record UserDashboardData(
+        User user,
+        String date,
+        List<Transaction> userSales,
+        String chartLabels,
+        String chartValues,
+        String revenueLabels,
+        String revenueValues,
+        String barLabels,
+        String visitsData,
+        String interestData
+    ) {
+    }
+
+    public record UserStatisticsData(
+        User user,
+        String totalSales,
+        int itemsSold,
+        String avgRating,
+        String inventoryValue,
+        String date,
+        String chartLabels,
+        String chartValues,
+        String revenueLabels,
+        String revenueValues,
+        String barLabels,
+        String visitsData,
+        String interestData
+    ) {
+    }
 
     @Autowired
     private UserRepository userRepository;
@@ -302,6 +344,18 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Seller not found"));
     }
 
+    public SellerProfilePageData getSellerProfilePageData(long id, String viewerUsername) {
+        User seller = getPublicProfileById(id);
+        boolean owner = viewerUsername != null && viewerUsername.equals(seller.getName());
+        return new SellerProfilePageData(
+                seller,
+                seller.getValorations(),
+                seller.getProducts(),
+                seller.getProducts().size(),
+                (int) Math.floor(seller.getRating()),
+                owner);
+    }
+
     /**
      * Processes and aggregates all sales and orders data for the authenticated user.
      * It dynamically checks if each purchase has been rated to update the UI buttons.
@@ -349,6 +403,57 @@ public class UserService {
 
         return data;
     } 
+
+        public UserDashboardData getUserDashboardData(String username) {
+        User user = getFullUserProfile(username);
+        List<Transaction> sales = transactionRepository.findBySellerUserId(user.getUserId());
+        Map<String, Long> salesByCategory = getSalesByCategory(sales);
+        List<String> monthLabels = getMonthLabels();
+        List<Double> monthlyRevenues = getRevenueByMonth(sales);
+        BarChartData chartData = getBarChartData(user);
+        List<String> barLabels = chartData.labels();
+        List<Long> visitsData = barLabels.stream()
+            .map(cat -> chartData.visitsByCategory().getOrDefault(cat, 0L))
+            .toList();
+        List<Long> interestData = barLabels.stream()
+            .map(cat -> chartData.interestByCategory().getOrDefault(cat, 0L))
+            .toList();
+
+        return new UserDashboardData(
+            user,
+            getFormattedDate(),
+            sales,
+            toJson(salesByCategory.keySet()),
+            toJson(salesByCategory.values()),
+            toJson(monthLabels),
+            toJson(monthlyRevenues),
+            toJson(barLabels),
+            toJson(visitsData),
+            toJson(interestData));
+        }
+
+        @Transactional(readOnly = true)
+        public UserStatisticsData getUserStatisticsData(String username) {
+        UserDashboardData dashboardData = getUserDashboardData(username);
+        List<Transaction> transactions = transactionRepository.findBySellerUserId(dashboardData.user().getUserId());
+        double totalSales = transactions.stream().mapToDouble(Transaction::getFinalPrice).sum();
+        double avgRating = getAverageRatingForSeller(username);
+
+        return new UserStatisticsData(
+            dashboardData.user(),
+            String.format("%.2f", totalSales),
+            transactions.size(),
+            String.format("%.1f", avgRating),
+            String.format("%.2f", calculateInventoryValue(username)),
+            dashboardData.date(),
+            dashboardData.chartLabels(),
+            dashboardData.chartValues(),
+            dashboardData.revenueLabels(),
+            dashboardData.revenueValues(),
+            dashboardData.barLabels(),
+            dashboardData.visitsData(),
+            dashboardData.interestData());
+        }
 
     public double calculateInventoryValue(String username) {
         // 1. Find the user
@@ -434,5 +539,13 @@ public class UserService {
 
     public boolean emailExists(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    private String toJson(Object value) {
+        try {
+            return new ObjectMapper().writeValueAsString(value);
+        } catch (Exception exception) {
+            return "[]";
+        }
     }
 }

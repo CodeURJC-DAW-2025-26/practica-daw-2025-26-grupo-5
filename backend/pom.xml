@@ -12,8 +12,9 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.0</version>
-		<relativePath/> </parent>
+		<version>4.0.3</version>
+		<relativePath />
+	</parent>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -115,7 +116,7 @@
 					<jmxPort>9009</jmxPort>
 				</configuration>
 				<executions>
-					<execution>
+					<!-- <execution>
 						<id>pre-integration-test</id>
 						<goals>
 							<goal>start</goal>
@@ -126,7 +127,7 @@
 						<goals>
 							<goal>stop</goal>
 						</goals>
-					</execution>
+					</execution> -->
 				</executions>
 			</plugin>
 
@@ -135,12 +136,12 @@
 				<artifactId>springdoc-openapi-maven-plugin</artifactId>
 				<version>1.5</version>
 				<executions>
-					<execution>
+					<!-- <execution>
 						<phase>integration-test</phase>
 						<goals>
 							<goal>generate</goal>
 						</goals>
-					</execution>
+					</execution> -->
 				</executions>
 				<configuration>
 					<apiDocsUrl>https://localhost:8443/v3/api-docs.yaml</apiDocsUrl>
@@ -154,7 +155,7 @@
 				<artifactId>openapi-generator-maven-plugin</artifactId>
 				<version>7.17.0</version>
 				<executions>
-					<execution>
+					<!-- <execution>
 						<phase>integration-test</phase>
 						<goals>
 							<goal>generate</goal>
@@ -165,7 +166,7 @@
 							<output>${project.basedir}/api-docs/</output>
 							<skipValidateSpec>true</skipValidateSpec>
 						</configuration>
-					</execution>
+					</execution> -->
 				</executions>
 			</plugin>
 
@@ -174,7 +175,7 @@
 				<artifactId>copy-rename-maven-plugin</artifactId>
 				<version>1.0.1</version>
 				<executions>
-					<execution>
+					<!-- <execution>
 						<id>copy-file</id>
 						<phase>integration-test</phase>
 						<goals>
@@ -184,7 +185,7 @@
 							<sourceFile>api-docs/index.html</sourceFile>
 							<destinationFile>api-docs/api-docs.html</destinationFile>
 						</configuration>
-					</execution>
+					</execution> -->
 				</executions>
 			</plugin>
 		</plugins>

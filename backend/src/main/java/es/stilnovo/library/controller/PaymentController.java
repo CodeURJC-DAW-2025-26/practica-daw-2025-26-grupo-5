@@ -7,10 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import es.stilnovo.library.model.Product;
-import es.stilnovo.library.model.User;
-import es.stilnovo.library.service.ProductService;
-import es.stilnovo.library.service.UserService;
+import es.stilnovo.library.service.PaymentService;
 
 
 /**
@@ -29,10 +26,7 @@ import es.stilnovo.library.service.UserService;
 public class PaymentController {
 
     @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private UserService userService;
+    private PaymentService paymentService;
 
     /**
      * Renders the payment page for a specific product.
@@ -43,31 +37,17 @@ public class PaymentController {
      */
     @GetMapping("/payment-page/{id}")
     public String showPaymentPage(Model model, @PathVariable long id, Principal principal) {
-        // STEP 1: Authentication check - redirect to login if not authenticated
         if (principal == null) {
             return "redirect:/login-page";
         }
 
-        // STEP 2: Fetch product from database via service layer
-        Product product = productService.findById(id).orElseThrow();
-
-        // STEP 3: Get current buyer user information from security context
-        User buyer = userService.findByName(principal.getName()).orElseThrow();
-
-        // STEP 4: Security validation - prevent sellers from buying their own products
-        if (product.getSeller().getUserId().equals(buyer.getUserId())) {
-            return "redirect:/info-product-page/" + id + "?error=self_purchase";
+        try {
+            var checkoutData = paymentService.prepareCheckout(id, principal.getName());
+            model.addAttribute("product", checkoutData.product());
+            model.addAttribute("user", checkoutData.buyer());
+            return "payment-page";
+        } catch (IllegalStateException exception) {
+            return "redirect:/info-product-page/" + id + "?error=" + exception.getMessage();
         }
-
-        // STEP 5: Check product is still available (active status)
-        if (!"active".equalsIgnoreCase(product.getStatus())) {
-            return "redirect:/info-product-page/" + id + "?error=not_available";
-        }
-
-        // STEP 6: Populate model with product and buyer data for payment form
-        model.addAttribute("product", product);
-        model.addAttribute("user", buyer);
-
-        return "payment-page";
     }
 }

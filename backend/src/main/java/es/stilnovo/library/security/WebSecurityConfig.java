@@ -3,12 +3,15 @@ package es.stilnovo.library.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.http.HttpMethod;
 
 /**
  * WebSecurityConfig for Spring Security setup
@@ -45,6 +48,11 @@ public class WebSecurityConfig {
         return authProvider;
     }
 
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
     /**
      * Configure Spring Security filter chain
      * Defines authorization rules for public, user, and admin endpoints
@@ -58,6 +66,8 @@ public class WebSecurityConfig {
         // STEP 1: Register authentication provider
         http.authenticationProvider(authenticationProvider());
 
+        http.csrf(csrf -> csrf.ignoringRequestMatchers("/api/v1/**"));
+
         // STEP 2: Configure authorization rules
         http
             .authorizeHttpRequests(authorize -> authorize
@@ -70,6 +80,10 @@ public class WebSecurityConfig {
                 .requestMatchers("/product-images/**").permitAll()
                 .requestMatchers("/info-product-page/**").permitAll()
                 .requestMatchers("/about-page/**").permitAll()
+                .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/api/v1/signup/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/main/**", "/api/v1/products/**", "/api/v1/info-products/**", "/api/v1/images/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/users/*/seller-profile").permitAll()
 
                 .requestMatchers("/user/me/profile-photo").permitAll()
 
@@ -90,11 +104,20 @@ public class WebSecurityConfig {
                     "/favorite-products-page/**",
                     "/help-center-page/**",
                     "/pdf/**",
-                    "/api/v1/notifications/**"
+                    "/api/v1/payments/**",
+                    "/api/v1/transactions/**",
+                    "/api/v1/users/me",
+                    "/api/v1/users/me/**",
+                    "/api/v1/products/**",
+                    "/api/v1/images/products/**",
+                    "/api/v1/contact-seller/**",
+                    "/api/v1/notifications/**",
+                    "/api/v1/pdfs/**",
+                    "/api/v1/valorations/**"
                 ).hasAnyRole("USER", "ADMIN")
 
                 // Admin only endpoints
-                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/admin/**", "/api/v1/admin/**").hasRole("ADMIN")
 
                 // Everything else requires authentication
                 .anyRequest().authenticated()

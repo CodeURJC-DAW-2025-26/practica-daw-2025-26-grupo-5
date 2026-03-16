@@ -8,4 +8,8 @@ import es.stilnovo.library.model.Image;
 public interface ImageMapper {
 
     ImageDTO toDTO(Image image);
+
+    @Mapping(target = "imageFile", ignore = true)
+    @Mapping(target = "product", ignore = true)
+    Image toEntity(ImageDTO imageDTO);
 }

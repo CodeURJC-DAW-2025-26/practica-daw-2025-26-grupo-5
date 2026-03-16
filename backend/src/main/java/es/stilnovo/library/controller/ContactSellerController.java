@@ -9,10 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import es.stilnovo.library.model.Product;
-import es.stilnovo.library.model.User;
-import es.stilnovo.library.service.ProductService;
-import es.stilnovo.library.service.UserService;
+import es.stilnovo.library.service.ContactSellerService;
 
 /**
  * ContactSellerController: Handles buyer-to-seller messaging
@@ -31,10 +28,7 @@ import es.stilnovo.library.service.UserService;
 public class ContactSellerController {
 
     @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private UserService userService;
+    private ContactSellerService contactSellerService;
 
     @GetMapping("/contact-seller-page/{id}")
     public String showContactSeller(@PathVariable long id, Model model, Principal principal,
@@ -46,27 +40,15 @@ public class ContactSellerController {
             return "redirect:/login-page";
         }
 
-        // STEP 2: Fetch product and its seller
-        Product product = productService.findById(id).orElseThrow();
-        User seller = product.getSeller();
-        
-        // STEP 3: Get current buyer from security context
-        User buyer = userService.findByName(principal.getName()).orElseThrow();
-
-        // STEP 4: Prevent seller from sending inquiry about their own product
-        if (seller.getUserId().equals(buyer.getUserId())) {
+        try {
+            var pageData = contactSellerService.getContactSellerPageData(id, principal.getName());
+            model.addAttribute("product", pageData.product());
+            model.addAttribute("seller", pageData.seller());
+            model.addAttribute("buyerName", pageData.buyerName());
+            model.addAttribute("buyerEmail", pageData.buyerEmail());
+        } catch (IllegalStateException exception) {
             return "redirect:/info-product-page/" + id + "?error=self_purchase";
         }
-
-        // STEP 5: Populate model with product and seller information
-        model.addAttribute("product", product);
-        model.addAttribute("seller", seller);
-        
-        // STEP 6: Pre-fill buyer's contact information for convenience
-        userService.findByName(principal.getName()).ifPresent(user -> {
-            model.addAttribute("buyerName", user.getName());
-            model.addAttribute("buyerEmail", user.getEmail());
-        });
 
         // STEP 7: Pass status flags to template (sent, error, cooldown messages)
         model.addAttribute("sent", "true".equalsIgnoreCase(sent));

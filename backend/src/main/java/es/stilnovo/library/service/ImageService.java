@@ -3,6 +3,7 @@ package es.stilnovo.library.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.sql.rowset.serial.SerialBlob;
 
@@ -34,6 +35,10 @@ public class ImageService {
 
     public Image getImage(long id) {
         return imageRepository.findById(id).orElseThrow();
+    }
+
+    public List<Image> getProductImages(long productId) {
+        return imageRepository.findByProductIdOrderByIdAsc(productId);
     }
 
     public Image createImage(InputStream inputStream) throws IOException {
