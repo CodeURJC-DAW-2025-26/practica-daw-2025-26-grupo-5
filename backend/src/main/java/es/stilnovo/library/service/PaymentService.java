@@ -18,6 +18,7 @@ public class PaymentService {
     private UserService userService;
 
     public CheckoutData prepareCheckout(long productId, String username) {
+        //Checks authentication and if it is a self purchase
         if (username == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
         }

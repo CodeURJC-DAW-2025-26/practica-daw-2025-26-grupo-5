@@ -54,10 +54,12 @@ public class DataBaseInitializer {
     public void init() throws IOException, URISyntaxException {
         // STEP 1: Load default profile images for users and admin
         Resource defaultUserImage = new ClassPathResource("static/images/no-profile-picture.png");
-        Blob photoUserBlob = BlobProxy.generateProxy(defaultUserImage.getInputStream(), defaultUserImage.contentLength());
+        byte[] userImageBytes = defaultUserImage.getInputStream().readAllBytes();
+        Blob photoUserBlob = BlobProxy.generateProxy(userImageBytes);
 
         Resource defaultAdminImage = new ClassPathResource("static/images/admin-profile-picture.png");
-        Blob photoAdminBlob = BlobProxy.generateProxy(defaultAdminImage.getInputStream(), defaultAdminImage.contentLength());
+        byte[] adminImageBytes = defaultAdminImage.getInputStream().readAllBytes();
+        Blob photoAdminBlob = BlobProxy.generateProxy(adminImageBytes);
 
         // STEP 2: Create default user and admin accounts with sample data
         User user1 = new User("user1", passwordEncoder.encode("user123"), "user1@stilnovo.es", photoUserBlob, 4.7, "1234 5678 9012 3456", "123", "09/27", 0, 129.10, 1872.87, "I am user1 in Stilnovo","ROLE_USER");

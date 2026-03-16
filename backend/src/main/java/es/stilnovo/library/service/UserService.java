@@ -42,6 +42,9 @@ import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.Transaction;
 import org.springframework.transaction.annotation.Transactional;
 
+import es.stilnovo.library.dto.UserDashboardDataDTO;
+import es.stilnovo.library.dto.SellerProfilePageDataDTO;
+import es.stilnovo.library.dto.UserStatisticsDataDTO;
 /**
  * UserService: Manages all user-related operations
  * 
@@ -57,46 +60,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UserService {
 
-    public record SellerProfilePageData(
-        User seller,
-        List<Valoration> sellerValorations,
-        List<Product> sellerProducts,
-        int itemsCount,
-        int fullStars,
-        boolean owner
-    ) {
-    }
-
-    public record UserDashboardData(
-        User user,
-        String date,
-        List<Transaction> userSales,
-        String chartLabels,
-        String chartValues,
-        String revenueLabels,
-        String revenueValues,
-        String barLabels,
-        String visitsData,
-        String interestData
-    ) {
-    }
-
-    public record UserStatisticsData(
-        User user,
-        String totalSales,
-        int itemsSold,
-        String avgRating,
-        String inventoryValue,
-        String date,
-        String chartLabels,
-        String chartValues,
-        String revenueLabels,
-        String revenueValues,
-        String barLabels,
-        String visitsData,
-        String interestData
-    ) {
-    }
 
     @Autowired
     private UserRepository userRepository;
@@ -344,10 +307,10 @@ public class UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Seller not found"));
     }
 
-    public SellerProfilePageData getSellerProfilePageData(long id, String viewerUsername) {
+    public SellerProfilePageDataDTO getSellerProfilePageData(long id, String viewerUsername) {
         User seller = getPublicProfileById(id);
         boolean owner = viewerUsername != null && viewerUsername.equals(seller.getName());
-        return new SellerProfilePageData(
+        return new SellerProfilePageDataDTO(
                 seller,
                 seller.getValorations(),
                 seller.getProducts(),
@@ -404,55 +367,55 @@ public class UserService {
         return data;
     } 
 
-        public UserDashboardData getUserDashboardData(String username) {
-        User user = getFullUserProfile(username);
-        List<Transaction> sales = transactionRepository.findBySellerUserId(user.getUserId());
-        Map<String, Long> salesByCategory = getSalesByCategory(sales);
-        List<String> monthLabels = getMonthLabels();
-        List<Double> monthlyRevenues = getRevenueByMonth(sales);
-        BarChartData chartData = getBarChartData(user);
-        List<String> barLabels = chartData.labels();
-        List<Long> visitsData = barLabels.stream()
-            .map(cat -> chartData.visitsByCategory().getOrDefault(cat, 0L))
-            .toList();
-        List<Long> interestData = barLabels.stream()
-            .map(cat -> chartData.interestByCategory().getOrDefault(cat, 0L))
-            .toList();
+        public UserDashboardDataDTO getUserDashboardData(String username) {
+            User user = getFullUserProfile(username);
+            List<Transaction> sales = transactionRepository.findBySellerUserId(user.getUserId());
+            Map<String, Long> salesByCategory = getSalesByCategory(sales);
+            List<String> monthLabels = getMonthLabels();
+            List<Double> monthlyRevenues = getRevenueByMonth(sales);
+            BarChartData chartData = getBarChartData(user);
+            List<String> barLabels = chartData.labels();
+            List<Long> visitsData = barLabels.stream()
+                .map(cat -> chartData.visitsByCategory().getOrDefault(cat, 0L))
+                .toList();
+            List<Long> interestData = barLabels.stream()
+                .map(cat -> chartData.interestByCategory().getOrDefault(cat, 0L))
+                .toList();
 
-        return new UserDashboardData(
-            user,
-            getFormattedDate(),
-            sales,
-            toJson(salesByCategory.keySet()),
-            toJson(salesByCategory.values()),
-            toJson(monthLabels),
-            toJson(monthlyRevenues),
-            toJson(barLabels),
-            toJson(visitsData),
-            toJson(interestData));
+            return new UserDashboardDataDTO(
+                user,
+                getFormattedDate(),
+                sales,
+                toJson(salesByCategory.keySet()),
+                toJson(salesByCategory.values()),
+                toJson(monthLabels),
+                toJson(monthlyRevenues),
+                toJson(barLabels),
+                toJson(visitsData),
+                toJson(interestData));
         }
 
         @Transactional(readOnly = true)
-        public UserStatisticsData getUserStatisticsData(String username) {
-        UserDashboardData dashboardData = getUserDashboardData(username);
-        List<Transaction> transactions = transactionRepository.findBySellerUserId(dashboardData.user().getUserId());
-        double totalSales = transactions.stream().mapToDouble(Transaction::getFinalPrice).sum();
-        double avgRating = getAverageRatingForSeller(username);
+        public UserStatisticsDataDTO getUserStatisticsData(String username) {
+            UserDashboardDataDTO dashboardData = getUserDashboardData(username);
+            List<Transaction> transactions = transactionRepository.findBySellerUserId(dashboardData.user().getUserId());
+            double totalSales = transactions.stream().mapToDouble(Transaction::getFinalPrice).sum();
+            double avgRating = getAverageRatingForSeller(username);
 
-        return new UserStatisticsData(
-            dashboardData.user(),
-            String.format("%.2f", totalSales),
-            transactions.size(),
-            String.format("%.1f", avgRating),
-            String.format("%.2f", calculateInventoryValue(username)),
-            dashboardData.date(),
-            dashboardData.chartLabels(),
-            dashboardData.chartValues(),
-            dashboardData.revenueLabels(),
-            dashboardData.revenueValues(),
-            dashboardData.barLabels(),
-            dashboardData.visitsData(),
-            dashboardData.interestData());
+            return new UserStatisticsDataDTO(
+                dashboardData.user(),
+                String.format("%.2f", totalSales),
+                transactions.size(),
+                String.format("%.1f", avgRating),
+                String.format("%.2f", calculateInventoryValue(username)),
+                dashboardData.date(),
+                dashboardData.chartLabels(),
+                dashboardData.chartValues(),
+                dashboardData.revenueLabels(),
+                dashboardData.revenueValues(),
+                dashboardData.barLabels(),
+                dashboardData.visitsData(),
+                dashboardData.interestData());
         }
 
     public double calculateInventoryValue(String username) {
@@ -505,7 +468,7 @@ public class UserService {
         return new ArrayList<>(revenueByMonth.values());
     }
 
-    public record BarChartData(
+    private record BarChartData(
         List<String> labels,
         Map<String, Long> visitsByCategory,
         Map<String, Long> interestByCategory
