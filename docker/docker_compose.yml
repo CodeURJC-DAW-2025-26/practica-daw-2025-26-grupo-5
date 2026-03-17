@@ -1,0 +1,56 @@
+# ============================================================
+#  Stilnovo - Docker Compose
+# ============================================================
+#
+#  PRIMER ARRANQUE (crea esquema + carga datos de ejemplo):
+#    Linux/macOS:
+#      DDL_AUTO=create docker compose -f oci://<usuario>/stilnovo-compose:latest up
+#
+#    Windows PowerShell:
+#      $env:DDL_AUTO="create"
+#      docker compose -f oci://<usuario>/stilnovo-compose:latest up
+#
+#  ARRANQUES POSTERIORES (esquema intacto, sin borrar datos):
+#    docker compose -f oci://<usuario>/stilnovo-compose:latest up
+#
+#  APP_IMAGE: imagen de la aplicacion publicada en DockerHub.
+#    Linux/macOS:  APP_IMAGE=<usuario>/stilnovo:latest docker compose ... up
+#    PowerShell:   $env:APP_IMAGE="<usuario>/stilnovo:latest"
+# ============================================================
+
+services:
+  db:
+    image: mysql:8.4
+    container_name: stilnovo-db
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: stilnovo
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-ppassword"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  app:
+    image: ${APP_IMAGE:-yourdockerhubuser/stilnovo:latest}
+    container_name: stilnovo-app
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8443:8443"
+    environment:
+      SERVER_PORT: 8443
+      APP_PUBLIC_BASE_URL: https://localhost:8443
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/stilnovo?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO:-none}
+
+volumes:
+  mysql_data:
+

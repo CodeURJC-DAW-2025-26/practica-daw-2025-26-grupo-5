@@ -1,7 +1,6 @@
 package es.stilnovo.library.controller;
 
 import java.security.Principal;
-import java.util.List;
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;

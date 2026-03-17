@@ -52,6 +52,10 @@ public class DataBaseInitializer {
 
     @PostConstruct
     public void init() throws IOException, URISyntaxException {
+        if (userRepository.count() > 0) {
+            return; // Database already has data, skip sample data loading
+        }
+
         // STEP 1: Load default profile images for users and admin
         Resource defaultUserImage = new ClassPathResource("static/images/no-profile-picture.png");
         byte[] userImageBytes = defaultUserImage.getInputStream().readAllBytes();
