@@ -528,6 +528,8 @@ Responsable de la implementación completa del sistema de administración de la 
 
 ## 🛠 **Práctica 2: Incorporación de una API REST a la aplicación web, despliegue con Docker y despliegue remoto**
 
+Nota: Para probar los endpoints POST/PUT que requieren imágenes en Postman, por favor adjunte un archivo local en la pestaña Body.
+
 ### **Vídeo de Demostración**
 📹 **[Enlace al vídeo en YouTube](https://www.youtube.com/watch?v=x91MPoITQ3I)**
 > Vídeo mostrando las principales funcionalidades de la aplicación web.

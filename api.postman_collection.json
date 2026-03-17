@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Stilnovo API v1",
-    "description": "Coleccion de ejemplo para probar la API REST de la Practica 2. Configura la variable de entorno {{baseUrl}} (por ejemplo: https://localhost:8443).",
+    "description": "Example collection for testing the REST API of Practice 2. Configure the environment variable {{baseUrl}} (for example: https://localhost:8443).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -209,7 +209,8 @@
               "mode": "formdata",
               "formdata": [
                 { "key": "newEmail", "value": "user1@stilnovo.es", "type": "text" },
-                { "key": "newDescription", "value": "Updated profile from REST", "type": "text" }
+                { "key": "newDescription", "value": "Updated profile from REST", "type": "text" },
+                { "key": "newProfilePhoto", "type": "file", "src": []}
               ]
             },
             "url": "{{baseUrl}}/api/v1/users/me/profile"
