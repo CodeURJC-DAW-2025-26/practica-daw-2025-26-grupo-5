@@ -210,7 +210,10 @@
               "formdata": [
                 { "key": "newEmail", "value": "user1@stilnovo.es", "type": "text" },
                 { "key": "newDescription", "value": "Updated profile from REST", "type": "text" },
-                { "key": "newProfilePhoto", "type": "file", "src": []}
+                { "key": "newProfilePhoto", "type": "file", "src": []},
+                { "key": "newCardNumber", "value": "1234567890123456", "type": "text" },
+                { "key": "newCardCvv", "value": "123", "type": "text" },
+                { "key": "newCardExpiringDate", "value": "12/25", "type": "text" }  
               ]
             },
             "url": "{{baseUrl}}/api/v1/users/me/profile"
