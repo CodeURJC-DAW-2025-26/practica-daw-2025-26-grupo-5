@@ -11,7 +11,6 @@ public record ProductDTO(
         String description,
         String status,
         ImageDTO image,
-        List<ImageDTO> images,
         UserDTO seller,
         List<UserInteractionDTO> userInteractions,
         boolean favorite) {
