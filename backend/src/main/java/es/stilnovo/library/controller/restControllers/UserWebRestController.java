@@ -1,9 +1,12 @@
-package es.stilnovo.library.controller;
+package es.stilnovo.library.controller.restControllers;
 
 import java.security.Principal;
+import java.sql.SQLException;
 import java.io.IOException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +25,8 @@ import es.stilnovo.library.dto.UserMapper;
 import es.stilnovo.library.dto.ValorationMapper;
 import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.UserService;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -72,6 +77,7 @@ public class UserWebRestController {
 
         return userMapper.toDTO(userService.getFullUserProfile(principal.getName()));
     }
+
 
     @DeleteMapping("/me")
     public ResponseEntity<Void> deleteMyAccount(Principal principal) {

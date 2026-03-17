@@ -1,4 +1,4 @@
-package es.stilnovo.library.controller;
+package es.stilnovo.library.controller.restControllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;

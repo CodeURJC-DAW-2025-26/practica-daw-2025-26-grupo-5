@@ -1,4 +1,4 @@
-package es.stilnovo.library.controller;
+package es.stilnovo.library.controller.restControllers;
 
 import es.stilnovo.library.dto.PagedResponse;
 import es.stilnovo.library.dto.ValorationDTO;
@@ -41,7 +41,7 @@ public class ValorationRestController {
         return valorationMapper.toDTO(valorationService.findById(id));
     }
 
-    // Crear una valoración nueva
+    // Create a new valoration
     @PostMapping
     public ResponseEntity<ValorationDTO> createValoration(@RequestBody ValorationDTO dto, Principal principal) {
         var buyer = userService.findByName(principal.getName()).orElseThrow();

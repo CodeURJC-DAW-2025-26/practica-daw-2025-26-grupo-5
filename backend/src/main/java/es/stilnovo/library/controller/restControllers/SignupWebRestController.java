@@ -1,4 +1,4 @@
-package es.stilnovo.library.controller;
+package es.stilnovo.library.controller.restControllers;
 
 import java.io.IOException;
 

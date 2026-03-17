@@ -38,7 +38,7 @@ public class SignupService {
 
         String encodedPassword = passwordEncoder.encode(password);
         Blob imageBlob = resolveProfileImage(profilePicture);
-        User newUser = new User(username, encodedPassword, email, imageBlob, 5.0, null, null, null, 0, 0.0, 0.0, null, "ROLE_USER");
+        User newUser = new User(username, encodedPassword, email, imageBlob, 0.0, null, null, null, 0, 0.0, 0.0, null, "ROLE_USER");
         userService.save(newUser);
         return newUser;
     }

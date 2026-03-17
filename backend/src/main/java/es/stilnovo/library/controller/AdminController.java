@@ -153,13 +153,13 @@ public class AdminController {
 
     @PostMapping("/products/add")
     public String createProductAsAdmin(@RequestParam Long sellerId,
-                                       @RequestParam("productPhotos") List<MultipartFile> productPhotos,
-                                       @RequestParam String productName,
-                                       @RequestParam String category,
-                                       @RequestParam String description,
-                                       @RequestParam double price,
-                                       @RequestParam String location,
-                                       @RequestParam(defaultValue = "Active") String status) throws IOException {
+                                        @RequestParam("productPhotos") List<MultipartFile> productPhotos,
+                                        @RequestParam String productName,
+                                        @RequestParam String category,
+                                        @RequestParam String description,
+                                        @RequestParam double price,
+                                        @RequestParam String location,
+                                        @RequestParam(defaultValue = "Active") String status) throws IOException {
         adminService.createProductAsAdmin(sellerId, productName, category, description, price, location, status, productPhotos);
         return "redirect:/admin/global-inventory";
     }

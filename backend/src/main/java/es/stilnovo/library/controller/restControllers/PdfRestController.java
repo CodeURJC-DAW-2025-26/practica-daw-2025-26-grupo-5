@@ -1,4 +1,4 @@
-package es.stilnovo.library.controller;
+package es.stilnovo.library.controller.restControllers;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.lowagie.text.DocumentException;
+
+import es.stilnovo.library.controller.PdfController;
 
 @RestController
 @RequestMapping("/api/v1")
