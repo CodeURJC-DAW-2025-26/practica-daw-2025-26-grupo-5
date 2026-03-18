@@ -66,9 +66,9 @@ public class DataBaseInitializer {
         Blob photoAdminBlob = BlobProxy.generateProxy(adminImageBytes);
 
         // STEP 2: Create default user and admin accounts with sample data
-        User user1 = new User("user1", passwordEncoder.encode("user123"), "user1@stilnovo.es", photoUserBlob, 4.7, "1234 5678 9012 3456", "123", "09/27", 0, 129.10, 1872.87, "I am user1 in Stilnovo","ROLE_USER");
-        User user2 = new User("user2", passwordEncoder.encode("user123"), "user2@stilnovo.es", photoUserBlob, 4.5, "9876 5432 1098 7654", "789", "11/28", 0, 86.30, 743.20, "I am user2 in Stilnovo","ROLE_USER");
-        User admin = new User("admin", passwordEncoder.encode("admin123"), "admin@stilnovo.es", photoAdminBlob, 5.0, "3456 7890 1234 5678", "456", "07/26", 0, 34.89, 899.76, "I am the administrator of the Stilnovo Ecosystem","ROLE_USER", "ROLE_ADMIN");
+        User user1 = new User("user1", passwordEncoder.encode("user123"), "user1@stilnovo.es", photoUserBlob, 0.0, "1234 5678 9012 3456", "123", "09/27", 0, 0, 0, "I am user1 in Stilnovo","ROLE_USER");
+        User user2 = new User("user2", passwordEncoder.encode("user123"), "user2@stilnovo.es", photoUserBlob, 0.0, "9876 5432 1098 7654", "789", "11/28", 0, 0, 0, "I am user2 in Stilnovo","ROLE_USER");
+        User admin = new User("admin", passwordEncoder.encode("admin123"), "admin@stilnovo.es", photoAdminBlob, 0.0, "3456 7890 1234 5678", "456", "07/26", 0, 0, 0, "I am the administrator of the Stilnovo Ecosystem","ROLE_USER", "ROLE_ADMIN");
 
         // STEP 3: Persist users to database
         userRepository.save(user1);
