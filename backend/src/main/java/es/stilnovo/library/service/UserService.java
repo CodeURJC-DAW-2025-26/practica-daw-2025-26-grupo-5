@@ -82,6 +82,16 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public boolean isAdmin(String username) {
+        return findByName(username)
+                .map(user -> user.getRoles().contains("ROLE_ADMIN"))
+                .orElse(false);
+    }
+
+    public boolean isAdmin(User user) {
+        return user != null && user.getRoles().contains("ROLE_ADMIN");
+    }
+
     public Optional<User> findByName(String name) {
         return userRepository.findByName(name);
     }

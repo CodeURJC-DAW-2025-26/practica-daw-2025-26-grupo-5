@@ -92,4 +92,11 @@ public class MainService {
                 catalogPage.last(),
                 catalogPage.products().size());
     }
+
+    public String resolveHomePageView(HomePageData homePageData) {
+        if (homePageData.products().size() == 1 && homePageData.searching()) {
+            return "redirect:/info-product-page/" + homePageData.products().get(0).getId();
+        }
+        return "index";
+    }
 }

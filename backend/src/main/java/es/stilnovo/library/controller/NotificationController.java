@@ -34,17 +34,11 @@ public class NotificationController {
                                 @RequestParam String type,
                                 @RequestParam String message,
                                 Principal principal) {
-        if (principal == null) {
-            return "redirect:/contact-seller-page/" + productId + "?error=auth";
-        }
-
-        var result = notificationService.sendInquiry(productId, phone, type, message, principal.getName());
-        if (result.cooldownMinutes() != null) {
-            return "redirect:/contact-seller-page/" + productId + "?cooldown=" + result.cooldownMinutes();
-        }
-        if (!result.sent()) {
-            return "redirect:/contact-seller-page/" + productId + "?error=" + result.errorCode();
-        }
-        return "redirect:/contact-seller-page/" + productId + "?sent=true";
+        return notificationService.resolveInquiryRedirect(
+                productId,
+                phone,
+                type,
+                message,
+                principal != null ? principal.getName() : null);
     }
 }

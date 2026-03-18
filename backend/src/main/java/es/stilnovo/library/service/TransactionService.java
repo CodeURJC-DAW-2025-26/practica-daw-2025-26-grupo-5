@@ -115,6 +115,19 @@ public class TransactionService {
         return transaction;
     }
 
+    public String resolveConfirmPurchaseRedirect(long productId, String buyerUsername) {
+        if (buyerUsername == null) {
+            return "redirect:/login-page";
+        }
+
+        try {
+            confirmPurchase(productId, buyerUsername);
+            return "redirect:/sales-and-orders-page";
+        } catch (IllegalStateException exception) {
+            return "redirect:/info-product-page/" + productId + "?error=" + exception.getMessage();
+        }
+    }
+
     /**
      * Gets a transaction if the current user is either the buyer or seller.
      * Used for Invoice generation (both parties can see it).

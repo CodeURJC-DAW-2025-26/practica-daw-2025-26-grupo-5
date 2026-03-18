@@ -245,8 +245,8 @@ public class UserWebController {
         
         
         // STEP 3: Check if user is admin (admins cannot delete account)
-        //If is admin, we not show delete form
-        boolean isAdmin = loggedInUser.getRoles().contains("ROLE_ADMIN");
+        // isAdmin already injected globally via @ModelAttribute, but ensure it's set
+        boolean isAdmin = userService.isAdmin(loggedInUser);
         model.addAttribute("isAdmin", isAdmin);
         
         

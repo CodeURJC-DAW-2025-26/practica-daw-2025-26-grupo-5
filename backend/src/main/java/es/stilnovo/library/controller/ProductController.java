@@ -54,7 +54,7 @@ public class ProductController {
                             Model model) {
         User user = mainService.getUserContext(principal != null ? principal.getName() : null);
         int pageSize = 10;
-        int pageNumber = Math.max(0, offset / pageSize);
+        int pageNumber = calculatePageNumber(offset, pageSize);
 
         CatalogPageResult page = productService.getCatalogPage(query, category, user, PageRequest.of(pageNumber, pageSize));
 
@@ -219,5 +219,12 @@ public class ProductController {
 
         // STEP 2: Redirect to inventory page
         return "redirect:/user-products-page";
+    }
+
+    /**
+     * Helper method to calculate page number from offset for pagination
+     */
+    private int calculatePageNumber(int offset, int pageSize) {
+        return Math.max(0, offset / pageSize);
     }
 }

@@ -34,17 +34,9 @@ public class TransactionController {
      */
     @PostMapping("/transactions/confirm/{productId}")
     public String confirmPayment(@PathVariable long productId, Principal principal) {
-        try {
-            // 1. Attempt to execute the purchase business logic
-            transactionService.confirmPurchase(productId, principal.getName());
-            
-            // 2. SUCCESS: Redirect to the user's transaction history
-            return "redirect:/sales-and-orders-page";
-            
-        } catch (IllegalStateException exception) {
-            // 3. FAILURE: Redirect back to the product page with a descriptive error parameter
-            return "redirect:/info-product-page/" + productId + "?error=" + exception.getMessage();
-        }
+        return transactionService.resolveConfirmPurchaseRedirect(
+                productId,
+                principal != null ? principal.getName() : null);
     }
 
     /**
@@ -56,17 +48,11 @@ public class TransactionController {
      */
     @GetMapping("/payment-page/{id}")
     public String showPaymentPage(Model model, @PathVariable long id, Principal principal) {
-        if (principal == null) {
-            return "redirect:/login-page";
+        var resolution = paymentService.resolvePaymentPage(id, principal != null ? principal.getName() : null);
+        if (resolution.checkoutData() != null) {
+            model.addAttribute("product", resolution.checkoutData().product());
+            model.addAttribute("user", resolution.checkoutData().buyer());
         }
-
-        try {
-            var checkoutData = paymentService.prepareCheckout(id, principal.getName());
-            model.addAttribute("product", checkoutData.product());
-            model.addAttribute("user", checkoutData.buyer());
-            return "payment-page";
-        } catch (IllegalStateException exception) {
-            return "redirect:/info-product-page/" + id + "?error=" + exception.getMessage();
-        }
+        return resolution.viewName();
     }
 }

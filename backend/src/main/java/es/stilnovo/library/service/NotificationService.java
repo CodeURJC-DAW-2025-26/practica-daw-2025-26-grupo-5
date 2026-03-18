@@ -45,6 +45,25 @@ public class NotificationService {
     @Value("${app.public-base-url:https://localhost:8443}")
     private String publicBaseUrl;
 
+    public String resolveInquiryRedirect(long productId,
+                                        String phone,
+                                        String type,
+                                        String message,
+                                        String username) {
+        if (username == null) {
+            return "redirect:/contact-seller-page/" + productId + "?error=auth";
+        }
+
+        InquirySubmissionResult result = sendInquiry(productId, phone, type, message, username);
+        if (result.cooldownMinutes() != null) {
+            return "redirect:/contact-seller-page/" + productId + "?cooldown=" + result.cooldownMinutes();
+        }
+        if (!result.sent()) {
+            return "redirect:/contact-seller-page/" + productId + "?error=" + result.errorCode();
+        }
+        return "redirect:/contact-seller-page/" + productId + "?sent=true";
+    }
+
     public InquirySubmissionResult sendInquiry(long productId, String phone, String type, String message, String username) {
         Product product = productService.findById(productId).orElseThrow();
         User buyer = userService.findByName(username)

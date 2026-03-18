@@ -27,9 +27,11 @@ public class GlobalControllerAdvice {
                 model.addAttribute("logged", true);
                 model.addAttribute("username", user.getName());
                 model.addAttribute("userId", user.getUserId()); // Here is the missing userId
+                model.addAttribute("isAdmin", userService.isAdmin(user));
             }
         } else {
             model.addAttribute("logged", false);
+            model.addAttribute("isAdmin", false);
         }
 
         // We always send the CSRF token so Logout doesn't return a 403 error

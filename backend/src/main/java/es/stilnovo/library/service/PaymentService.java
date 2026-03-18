@@ -11,6 +11,9 @@ import es.stilnovo.library.model.User;
 @Service
 public class PaymentService {
 
+    public record PaymentPageResolution(String viewName, CheckoutData checkoutData) {
+    }
+
     @Autowired
     private ProductService productService;
 
@@ -38,5 +41,18 @@ public class PaymentService {
         }
 
         return new CheckoutData(product, buyer);
+    }
+
+    public PaymentPageResolution resolvePaymentPage(long productId, String username) {
+        if (username == null) {
+            return new PaymentPageResolution("redirect:/login-page", null);
+        }
+
+        try {
+            CheckoutData checkoutData = prepareCheckout(productId, username);
+            return new PaymentPageResolution("payment-page", checkoutData);
+        } catch (IllegalStateException exception) {
+            return new PaymentPageResolution("redirect:/info-product-page/" + productId + "?error=" + exception.getMessage(), null);
+        }
     }
 }

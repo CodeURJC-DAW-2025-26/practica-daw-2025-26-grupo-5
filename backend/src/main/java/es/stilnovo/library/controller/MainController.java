@@ -47,10 +47,6 @@ public class MainController {
         model.addAttribute("isLast", homePageData.last());
         model.addAttribute("nextOffset", homePageData.nextOffset());
 
-        if (homePageData.products().size() == 1 && homePageData.searching()) {
-            return "redirect:/info-product-page/" + homePageData.products().get(0).getId();
-        }
-
-        return "index";
+        return mainService.resolveHomePageView(homePageData);
     }
 }
