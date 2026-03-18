@@ -53,7 +53,7 @@ public class ValorationController {
         
         // STEP 3: Populate model with pending reviews and count for UI badges
         model.addAttribute("pendingValorations", pending);
-        model.addAttribute("pendingCount", pending.size());
+        model.addAttribute("pendingCount", valorationService.getPendingValorationCount(user));
         
         // STEP 4: Fetch buyer's complete rating history
         model.addAttribute("myValorations", valorationService.getBuyerHistory(user));

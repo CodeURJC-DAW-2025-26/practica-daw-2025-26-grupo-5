@@ -82,12 +82,10 @@ public class ProductController {
         List<Product> recommendations = productService.getRecommendations(user);
         
         // STEP 5: Remove current product from recommendations to avoid duplication
-        if (recommendations != null) {
-            recommendations.removeIf(p -> p.getId().equals(id));
-        }
+        recommendations = productService.filterOutCurrentProduct(recommendations, id);
 
         // STEP 6: Determine if recommendations section should be displayed
-        boolean showSection = (recommendations != null && !recommendations.isEmpty());
+        boolean showSection = productService.hasRecommendations(recommendations);
         model.addAttribute("haveRecoProds", showSection);
 
         // STEP 7: Populate model with all data for template rendering
@@ -111,7 +109,7 @@ public class ProductController {
         // STEP 2: Populate model with user products list and count
         model.addAttribute("user", user); 
         model.addAttribute("userProducts", user.getProducts());
-        model.addAttribute("itemsCount", user.getProducts().size());
+        model.addAttribute("itemsCount", productService.getUserProductCount(principal.getName()));
     
         return "user-products-page";
     }
@@ -137,11 +135,7 @@ public class ProductController {
                                 Model model,
                                 @RequestParam(name = "productPhotos", required = false) MultipartFile productPhoto) throws IOException {
 
-        if (updatedProduct.getPrice() <= 0) {
-            model.addAttribute("product", productService.getProductForEditing(id, principal.getName()));
-            model.addAttribute("error", "Price must be greater than 0.");
-            return "edit-product-page";
-        }
+        productService.validateProductPrice(updatedProduct.getPrice());
     
         // STEP 1: Update product with new data (service validates ownership)
         productService.updateProductSafely(id, updatedProduct, principal.getName(), productPhoto);
@@ -176,34 +170,13 @@ public class ProductController {
                             @RequestParam String location,
                             @RequestParam String status) throws IOException {
 
-        if (price <= 0) {
-            model.addAttribute("error", "Price must be greater than 0.");
-            model.addAttribute("productName", productName);
-            model.addAttribute("category", category);
-            model.addAttribute("price", price);
-            model.addAttribute("location", location);
-            model.addAttribute("description", description);
-            model.addAttribute("status", status);
-            return "add-product-page";
-        }
+        productService.validateProductPrice(price);
+        productService.validateProductPhoto(productPhoto);
 
-        // STEP 1: Validate product photo is uploaded
-        if (productPhoto == null || productPhoto.isEmpty()) {
-            model.addAttribute("error", "You must upload one product photo.");
-            model.addAttribute("productName", productName);
-            model.addAttribute("category", category);
-            model.addAttribute("price", price);
-            model.addAttribute("location", location);
-            model.addAttribute("description", description);
-            model.addAttribute("status", status);
-            
-            return "add-product-page"; 
-        }
-
-        // STEP 2: Create product and associate with authenticated user
+        // STEP 1: Create product and associate with authenticated user
         productService.addProduct(principal, productPhoto, productName, category, description, price, location, status);
 
-        // STEP 3: Redirect to inventory page
+        // STEP 2: Redirect to inventory page
         return "redirect:/user-products-page";
     }
 

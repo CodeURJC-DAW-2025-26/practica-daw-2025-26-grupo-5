@@ -129,6 +129,52 @@ public class ProductService {
         // STEP 2: Persist to database for recommendation algorithm
         userInteractionRepository.save(interaction);
     }
+
+    /**
+     * Validates product price is greater than 0
+     */
+    public void validateProductPrice(double price) {
+        if (price <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Price must be greater than 0.");
+        }
+    }
+
+    /**
+     * Validates product photo file is provided and not empty
+     */
+    public void validateProductPhoto(MultipartFile photo) {
+        if (photo == null || photo.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You must upload one product photo.");
+        }
+    }
+
+    /**
+     * Filters out current product from recommendations list
+     */
+    public List<Product> filterOutCurrentProduct(List<Product> recommendations, long currentProductId) {
+        if (recommendations == null) {
+            return Collections.emptyList();
+        }
+        return recommendations.stream()
+                .filter(p -> !p.getId().equals(currentProductId))
+                .toList();
+    }
+
+    /**
+     * Checks if recommendations exist and are not empty
+     */
+    public boolean hasRecommendations(List<Product> recommendations) {
+        return recommendations != null && !recommendations.isEmpty();
+    }
+
+    /**
+     * Gets product count for user (for inventory page)
+     */
+    public int getUserProductCount(String username) {
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        return user.getProducts().size();
+    }
     
     public List<Product> findByQueryCategory(String query) {
         // STEP 1: Handle empty query - return all products

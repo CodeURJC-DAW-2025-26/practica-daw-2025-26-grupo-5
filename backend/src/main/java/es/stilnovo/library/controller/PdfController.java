@@ -83,26 +83,24 @@ public class PdfController {
         table.addCell(valueCell(formatCurrency(t.getFinalPrice())));
         doc.add(table);
 
-        // Financial Breakdown (VAT, Fees) 
-        double base = t.getFinalPrice();
-        double vat = base * 0.21;
-        double fees = base * 0.01; // Fixed Service Fee, 1%
+        // Financial Breakdown (VAT, Fees) - delegated to service
+        TransactionService.InvoiceBreakdown breakdown = transactionService.calculateInvoiceBreakdown(t.getFinalPrice());
 
         PdfPTable totals = new PdfPTable(2);
         totals.setWidthPercentage(45);
         totals.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        totals.addCell(summaryLabel("Net Subtotal:")); totals.addCell(summaryValue(formatCurrency(base)));
-        totals.addCell(summaryLabel("Stilnovo Fee:")); totals.addCell(summaryValue(formatCurrency(fees)));
-        totals.addCell(summaryLabel("Applicable VAT (21%):")); totals.addCell(summaryValue(formatCurrency(vat)));
+        totals.addCell(summaryLabel("Net Subtotal:")); totals.addCell(summaryValue(formatCurrency(breakdown.base())));
+        totals.addCell(summaryLabel("Stilnovo Fee:")); totals.addCell(summaryValue(formatCurrency(breakdown.fees())));
+        totals.addCell(summaryLabel("Applicable VAT (21%):")); totals.addCell(summaryValue(formatCurrency(breakdown.vat())));
         
         PdfPCell totalLab = summaryLabel("TOTAL PAID:"); 
         totalLab.setBackgroundColor(BRAND_BLUE); 
         totalLab.setPhrase(new Phrase("TOTAL PAID:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, Color.WHITE)));
         totals.addCell(totalLab);
         
-        PdfPCell totalVal = summaryValue(formatCurrency(base + fees + vat)); 
+        PdfPCell totalVal = summaryValue(formatCurrency(breakdown.total())); 
         totalVal.setBackgroundColor(BRAND_BLUE); 
-        totalVal.setPhrase(new Phrase(formatCurrency(base + fees + vat), FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11, Color.WHITE)));
+        totalVal.setPhrase(new Phrase(formatCurrency(breakdown.total()), FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11, Color.WHITE)));
         totals.addCell(totalVal);
         doc.add(totals);
 

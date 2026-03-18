@@ -129,6 +129,20 @@ public class TransactionService {
     }
 
     /**
+     * Calculates financial breakdown for payment invoice (VAT, fees, total)
+     * VAT rate: 21%, Service fee: 1%
+     */
+    public record InvoiceBreakdown(double base, double fees, double vat, double total) {}
+
+    public InvoiceBreakdown calculateInvoiceBreakdown(double finalPrice) {
+        double base = finalPrice;
+        double vat = base * 0.21;      // 21% VAT
+        double fees = base * 0.01;     // 1% Stilnovo service fee
+        double total = base + fees + vat;
+        return new InvoiceBreakdown(base, fees, vat, total);
+    }
+
+    /**
      * Gets a transaction if the current user is either the buyer or seller.
      * Used for Invoice generation (both parties can see it).
      * @param transactionId The ID of the transaction

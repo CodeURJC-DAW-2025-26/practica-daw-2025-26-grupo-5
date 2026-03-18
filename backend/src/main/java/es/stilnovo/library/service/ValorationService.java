@@ -60,6 +60,14 @@ public class ValorationService {
     }
 
     /**
+     * Gets count of pending valorations for a user
+     */
+    public int getPendingValorationCount(User buyer) {
+        List<Transaction> pending = getPendingTransactions(buyer);
+        return pending.size();
+    }
+
+    /**
      * Creates a new valoration and updates the seller's global rating in one transaction.
      * This ensures data consistency between reviews and displayed scores.
      * * @param transactionId The ID of the transaction being rated.
