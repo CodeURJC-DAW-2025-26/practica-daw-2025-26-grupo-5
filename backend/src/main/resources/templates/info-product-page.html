@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -78,9 +78,9 @@
 
                     <div class="mb-4">
                         <h2 class="display-5 fw-800 mb-0 {{#isActive}}text-primary{{/isActive}}{{^isActive}}text-danger{{/isActive}}">
-                            {{price}} €
+                            {{formattedPrice}} â‚¬
                         </h2>
-                        <p class="small text-muted fw-700">Ref: ST-{{id}} • Verified Treasure</p>
+                        <p class="small text-muted fw-700">Ref: ST-{{id}} â€¢ Verified Treasure</p>
                     </div>
                     
                     <div class="d-flex flex-wrap gap-2 mb-5">
@@ -124,7 +124,7 @@
                                 <div>
                                     <p class="fw-800 mb-0 text-dark">{{name}}</p>
                                     <div class="d-flex align-items-center gap-1 small fw-700 text-muted">
-                                        <i class="fa-solid fa-star text-warning"></i> {{rating}} ({{numRatings}} Ratings)
+                                        <i class="fa-solid fa-star text-warning"></i> {{rating}} (<span data-format="qty">{{numRatings}}</span> Ratings)
                                     </div>
                                 </div>
                             </div>
@@ -170,7 +170,7 @@
                                 <img src="/product-images/{{id}}" class="img-fluid w-100 h-100" style="object-fit: cover;" alt="{{name}}">
                             </div>
                             <div class="px-2 pb-2">
-                                <p class="fw-800 mb-1 text-dark">{{price}}€</p>
+                                <p class="fw-800 mb-1 text-dark">{{formattedPrice}}â‚¬</p>
                                 <p class="x-small text-muted text-truncate fw-600">{{name}}</p>
                             </div>
                         </div>
@@ -187,5 +187,7 @@
 
     {{>footer}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/javascript/number-formatting.js"></script>
 </body>
 </html>
+

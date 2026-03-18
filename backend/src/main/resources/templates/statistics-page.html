@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -100,7 +100,7 @@
                 <div class="col-xl-3 col-md-6">
                     <div class="clay-card p-4">
                         <p class="label-categories mb-1">Items Sold</p>
-                        <h2 class="fw-800 mb-0">{{itemsSold}}</h2>
+                        <h2 class="fw-800 mb-0"><span data-format="qty">{{itemsSold}}</span></h2>
                     </div>
                 </div>
                 <div class="col-xl-3 col-md-6">
@@ -175,5 +175,7 @@
 
     <script src="/javascript/dashboard-charts.js"></script>
 
+    <script src="/javascript/number-formatting.js"></script>
 </body>
 </html>
+

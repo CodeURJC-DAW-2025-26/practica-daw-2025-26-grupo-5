@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -51,7 +51,7 @@
                                     <img src="/product-images/{{id}}" alt="{{name}}" class="img-fluid rounded-4 shadow-sm" style="max-height: 220px; width: 100%; object-fit: contain;">
                                 </div>
                                 <h2 class="fw-800 h3 mb-1">{{name}}</h2>
-                                <p class="text-muted small fw-700 mb-4">{{location}} • Verified Seller</p>
+                                <p class="text-muted small fw-700 mb-4">{{location}} â€¢ Verified Seller</p>
 
                                 <div class="alert-oversized p-3 rounded-4 bg-white border d-flex align-items-center gap-3 mb-4 mx-auto text-start" style="max-width: 350px;">
                                     <i class="fa-solid fa-truck-fast text-primary fs-3"></i>
@@ -64,7 +64,7 @@
                                 <div class="d-flex justify-content-center gap-4 align-items-center">
                                     <div class="text-center">
                                         <p class="x-small fw-800 text-muted mb-0">PRICE</p>
-                                        <p class="fw-800 h4 mb-0">{{price}} €</p>
+                                        <p class="fw-800 h4 mb-0">{{formattedPrice}} â‚¬</p>
                                     </div>
                                     <div class="vr opacity-10" style="height: 30px;"></div>
                                     <div class="text-center">
@@ -175,5 +175,7 @@
         });
     </script>
 
+    <script src="/javascript/number-formatting.js"></script>
 </body>
 </html>
+

@@ -3,9 +3,6 @@ package es.stilnovo.library.controller;
 import java.io.IOException;
 import java.security.Principal;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import es.stilnovo.library.model.User;
 import es.stilnovo.library.service.ContactSellerService;
 import es.stilnovo.library.service.UserService;
+import es.stilnovo.library.util.NumberFormattingUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -182,11 +180,7 @@ public class UserWebController {
     }
 
     private String formatCurrency(double value) {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols(Locale.forLanguageTag("es-ES"));
-        symbols.setGroupingSeparator('.');
-        symbols.setDecimalSeparator(',');
-        DecimalFormat decimalFormat = new DecimalFormat("#,##0.00", symbols);
-        return decimalFormat.format(value);
+        return NumberFormattingUtils.formatMoney(value);
     }
     
 

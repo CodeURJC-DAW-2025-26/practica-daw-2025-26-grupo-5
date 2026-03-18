@@ -4,6 +4,8 @@ package es.stilnovo.library.model;
 import jakarta.persistence.*;
 import java.util.List;
 
+import es.stilnovo.library.util.NumberFormattingUtils;
+
 /**
  * Product: Represents an item/product listed for sale
  * 
@@ -103,6 +105,10 @@ public class Product {
 
     public double getPrice() { return price; }
     public void setPrice(double price) { this.price = price; }
+
+    public String getFormattedPrice() {
+        return NumberFormattingUtils.formatMoney(this.price);
+    }
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }

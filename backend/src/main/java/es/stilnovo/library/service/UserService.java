@@ -45,6 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 import es.stilnovo.library.dto.UserDashboardDataDTO;
 import es.stilnovo.library.dto.SellerProfilePageDataDTO;
 import es.stilnovo.library.dto.UserStatisticsDataDTO;
+import es.stilnovo.library.util.NumberFormattingUtils;
 /**
  * UserService: Manages all user-related operations
  * 
@@ -404,10 +405,10 @@ public class UserService {
 
             return new UserStatisticsDataDTO(
                 dashboardData.user(),
-                String.format("%.2f", totalSales),
+                NumberFormattingUtils.formatMoney(totalSales),
                 transactions.size(),
                 String.format("%.1f", avgRating),
-                String.format("%.2f", calculateInventoryValue(username)),
+                NumberFormattingUtils.formatMoney(calculateInventoryValue(username)),
                 dashboardData.date(),
                 dashboardData.chartLabels(),
                 dashboardData.chartValues(),

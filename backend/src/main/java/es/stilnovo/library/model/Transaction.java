@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import es.stilnovo.library.util.NumberFormattingUtils;
+
 /**
  * Transaction: Represents a completed sale between buyer and seller
  * 
@@ -91,6 +93,10 @@ public class Transaction {
 
     public double getFinalPrice() { return finalPrice; }
     public void setFinalPrice(double finalPrice) { this.finalPrice = finalPrice; }
+
+    public String getFormattedFinalPrice() {
+        return NumberFormattingUtils.formatMoney(this.finalPrice);
+    }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

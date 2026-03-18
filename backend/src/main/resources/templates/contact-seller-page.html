@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -36,7 +36,7 @@
                                 <span class="badge rounded-pill bg-primary-subtle text-primary px-3 mb-3 fw-700">New Inquiry</span>
                                 <img src="/product-images/{{product.id}}" alt="{{product.name}}" class="img-fluid rounded-4 mb-3 shadow-sm d-block mx-auto mx-lg-0" style="max-height: 180px; object-fit: cover;">
                                 <h2 class="fw-800 h4 mb-1">{{product.name}}</h2>
-                                <p class="price mb-0 fs-5" style="color: var(--brand-blue)">{{product.price}} €</p>
+                                <p class="price mb-0 fs-5" style="color: var(--brand-blue)">{{product.formattedPrice}} â‚¬</p>
                             </div>
 
                             <div class="p-3 bg-light rounded-4 d-flex align-items-center gap-3 mb-4">
@@ -134,5 +134,7 @@
         </div>
     </main>
 
+    <script src="/javascript/number-formatting.js"></script>
 </body>
 </html>
+

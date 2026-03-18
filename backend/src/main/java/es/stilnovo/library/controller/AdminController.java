@@ -1,9 +1,7 @@
 package es.stilnovo.library.controller;
 
 import java.io.IOException;
-import java.text.NumberFormat;
 import java.util.List;
-import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -22,6 +20,7 @@ import es.stilnovo.library.service.AdminService;
 import es.stilnovo.library.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import es.stilnovo.library.service.ProductService;
+import es.stilnovo.library.util.NumberFormattingUtils;
 
 
 
@@ -265,6 +264,6 @@ public class AdminController {
     }
 
     private String formatInt(int value) {
-        return NumberFormat.getIntegerInstance(Locale.forLanguageTag("es-ES")).format(value);
+        return NumberFormattingUtils.formatQuantity(value);
     }
 }

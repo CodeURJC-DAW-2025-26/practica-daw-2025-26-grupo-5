@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -270,10 +270,12 @@
                     var name = button.getAttribute('data-user-name');
                     
                     document.getElementById('confirmDeleteForm').action = '/admin/users/delete/' + userId;
-                    document.getElementById('confirmDeleteMessage').innerHTML = "¿Are you sure you want to delete <strong>" + name + "</strong>? This action is permanent.";
+                    document.getElementById('confirmDeleteMessage').innerHTML = "Â¿Are you sure you want to delete <strong>" + name + "</strong>? This action is permanent.";
                 });
             }
         });
     </script>
+    <script src="/javascript/number-formatting.js"></script>
 </body>
 </html>
+
