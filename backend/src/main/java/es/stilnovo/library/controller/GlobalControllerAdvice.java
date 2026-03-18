@@ -26,7 +26,7 @@ public class GlobalControllerAdvice {
             if (user != null) {
                 model.addAttribute("logged", true);
                 model.addAttribute("username", user.getName());
-                model.addAttribute("userId", user.getUserId()); // ¡AQUÍ ESTÁ EL userId QUE FALTA!
+                model.addAttribute("userId", user.getUserId()); // Here is the missing userId
             }
         } else {
             model.addAttribute("logged", false);

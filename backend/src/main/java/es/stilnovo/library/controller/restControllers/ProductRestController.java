@@ -184,7 +184,7 @@ public class ProductRestController {
         // 1. Trigger product creation (Service is void)
         productService.addProduct(
                 principal,
-                request.getFiles(),
+                request.getFile(),
                 request.getName(),
                 request.getCategory(),
                 request.getDescription(),
@@ -237,7 +237,7 @@ public class ProductRestController {
         if (request.getStatus() != null) current.setStatus(request.getStatus());
 
         // 3. Execute secure update via service
-        productService.updateProductSafely(id, current, principal.getName(), request.getFiles());
+        productService.updateProductSafely(id, current, principal.getName(), request.getFile());
 
         return ResponseEntity.ok(productMapper.toDTO(current));
     }

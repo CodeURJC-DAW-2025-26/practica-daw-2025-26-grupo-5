@@ -3,7 +3,6 @@ package es.stilnovo.library.service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.List;
 
 import javax.sql.rowset.serial.SerialBlob;
 
@@ -13,7 +12,6 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import es.stilnovo.library.model.Image;
-import es.stilnovo.library.model.Product;
 import es.stilnovo.library.repository.ImageRepository;
 
 /**
@@ -37,8 +35,8 @@ public class ImageService {
         return imageRepository.findById(id).orElseThrow();
     }
 
-    public List<Image> getProductImages(long productId) {
-        return imageRepository.findByProductIdOrderByIdAsc(productId);
+    public Image getProductImage(long productId) {
+        return imageRepository.findByProductId(productId).orElseThrow();
     }
 
     public Image createImage(InputStream inputStream) throws IOException {
@@ -89,10 +87,6 @@ public class ImageService {
         Image image = imageRepository.findById(id).orElseThrow();
         imageRepository.deleteById(id);
         return image;
-    }
-
-    public void setProduct(Product product, Image image) {
-        image.setProduct(product);
     }
 }
 

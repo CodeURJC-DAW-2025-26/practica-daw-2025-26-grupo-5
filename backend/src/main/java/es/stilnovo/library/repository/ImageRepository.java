@@ -1,6 +1,6 @@
 package es.stilnovo.library.repository;
 
-import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -12,6 +12,6 @@ import es.stilnovo.library.model.Image;
  */
 public interface ImageRepository extends JpaRepository<Image, Long> {
 
-	List<Image> findByProductIdOrderByIdAsc(Long productId);
+	Optional<Image> findByProductId(Long productId);
 
 }

@@ -81,7 +81,7 @@ public class UserWebRestController {
     public ResponseEntity<Map<String, Object>> getMyTransactions(Principal principal, 
             @RequestParam(required = false) Long transactionId) {
         Map<String, Object> data = userService.getSalesAndOrdersDashboard(principal.getName(), transactionId);
-        // Nota: Aquí deberiamos mapear los objetos del Map a DTOs si contienen entidades JPA
+        // Note: Here we should map the Map objects to DTOs if they contain JPA entities
         return ResponseEntity.ok(data);
     }
 

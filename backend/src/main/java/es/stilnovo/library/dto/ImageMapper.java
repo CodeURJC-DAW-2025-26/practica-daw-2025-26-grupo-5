@@ -10,6 +10,6 @@ public interface ImageMapper {
     ImageDTO toDTO(Image image);
 
     @Mapping(target = "imageFile", ignore = true)
-    @Mapping(target = "product", ignore = true)
+    @Mapping(target = "id", ignore = true)
     Image toEntity(ImageDTO imageDTO);
 }

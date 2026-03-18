@@ -151,14 +151,14 @@ public class AdminController {
 
     @PostMapping("/products/add")
     public String createProductAsAdmin(@RequestParam Long sellerId,
-                                        @RequestParam("productPhotos") List<MultipartFile> productPhotos,
+                                        @RequestParam("productPhotos") MultipartFile productPhoto,
                                         @RequestParam String productName,
                                         @RequestParam String category,
                                         @RequestParam String description,
                                         @RequestParam double price,
                                         @RequestParam String location,
                                         @RequestParam(defaultValue = "Active") String status) throws IOException {
-        adminService.createProductAsAdmin(sellerId, productName, category, description, price, location, status, productPhotos);
+        adminService.createProductAsAdmin(sellerId, productName, category, description, price, location, status, productPhoto);
         return "redirect:/admin/global-inventory";
     }
 
@@ -177,7 +177,7 @@ public class AdminController {
 
 
     @GetMapping("/transactions")
-    public String showTransactions(Model model, HttpServletRequest request) { // Añade el request aquí
+    public String showTransactions(Model model, HttpServletRequest request) { // Add the request here
         var transactionsData = adminService.getAdminTransactionsData();
         model.addAttribute("totalRevenue", transactionsData.totalRevenue());
         model.addAttribute("numTransactions", transactionsData.numTransactions());

@@ -2,7 +2,6 @@ package es.stilnovo.library.model;
 
 
 import jakarta.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,7 +17,7 @@ import java.util.List;
  * 
  * Relationships:
  * - ManyToOne: User (the seller)
- * - OneToMany: Image (product gallery)
+ * - OneToOne: Image (single product image)
  * - OneToMany: UserInteraction (views, likes, purchases)
  * 
  * Transient field 'favorite' is used by UI for real-time display
@@ -52,10 +51,10 @@ public class Product {
     /** Product status: Active, Inactive, or Sold */
     private String status; // active, inactive
     
-    /** Product images gallery. The first image acts as the primary image for legacy views. */
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderColumn(name = "image_order")
-    private List<Image> images = new ArrayList<>();
+    /** Product primary image. */
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "image_id")
+    private Image image;
 
     /** The seller (User) who owns this product */
     @ManyToOne
@@ -112,38 +111,11 @@ public class Product {
     public void setStatus(String status) { this.status = status; }
 
     public Image getImage() {
-        return images.isEmpty() ? null : images.get(0);
+        return image;
     }
 
     public void setImage(Image image) {
-        clearImages();
-        if (image != null) {
-            addImage(image);
-        }
-    }
-
-    public List<Image> getImages() {
-        return images;
-    }
-
-    public void setImages(List<Image> images) {
-        clearImages();
-        if (images != null) {
-            images.forEach(this::addImage);
-        }
-    }
-
-    public void addImage(Image image) {
-        if (image == null) {
-            return;
-        }
-        this.images.add(image);
-        image.setProduct(this);
-    }
-
-    public void clearImages() {
-        images.forEach(existingImage -> existingImage.setProduct(null));
-        images.clear();
+        this.image = image;
     }
 
     public User getSeller() { return seller; }

@@ -3,7 +3,6 @@ package es.stilnovo.library.controller.restControllers;
 import java.io.IOException;
 import java.security.Principal;
 import java.sql.SQLException;
-import java.util.List;
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,9 +41,9 @@ public class ImageRestController {
 	@Autowired
 	private ProductMapper productMapper;
 
-	@GetMapping("/products/{productId}/images")
-	public List<ImageDTO> getProductImages(@PathVariable long productId) {
-		return imageService.getProductImages(productId).stream().map(imageMapper::toDTO).toList();
+	@GetMapping("/products/{productId}/image")
+	public ImageDTO getProductImage(@PathVariable long productId) {
+		return imageMapper.toDTO(imageService.getProductImage(productId));
 	}
 
 	@GetMapping(value = "/images/{imageId}/file", produces = MediaType.IMAGE_JPEG_VALUE)
@@ -52,13 +51,13 @@ public class ImageRestController {
 		return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageService.getImageFile(imageId));
 	}
 
-	@PostMapping("/products/{productId}/images")
-	public ResponseEntity<ProductDTO> addProductImages(@PathVariable long productId,
-									   @RequestParam("files") List<MultipartFile> files,
+	@PostMapping("/products/{productId}/image")
+	public ResponseEntity<ProductDTO> replaceProductImage(@PathVariable long productId,
+								   @RequestParam("file") MultipartFile file,
 									   Principal principal) throws IOException {
-		var product = productMapper.toDTO(productService.addImages(productId, principal.getName(), files));
+		var product = productMapper.toDTO(productService.replaceImage(productId, principal.getName(), file));
 		URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-				.path("/api/v1/products/{productId}/images")
+				.path("/api/v1/products/{productId}/image")
 				.buildAndExpand(productId)
 				.toUri();
 		return ResponseEntity.created(location).body(product);

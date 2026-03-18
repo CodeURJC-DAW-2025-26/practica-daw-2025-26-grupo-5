@@ -49,10 +49,11 @@ public class ImageController {
         Product product = productService.findById(productId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        Image img = product.getImages().stream()
-                .filter(image -> image.getId() != null && image.getId().equals(imageId))
-                .findFirst()
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        Image img = product.getImage();
+
+        if (img == null || img.getId() == null || !img.getId().equals(imageId)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
 
         if (img.getImageFile() == null) {
             return ResponseEntity.notFound().build();

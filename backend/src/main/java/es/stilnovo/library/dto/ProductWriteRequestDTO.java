@@ -1,7 +1,5 @@
 package es.stilnovo.library.dto;
 
-import java.util.List;
-
 import org.springframework.web.multipart.MultipartFile;
 
 public class ProductWriteRequestDTO {
@@ -12,7 +10,7 @@ public class ProductWriteRequestDTO {
     private String location;
     private String description;
     private String status;
-    private List<MultipartFile> files;
+    private MultipartFile file;
 
     public String getName() {
         return name;
@@ -62,11 +60,11 @@ public class ProductWriteRequestDTO {
         this.status = status;
     }
 
-    public List<MultipartFile> getFiles() {
-        return files;
+    public MultipartFile getFile() {
+        return file;
     }
 
-    public void setFiles(List<MultipartFile> files) {
-        this.files = files;
+    public void setFile(MultipartFile file) {
+        this.file = file;
     }
 }

@@ -272,7 +272,7 @@ public class AdminService {
                                         double price,
                                         String location,
                                         String status,
-                                        List<MultipartFile> productPhotos) throws IOException {
+                                        MultipartFile productPhoto) throws IOException {
         if (price <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Price must be greater than 0");
         }
@@ -282,14 +282,9 @@ public class AdminService {
 
         Product newProduct = new Product(productName, category, price, description, status, seller, location);
 
-        if (productPhotos != null) {
-            for (MultipartFile productPhoto : productPhotos) {
-                if (productPhoto == null || productPhoto.isEmpty()) {
-                    continue;
-                }
-                Image img = imageService.createImage(productPhoto.getInputStream());
-                newProduct.addImage(img);
-            }
+        if (productPhoto != null && !productPhoto.isEmpty()) {
+            Image img = imageService.createImage(productPhoto.getInputStream());
+            newProduct.setImage(img);
         }
 
         return productRepository.save(newProduct);

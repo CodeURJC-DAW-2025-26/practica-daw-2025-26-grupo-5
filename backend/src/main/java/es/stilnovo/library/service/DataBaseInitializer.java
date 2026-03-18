@@ -47,7 +47,6 @@ public class DataBaseInitializer {
         Resource imageRes = new ClassPathResource("sample-images/images/" + classpathResource);
         Image createdImage = imageService.createImage(imageRes.getInputStream());
         product.setImage(createdImage);
-        createdImage.setProduct(product);
     }   
 
     @PostConstruct

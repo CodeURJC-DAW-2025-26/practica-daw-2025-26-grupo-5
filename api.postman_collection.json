@@ -106,7 +106,7 @@
                 { "key": "location", "value": "Madrid", "type": "text" },
                 { "key": "description", "value": "Modern lamp", "type": "text" },
                 { "key": "status", "value": "Active", "type": "text" },
-                { "key": "files", "type": "file", "src": [] }
+                { "key": "file", "type": "file", "src": [] }
               ]
             },
             "url": "{{baseUrl}}/api/v1/products"
@@ -155,10 +155,10 @@
       "name": "Images",
       "item": [
         {
-          "name": "List Product Images",
+          "name": "Get Product Image",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/v1/products/1/images"
+            "url": "{{baseUrl}}/api/v1/products/1/image"
           }
         },
         {
@@ -169,17 +169,16 @@
           }
         },
         {
-          "name": "Upload Product Images",
+          "name": "Replace Product Image",
           "request": {
             "method": "POST",
             "body": {
               "mode": "formdata",
               "formdata": [
-                { "key": "files", "type": "file", "src": [] },
-                { "key": "files", "type": "file", "src": [] }
+                { "key": "file", "type": "file", "src": [] }
               ]
             },
-            "url": "{{baseUrl}}/api/v1/products/1/images"
+            "url": "{{baseUrl}}/api/v1/products/1/image"
           }
         }
       ]

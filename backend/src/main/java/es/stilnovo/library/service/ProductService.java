@@ -162,9 +162,8 @@ public class ProductService {
      * @param imageFile The new image file (optional).
      */
     @Transactional
-    public void updateProductSafely(long id, Product updatedData, String username, List<MultipartFile> imageFiles) throws IOException {
-        List<MultipartFile> uploadedFiles = imageFiles == null ? List.of() : imageFiles;
-        
+    public void updateProductSafely(long id, Product updatedData, String username, MultipartFile imageFile) throws IOException {
+
         // 1. Domain Logic: Search for the original product in the database
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
@@ -184,17 +183,10 @@ public class ProductService {
         existingProduct.setLocation(updatedData.getLocation());
         existingProduct.setCategory(updatedData.getCategory());
 
-        // 4. Image Processing: replace gallery only when new images are provided
-        boolean hasNewImages = uploadedFiles.stream().anyMatch(file -> file != null && !file.isEmpty());
-        if (hasNewImages) {
-            existingProduct.clearImages();
-            for (MultipartFile imageFile : uploadedFiles) {
-                if (imageFile == null || imageFile.isEmpty()) {
-                    continue;
-                }
-                Image newImage = imageService.createImage(imageFile.getInputStream());
-                existingProduct.addImage(newImage);
-            }
+        // 4. Image Processing: replace image only when a new one is provided
+        if (imageFile != null && !imageFile.isEmpty()) {
+            Image newImage = imageService.createImage(imageFile.getInputStream());
+            existingProduct.setImage(newImage);
         }
 
         // 5. Persistence: Explicit save for clarity
@@ -206,7 +198,7 @@ public class ProductService {
      * @Transactional ensures that the product and its image are saved as a single atomic operation.
      */
     @Transactional
-    public void addProduct(Principal principal, List<MultipartFile> productPhotos,
+    public void addProduct(Principal principal, MultipartFile productPhoto,
                                 String productName, String category, String description,
                                 double price, String location, String status) throws IOException {
 
@@ -219,16 +211,10 @@ public class ProductService {
         // 2. Domain Logic: Initialize the new Product entity
         Product newProduct = new Product(productName, category, price, description, status, seller, location);
 
-        // 3. Image Processing: Create full gallery from uploaded images
-        if (productPhotos != null) {
-            for (MultipartFile productPhoto : productPhotos) {
-                if (productPhoto == null || productPhoto.isEmpty()) {
-                    continue;
-                }
-
-                Image img = imageService.createImage(productPhoto.getInputStream());
-                newProduct.addImage(img);
-            }
+        // 3. Image Processing: Set a single product image
+        if (productPhoto != null && !productPhoto.isEmpty()) {
+            Image img = imageService.createImage(productPhoto.getInputStream());
+            newProduct.setImage(img);
         }
 
         // 4. Persistence: Save the product. Cascading handles the Image entity
@@ -243,7 +229,7 @@ public class ProductService {
                                     double price,
                                     String location,
                                     String status,
-                                    List<MultipartFile> productPhotos) throws IOException {
+                                    MultipartFile productPhoto) throws IOException {
 
         validatePositivePrice(price);
 
@@ -252,14 +238,9 @@ public class ProductService {
 
         Product newProduct = new Product(productName, category, price, description, status, seller, location);
 
-        if (productPhotos != null) {
-            for (MultipartFile productPhoto : productPhotos) {
-                if (productPhoto == null || productPhoto.isEmpty()) {
-                    continue;
-                }
-                Image img = imageService.createImage(productPhoto.getInputStream());
-                newProduct.addImage(img);
-            }
+        if (productPhoto != null && !productPhoto.isEmpty()) {
+            Image img = imageService.createImage(productPhoto.getInputStream());
+            newProduct.setImage(img);
         }
 
         return productRepository.save(newProduct);
@@ -272,7 +253,7 @@ public class ProductService {
     }
 
     @Transactional
-    public Product addImages(long productId, String username, List<MultipartFile> imageFiles) throws IOException {
+    public Product replaceImage(long productId, String username, MultipartFile imageFile) throws IOException {
         User user = userRepository.findByName(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
@@ -286,12 +267,11 @@ public class ProductService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Unauthorized: You do not own this product");
         }
 
-        for (MultipartFile imageFile : imageFiles) {
-            if (imageFile == null || imageFile.isEmpty()) {
-                continue;
-            }
-            product.addImage(imageService.createImage(imageFile.getInputStream()));
+        if (imageFile == null || imageFile.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Image file is required");
         }
+
+        product.setImage(imageService.createImage(imageFile.getInputStream()));
 
         return productRepository.save(product);
     }
