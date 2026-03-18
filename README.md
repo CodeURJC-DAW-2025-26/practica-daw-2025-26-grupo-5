@@ -46,10 +46,10 @@ Describir los permisos de cada tipo de usuario e indicar de qué entidades es du
   - Es dueño de: Gestiona todas las entidades de la plataforma.
 
 ### **Imágenes**
-Indicar qué entidades tendrán asociadas una o varias imágenes:
+Indicar qué entidades tendrán asociada una imagen:
 
 - **Usuario**: Una imagen de avatar personalizada.
-- **Producto**: Múltiples fotos descriptivas por cada artículo anunciado.
+- **Producto**: Una imagen descriptiva por cada artículo anunciado.
 
 ### **Gráficos**
 Para ofrecer una experiencia de gestión basada en datos, la aplicación integra visualizaciones dinámicas que permiten al usuario y al administrador monitorizar el rendimiento comercial en tiempo real.
