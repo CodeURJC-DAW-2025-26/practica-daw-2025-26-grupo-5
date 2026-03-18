@@ -3,6 +3,8 @@ package es.stilnovo.library.repository;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import es.stilnovo.library.model.Image;
 
@@ -12,6 +14,7 @@ import es.stilnovo.library.model.Image;
  */
 public interface ImageRepository extends JpaRepository<Image, Long> {
 
-	Optional<Image> findByProductId(Long productId);
+	@Query("SELECT p.image FROM ProductTable p WHERE p.id = :productId")
+	Optional<Image> findByProductId(@Param("productId") Long productId);
 
 }

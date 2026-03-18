@@ -1,4 +1,18 @@
 (function () {
+  function formatWithEsGrouping(value, fractionDigits) {
+    const negative = value < 0;
+    const absValue = Math.abs(value);
+    const fixed = absValue.toFixed(fractionDigits);
+    const parts = fixed.split(".");
+    const integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+    if (fractionDigits === 0) {
+      return (negative ? "-" : "") + integerPart;
+    }
+
+    return (negative ? "-" : "") + integerPart + "," + parts[1];
+  }
+
   function isNumericValue(value) {
     return /^-?\d+(?:[.,]\d+)?$/.test(value.trim());
   }
@@ -14,25 +28,16 @@
 
   function formatMoney(value) {
     const hasDecimals = Math.abs(value % 1) > Number.EPSILON;
-    return new Intl.NumberFormat("es-ES", {
-      minimumFractionDigits: hasDecimals ? 2 : 0,
-      maximumFractionDigits: hasDecimals ? 2 : 0,
-    }).format(value);
+    return formatWithEsGrouping(value, hasDecimals ? 2 : 0);
   }
 
   function formatQuantity(value) {
-    return new Intl.NumberFormat("es-ES", {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
+    return formatWithEsGrouping(value, 0);
   }
 
   function formatPercentage(value) {
     const hasDecimals = Math.abs(value % 1) > Number.EPSILON;
-    const formatted = new Intl.NumberFormat("es-ES", {
-      minimumFractionDigits: hasDecimals ? 2 : 0,
-      maximumFractionDigits: hasDecimals ? 2 : 0,
-    }).format(value);
+    const formatted = formatWithEsGrouping(value, hasDecimals ? 2 : 0);
     return formatted + "%";
   }
 
