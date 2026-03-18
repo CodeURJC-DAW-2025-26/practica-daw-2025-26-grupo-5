@@ -29,8 +29,6 @@ public class UserInteraction {
     @Enumerated(EnumType.STRING)
     private InteractionType type; // VIEW, CLICK, BUY
 
-    //private LocalDateTime timestamp;
-
     public UserInteraction() {}
 
     /** Create interaction record */
@@ -38,7 +36,6 @@ public class UserInteraction {
         this.user = user;
         this.product = product;
         this.type = type;
-        //this.timestamp = LocalDateTime.now();
     }
 
     // Getters

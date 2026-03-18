@@ -61,7 +61,6 @@ public class Valoration {
         this.buyer = transaction.getBuyer();
     }
 
-    // --- GETTERS AND SETTERS ---
     public Long getId() { return id; }
     public int getStars() { return stars; }
     public void setStars(int stars) { this.stars = stars; }

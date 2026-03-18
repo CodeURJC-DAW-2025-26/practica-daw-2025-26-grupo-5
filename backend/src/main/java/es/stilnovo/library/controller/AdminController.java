@@ -132,8 +132,6 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-
-
     /**
      * Displays global product inventory view
      * Shows all products in the system with status
@@ -213,7 +211,7 @@ public class AdminController {
         model.addAttribute("numValorations", valorationsData.numValorations());
         model.addAttribute("avgRating", valorationsData.avgRating());
 
-        // Seguridad CSRF
+        // CSRF Security
         CsrfToken csrf = (CsrfToken) request.getAttribute("_csrf");
         if (csrf != null) {
             model.addAttribute("token", csrf.getToken());

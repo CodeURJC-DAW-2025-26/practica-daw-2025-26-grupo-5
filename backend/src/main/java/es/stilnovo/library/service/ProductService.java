@@ -237,13 +237,13 @@ public class ProductService {
 
     @Transactional
     public Product createProduct(String username,
-                                 String productName,
-                                 String category,
-                                 String description,
-                                 double price,
-                                 String location,
-                                 String status,
-                                 List<MultipartFile> productPhotos) throws IOException {
+                                    String productName,
+                                    String category,
+                                    String description,
+                                    double price,
+                                    String location,
+                                    String status,
+                                    List<MultipartFile> productPhotos) throws IOException {
 
         validatePositivePrice(price);
 

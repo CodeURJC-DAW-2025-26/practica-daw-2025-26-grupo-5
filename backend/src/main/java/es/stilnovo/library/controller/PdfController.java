@@ -128,7 +128,7 @@ public class PdfController {
 
         addBrandHeader(doc, "STILNOVO LOGISTICS LABEL", loadLogoBytes());
 
-        // Address blocks [cite: 161-170]
+        // Address blocks 
         PdfPTable grid = new PdfPTable(1);
         grid.setWidthPercentage(100);
         grid.addCell(infoBox("SENDER (Seller Info)", t.getSeller().getName() + "\n" + t.getSeller().getEmail()));
@@ -143,12 +143,12 @@ public class PdfController {
         grid.addCell(receiver);
         doc.add(grid);
 
-        // Logistics details [cite: 176-180]
+        // Logistics details 
         doc.add(new Paragraph("\nLOGISTICS INFO", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9, BRAND_BLUE)));
         addKeyValueLine(doc, "Tracking ID: ", "STN-TRK-" + UUID.randomUUID().toString().substring(0,8).toUpperCase(), 9);
         addKeyValueLine(doc, "Package Weight: ", "1.450 KG", 9);
 
-        // QR Code [cite: 174]
+        // QR Code 
         byte[] qr = loadQrBytes();
         if (qr != null) {
             Image img = Image.getInstance(qr);

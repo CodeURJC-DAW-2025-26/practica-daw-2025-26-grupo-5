@@ -20,7 +20,6 @@ public class GlobalControllerAdvice {
         Principal principal = request.getUserPrincipal();
         
         if (principal != null) {
-            // Buscamos al usuario por su email/nombre (el que uses para loguear)
             // Use service layer instead of direct repository access
             User user = userService.findByName(principal.getName()).orElse(null);
             
@@ -33,7 +32,7 @@ public class GlobalControllerAdvice {
             model.addAttribute("logged", false);
         }
 
-        // Siempre mandamos el token CSRF para que el Logout no de error 403
+        // We always send the CSRF token so Logout doesn't return a 403 error
         Object csrf = request.getAttribute("_csrf");
         if (csrf != null) {
             model.addAttribute("token", ((org.springframework.security.web.csrf.CsrfToken) csrf).getToken());

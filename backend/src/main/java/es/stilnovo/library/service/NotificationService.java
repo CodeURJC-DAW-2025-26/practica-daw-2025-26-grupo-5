@@ -112,7 +112,7 @@ public class NotificationService {
     private static class MailTemplates {
 
         private static String proSellerInquiry(String baseUrl, long productId, String productName, String type, String message,
-                                               String buyerName, String buyerEmail, String phone, String logoCid) {
+                                                String buyerName, String buyerEmail, String phone, String logoCid) {
             return """
                 <!DOCTYPE html>
                 <html>

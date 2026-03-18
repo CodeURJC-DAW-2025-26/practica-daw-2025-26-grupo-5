@@ -438,7 +438,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<Product> getSales(String username) {
-        // Asumimos que "Sold" es el estado para productos ya comprados
+
         return productRepository.findBySellerNameAndStatus(username, "Sold");
     }
 

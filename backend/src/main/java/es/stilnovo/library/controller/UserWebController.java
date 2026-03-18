@@ -5,7 +5,6 @@ import java.security.Principal;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -21,9 +20,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
-import es.stilnovo.library.service.ProductService;
+import es.stilnovo.library.service.ContactSellerService;
 import es.stilnovo.library.service.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,10 +44,10 @@ import jakarta.servlet.http.HttpServletRequest;
 public class UserWebController {
 
     @Autowired
-    private ProductService productService;
+    private UserService userService;
 
     @Autowired
-    private UserService userService;
+    private ContactSellerService contactSellerService;
 
     @GetMapping("/about-page")
 	public String showAboutPage() {
@@ -117,6 +115,33 @@ public class UserWebController {
         return "seller-profile-page";
     }
 
+    @GetMapping("/contact-seller-page/{id}")
+    public String showContactSeller(@PathVariable long id, Model model, Principal principal,
+                                    @RequestParam(required = false) String sent,
+                                    @RequestParam(required = false) String error,
+                                    @RequestParam(required = false) String cooldown) {
+        // STEP 1: Check buyer is authenticated
+        if (principal == null) {
+            return "redirect:/login-page";
+        }
+
+        try {
+            var pageData = contactSellerService.getContactSellerPageData(id, principal.getName());
+            model.addAttribute("product", pageData.product());
+            model.addAttribute("seller", pageData.seller());
+            model.addAttribute("buyerName", pageData.buyerName());
+            model.addAttribute("buyerEmail", pageData.buyerEmail());
+        } catch (IllegalStateException exception) {
+            return "redirect:/info-product-page/" + id + "?error=self_purchase";
+        }
+
+        // STEP 7: Pass status flags to template (sent, error, cooldown messages)
+        model.addAttribute("sent", "true".equalsIgnoreCase(sent));
+        model.addAttribute("error", error);
+        model.addAttribute("cooldownMinutes", cooldown);
+
+        return "contact-seller-page";
+    }
 
     /**
      * Displays the personal profile page of the authenticated user.
@@ -201,156 +226,6 @@ public class UserWebController {
         model.addAttribute("user", user);
 
         return "help-center-page";
-    }
-
-
-    /*USER PRODUCT PAGE*/
-    /**
-     * Displays the authenticated user's personal product inventory.
-     * Following REST best practices: The User ID is hidden from the URL to prevent enumeration attacks.
-     */
-    @GetMapping("/user-products-page")
-    public String userProducts(Model model, Principal principal) {
-    
-        // STEP 1: Get user with their product inventory from database
-        // 1. Get the user and their products directly
-        User user = productService.getAuthenticatedUserWithProducts(principal.getName());
-    
-    
-        // STEP 2: Populate model with user products list and count
-        // 2. Add the raw list. Mustache will now use the getIs... methods automatically
-        model.addAttribute("user", user); 
-        model.addAttribute("userProducts", user.getProducts());
-        model.addAttribute("itemsCount", user.getProducts().size());
-    
-        return "user-products-page";
-    }
-
-    /*-- Edit product --*/
-    // GET method to display the edit form with existing data
-    @GetMapping("/edit-product-page/{id}")
-    public String showEditForm(Model model, @PathVariable long id, Principal principal) {
-    
-        // STEP 1: Fetch product and validate ownership
-        // 1. Find the product by its ID using the service
-        Product product = productService.getProductForEditing(id, principal.getName());
-
-
-        // STEP 2: Pre-fill form fields with existing product data
-        // 3. Add the product to the model so the form fields can be pre-filled
-        model.addAttribute("product", product);
-    
-        return "edit-product-page"; 
-    }
-    
-    @PostMapping("/edit-product/{id}")
-    public String updateProduct(@PathVariable long id,
-                                Product updatedProduct,
-                                Principal principal,
-                                Model model,
-                                @RequestParam(name = "productPhotos", required = false) List<MultipartFile> productPhotos) throws IOException {
-
-        if (updatedProduct.getPrice() <= 0) {
-            model.addAttribute("product", productService.getProductForEditing(id, principal.getName()));
-            model.addAttribute("error", "Price must be greater than 0.");
-            return "edit-product-page";
-        }
-    
-        // STEP 1: Update product with new data (service validates ownership)
-        //Delegate: Send the base product and the product with changes
-        productService.updateProductSafely(id, updatedProduct, principal.getName(), productPhotos);
-
-
-        // STEP 2: Redirect to inventory page
-        //Redirect back to the inventory page
-        return "redirect:/user-products-page";
-    } 
-    
-    /**
-     * GET method to display the product creation form.
-     * Ensures the authenticated user data is available for the sidebar/navbar.
-     */
-    @GetMapping("/add-product-page")
-    public String showAddForm(Model model, Principal principal) {
-        
-        // STEP 1: Load user data for sidebar/navbar if authenticated
-        // 1. Identity Check: If logged in, provide user data to the template
-        if (principal != null) {
-            // Reuse your service to get the full profile (avatar, balance, etc.)
-            User user = userService.getFullUserProfile(principal.getName());
-            model.addAttribute("user", user);
-        }
-        
-        return "add-product-page"; 
-    }
-
-
-    @PostMapping("/add-product")
-    public String newProduct(Model model, Principal principal, 
-                            @RequestParam("productPhotos") List<MultipartFile> productPhotos,
-                            @RequestParam String productName,
-                            @RequestParam String category,
-                            @RequestParam String description,
-                            @RequestParam double price,
-                            @RequestParam String location,
-                            @RequestParam String status) throws IOException {
-
-        if (price <= 0) {
-            model.addAttribute("error", "Price must be greater than 0.");
-            model.addAttribute("productName", productName);
-            model.addAttribute("category", category);
-            model.addAttribute("price", price);
-            model.addAttribute("location", location);
-            model.addAttribute("description", description);
-            model.addAttribute("status", status);
-            return "add-product-page";
-        }
-
-        // STEP 1: Validate product photo is uploaded
-        // 1. Initial UI Validation: Ensure at least one photo is uploaded
-        boolean hasAtLeastOnePhoto = productPhotos != null
-                && productPhotos.stream().anyMatch(file -> file != null && !file.isEmpty());
-
-        if (!hasAtLeastOnePhoto) {
-            // ERROR HANDLING: Return to the form and preserve user input to improve UX
-            model.addAttribute("error", "You must upload at least one product photo.");
-            model.addAttribute("productName", productName);
-            model.addAttribute("category", category);
-            model.addAttribute("price", price);
-            model.addAttribute("location", location);
-            model.addAttribute("description", description);
-            model.addAttribute("status", status);
-            
-            return "add-product-page"; 
-        }
-
-
-        // STEP 2: Create product and associate with authenticated user
-        // 2. Service Delegation: Transfer execution to the Service Layer
-        productService.addProduct(principal, productPhotos, productName, category, description, price, location, status);
-
-
-        // STEP 3: Redirect to inventory page
-        // 3. SECURE REDIRECT: Redirect back to the inventory page
-        return "redirect:/user-products-page";
-    }
-
-    
-    /**
-     * Processes the deletion request for a specific product.
-     * After a successful deletion, it redirects the user to the clean inventory page. [cite: 488]
-     */
-    @PostMapping("/delete-product/{id}")
-    public String deleteProduct(@PathVariable long id, Principal principal) {
-        
-        // STEP 1: Delete product from database (service validates ownership)
-        // 1. Execute deletion via Service Layer using the secure Principal name [cite: 650]
-        productService.deleteProduct(id, principal.getName());
-
-
-        // STEP 2: Redirect to inventory page
-        // 2. SECURE REDIRECT: Returns to the inventory view without exposing User IDs [cite: 124, 157]
-        return "redirect:/user-products-page";
     }
     
     /*USER SETTING PAGE (PERSONAL INFORMATION)*/
