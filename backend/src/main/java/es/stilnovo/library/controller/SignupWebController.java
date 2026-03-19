@@ -33,7 +33,7 @@ public class SignupWebController {
 
     @GetMapping("/error")
     public String signupError() {
-        return "error"; 
+        return "error";
     }
 
     @Autowired
@@ -47,18 +47,18 @@ public class SignupWebController {
         if (token != null) {
             model.addAttribute("token", token.getToken());
         }
-        
-        return "signup-page"; 
+
+        return "signup-page";
     }
 
     /** Process account creation with validation */
     @PostMapping("/signup-page")
-    public String createAccount(Model model, 
-                                @RequestParam MultipartFile profilePicture, 
-                                @RequestParam String username,
-                                @RequestParam String email,
-                                @RequestParam String password,
-                                @RequestParam String confirmPassword) throws IOException{
+    public String createAccount(Model model,
+            @RequestParam MultipartFile profilePicture,
+            @RequestParam String username,
+            @RequestParam String email,
+            @RequestParam String password,
+            @RequestParam String confirmPassword) throws IOException {
         try {
             signupService.registerUser(profilePicture, username, email, password, confirmPassword);
             return "redirect:/login-page";

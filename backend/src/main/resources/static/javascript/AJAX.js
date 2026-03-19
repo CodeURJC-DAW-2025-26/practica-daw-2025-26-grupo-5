@@ -4,14 +4,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('product-container');
 
     if (loadMoreBtn) {
-        loadMoreBtn.addEventListener('click', function() {
+        loadMoreBtn.addEventListener('click', function () {
             // Visual Feedback
             spinner.classList.remove('d-none');
             this.disabled = true;
 
             // Extract the offset where we left off
             let currentOffset = parseInt(this.getAttribute('data-offset')) || 0;
-            
+
             // Extract the search parameters from the URL if they exist
             const urlParams = new URLSearchParams(window.location.search);
             const queryParam = urlParams.get('query') || '';

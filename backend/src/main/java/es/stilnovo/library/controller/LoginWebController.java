@@ -24,7 +24,8 @@ public class LoginWebController {
 
     /**
      * Display login form with CSRF token
-     * @param model UI data model
+     * 
+     * @param model   UI data model
      * @param request HTTP request
      * @return login-page template
      */
@@ -41,7 +42,8 @@ public class LoginWebController {
 
     /**
      * Display login form with error message after failed authentication
-     * @param model UI data model
+     * 
+     * @param model   UI data model
      * @param request HTTP request
      * @return login-page template with error flag
      */
@@ -59,6 +61,7 @@ public class LoginWebController {
 
     /**
      * Display banned account notification page
+     * 
      * @return banned-page template
      */
     @GetMapping("/banned")

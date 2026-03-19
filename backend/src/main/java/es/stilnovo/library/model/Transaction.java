@@ -40,18 +40,19 @@ public class Transaction {
     private User buyer;
 
     /**
-    * Product being sold in this transaction.
-    * cascade = CascadeType.MERGE ensures product status updates are saved correctly.
-    */
+     * Product being sold in this transaction.
+     * cascade = CascadeType.MERGE ensures product status updates are saved
+     * correctly.
+     */
     @OneToOne(cascade = CascadeType.MERGE)
     private Product product;
 
     /** Final price paid by buyer */
     private double finalPrice;
-    
+
     /** When transaction was created */
     private LocalDateTime createdAt;
-    
+
     /** Transaction status: Pending, Completed, Cancelled, etc. */
     private String transactionStatus;
 
@@ -59,12 +60,13 @@ public class Transaction {
     /** Whether the buyer has rated the seller for this transaction */
     @Transient
     private boolean rated;
-    
+
     /** Star rating given by buyer to seller (1-5 stars) */
     private Integer stars;
 
     /** Default constructor for JPA */
-    public Transaction() {}
+    public Transaction() {
+    }
 
     /** Create transaction for a product purchase */
     public Transaction(User seller, User buyer, Product product, String status) {
@@ -78,42 +80,88 @@ public class Transaction {
     }
 
     // --- GETTERS AND SETTERS ---
-    
-    public Long getTransactionId() { return transactionId; }
-    public void setTransactionId(Long transactionId) { this.transactionId = transactionId; }
 
-    public User getSeller() { return seller; }
-    public void setSeller(User seller) { this.seller = seller; }
+    public Long getTransactionId() {
+        return transactionId;
+    }
 
-    public User getBuyer() { return buyer; }
-    public void setBuyer(User buyer) { this.buyer = buyer; }
+    public void setTransactionId(Long transactionId) {
+        this.transactionId = transactionId;
+    }
 
-    public Product getProduct() { return product; }
-    public void setProduct(Product product) { this.product = product; }
+    public User getSeller() {
+        return seller;
+    }
 
-    public double getFinalPrice() { return finalPrice; }
-    public void setFinalPrice(double finalPrice) { this.finalPrice = finalPrice; }
+    public void setSeller(User seller) {
+        this.seller = seller;
+    }
+
+    public User getBuyer() {
+        return buyer;
+    }
+
+    public void setBuyer(User buyer) {
+        this.buyer = buyer;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public double getFinalPrice() {
+        return finalPrice;
+    }
+
+    public void setFinalPrice(double finalPrice) {
+        this.finalPrice = finalPrice;
+    }
 
     public String getFormattedFinalPrice() {
         return NumberFormattingUtils.formatMoney(this.finalPrice);
     }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
-    public String getTransactionStatus() { return transactionStatus; }
-    public void setTransactionStatus(String transactionStatus) { this.transactionStatus = transactionStatus; }
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 
-    public boolean isRated() { return rated; }
-    public void setRated(boolean rated) { this.rated = rated; }
+    public String getTransactionStatus() {
+        return transactionStatus;
+    }
 
-    public Integer getStars() { return stars; }
-    public void setStars(Integer stars) { this.stars = stars; }
+    public void setTransactionStatus(String transactionStatus) {
+        this.transactionStatus = transactionStatus;
+    }
+
+    public boolean isRated() {
+        return rated;
+    }
+
+    public void setRated(boolean rated) {
+        this.rated = rated;
+    }
+
+    public Integer getStars() {
+        return stars;
+    }
+
+    public void setStars(Integer stars) {
+        this.stars = stars;
+    }
 
     public String getFormattedDate() {
-    if (this.createdAt == null) return "";
-    
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        if (this.createdAt == null)
+            return "";
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return this.createdAt.format(formatter);
     }
 }

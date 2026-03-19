@@ -32,10 +32,11 @@ public class MainController {
     /** Display homepage with product listings and recommendations */
     @GetMapping("/")
     public String index(Model model,
-                        @RequestParam(required = false) String query,
-                        @RequestParam(required = false) String category,
-                        Principal principal) {
-        var homePageData = mainService.getHomePageData(query, category, principal != null ? principal.getName() : null, 10);
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) String category,
+            Principal principal) {
+        var homePageData = mainService.getHomePageData(query, category, principal != null ? principal.getName() : null,
+                10);
 
         model.addAttribute("products", homePageData.products());
         model.addAttribute("recommendedProducts", homePageData.recommendedProducts());

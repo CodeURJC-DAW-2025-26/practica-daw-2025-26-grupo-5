@@ -25,9 +25,6 @@ import es.stilnovo.library.repository.UserRepository;
 import es.stilnovo.library.model.Image;
 import es.stilnovo.library.model.Valoration;
 
-
-
-
 /**
  * AdminService: Manages administrative operations
  * 
@@ -46,7 +43,7 @@ public class AdminService {
     private UserRepository userRepository;
 
     @Autowired
-    private UserService userService; 
+    private UserService userService;
 
     @Autowired
     private ProductRepository productRepository;
@@ -63,34 +60,31 @@ public class AdminService {
     @Autowired
     private UserInteractionRepository interactionRepository;
 
-        @Autowired
-        private TransactionService transactionService;
+    @Autowired
+    private TransactionService transactionService;
 
-        @Autowired
-        private ValorationService valorationService;
+    @Autowired
+    private ValorationService valorationService;
 
-        public record AdminPanelData(
+    public record AdminPanelData(
             int numUsers,
             int numBanneds,
             List<User> users,
             List<Product> products,
-            String memoryUsage
-        ) {
-        }
+            String memoryUsage) {
+    }
 
-        public record AdminTransactionsData(
+    public record AdminTransactionsData(
             int totalRevenue,
             int numTransactions,
-            List<Transaction> globalTransactions
-        ) {
-        }
+            List<Transaction> globalTransactions) {
+    }
 
-        public record AdminValorationsData(
+    public record AdminValorationsData(
             List<Valoration> globalValorations,
             int numValorations,
-            double avgRating
-        ) {
-        }
+            double avgRating) {
+    }
 
     @Transactional
     public void deleteUser(Long userId) {
@@ -104,7 +98,7 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
-    public int getNumTotalUsers(){
+    public int getNumTotalUsers() {
         return (int) userRepository.count();
     }
 
@@ -191,12 +185,12 @@ public class AdminService {
 
     @Transactional
     public void updateUserAsAdmin(Long id,
-                                MultipartFile newProfilePhoto,
-                                String email,
-                                String cardNumber,
-                                String cardCvv,
-                                String cardExpiringDate,
-                                String description) throws IOException {
+            MultipartFile newProfilePhoto,
+            String email,
+            String cardNumber,
+            String cardCvv,
+            String cardExpiringDate,
+            String description) throws IOException {
         // STEP 1: Fetch the user to be updated from database
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -205,16 +199,20 @@ public class AdminService {
         if (newProfilePhoto != null && !newProfilePhoto.isEmpty()) {
             user.setProfileImage(BlobProxy.generateProxy(
                     newProfilePhoto.getInputStream(),
-                    newProfilePhoto.getSize()
-            ));
+                    newProfilePhoto.getSize()));
         }
 
         // STEP 3: Conditionally update billing and profile fields (only if not blank)
-        if (email != null && !email.trim().isEmpty()) user.setEmail(email);
-        if (cardNumber != null && !cardNumber.trim().isEmpty()) user.setCardNumber(cardNumber);
-        if (cardCvv != null && !cardCvv.trim().isEmpty()) user.setCardCvv(cardCvv);
-        if (cardExpiringDate != null && !cardExpiringDate.trim().isEmpty()) user.setCardExpiringDate(cardExpiringDate);
-        if (description != null && !description.trim().isEmpty()) user.setUserDescription(description);
+        if (email != null && !email.trim().isEmpty())
+            user.setEmail(email);
+        if (cardNumber != null && !cardNumber.trim().isEmpty())
+            user.setCardNumber(cardNumber);
+        if (cardCvv != null && !cardCvv.trim().isEmpty())
+            user.setCardCvv(cardCvv);
+        if (cardExpiringDate != null && !cardExpiringDate.trim().isEmpty())
+            user.setCardExpiringDate(cardExpiringDate);
+        if (description != null && !description.trim().isEmpty())
+            user.setUserDescription(description);
 
         // STEP 4: Persist updated user to database
         userRepository.save(user);
@@ -222,57 +220,58 @@ public class AdminService {
 
     @Transactional
     public void updateProductAsAdmin(long id, Product updatedData, MultipartFile imageFile) throws IOException {
-    
+
         // 1. Retrieve the existing product from the database
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
-    
-        // 2. Update fields only if new data is provided and not blank (prevents accidental deletion)
+
+        // 2. Update fields only if new data is provided and not blank (prevents
+        // accidental deletion)
         if (updatedData.getName() != null && !updatedData.getName().isBlank()) {
             existingProduct.setName(updatedData.getName());
         }
-    
+
         if (updatedData.getPrice() <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Price must be greater than 0");
         }
         existingProduct.setPrice(updatedData.getPrice());
-    
+
         if (updatedData.getDescription() != null && !updatedData.getDescription().isBlank()) {
             existingProduct.setDescription(updatedData.getDescription());
         }
-    
+
         if (updatedData.getCategory() != null && !updatedData.getCategory().isBlank()) {
             existingProduct.setCategory(updatedData.getCategory());
         }
-    
+
         if (updatedData.getLocation() != null && !updatedData.getLocation().isBlank()) {
             existingProduct.setLocation(updatedData.getLocation());
         }
-    
+
         if (updatedData.getStatus() != null && !updatedData.getStatus().isBlank()) {
             existingProduct.setStatus(updatedData.getStatus());
         }
-    
+
         // 3. Handle image update only if a new file was actually uploaded
         if (imageFile != null && !imageFile.isEmpty()) {
             // Create new image blob and link it to the existing product
             Image newImage = imageService.createImage(imageFile.getInputStream());
             existingProduct.setImage(newImage);
         }
-    
+
         // 4. Save the updated product back to the repository
         productRepository.save(existingProduct);
     }
 
     @Transactional
     public Product createProductAsAdmin(Long sellerId,
-                                        String productName,
-                                        String category,
-                                        String description,
-                                        double price,
-                                        String location,
-                                        String status,
-                                        MultipartFile productPhoto) throws IOException {
+            String productName,
+            String category,
+            String description,
+            double price,
+            String location,
+            String status,
+            MultipartFile productPhoto) throws IOException {
         if (price <= 0) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Price must be greater than 0");
         }
@@ -308,14 +307,16 @@ public class AdminService {
         List<Transaction> transactions = transactionRepository.findByProduct(product);
         if (!transactions.isEmpty()) {
             for (Transaction t : transactions) {
-                // We unlink the product to maintain the financial history without the physical item
-                t.setProduct(null); 
+                // We unlink the product to maintain the financial history without the physical
+                // item
+                t.setProduct(null);
                 transactionRepository.save(t);
             }
         }
 
         // STEP 4: Final deletion
-        // Now that no Inquiries or Interactions point to this ID, SQL allows the deletion
+        // Now that no Inquiries or Interactions point to this ID, SQL allows the
+        // deletion
         productRepository.delete(product);
     }
 
@@ -335,4 +336,3 @@ public class AdminService {
     }
 
 }
-

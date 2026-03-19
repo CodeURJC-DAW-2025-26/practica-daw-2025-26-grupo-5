@@ -48,15 +48,15 @@ public class UserWebController {
     private ContactSellerService contactSellerService;
 
     @GetMapping("/about-page")
-	public String showAboutPage() {
-		return "about-page";
-	}
+    public String showAboutPage() {
+        return "about-page";
+    }
 
     @GetMapping("/help-center-page")
-	public String showHelpPage() {
-		return "help-center-page";
-	}
-    
+    public String showHelpPage() {
+        return "help-center-page";
+    }
+
     /**
      * GET method to retrieve the profile photo of the currently authenticated user.
      * Uses 'me' in the URL to hide the ID and rely on the session Principal.
@@ -68,15 +68,16 @@ public class UserWebController {
 
     /**
      * GET method to retrieve any user's profile photo by their ID.
-     * This is used for public views, such as viewing a seller's photo on a product page.
+     * This is used for public views, such as viewing a seller's photo on a product
+     * page.
      */
     @GetMapping("/user/{id}/profile-photo")
     public ResponseEntity<Resource> getPublicProfilePhoto(@PathVariable Long id) throws SQLException {
         // We delegate the search by ID to the service
         Resource image = userService.getProfilePhotoResourceById(id);
-        
+
         return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_PNG) 
+                .contentType(MediaType.IMAGE_PNG)
                 .body(image);
     }
 
@@ -90,18 +91,19 @@ public class UserWebController {
                 .body(image);
     }
 
-
     /**
      * GET method to display a specific seller's public profile using their ID.
      * This allows users to browse different sellers in the marketplace.
      *
-     * @param id The internal ID of the seller to display.
-     * @param model UI model to pass seller data to the template.
-     * @param principal The current logged-in user (optional, used for ownership checks).
+     * @param id        The internal ID of the seller to display.
+     * @param model     UI model to pass seller data to the template.
+     * @param principal The current logged-in user (optional, used for ownership
+     *                  checks).
      */
     @GetMapping("/seller-profile/{id}")
     public String showPublicSellerProfile(@PathVariable long id, Model model, Principal principal) {
-        var sellerProfileData = userService.getSellerProfilePageData(id, principal != null ? principal.getName() : null);
+        var sellerProfileData = userService.getSellerProfilePageData(id,
+                principal != null ? principal.getName() : null);
 
         model.addAttribute("seller", sellerProfileData.seller());
         model.addAttribute("sellerValorations", sellerProfileData.sellerValorations());
@@ -115,9 +117,9 @@ public class UserWebController {
 
     @GetMapping("/contact-seller-page/{id}")
     public String showContactSeller(@PathVariable long id, Model model, Principal principal,
-                                    @RequestParam(required = false) String sent,
-                                    @RequestParam(required = false) String error,
-                                    @RequestParam(required = false) String cooldown) {
+            @RequestParam(required = false) String sent,
+            @RequestParam(required = false) String error,
+            @RequestParam(required = false) String cooldown) {
         // STEP 1: Check buyer is authenticated
         if (principal == null) {
             return "redirect:/login-page";
@@ -143,22 +145,24 @@ public class UserWebController {
 
     /**
      * Displays the personal profile page of the authenticated user.
-     * This route is used as a private dashboard where the user can see their own public-facing info.
-     * By using the Principal instead of a PathVariable ID, we prevent unauthorized access 
+     * This route is used as a private dashboard where the user can see their own
+     * public-facing info.
+     * By using the Principal instead of a PathVariable ID, we prevent unauthorized
+     * access
      * to other users' profile data.
      * * @param model UI model to pass user data to the mustache template.
+     * 
      * @param principal The security context of the logged-in user.
      * @return The user profile view template.
      */
     @GetMapping("/user-page")
     public String showUserPage(Model model, Principal principal) {
-        
+
         // STEP 1: Validate user session exists
         // Safety Check: If the user session is lost, redirect to login
         if (principal == null) {
             return "redirect:/login-page";
         }
-
 
         var dashboardData = userService.getUserDashboardData(principal.getName());
 
@@ -176,36 +180,35 @@ public class UserWebController {
         model.addAttribute("formattedTotalRevenue", formatCurrency(dashboardData.user().getTotalRevenue()));
         model.addAttribute("formattedBalance", formatCurrency(dashboardData.user().getBalance()));
 
-        return "user-page"; 
+        return "user-page";
     }
 
     private String formatCurrency(double value) {
         return NumberFormattingUtils.formatMoney(value);
     }
-    
 
     /**
      * GET method for the sales and orders dashboard.
-     * Uses the session Principal to ensure users can only see their own private financial history.
+     * Uses the session Principal to ensure users can only see their own private
+     * financial history.
      *
      */
     @GetMapping("/sales-and-orders-page")
     public String showSalesAndOrders(Model model, Principal principal,
-                                    @RequestParam(required = false) Long transactionId) {
+            @RequestParam(required = false) Long transactionId) {
 
         // STEP 1: Get authenticated user profile
         // 1. Get the full profile for the sidebar/header
         model.addAttribute("user", userService.getFullUserProfile(principal.getName()));
 
-
-        // STEP 2: Fetch sales and orders dashboard data (includes transaction lists and selected transaction)
+        // STEP 2: Fetch sales and orders dashboard data (includes transaction lists and
+        // selected transaction)
         // 2. Delegate business logic to the OrderService
         Map<String, Object> dashboardData = userService.getSalesAndOrdersDashboard(principal.getName(), transactionId);
         model.addAllAttributes(dashboardData);
 
         return "sales-and-orders-page";
     }
-
 
     @GetMapping("/help-center-page/{id}")
     public String showHelpCenterPage(Model model, @PathVariable long id, HttpServletRequest request) {
@@ -221,12 +224,12 @@ public class UserWebController {
 
         return "help-center-page";
     }
-    
-    /*USER SETTING PAGE (PERSONAL INFORMATION)*/
+
+    /* USER SETTING PAGE (PERSONAL INFORMATION) */
 
     /**
      * GET method to display the account settings page.
-     * Identity is resolved via Spring Security's Principal to prevent ID spoofing. 
+     * Identity is resolved via Spring Security's Principal to prevent ID spoofing.
      */
     @GetMapping("/user-setting-page")
     public String showUserSettings(Model model, Principal principal) {
@@ -237,19 +240,17 @@ public class UserWebController {
             return "redirect:/login-page";
         }
 
-
         // STEP 2: Fetch full user profile from database
         // 2. Fetch the full User entity from the Service (NOT just the Principal)
-        // The Principal only provides the name; we need the full JPA entity for the view 
+        // The Principal only provides the name; we need the full JPA entity for the
+        // view
         User loggedInUser = userService.getFullUserProfile(principal.getName());
-        
-        
+
         // STEP 3: Check if user is admin (admins cannot delete account)
         // isAdmin already injected globally via @ModelAttribute, but ensure it's set
         boolean isAdmin = userService.isAdmin(loggedInUser);
         model.addAttribute("isAdmin", isAdmin);
-        
-        
+
         // STEP 4: Pre-fill settings form with current user data
         // 3. Add the complete User object to the model for the Mustache template
         model.addAttribute("user", loggedInUser);
@@ -259,22 +260,22 @@ public class UserWebController {
 
     /**
      * Processes the profile update form submission.
-     * Uses the Principal object to identify the user, ensuring no ID spoofing is possible.
+     * Uses the Principal object to identify the user, ensuring no ID spoofing is
+     * possible.
      */
-    @PostMapping("/user-settings/edit") 
-    public String updateSettings(Principal principal, 
-                                @RequestParam(required = false) MultipartFile newProfilePhoto,
-                                @RequestParam(required = false) String newEmail,
-                                @RequestParam(required = false) String newCardNumber,
-                                @RequestParam(required = false) String newCardCvv,
-                                @RequestParam(required = false) String newCardExpiringDate, 
-                                @RequestParam(required = false) String newDescription) throws IOException {
-        
+    @PostMapping("/user-settings/edit")
+    public String updateSettings(Principal principal,
+            @RequestParam(required = false) MultipartFile newProfilePhoto,
+            @RequestParam(required = false) String newEmail,
+            @RequestParam(required = false) String newCardNumber,
+            @RequestParam(required = false) String newCardCvv,
+            @RequestParam(required = false) String newCardExpiringDate,
+            @RequestParam(required = false) String newDescription) throws IOException {
+
         // STEP 1: Update user profile with new data (only updates non-null fields)
         // 1. Delegate everything to the Service Layer using the secure session identity
-        userService.updateUserSettings(principal.getName(), newProfilePhoto, newEmail, 
-                                    newCardNumber, newCardCvv, newCardExpiringDate, newDescription);
-
+        userService.updateUserSettings(principal.getName(), newProfilePhoto, newEmail,
+                newCardNumber, newCardCvv, newCardExpiringDate, newDescription);
 
         // STEP 2: Redirect to settings page to show updated data
         // 2. Redirect to the settings page (the clean GET route we created before)
@@ -288,17 +289,14 @@ public class UserWebController {
     @PostMapping("/user-settings/delete")
     public String deleteUserInSettings(Principal principal, HttpServletRequest request) throws ServletException {
 
-
         // STEP 1: Delete user and all associated data from database
         // 1. Delete the user from the database via the service layer
         userService.deleteUserSelf(principal.getName());
 
-
         // STEP 2: Invalidate session and clear security context
-        // 2. request.logout() invalidates the session and 
+        // 2. request.logout() invalidates the session and
         // clears the SecurityContext in Spring Security.
         request.logout();
-
 
         // STEP 3: Redirect to homepage as anonymous user
         // 3. Redirect to the home page as an anonymous guest

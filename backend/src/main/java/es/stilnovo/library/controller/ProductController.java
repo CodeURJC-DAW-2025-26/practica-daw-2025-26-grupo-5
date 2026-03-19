@@ -39,29 +39,31 @@ public class ProductController {
     /**
      * Load next batch of products via AJAX for infinite scroll feature
      * Handles search filtering, category filtering, and pagination
-     * @param offset number of products to skip
-     * @param query optional search text
-     * @param category optional category filter
+     * 
+     * @param offset    number of products to skip
+     * @param query     optional search text
+     * @param category  optional category filter
      * @param principal current user session
-     * @param model UI data model
+     * @param model     UI data model
      * @return product_items template fragment
      */
     @GetMapping("/load-more-products")
-    public String loadMore(@RequestParam int offset, 
-                            @RequestParam(required = false) String query,
-                            @RequestParam(required = false) String category,
-                            Principal principal,
-                            Model model) {
+    public String loadMore(@RequestParam int offset,
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) String category,
+            Principal principal,
+            Model model) {
         User user = mainService.getUserContext(principal != null ? principal.getName() : null);
         int pageSize = 10;
         int pageNumber = calculatePageNumber(offset, pageSize);
 
-        CatalogPageResult page = productService.getCatalogPage(query, category, user, PageRequest.of(pageNumber, pageSize));
+        CatalogPageResult page = productService.getCatalogPage(query, category, user,
+                PageRequest.of(pageNumber, pageSize));
 
         model.addAttribute("products", page.products());
         model.addAttribute("isLast", page.last());
-        
-        return "product_items"; 
+
+        return "product_items";
     }
 
     @GetMapping("/info-product-page/{id}")
@@ -71,7 +73,7 @@ public class ProductController {
 
         // STEP 2: Fetch product by ID from database (throws 404 if not found)
         Product product = productService.findById(id)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
 
         // STEP 3: Record user view interaction for analytics if logged in
         if (user != null) {
@@ -80,7 +82,7 @@ public class ProductController {
 
         // STEP 4: Get personalized product recommendations for user
         List<Product> recommendations = productService.getRecommendations(user);
-        
+
         // STEP 5: Remove current product from recommendations to avoid duplication
         recommendations = productService.filterOutCurrentProduct(recommendations, id);
 
@@ -92,25 +94,26 @@ public class ProductController {
         model.addAttribute("product", product);
         model.addAttribute("recommendedProducts", recommendations);
         model.addAttribute("logged", user != null);
-        
+
         return "info-product-page";
     }
-    
+
     /**
      * Displays the authenticated user's personal product inventory.
-     * Following REST best practices: The User ID is hidden from the URL to prevent enumeration attacks.
+     * Following REST best practices: The User ID is hidden from the URL to prevent
+     * enumeration attacks.
      */
     @GetMapping("/user-products-page")
     public String userProducts(Model model, Principal principal) {
-    
+
         // STEP 1: Get user with their product inventory from database
         User user = productService.getAuthenticatedUserWithProducts(principal.getName());
-    
+
         // STEP 2: Populate model with user products list and count
-        model.addAttribute("user", user); 
+        model.addAttribute("user", user);
         model.addAttribute("userProducts", user.getProducts());
         model.addAttribute("itemsCount", productService.getUserProductCount(principal.getName()));
-    
+
         return "user-products-page";
     }
 
@@ -118,57 +121,57 @@ public class ProductController {
     // GET method to display the edit form with existing data
     @GetMapping("/edit-product-page/{id}")
     public String showEditForm(Model model, @PathVariable long id, Principal principal) {
-    
+
         // STEP 1: Fetch product and validate ownership
         Product product = productService.getProductForEditing(id, principal.getName());
 
         // STEP 2: Pre-fill form fields with existing product data
         model.addAttribute("product", product);
-    
-        return "edit-product-page"; 
+
+        return "edit-product-page";
     }
-    
+
     @PostMapping("/edit-product/{id}")
     public String updateProduct(@PathVariable long id,
-                                Product updatedProduct,
-                                Principal principal,
-                                Model model,
-                                @RequestParam(name = "productPhotos", required = false) MultipartFile productPhoto) throws IOException {
+            Product updatedProduct,
+            Principal principal,
+            Model model,
+            @RequestParam(name = "productPhotos", required = false) MultipartFile productPhoto) throws IOException {
 
         productService.validateProductPrice(updatedProduct.getPrice());
-    
+
         // STEP 1: Update product with new data (service validates ownership)
         productService.updateProductSafely(id, updatedProduct, principal.getName(), productPhoto);
 
         // STEP 2: Redirect to inventory page
         return "redirect:/user-products-page";
-    } 
-    
+    }
+
     /**
      * GET method to display the product creation form.
      * Ensures the authenticated user data is available for the sidebar/navbar.
      */
     @GetMapping("/add-product-page")
     public String showAddForm(Model model, Principal principal) {
-        
+
         // STEP 1: Load user data for sidebar/navbar if authenticated
         if (principal != null) {
             User user = userService.getFullUserProfile(principal.getName());
             model.addAttribute("user", user);
         }
-        
-        return "add-product-page"; 
+
+        return "add-product-page";
     }
 
     @PostMapping("/add-product")
-    public String newProduct(Model model, Principal principal, 
-                            @RequestParam("productPhotos") MultipartFile productPhoto,
-                            @RequestParam String productName,
-                            @RequestParam String category,
-                            @RequestParam String description,
-                            @RequestParam double price,
-                            @RequestParam String location,
-                            @RequestParam String status) throws IOException {
+    public String newProduct(Model model, Principal principal,
+            @RequestParam("productPhotos") MultipartFile productPhoto,
+            @RequestParam String productName,
+            @RequestParam String category,
+            @RequestParam String description,
+            @RequestParam double price,
+            @RequestParam String location,
+            @RequestParam String status) throws IOException {
 
         productService.validateProductPrice(price);
         productService.validateProductPhoto(productPhoto);
@@ -182,11 +185,12 @@ public class ProductController {
 
     /**
      * Processes the deletion request for a specific product.
-     * After a successful deletion, it redirects the user to the clean inventory page.
+     * After a successful deletion, it redirects the user to the clean inventory
+     * page.
      */
     @PostMapping("/delete-product/{id}")
     public String deleteProduct(@PathVariable long id, Principal principal) {
-        
+
         // STEP 1: Delete product from database (service validates ownership)
         productService.deleteProduct(id, principal.getName());
 

@@ -1,7 +1,7 @@
 package es.stilnovo.library.controller;
 
 import es.stilnovo.library.model.User;
-import es.stilnovo.library.service.UserService; 
+import es.stilnovo.library.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -18,11 +18,11 @@ public class GlobalControllerAdvice {
     @ModelAttribute
     public void addAttributes(Model model, HttpServletRequest request) {
         Principal principal = request.getUserPrincipal();
-        
+
         if (principal != null) {
             // Use service layer instead of direct repository access
             User user = userService.findByName(principal.getName()).orElse(null);
-            
+
             if (user != null) {
                 model.addAttribute("logged", true);
                 model.addAttribute("username", user.getName());

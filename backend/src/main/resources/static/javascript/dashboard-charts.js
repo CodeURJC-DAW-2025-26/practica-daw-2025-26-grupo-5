@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
 
     const rawDataElement = document.getElementById('chart-data');
     let chartLabels = [];
@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (rawDataElement) {
         try {
             const chartData = JSON.parse(rawDataElement.textContent);
-            chartLabels = chartData.labels; 
+            chartLabels = chartData.labels;
             chartValues = chartData.values;
             revenueLabels = chartData.revenueLabels;
             revenueValues = chartData.revenueValues;
@@ -33,13 +33,13 @@ document.addEventListener("DOMContentLoaded", function() {
             '#111827',
             '#a5b4fc',
             '#c5ccdc',
-            '#818cf8' 
+            '#818cf8'
         ];
 
         Chart.defaults.font.family = "'Inter', sans-serif";
         Chart.defaults.font.size = 13;
-        Chart.defaults.color = '#6b7280'; 
-        
+        Chart.defaults.color = '#6b7280';
+
         new Chart(ctx, {
             type: 'doughnut',
             data: {
@@ -48,10 +48,10 @@ document.addEventListener("DOMContentLoaded", function() {
                     label: 'Products Sold',
                     data: chartValues,
                     backgroundColor: brandPalette,
-                    borderWidth: 2,          
-                    borderColor: '#ffffff',  
-                    hoverOffset: 8,          
-                    spacing: 3 
+                    borderWidth: 2,
+                    borderColor: '#ffffff',
+                    hoverOffset: 8,
+                    spacing: 3
                 }]
             },
             options: {
@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     tooltip: {
                         backgroundColor: '#111827',
                         padding: 12,
-                        cornerRadius: 8,  
+                        cornerRadius: 8,
                         titleFont: {
                             size: 14,
                             weight: '700',
@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", function() {
     } else {
         const chartCanvas = document.getElementById('salesByCategoryChart');
         if (chartCanvas) {
-            chartCanvas.parentElement.innerHTML = 
+            chartCanvas.parentElement.innerHTML =
                 '<div class="d-flex align-items-center justify-content-center h-100">' +
                 '  <p class="text-muted text-center small">You have no sales yet.</p>' +
                 '</div>';
@@ -106,7 +106,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const revenueCtx = document.getElementById('revenueChart');
 
     if (revenueLabels && typeof revenueLabels !== 'undefined' && revenueLabels.length > 0) {
-        
+
         new Chart(revenueCtx, {
             type: 'line',
             data: {
@@ -126,28 +126,28 @@ document.addEventListener("DOMContentLoaded", function() {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    y: { 
+                    y: {
                         beginAtZero: true,
                         ticks: {
-                            callback: function(value) { return value + ' €'; }
+                            callback: function (value) { return value + ' €'; }
                         }
                     }
                 },
                 plugins: {
-                    legend: { display: false } 
+                    legend: { display: false }
                 }
             }
         });
     } else {
         if (revenueCtx) {
-            revenueCtx.parentElement.innerHTML = 
+            revenueCtx.parentElement.innerHTML =
                 '<div class="d-flex align-items-center justify-content-center h-100">' +
                 '  <p class="text-muted text-center small">You have no sales yet.</p>' +
                 '</div>';
         }
     }
     const barCtx = document.getElementById('visitsInterestChart');
-    
+
     if (barCtx && typeof barLabels !== 'undefined' && barLabels.length > 0) {
         new Chart(barCtx, {
             type: 'bar',
@@ -157,7 +157,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     {
                         label: 'Visits',
                         data: visitsData,
-                        backgroundColor: '#cbd5e0', 
+                        backgroundColor: '#cbd5e0',
                         borderRadius: 4
                     },
                     {
@@ -172,13 +172,13 @@ document.addEventListener("DOMContentLoaded", function() {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    y: { 
+                    y: {
                         beginAtZero: true,
                         ticks: { stepSize: 1 }
                     }
                 },
                 plugins: {
-                    legend: { 
+                    legend: {
                         position: 'bottom',
                         labels: {
                             usePointStyle: true,
@@ -189,7 +189,7 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     } else if (barCtx) {
-        barCtx.parentElement.innerHTML = 
+        barCtx.parentElement.innerHTML =
             '<div class="d-flex align-items-center justify-content-center h-100">' +
             '  <p class="text-muted text-center small">No interaction data available yet.</p>' +
             '</div>';

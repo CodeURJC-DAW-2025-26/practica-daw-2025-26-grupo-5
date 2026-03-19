@@ -37,10 +37,10 @@ public class Valoration {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    private int stars; // Numeric score (1 to 5) 
+    private int stars; // Numeric score (1 to 5)
 
     @Column(columnDefinition = "TEXT")
-    private String comment; // Subjective review 
+    private String comment; // Subjective review
 
     @OneToOne
     private Transaction transaction; // Strictly linked to a completed transaction
@@ -51,7 +51,8 @@ public class Valoration {
     @ManyToOne
     private User buyer; // The user giving the rating
 
-    public Valoration() {}
+    public Valoration() {
+    }
 
     public Valoration(Transaction transaction, int stars, String comment) {
         this.transaction = transaction;
@@ -61,12 +62,35 @@ public class Valoration {
         this.buyer = transaction.getBuyer();
     }
 
-    public Long getId() { return id; }
-    public int getStars() { return stars; }
-    public void setStars(int stars) { this.stars = stars; }
-    public String getComment() { return comment; }
-    public void setComment(String comment) { this.comment = comment; }
-    public Transaction getTransaction() { return transaction; }
-    public User getSeller() { return seller; }
-    public User getBuyer() { return buyer; }
+    public Long getId() {
+        return id;
+    }
+
+    public int getStars() {
+        return stars;
+    }
+
+    public void setStars(int stars) {
+        this.stars = stars;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public Transaction getTransaction() {
+        return transaction;
+    }
+
+    public User getSeller() {
+        return seller;
+    }
+
+    public User getBuyer() {
+        return buyer;
+    }
 }

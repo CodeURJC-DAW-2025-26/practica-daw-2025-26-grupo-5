@@ -39,14 +39,14 @@ public class MainService {
         String status = "Active";
 
         // STEP 2: Check if user searched by query text
-        if(query != null && !query.isEmpty()){
+        if (query != null && !query.isEmpty()) {
             return productService.findByQuery(query);
         }
         // STEP 3: Check if user filtered by category
         if (category != null && !category.isEmpty()) {
             return productService.findByQueryCategory(category);
-        } 
-        
+        }
+
         // STEP 4: Return all active products (default browse)
         return productService.findProductsByStatus(status);
     }
@@ -55,7 +55,8 @@ public class MainService {
      * Retrieves the full user profile safely.
      */
     public User getUserContext(String username) {
-        if (username == null) return null;
+        if (username == null)
+            return null;
         return userRepository.findByName(username).orElse(null);
     }
 
@@ -71,12 +72,14 @@ public class MainService {
         User user = getUserContext(username);
         boolean searching = (query != null && !query.isBlank()) || (category != null && !category.isBlank());
         boolean isFirstPage = pageable.getPageNumber() == 0;
-        List<Product> recommendedProducts = (searching || !isFirstPage) ? List.of() : productService.getRecommendations(user);
+        List<Product> recommendedProducts = (searching || !isFirstPage) ? List.of()
+                : productService.getRecommendations(user);
 
         int recommendedSize = recommendedProducts.size();
         int regularLimit = Math.max(0, pageable.getPageSize() - recommendedSize);
         CatalogPageResult catalogPage = regularLimit > 0
-                ? productService.getCatalogPage(query, category, user, PageRequest.of(pageable.getPageNumber(), regularLimit))
+                ? productService.getCatalogPage(query, category, user,
+                        PageRequest.of(pageable.getPageNumber(), regularLimit))
                 : new CatalogPageResult(List.of(), true, 0, 0, 0);
 
         String normalizedQuery = query != null ? query : (category != null ? category : "");

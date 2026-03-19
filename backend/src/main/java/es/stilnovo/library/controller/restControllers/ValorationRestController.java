@@ -34,7 +34,8 @@ public class ValorationRestController {
      * Use this for administrative views or global feedback lists.
      *
      * @param pageable Pagination and sorting information (default size: 10).
-     * @return PagedResponse containing a list of ValorationDTOs and paging metadata.
+     * @return PagedResponse containing a list of ValorationDTOs and paging
+     *         metadata.
      */
     @GetMapping
     public PagedResponse<ValorationDTO> getAllValorations(@PageableDefault(size = 10) Pageable pageable) {
@@ -47,7 +48,8 @@ public class ValorationRestController {
      * Retrieves the details of a specific valoration by its unique identifier.
      *
      * @param id The ID of the valoration to retrieve.
-     * @return ValorationDTO containing the feedback, stars, and associated user data.
+     * @return ValorationDTO containing the feedback, stars, and associated user
+     *         data.
      */
     @GetMapping("/{id}")
     public ValorationDTO getValoration(@PathVariable Long id) {
@@ -58,24 +60,26 @@ public class ValorationRestController {
      * Submits a new valoration for a completed transaction.
      * The buyer identity is automatically resolved from the security context.
      *
-     * @param dto       The valoration data including stars, comment, and transactionId.
+     * @param dto       The valoration data including stars, comment, and
+     *                  transactionId.
      * @param principal The security context of the authenticated buyer.
-     * @return ResponseEntity with 201 Created status, the URI of the new resource, and the ValorationDTO.
+     * @return ResponseEntity with 201 Created status, the URI of the new resource,
+     *         and the ValorationDTO.
      */
     @PostMapping
     public ResponseEntity<ValorationDTO> createValoration(@RequestBody ValorationDTO dto, Principal principal) {
         // 1. Resolve buyer from current session
         var buyer = userService.findByName(principal.getName()).orElseThrow();
-        
+
         // 2. Create the valoration via service layer
         var created = valorationService.createValoration(dto.transactionId(), dto.stars(), dto.comment(), buyer);
-        
+
         // 3. Construct the URI for the newly created valoration
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(created.getId())
                 .toUri();
-                
+
         return ResponseEntity.created(location).body(new ValorationDTO(created));
     }
 }

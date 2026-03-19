@@ -30,10 +30,10 @@ public class NotificationController {
     /** Process inquiry submission with spam prevention and email notifications */
     @PostMapping("/notifications/send-inquiry")
     public String sendInquiry(@RequestParam long productId,
-                                @RequestParam(required = false) String phone,
-                                @RequestParam String type,
-                                @RequestParam String message,
-                                Principal principal) {
+            @RequestParam(required = false) String phone,
+            @RequestParam String type,
+            @RequestParam String message,
+            Principal principal) {
         return notificationService.resolveInquiryRedirect(
                 productId,
                 phone,

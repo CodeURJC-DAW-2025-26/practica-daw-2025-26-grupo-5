@@ -87,7 +87,7 @@ public class User {
 
     /** Account balance/wallet */
     private double balance;
-    
+
     /** Total revenue from product sales */
     private double totalRevenue;
 
@@ -105,7 +105,8 @@ public class User {
 
     /* ----------------- CONSTRUCTORS ----------------- */
 
-    public User() {}
+    public User() {
+    }
 
     /**
      * Simple constructor used by DataBaseInitializer and many places.
@@ -121,28 +122,31 @@ public class User {
     }
 
     /**
-     * Full constructor to be compatible with older controller usages (signup code that passed many params).
+     * Full constructor to be compatible with older controller usages (signup code
+     * that passed many params).
      * Order matches the example that caused the constructor error in your logs.
      *
      * Example call that motivated this signature:
-     * new User(username, encodedPassword, email, imageBlob, 5.0, null, null, null , 0, 0.0, 0.0, null, "ROLE_USER");
+     * new User(username, encodedPassword, email, imageBlob, 5.0, null, null, null ,
+     * 0, 0.0, 0.0, null, "ROLE_USER");
      *
      * Parameters:
-     *  - cardNumber, cardCvv, cardExpiringDate, numRatings, balance, totalRevenue, description, roles...
+     * - cardNumber, cardCvv, cardExpiringDate, numRatings, balance, totalRevenue,
+     * description, roles...
      */
     public User(String name,
-                String encodedPassword,
-                String email,
-                Blob profileImage,
-                Double rating,
-                String cardNumber,
-                String cardCvv,
-                String cardExpiringDate,
-                int numRatings,
-                double balance,
-                double totalRevenue,
-                String description,
-                String... roles) {
+            String encodedPassword,
+            String email,
+            Blob profileImage,
+            Double rating,
+            String cardNumber,
+            String cardCvv,
+            String cardExpiringDate,
+            int numRatings,
+            double balance,
+            double totalRevenue,
+            String description,
+            String... roles) {
 
         this.name = name;
         this.encodedPassword = encodedPassword;
@@ -169,7 +173,7 @@ public class User {
         this.name = name;
     }
 
-	// NOTE: Some code calls getEncodedPassword() / setEncodedPassword()
+    // NOTE: Some code calls getEncodedPassword() / setEncodedPassword()
     public String getEncodedPassword() {
         return encodedPassword;
     }
@@ -230,7 +234,8 @@ public class User {
         this.cardNumber = cardNumber;
     }
 
-    // some controllers used setCardnumber (lowercase n) — provide alias for compatibility
+    // some controllers used setCardnumber (lowercase n) — provide alias for
+    // compatibility
     public void setCardnumber(String cardNumber) {
         this.cardNumber = cardNumber;
     }
@@ -357,4 +362,3 @@ public class User {
                 '}';
     }
 }
-

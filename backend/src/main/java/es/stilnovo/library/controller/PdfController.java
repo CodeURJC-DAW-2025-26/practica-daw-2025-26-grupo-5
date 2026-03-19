@@ -25,7 +25,9 @@ import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.service.TransactionService;
 import es.stilnovo.library.service.UserService;
 
-/** Controller for generating and serving PDF invoices/receipts for transactions */
+/**
+ * Controller for generating and serving PDF invoices/receipts for transactions
+ */
 @Controller
 public class PdfController {
 
@@ -43,12 +45,12 @@ public class PdfController {
     private UserService userService;
 
     /**
-     * Build an ultra-detailed invoice with professional breakdown. 
+     * Build an ultra-detailed invoice with professional breakdown.
      */
     @GetMapping("/pdf/invoice/{transactionId}")
     public ResponseEntity<byte[]> exportInvoice(@PathVariable long transactionId, Principal principal)
             throws DocumentException, IOException {
-        
+
         // Use service layer for data access and security validation
         Transaction t = transactionService.getTransactionForInvolvedUser(transactionId, principal.getName());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -63,16 +65,19 @@ public class PdfController {
         parties.setWidthPercentage(100);
         parties.setSpacingBefore(15f);
         parties.addCell(infoBox("BILLED TO (Buyer)", t.getBuyer().getName() + "\nEmail: " + t.getBuyer().getEmail()));
-        parties.addCell(infoBox("SOLD BY (Seller)", t.getSeller().getName() + "\nSeller Card ID: STN-" + t.getSeller().getUserId()));
+        parties.addCell(infoBox("SOLD BY (Seller)",
+                t.getSeller().getName() + "\nSeller Card ID: STN-" + t.getSeller().getUserId()));
         doc.add(parties);
 
         // Technical Metadata
         doc.add(new Paragraph("\nTRANSACTION DATA", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9, BRAND_BLUE)));
-        doc.add(new Paragraph("Internal Reference: " + UUID.randomUUID().toString().toUpperCase(), FontFactory.getFont(FontFactory.HELVETICA, 8)));
-        doc.add(new Paragraph("Completion Date: " + t.getCreatedAt().format(DATE_FORMATTER), FontFactory.getFont(FontFactory.HELVETICA, 8)));
-        
+        doc.add(new Paragraph("Internal Reference: " + UUID.randomUUID().toString().toUpperCase(),
+                FontFactory.getFont(FontFactory.HELVETICA, 8)));
+        doc.add(new Paragraph("Completion Date: " + t.getCreatedAt().format(DATE_FORMATTER),
+                FontFactory.getFont(FontFactory.HELVETICA, 8)));
+
         // Product Line Item [cite: 148-150]
-        PdfPTable table = new PdfPTable(new float[]{4, 1, 1});
+        PdfPTable table = new PdfPTable(new float[] { 4, 1, 1 });
         table.setWidthPercentage(100);
         table.setSpacingBefore(20f);
         table.addCell(headerCell("Product Description"));
@@ -89,34 +94,39 @@ public class PdfController {
         PdfPTable totals = new PdfPTable(2);
         totals.setWidthPercentage(45);
         totals.setHorizontalAlignment(Element.ALIGN_RIGHT);
-        totals.addCell(summaryLabel("Net Subtotal:")); totals.addCell(summaryValue(formatCurrency(breakdown.base())));
-        totals.addCell(summaryLabel("Stilnovo Fee:")); totals.addCell(summaryValue(formatCurrency(breakdown.fees())));
-        totals.addCell(summaryLabel("Applicable VAT (21%):")); totals.addCell(summaryValue(formatCurrency(breakdown.vat())));
-        
-        PdfPCell totalLab = summaryLabel("TOTAL PAID:"); 
-        totalLab.setBackgroundColor(BRAND_BLUE); 
+        totals.addCell(summaryLabel("Net Subtotal:"));
+        totals.addCell(summaryValue(formatCurrency(breakdown.base())));
+        totals.addCell(summaryLabel("Stilnovo Fee:"));
+        totals.addCell(summaryValue(formatCurrency(breakdown.fees())));
+        totals.addCell(summaryLabel("Applicable VAT (21%):"));
+        totals.addCell(summaryValue(formatCurrency(breakdown.vat())));
+
+        PdfPCell totalLab = summaryLabel("TOTAL PAID:");
+        totalLab.setBackgroundColor(BRAND_BLUE);
         totalLab.setPhrase(new Phrase("TOTAL PAID:", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, Color.WHITE)));
         totals.addCell(totalLab);
-        
-        PdfPCell totalVal = summaryValue(formatCurrency(breakdown.total())); 
-        totalVal.setBackgroundColor(BRAND_BLUE); 
-        totalVal.setPhrase(new Phrase(formatCurrency(breakdown.total()), FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11, Color.WHITE)));
+
+        PdfPCell totalVal = summaryValue(formatCurrency(breakdown.total()));
+        totalVal.setBackgroundColor(BRAND_BLUE);
+        totalVal.setPhrase(new Phrase(formatCurrency(breakdown.total()),
+                FontFactory.getFont(FontFactory.HELVETICA_BOLD, 11, Color.WHITE)));
         totals.addCell(totalVal);
         doc.add(totals);
 
         addFooter(doc, "This document serves as proof of purchase within the Stilnovo ecosystem.");
         doc.close();
-        
+
         return pdfResponse(out, "Invoice_STN_" + t.getTransactionId() + ".pdf");
     }
 
     /**
-     * Build shipping label with fragile warnings and logistics data. [cite: 159-181]
+     * Build shipping label with fragile warnings and logistics data. [cite:
+     * 159-181]
      */
     @GetMapping("/pdf/shipping-label/{transactionId}")
     public ResponseEntity<byte[]> exportShippingLabel(@PathVariable long transactionId, Principal principal)
             throws DocumentException, IOException {
-        
+
         // Use service layer for data access and security validation (seller only)
         Transaction t = transactionService.getTransactionForSeller(transactionId, principal.getName());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -126,34 +136,38 @@ public class PdfController {
 
         addBrandHeader(doc, "STILNOVO LOGISTICS LABEL", loadLogoBytes());
 
-        // Address blocks 
+        // Address blocks
         PdfPTable grid = new PdfPTable(1);
         grid.setWidthPercentage(100);
         grid.addCell(infoBox("SENDER (Seller Info)", t.getSeller().getName() + "\n" + t.getSeller().getEmail()));
-        
+
         PdfPCell receiver = new PdfPCell();
         receiver.setPadding(15f);
         receiver.setBorderWidth(2f);
         receiver.setBorderColor(BRAND_BLUE);
-        receiver.addElement(new Paragraph("SHIP TO (Customer)", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, BRAND_BLUE)));
+        receiver.addElement(
+                new Paragraph("SHIP TO (Customer)", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, BRAND_BLUE)));
         receiver.addElement(new Paragraph(t.getBuyer().getName(), FontFactory.getFont(FontFactory.HELVETICA_BOLD, 14)));
-        receiver.addElement(new Paragraph(t.getProduct().getLocation(), FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12)));
+        receiver.addElement(
+                new Paragraph(t.getProduct().getLocation(), FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12)));
         grid.addCell(receiver);
         doc.add(grid);
 
-        // Logistics details 
+        // Logistics details
         doc.add(new Paragraph("\nLOGISTICS INFO", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9, BRAND_BLUE)));
-        addKeyValueLine(doc, "Tracking ID: ", "STN-TRK-" + UUID.randomUUID().toString().substring(0,8).toUpperCase(), 9);
+        addKeyValueLine(doc, "Tracking ID: ", "STN-TRK-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase(),
+                9);
         addKeyValueLine(doc, "Package Weight: ", "1.450 KG", 9);
 
-        // QR Code 
+        // QR Code
         byte[] qr = loadQrBytes();
         if (qr != null) {
             Image img = Image.getInstance(qr);
             img.scaleToFit(100, 100);
             img.setAlignment(Element.ALIGN_CENTER);
             doc.add(img);
-            Paragraph p = new Paragraph("SCAN TO VERIFY RECEIPT", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 8, Color.GRAY));
+            Paragraph p = new Paragraph("SCAN TO VERIFY RECEIPT",
+                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 8, Color.GRAY));
             p.setAlignment(Element.ALIGN_CENTER);
             doc.add(p);
         }
@@ -162,13 +176,14 @@ public class PdfController {
         PdfPTable warning = new PdfPTable(1);
         warning.setWidthPercentage(100);
         warning.setSpacingBefore(15f);
-        
-        PdfPCell warnCell = new PdfPCell(new Phrase("FRAGILE: HANDLE WITH CARE - HIGH VALUE DESIGN ITEM", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9, Color.WHITE)));
+
+        PdfPCell warnCell = new PdfPCell(new Phrase("FRAGILE: HANDLE WITH CARE - HIGH VALUE DESIGN ITEM",
+                FontFactory.getFont(FontFactory.HELVETICA_BOLD, 9, Color.WHITE)));
         warnCell.setBackgroundColor(DANGER_RED);
         warnCell.setHorizontalAlignment(Element.ALIGN_CENTER);
         warnCell.setPadding(10f);
         warnCell.setBorder(Rectangle.NO_BORDER);
-        
+
         warning.addCell(warnCell);
         doc.add(warning);
 
@@ -181,14 +196,21 @@ public class PdfController {
     private void addBrandHeader(Document doc, String title, byte[] logo) throws DocumentException {
         PdfPTable h = new PdfPTable(2);
         h.setWidthPercentage(100);
-        h.setWidths(new float[]{4, 1});
+        h.setWidths(new float[] { 4, 1 });
         PdfPCell t = new PdfPCell(new Phrase(title, FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, BRAND_BLUE)));
         t.setBorder(Rectangle.NO_BORDER);
         t.setVerticalAlignment(Element.ALIGN_MIDDLE);
         h.addCell(t);
         PdfPCell l = new PdfPCell();
         l.setBorder(Rectangle.NO_BORDER);
-        if (logo != null) { try { Image i = Image.getInstance(logo); i.scaleToFit(45, 45); l.addElement(i); } catch (Exception e) {} }
+        if (logo != null) {
+            try {
+                Image i = Image.getInstance(logo);
+                i.scaleToFit(45, 45);
+                l.addElement(i);
+            } catch (Exception e) {
+            }
+        }
         h.addCell(l);
         doc.add(h);
         doc.add(new LineSeparator(1.5f, 100, BRAND_BLUE, Element.ALIGN_CENTER, -2));
@@ -211,22 +233,22 @@ public class PdfController {
      */
     @GetMapping("/pdf/statistics")
     public ResponseEntity<byte[]> exportStatistics(Principal principal) throws DocumentException, IOException {
-        
+
         // Use service layer for data access and security validation
         java.util.List<Transaction> transactions = transactionService.getSellerTransactions(principal.getName());
-        
+
         // Calculate statistics
         double totalSales = transactions.stream()
-            .mapToDouble(Transaction::getFinalPrice)
-            .sum();
-        
+                .mapToDouble(Transaction::getFinalPrice)
+                .sum();
+
         int itemsSold = transactions.size();
-        
+
         double avgRating = userService.getAverageRatingForSeller(principal.getName());
-        
+
         // Calculate Inventory Value (sum of all products)
         double inventoryValue = userService.calculateInventoryValue(principal.getName());
-        
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Document doc = new Document(PageSize.A4, 45, 45, 45, 45);
         PdfWriter.getInstance(doc, out);
@@ -236,61 +258,65 @@ public class PdfController {
         addBrandHeader(doc, "STILNOVO STATISTICS REPORT", loadLogoBytes());
 
         // Statistics Summary Section
-        doc.add(new Paragraph("\nPERFORMANCE OVERVIEW", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BRAND_BLUE)));
+        doc.add(new Paragraph("\nPERFORMANCE OVERVIEW",
+                FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BRAND_BLUE)));
         doc.add(new Paragraph(""));
-        
+
         PdfPTable stats = new PdfPTable(4);
         stats.setWidthPercentage(100);
         stats.setSpacingBefore(10f);
         stats.setSpacingAfter(20f);
-        
+
         stats.addCell(headerCell("Total Sales"));
         stats.addCell(headerCell("Items Sold"));
         stats.addCell(headerCell("Inventory Value"));
         stats.addCell(headerCell("Avg. Rating"));
-        
+
         stats.addCell(valueCell(formatCurrency(totalSales)));
         stats.addCell(valueCell(String.valueOf(itemsSold)));
         stats.addCell(valueCell(formatCurrency(inventoryValue)));
         stats.addCell(valueCell(avgRating + " ⭐"));
-        
+
         doc.add(stats);
-        
+
         // Transaction Details
         if (!transactions.isEmpty()) {
-            doc.add(new Paragraph("\nRECENT TRANSACTIONS", FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BRAND_BLUE)));
-            
-            PdfPTable tTable = new PdfPTable(new float[]{2, 2, 2, 1});
+            doc.add(new Paragraph("\nRECENT TRANSACTIONS",
+                    FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12, BRAND_BLUE)));
+
+            PdfPTable tTable = new PdfPTable(new float[] { 2, 2, 2, 1 });
             tTable.setWidthPercentage(100);
             tTable.setSpacingBefore(10f);
-            
+
             tTable.addCell(headerCell("Product"));
             tTable.addCell(headerCell("Buyer"));
             tTable.addCell(headerCell("Amount"));
             tTable.addCell(headerCell("Date"));
-            
+
             transactions.stream().limit(15).forEach(t -> {
                 tTable.addCell(valueCell(t.getProduct().getName()));
                 tTable.addCell(valueCell(t.getBuyer().getName()));
                 tTable.addCell(valueCell(formatCurrency(t.getFinalPrice())));
                 tTable.addCell(valueCell(t.getCreatedAt() != null ? t.getCreatedAt().format(DATE_FORMATTER) : "N/A"));
             });
-            
+
             doc.add(tTable);
         }
-        
+
         // Footer
         addFooter(doc, "Statistics Report Generated by Stilnovo Marketplace");
         doc.close();
-        
+
         return pdfResponse(out, "Stilnovo_Statistics_Report.pdf");
     }
 
-    // (Keep previous helper methods like pdfResponse, loadLogoBytes, formatCurrency)
-    
+    // (Keep previous helper methods like pdfResponse, loadLogoBytes,
+    // formatCurrency)
+
     private void addFooter(Document doc, String note) throws DocumentException {
         doc.add(new Paragraph("\n"));
-        Paragraph f = new Paragraph(note + "\nDigital Document protected by Stilnovo Security Layer.", FontFactory.getFont(FontFactory.HELVETICA, 8, Color.GRAY));
+        Paragraph f = new Paragraph(note + "\nDigital Document protected by Stilnovo Security Layer.",
+                FontFactory.getFont(FontFactory.HELVETICA, 8, Color.GRAY));
         f.setAlignment(Element.ALIGN_CENTER);
         doc.add(f);
     }
@@ -325,15 +351,35 @@ public class PdfController {
         return c;
     }
 
-    private byte[] loadLogoBytes() { try (InputStream s = Thread.currentThread().getContextClassLoader().getResourceAsStream("static/images/logo.png")) { return (s != null) ? s.readAllBytes() : null; } catch (IOException e) { return null; } }
-    private byte[] loadQrBytes() { try (InputStream s = Thread.currentThread().getContextClassLoader().getResourceAsStream("static/images/qr-stilnovo.png")) { return (s != null) ? s.readAllBytes() : null; } catch (IOException e) { return null; } }
-    private String formatCurrency(double a) { return "$" + CURRENCY.format(a); }
+    private byte[] loadLogoBytes() {
+        try (InputStream s = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream("static/images/logo.png")) {
+            return (s != null) ? s.readAllBytes() : null;
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    private byte[] loadQrBytes() {
+        try (InputStream s = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream("static/images/qr-stilnovo.png")) {
+            return (s != null) ? s.readAllBytes() : null;
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    private String formatCurrency(double a) {
+        return "$" + CURRENCY.format(a);
+    }
+
     private ResponseEntity<byte[]> pdfResponse(ByteArrayOutputStream os, String n) {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + n + "\"")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(os.toByteArray());
     }
+
     private void addKeyValueLine(Document doc, String l, String v, float s) throws DocumentException {
         Paragraph p = new Paragraph();
         p.add(new Phrase(l, FontFactory.getFont(FontFactory.HELVETICA_BOLD, s)));

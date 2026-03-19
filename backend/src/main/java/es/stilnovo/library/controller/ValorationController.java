@@ -50,15 +50,15 @@ public class ValorationController {
 
         // STEP 2: Fetch all transactions awaiting buyer's review
         List<Transaction> pending = valorationService.getPendingTransactions(user);
-        
+
         // STEP 3: Populate model with pending reviews and count for UI badges
         model.addAttribute("pendingValorations", pending);
         model.addAttribute("pendingCount", valorationService.getPendingValorationCount(user));
-        
+
         // STEP 4: Fetch buyer's complete rating history
         model.addAttribute("myValorations", valorationService.getBuyerHistory(user));
 
-        return "user-valorations-page"; 
+        return "user-valorations-page";
     }
 
     /**
@@ -67,9 +67,9 @@ public class ValorationController {
      */
     @PostMapping("/submit-valoration")
     public String submitValoration(Principal principal,
-                                    @RequestParam long transactionId,
-                                    @RequestParam int stars,
-                                    @RequestParam String comment) {
+            @RequestParam long transactionId,
+            @RequestParam int stars,
+            @RequestParam String comment) {
         // STEP 1: Get the authenticated user (buyer) from session
         User buyer = userService.getFullUserProfile(principal.getName());
 
@@ -101,17 +101,17 @@ public class ValorationController {
      * Uses @PathVariable for the ID and @RequestParam for the form data.
      */
     @PostMapping("/valoration/edit/{id}")
-    public String editValoration(@PathVariable long id, 
-                                @RequestParam int stars, 
-                                @RequestParam String comment, 
-                                Principal principal) {
-        
+    public String editValoration(@PathVariable long id,
+            @RequestParam int stars,
+            @RequestParam String comment,
+            Principal principal) {
+
         // 1. Identify the user through the Security Context
         User user = userService.getFullUserProfile(principal.getName());
 
         // 2. Delegate the update logic to the Service Layer
         valorationService.updateValoration(id, stars, comment, user);
-        
+
         // 3. Success redirect to the dashboard
         return "redirect:/user-valorations-page";
     }
