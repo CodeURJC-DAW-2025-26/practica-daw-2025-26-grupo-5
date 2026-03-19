@@ -4,6 +4,8 @@ import es.stilnovo.library.dto.PagedResponse;
 import es.stilnovo.library.dto.ValorationDTO;
 import es.stilnovo.library.dto.ValorationMapper;
 import es.stilnovo.library.service.ValorationService;
+import io.swagger.v3.oas.annotations.Operation;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -82,4 +84,23 @@ public class ValorationRestController {
 
         return ResponseEntity.created(location).body(new ValorationDTO(created));
     }
+
+    @Operation(summary = "Update a valoration")
+    @PutMapping("/{id}")
+    public ResponseEntity<ValorationDTO> updateValoration(
+            @PathVariable long id, 
+            @RequestBody ValorationDTO request, 
+            Principal principal) {
+        var user = userService.getFullUserProfile(principal.getName());
+        valorationService.updateValoration(id, request.stars(), request.comment(), user);
+        return ResponseEntity.ok(valorationMapper.toDTO(valorationService.findById(id)));
+    }
+
+    @Operation(summary = "Delete a valoration")
+    @DeleteMapping("/{id}/own")
+    public ResponseEntity<Void> deleteOwnValoration(@PathVariable long id, Principal principal) {
+        var user = userService.getFullUserProfile(principal.getName());
+        valorationService.deleteValoration(id, user);
+        return ResponseEntity.noContent().build(); // Returns 204 No Content
+}
 }
