@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.io.IOException;
-import java.io.ObjectInput;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -32,9 +31,6 @@ import es.stilnovo.library.service.ContactSellerService;
 import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.UserService;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestBody;
-
-
 
 
 @RestController
@@ -63,6 +59,12 @@ public class UserWebRestController {
     public UserDTO getCurrentUser(Principal principal) {
         return userMapper.toDTO(userService.getFullUserProfile(principal.getName()));
     }
+
+    @DeleteMapping("/me")
+    public ResponseEntity<Void> deleteMyAccount(Principal principal) {
+        userService.deleteUserSelf(principal.getName());
+        return ResponseEntity.noContent().build();
+    }
     
     @GetMapping("/me/profile-photo")
     public ResponseEntity<Resource> getMyProfilePhoto(Principal principal) throws SQLException {
@@ -70,6 +72,28 @@ public class UserWebRestController {
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_PNG)
                 .body(my_image);
+    }
+
+    @PutMapping("/me/profile-photo")
+    public ResponseEntity<UserDTO> putMethodName(Principal principal, @RequestParam("image") MultipartFile file) throws IOException{
+        String nameToModify = principal.getName();
+        UserDTO updatedUser = userMapper.toDTO(userService.getFullUserProfile(nameToModify));
+    
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @PutMapping(value = "/me/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public UserDTO updateMySettings(@ModelAttribute UserSettingsUpdateDTO request, Principal principal) throws IOException {
+        userService.updateUserSettings(
+                principal.getName(),
+                request.getNewProfilePhoto(),
+                request.getNewEmail(),
+                request.getNewCardNumber(),
+                request.getNewCardCvv(),
+                request.getNewCardExpiringDate(),
+                request.getNewDescription());
+
+        return userMapper.toDTO(userService.getFullUserProfile(principal.getName()));
     }
 
     @GetMapping("/me/dashboard")
@@ -100,27 +124,12 @@ public class UserWebRestController {
         return ResponseEntity.ok(valorationMapper.toDTOs(user.getValorations()));
     }
 
-    
-    @PutMapping(value = "/me/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public UserDTO updateMySettings(@ModelAttribute UserSettingsUpdateDTO request, Principal principal) throws IOException {
-        userService.updateUserSettings(
-                principal.getName(),
-                request.getNewProfilePhoto(),
-                request.getNewEmail(),
-                request.getNewCardNumber(),
-                request.getNewCardCvv(),
-                request.getNewCardExpiringDate(),
-                request.getNewDescription());
+    @GetMapping("me/statistics")
+    public ResponseEntity<UserStatisticsDataDTO> getStatictis(Principal principal){
+        var statisticsData = userService.getUserStatisticsData(principal.getName());
 
-        return userMapper.toDTO(userService.getFullUserProfile(principal.getName()));
+        return ResponseEntity.ok(statisticsData);
     }
-
-    @DeleteMapping("/me")
-    public ResponseEntity<Void> deleteMyAccount(Principal principal) {
-        userService.deleteUserSelf(principal.getName());
-        return ResponseEntity.noContent().build();
-    }
-
 
     @GetMapping("/{id}/profile")
     public SellerProfileDTO getSellerProfile(@PathVariable long id, Principal principal) {
@@ -142,14 +151,6 @@ public class UserWebRestController {
             .body(image);
     }
 
-    @PutMapping("me/profile-photo")
-    public ResponseEntity<UserDTO> putMethodName(Principal principal, @RequestParam("image") MultipartFile file) throws IOException{
-        String nameToModify = principal.getName();
-        UserDTO updatedUser = userMapper.toDTO(userService.getFullUserProfile(nameToModify));
-    
-        return ResponseEntity.ok(updatedUser);
-    }
-
     @GetMapping("{id}/contact-info")
     public ResponseEntity<Map<String, Object>> getContactInfo(@PathVariable int id, Principal principal){
         try {
@@ -169,11 +170,5 @@ public class UserWebRestController {
         }
 
     }
-
-    @GetMapping("me/statistics")
-    public ResponseEntity<UserStatisticsDataDTO> getStatictis(Principal principal){
-        var statisticsData = userService.getUserStatisticsData(principal.getName());
-
-        return ResponseEntity.ok(statisticsData);
-    }
+    
 }
