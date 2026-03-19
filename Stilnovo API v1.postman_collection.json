@@ -23,14 +23,15 @@
 							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/sessions",
+							"raw": "{{baseUrl}}/api/v1/auth/login",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"sessions"
+								"auth",
+								"login"
 							]
 						}
 					},
@@ -582,7 +583,20 @@
 					"name": "Get Profile photo",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/me/profile-photo",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"me",
+								"profile-photo"
+							]
+						}
 					},
 					"response": []
 				},
@@ -590,7 +604,20 @@
 					"name": "Get Dashboard",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/me/dashboard",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"me",
+								"dashboard"
+							]
+						}
 					},
 					"response": []
 				},
@@ -598,7 +625,20 @@
 					"name": "Get Transactions",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/me/transactions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"me",
+								"transactions"
+							]
+						}
 					},
 					"response": []
 				},
@@ -606,7 +646,20 @@
 					"name": "New Request",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/me/valorations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"me",
+								"valorations"
+							]
+						}
 					},
 					"response": []
 				},
@@ -614,15 +667,51 @@
 					"name": "Get profile-photo",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/1/profile-photo",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"1",
+								"profile-photo"
+							]
+						}
 					},
 					"response": []
 				},
 				{
 					"name": "Update profile-photo",
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": "/home/alonso/Pictures/Screenshots/Screenshot from 2026-03-14 23-20-08.png"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/me/profile-photo",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"me",
+								"profile-photo"
+							]
+						}
 					},
 					"response": []
 				},
@@ -630,7 +719,41 @@
 					"name": "Get Contact info",
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/1/contact-info",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"1",
+								"contact-info"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Statictis",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/me/statistics",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"me",
+								"statistics"
+							]
+						}
 					},
 					"response": []
 				}

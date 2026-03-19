@@ -1,23 +1,23 @@
-# PASO 1: Compilar la aplicación (Contenedor de construcción)
-# Usamos una imagen que YA TIENE maven instalado [cite: 192, 260]
+# STEP 1: Build the application (Build container)
+# We use an image that ALREADY HAS Maven installed
 FROM maven:3.9-eclipse-temurin-21 AS builder
 WORKDIR /project
 
-# Copiamos el archivo de configuración y el código fuente [cite: 196, 197]
-COPY pom.xml /project/
-COPY src /project/src
+# We copy the configuration file and the source code
+COPY backend/pom.xml /project/
+COPY backend/src /project/src
 
-# Ejecutamos la compilación dentro del contenedor [cite: 199, 267]
-# Aquí es donde se hace el 'mvn package' que te fallaba fuera
+# We run the build inside the container
+# This is where the 'mvn package' that was failing for you outside is executed
 RUN mvn clean package -DskipTests
 
-# PASO 2: Crear la imagen final de ejecución [cite: 200, 268]
+# STEP 2: Create the final runtime image
 FROM eclipse-temurin:21-jre
 WORKDIR /usr/src/app/
 
-# Copiamos el archivo .jar generado en el paso anterior [cite: 204, 273]
+# We copy the .jar file generated in the previous step
 COPY --from=builder /project/target/*.jar /usr/src/app/app.jar
 
 EXPOSE 8443
-# Comando para arrancar la aplicación [cite: 208, 277]
+# Command to start the application
 CMD [ "java", "-jar", "app.jar" ]
