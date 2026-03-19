@@ -40,22 +40,22 @@ public class Inquiry {
     /** The buyer asking the question */
     @ManyToOne
     private User buyer;
-    
+
     /** Name of the product (cached from product object) */
     private String productName;
-    
+
     /** Email of the seller (cached from product.seller) */
     private String sellerEmail;
-    
+
     /** Name of the buyer (cached from buyer object) */
     private String buyerName;
-    
+
     /** Email of the buyer (cached from buyer object) */
     private String buyerEmail;
-    
+
     /** Phone number of the buyer */
     private String buyerPhone;
-    
+
     /** Type of inquiry (question, offer, complaint, etc.) */
     private String inquiryType;
 
@@ -64,7 +64,7 @@ public class Inquiry {
 
     /** When the inquiry was created */
     private LocalDateTime createdAt;
-    
+
     /** Status of inquiry: Open, Answered, Closed, etc. */
     private String status;
 

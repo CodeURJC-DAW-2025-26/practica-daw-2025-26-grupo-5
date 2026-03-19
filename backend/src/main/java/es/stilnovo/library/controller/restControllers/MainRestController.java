@@ -19,36 +19,36 @@ import es.stilnovo.library.service.MainService;
 @RequestMapping("/api/v1/catalog")
 public class MainRestController {
 
-    @Autowired
-    private MainService mainService;
+        @Autowired
+        private MainService mainService;
 
-    @Autowired
-    private ProductMapper productMapper;
+        @Autowired
+        private ProductMapper productMapper;
 
-    @Autowired
-    private UserMapper userMapper;
+        @Autowired
+        private UserMapper userMapper;
 
-    @GetMapping
-    public HomePageDTO getHomePage(
-            @RequestParam(required = false) String query,
-            @RequestParam(required = false) String category,
-            @PageableDefault(size = 10) Pageable pageable,
-            Principal principal) {
-        var homePageData = mainService.getHomePageData(
-                query,
-                category,
-                principal != null ? principal.getName() : null,
-                pageable);
+        @GetMapping
+        public HomePageDTO getHomePage(
+                        @RequestParam(required = false) String query,
+                        @RequestParam(required = false) String category,
+                        @PageableDefault(size = 10) Pageable pageable,
+                        Principal principal) {
+                var homePageData = mainService.getHomePageData(
+                                query,
+                                category,
+                                principal != null ? principal.getName() : null,
+                                pageable);
 
-        return new HomePageDTO(
-                productMapper.toDTOs(homePageData.products()),
-                productMapper.toDTOs(homePageData.recommendedProducts()),
-                homePageData.user() != null ? userMapper.toDTO(homePageData.user()) : null,
-                homePageData.logged(),
-                homePageData.admin(),
-                homePageData.query(),
-                homePageData.searching(),
-                homePageData.last(),
-                homePageData.nextOffset());
-    }
+                return new HomePageDTO(
+                                productMapper.toDTOs(homePageData.products()),
+                                productMapper.toDTOs(homePageData.recommendedProducts()),
+                                homePageData.user() != null ? userMapper.toDTO(homePageData.user()) : null,
+                                homePageData.logged(),
+                                homePageData.admin(),
+                                homePageData.query(),
+                                homePageData.searching(),
+                                homePageData.last(),
+                                homePageData.nextOffset());
+        }
 }

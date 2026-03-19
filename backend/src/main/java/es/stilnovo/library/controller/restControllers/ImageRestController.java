@@ -53,8 +53,8 @@ public class ImageRestController {
 
 	@PostMapping("/products/{productId}/image")
 	public ResponseEntity<ProductDTO> replaceProductImage(@PathVariable long productId,
-								   @RequestParam("file") MultipartFile file,
-									   Principal principal) throws IOException {
+			@RequestParam("file") MultipartFile file,
+			Principal principal) throws IOException {
 		var product = productMapper.toDTO(productService.replaceImage(productId, principal.getName(), file));
 		URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
 				.path("/api/v1/products/{productId}/image")

@@ -15,8 +15,7 @@ public class ContactSellerService {
             Product product,
             User seller,
             String buyerName,
-            String buyerEmail
-    ) {
+            String buyerEmail) {
     }
 
     @Autowired

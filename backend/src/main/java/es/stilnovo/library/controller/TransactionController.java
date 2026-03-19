@@ -22,15 +22,16 @@ public class TransactionController {
     private PaymentService paymentService;
 
     /**
-     * Processes the final confirmation of a product purchase from the web interface.
-     * This method triggers the transaction logic via the service layer, including 
+     * Processes the final confirmation of a product purchase from the web
+     * interface.
+     * This method triggers the transaction logic via the service layer, including
      * balance verification and inventory status updates.
      *
      * @param productId The unique ID of the product to be purchased.
      * @param principal The security context of the authenticated buyer.
-     * @return A redirect to the "Sales and Orders" page on success, or back to the 
-     * product detail page with an error message if the transaction fails 
-     * (e.g., due to insufficient balance or product unavailability).
+     * @return A redirect to the "Sales and Orders" page on success, or back to the
+     *         product detail page with an error message if the transaction fails
+     *         (e.g., due to insufficient balance or product unavailability).
      */
     @PostMapping("/transactions/confirm/{productId}")
     public String confirmPayment(@PathVariable long productId, Principal principal) {
@@ -42,7 +43,8 @@ public class TransactionController {
     /**
      * Renders the payment page for a specific product.
      * Includes security checks to ensure a valid transaction environment.
-     * @param id The ID of the product to purchase.
+     * 
+     * @param id        The ID of the product to purchase.
      * @param principal The security principal of the logged-in buyer.
      * @return The payment view or a redirect if validation fails.
      */

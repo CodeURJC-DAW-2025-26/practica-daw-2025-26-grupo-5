@@ -18,7 +18,7 @@ import jakarta.persistence.Lob;
  * Note: Product owns the relationship as a single @OneToOne image.
  * Used by: ImageService, ProductService
  */
-@Entity(name="ImageTable")
+@Entity(name = "ImageTable")
 public class Image {
 
     @Id
@@ -51,7 +51,7 @@ public class Image {
     public void setImageFile(Blob imageFile) {
         this.imageFile = imageFile;
     }
-    
+
     @Override
     public String toString() {
         return "Image [id=" + id + "]";

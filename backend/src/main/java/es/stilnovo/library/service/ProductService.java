@@ -35,7 +35,8 @@ import jakarta.transaction.Transactional;
  * - Personalized product recommendations based on user interactions
  * - User interaction tracking (views, likes, purchases)
  * 
- * Uses: ProductRepository, UserRepository, ImageService, UserInteractionRepository
+ * Uses: ProductRepository, UserRepository, ImageService,
+ * UserInteractionRepository
  */
 @Service
 public class ProductService {
@@ -51,7 +52,7 @@ public class ProductService {
 
     @Autowired
     private ImageService imageService;
-    
+
     /** Checks if a product exists by ID */
     public boolean exist(long id) {
         return productRepository.existsById(id);
@@ -71,7 +72,7 @@ public class ProductService {
     }
 
     /** Retrieves all products with a specific status (Active, Inactive, Sold) */
-    public List<Product> findProductsByStatus(String status){
+    public List<Product> findProductsByStatus(String status) {
         return productRepository.findByStatus(status);
     }
 
@@ -103,11 +104,12 @@ public class ProductService {
     // ALGORITHM METHODS
     public List<Product> getRecommendations(User user) {
         // STEP 1: Handle null user (anonymous browsing)
-        if (user == null) { 
-            return Collections.emptyList(); 
+        if (user == null) {
+            return Collections.emptyList();
         }
 
-        // STEP 2: Query database for recommended products based on user interaction history
+        // STEP 2: Query database for recommended products based on user interaction
+        // history
         List<Product> recommendations = productRepository.findRecommendedProducts(user.getUserId());
 
         // STEP 3: Return filtered recommendations
@@ -175,7 +177,7 @@ public class ProductService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         return user.getProducts().size();
     }
-    
+
     public List<Product> findByQueryCategory(String query) {
         // STEP 1: Handle empty query - return all products
         if (query == null || query.isEmpty()) {
@@ -185,30 +187,36 @@ public class ProductService {
         return productRepository.findByCategoryContainingIgnoreCase(query);
     }
 
-
     /**
-     * Business Logic: Retrieves the authenticated user and their associated products.
-     * Leverages the @OneToMany relationship defined in the User entity for efficient data retrieval.
+     * Business Logic: Retrieves the authenticated user and their associated
+     * products.
+     * Leverages the @OneToMany relationship defined in the User entity for
+     * efficient data retrieval.
      */
     public User getAuthenticatedUserWithProducts(String username) {
-        
-        // 1. Fetch the user from the database using the username from the Principal object
-        // This ensures that we only access the data of the currently authenticated session
+
+        // 1. Fetch the user from the database using the username from the Principal
+        // object
+        // This ensures that we only access the data of the currently authenticated
+        // session
         return userRepository.findByName(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
-
     /**
-     * Updates a product's details and image after verifying the requester's identity.
-     * Uses @Transactional to ensure the database remains consistent even if the image upload fails.
+     * Updates a product's details and image after verifying the requester's
+     * identity.
+     * Uses @Transactional to ensure the database remains consistent even if the
+     * image upload fails.
      * * @param id The ID of the product to update.
+     * 
      * @param updatedData DTO or entity containing the new text fields.
-     * @param username The name of the authenticated user from the session.
-     * @param imageFile The new image file (optional).
+     * @param username    The name of the authenticated user from the session.
+     * @param imageFile   The new image file (optional).
      */
     @Transactional
-    public void updateProductSafely(long id, Product updatedData, String username, MultipartFile imageFile) throws IOException {
+    public void updateProductSafely(long id, Product updatedData, String username, MultipartFile imageFile)
+            throws IOException {
 
         // 1. Domain Logic: Search for the original product in the database
         Product existingProduct = productRepository.findById(id)
@@ -240,13 +248,16 @@ public class ProductService {
     }
 
     /**
-     * Processes the creation of a new product and links it to the authenticated seller.
-     * @Transactional ensures that the product and its image are saved as a single atomic operation.
+     * Processes the creation of a new product and links it to the authenticated
+     * seller.
+     * 
+     * @Transactional ensures that the product and its image are saved as a single
+     *                atomic operation.
      */
     @Transactional
     public void addProduct(Principal principal, MultipartFile productPhoto,
-                                String productName, String category, String description,
-                                double price, String location, String status) throws IOException {
+            String productName, String category, String description,
+            double price, String location, String status) throws IOException {
 
         validatePositivePrice(price);
 
@@ -269,13 +280,13 @@ public class ProductService {
 
     @Transactional
     public Product createProduct(String username,
-                                    String productName,
-                                    String category,
-                                    String description,
-                                    double price,
-                                    String location,
-                                    String status,
-                                    MultipartFile productPhoto) throws IOException {
+            String productName,
+            String category,
+            String description,
+            double price,
+            String location,
+            String status,
+            MultipartFile productPhoto) throws IOException {
 
         validatePositivePrice(price);
 
@@ -323,20 +334,25 @@ public class ProductService {
     }
 
     /**
-     * Retrieves a product for editing after validating that the requester is the legitimate owner.
-     * This prevents users from accessing the edit page of products they do not own by simply changing the ID in the URL.
+     * Retrieves a product for editing after validating that the requester is the
+     * legitimate owner.
+     * This prevents users from accessing the edit page of products they do not own
+     * by simply changing the ID in the URL.
      * * @param productId The ID of the product to be edited.
+     * 
      * @param username The name of the authenticated user (from Principal).
      * @return The Product entity if found and ownership is verified.
-     * @throws ResponseStatusException 404 if product not found, 403 if ownership verification fails.
+     * @throws ResponseStatusException 404 if product not found, 403 if ownership
+     *                                 verification fails.
      */
     public Product getProductForEditing(long productId, String username) {
-        
+
         // 1. Fetch the product from the database
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
 
-        // 2. Security Check: Compare the authenticated username with the product seller's name 
+        // 2. Security Check: Compare the authenticated username with the product
+        // seller's name
         if (!product.getSeller().getName().equals(username)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to edit this product");
         }
@@ -345,18 +361,23 @@ public class ProductService {
     }
 
     /**
-     * Permanently deletes a product from the marketplace after verifying the requester's ownership.
-     * Leveraging 'CascadeType.ALL' in the Product entity, this operation also removes all 
+     * Permanently deletes a product from the marketplace after verifying the
+     * requester's ownership.
+     * Leveraging 'CascadeType.ALL' in the Product entity, this operation also
+     * removes all
      * associated images from the database.
      * * @param id The unique identifier of the product to be deleted.
-     * @param username The authenticated username (from Principal) performing the action.
-     * @throws ResponseStatusException 404 if product not found, 403 if user is not the owner. [cite: 412]
+     * 
+     * @param username The authenticated username (from Principal) performing the
+     *                 action.
+     * @throws ResponseStatusException 404 if product not found, 403 if user is not
+     *                                 the owner. [cite: 412]
      */
     @Transactional
     public void deleteProduct(Long id, String username) {
         User user = userRepository.findByName(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        
+
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
 
@@ -373,8 +394,10 @@ public class ProductService {
 
     /**
      * Prepares the public seller profile data.
-     * This method aggregates products, ratings, and calculated star counts for the UI.
+     * This method aggregates products, ratings, and calculated star counts for the
+     * UI.
      * * @param username The seller's username to fetch.
+     * 
      * @return The User entity with all associated seller data.
      */
     public User getSellerProfileData(String username) {
@@ -385,6 +408,7 @@ public class ProductService {
 
     /**
      * Calculates the number of full stars based on the user's average rating.
+     * 
      * @param user The seller entity.
      * @return The floor value of the rating.
      */
@@ -394,7 +418,7 @@ public class ProductService {
 
     public List<Product> getProductsByStatusAndPage(String status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-    
+
         // Here we call the new method combining status and pagination
         return productRepository.findByStatus(status, pageable).getContent();
     }
@@ -404,7 +428,8 @@ public class ProductService {
             return productRepository.findByStatusIgnoreCaseAndNameContainingIgnoreCase("Active", query, pageable);
         }
         if (category != null && !category.isBlank()) {
-            return productRepository.findByStatusIgnoreCaseAndCategoryContainingIgnoreCase("Active", category, pageable);
+            return productRepository.findByStatusIgnoreCaseAndCategoryContainingIgnoreCase("Active", category,
+                    pageable);
         }
         return productRepository.findByStatusIgnoreCase("Active", pageable);
     }

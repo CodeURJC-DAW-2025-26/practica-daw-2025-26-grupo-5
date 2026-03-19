@@ -41,7 +41,8 @@ public class NotificationRestController {
 	}
 
 	@PostMapping("/inquiries")
-	public ResponseEntity<NotificationResultDTO> sendInquiry(@RequestBody InquiryRequestDTO request, Principal principal) {
+	public ResponseEntity<NotificationResultDTO> sendInquiry(@RequestBody InquiryRequestDTO request,
+			Principal principal) {
 		var result = notificationService.sendInquiry(
 				request.productId(),
 				request.phone(),

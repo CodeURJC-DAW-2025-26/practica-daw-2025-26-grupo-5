@@ -48,18 +48,18 @@ public class ProductRestController {
     private MainService mainService;
 
     @Autowired
-	private ContactSellerService contactSellerService;
+    private ContactSellerService contactSellerService;
 
-	@Autowired
-	private UserMapper userMapper;
+    @Autowired
+    private UserMapper userMapper;
 
     /**
      * Retrieves a paginated list of products from the global catalog.
      * Supports filtering by search query and category.
      *
-     * @param query    Optional search string to filter by name or description.
-     * @param category Optional category name to filter products.
-     * @param pageable Pagination parameters (page, size, sort).
+     * @param query     Optional search string to filter by name or description.
+     * @param category  Optional category name to filter products.
+     * @param pageable  Pagination parameters (page, size, sort).
      * @param principal The security context of the user (optional).
      * @return PagedResponse containing product data and pagination metadata.
      */
@@ -69,10 +69,10 @@ public class ProductRestController {
             @RequestParam(required = false) String category,
             @PageableDefault(size = 10) Pageable pageable,
             Principal principal) {
-        
+
         User user = mainService.getUserContext(principal != null ? principal.getName() : null);
         CatalogPageResult page = productService.getCatalogPage(query, category, user, pageable);
-        
+
         return new PagedResponse<>(
                 productMapper.toDTOs(page.products()),
                 page.page(),
@@ -81,22 +81,26 @@ public class ProductRestController {
                 page.last());
     }
 
-
     /**
-     * Retrieves all necessary data to populate the "Contact Seller" interface for a specific product.
-     * This endpoint aggregates the product details, the seller's public information, 
-     * and the authenticated buyer's pre-filled contact data (name and email) to 
+     * Retrieves all necessary data to populate the "Contact Seller" interface for a
+     * specific product.
+     * This endpoint aggregates the product details, the seller's public
+     * information,
+     * and the authenticated buyer's pre-filled contact data (name and email) to
      * facilitate communication.
      *
-     * @param id        The unique identifier of the product the user is interested in.
-     * @param principal The security context of the authenticated user (prospective buyer).
-     * @return ContactSellerPageDTO containing the product DTO, seller DTO, and buyer's basic info.
+     * @param id        The unique identifier of the product the user is interested
+     *                  in.
+     * @param principal The security context of the authenticated user (prospective
+     *                  buyer).
+     * @return ContactSellerPageDTO containing the product DTO, seller DTO, and
+     *         buyer's basic info.
      */
     @GetMapping("/{id}/contact")
     public ContactSellerPageDTO getContactSellerData(@PathVariable long id, Principal principal) {
         // 1. Delegate business logic to fetch aggregated page data
         var pageData = contactSellerService.getContactSellerPageData(id, principal.getName());
-        
+
         // 2. Map domain entities to DTOs and return the composite object
         return new ContactSellerPageDTO(
                 productMapper.toDTO(pageData.product()),
@@ -105,7 +109,7 @@ public class ProductRestController {
                 pageData.buyerEmail());
     }
 
-    /*Private secction for user*/
+    /* Private secction for user */
     /**
      * Retrieves the authenticated user's personal inventory.
      *
@@ -131,21 +135,24 @@ public class ProductRestController {
     }
 
     /**
-     * Retrieves full product details including recommendations and tracks the visit.
-     * This method is essential for updating user statistics and providing related items.
+     * Retrieves full product details including recommendations and tracks the
+     * visit.
+     * This method is essential for updating user statistics and providing related
+     * items.
      *
      * InfoProductPage
      * 
      * @param id        Unique identifier of the product.
      * @param principal The security context of the user (optional).
-     * @return ProductDetailsDTO containing the main product, recommendations, and login status.
+     * @return ProductDetailsDTO containing the main product, recommendations, and
+     *         login status.
      * @throws ResponseStatusException 404 if the product is not found.
      */
     @GetMapping("/{id}")
     public ProductDetailsDTO getProductDetails(@PathVariable long id, Principal principal) {
         // 1. Get user context if logged in
         User user = principal != null ? mainService.getUserContext(principal.getName()) : null;
-        
+
         // 2. Fetch the main product
         Product product = productService.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
@@ -168,7 +175,7 @@ public class ProductRestController {
 
     /**
      * Creates a new product for the authenticated user.
-     * As the service returns void, the new product is retrieved from the database 
+     * As the service returns void, the new product is retrieved from the database
      * after creation to return its data.
      *
      * @param request   DTO containing product text data and multipart files.
@@ -178,9 +185,9 @@ public class ProductRestController {
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductDTO> createProduct(
-            @ModelAttribute ProductWriteRequestDTO request, 
+            @ModelAttribute ProductWriteRequestDTO request,
             Principal principal) throws IOException {
-        
+
         // 1. Trigger product creation (Service is void)
         productService.addProduct(
                 principal,
@@ -209,7 +216,7 @@ public class ProductRestController {
     }
 
     /**
-     * Updates an existing product. 
+     * Updates an existing product.
      * Performs a partial update (Merge) to prevent data loss on omitted fields.
      *
      * @param id        ID of the product to update.
@@ -229,12 +236,18 @@ public class ProductRestController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
 
         // 2. Merge logic: apply changes only if fields are present in the request
-        if (request.getName() != null) current.setName(request.getName());
-        if (request.getPrice() != null) current.setPrice(request.getPrice());
-        if (request.getDescription() != null) current.setDescription(request.getDescription());
-        if (request.getCategory() != null) current.setCategory(request.getCategory());
-        if (request.getLocation() != null) current.setLocation(request.getLocation());
-        if (request.getStatus() != null) current.setStatus(request.getStatus());
+        if (request.getName() != null)
+            current.setName(request.getName());
+        if (request.getPrice() != null)
+            current.setPrice(request.getPrice());
+        if (request.getDescription() != null)
+            current.setDescription(request.getDescription());
+        if (request.getCategory() != null)
+            current.setCategory(request.getCategory());
+        if (request.getLocation() != null)
+            current.setLocation(request.getLocation());
+        if (request.getStatus() != null)
+            current.setStatus(request.getStatus());
 
         // 3. Execute secure update via service
         productService.updateProductSafely(id, current, principal.getName(), request.getFile());

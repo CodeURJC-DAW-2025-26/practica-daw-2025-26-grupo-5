@@ -63,24 +63,24 @@ public class WebSecurityConfig {
         http.authenticationProvider(authenticationProvider());
 
         http
-            .securityMatcher("/api/v1/**")
-            .exceptionHandling(handling -> handling.authenticationEntryPoint(unauthorizedHandlerJwt));
+                .securityMatcher("/api/v1/**")
+                .exceptionHandling(handling -> handling.authenticationEntryPoint(unauthorizedHandlerJwt));
 
         http
-            .authorizeHttpRequests(authorize -> authorize
-                // Public API Endpoints
-                .requestMatchers("/api/v1/auth/**", "/api/v1/sessions/**").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll() // Sign up
-                .requestMatchers(HttpMethod.GET, 
-                    "/api/v1/catalog/**", 
-                    "/api/v1/products/**", 
-                    "/api/v1/images/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/users/*/profile").permitAll()
-                
-                // Private API Endpoints
-                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                .anyRequest().hasAnyRole("USER", "ADMIN")
-            );
+                .authorizeHttpRequests(authorize -> authorize
+                        // Public API Endpoints
+                        .requestMatchers("/api/v1/auth/**", "/api/v1/sessions/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll() // Sign up
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/v1/catalog/**",
+                                "/api/v1/products/**",
+                                "/api/v1/images/**")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/*/profile").permitAll()
+
+                        // Private API Endpoints
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        .anyRequest().hasAnyRole("USER", "ADMIN"));
 
         // REST Security best practices
         http.formLogin(form -> form.disable());
@@ -105,35 +105,32 @@ public class WebSecurityConfig {
         http.authenticationProvider(authenticationProvider());
 
         http
-            .authorizeHttpRequests(authorize -> authorize
-                // Public Web Pages
-                .requestMatchers("/", "/error", "/banned").permitAll()
-                .requestMatchers("/css/**", "/javascript/**", "/images/**", "/favicon.ico").permitAll()
-                .requestMatchers("/login-page", "/login-error", "/signup-page").permitAll()
-                .requestMatchers("/product-images/**", "/info-product-page/**", "/about-page/**").permitAll()
-                .requestMatchers("/user/me/profile-photo", "/load-more-products").permitAll()
+                .authorizeHttpRequests(authorize -> authorize
+                        // Public Web Pages
+                        .requestMatchers("/", "/error", "/banned").permitAll()
+                        .requestMatchers("/css/**", "/javascript/**", "/images/**", "/favicon.ico").permitAll()
+                        .requestMatchers("/login-page", "/login-error", "/signup-page").permitAll()
+                        .requestMatchers("/product-images/**", "/info-product-page/**", "/about-page/**").permitAll()
+                        .requestMatchers("/user/me/profile-photo", "/load-more-products").permitAll()
 
-                // OpenAPI / Swagger Documentation 
-                .requestMatchers("/v3/api-docs*/**").permitAll()
-                .requestMatchers("/swagger-ui.html").permitAll()
-                .requestMatchers("/swagger-ui/**").permitAll()
+                        // OpenAPI / Swagger Documentation
+                        .requestMatchers("/v3/api-docs*/**").permitAll()
+                        .requestMatchers("/swagger-ui.html").permitAll()
+                        .requestMatchers("/swagger-ui/**").permitAll()
 
-                // Private Web Pages
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .anyRequest().hasAnyRole("USER", "ADMIN")
-            )
-            .formLogin(form -> form
-                .loginPage("/login-page")
-                .failureUrl("/login-error")
-                .failureHandler(failureHandler)
-                .defaultSuccessUrl("/", true)
-                .permitAll()
-            )
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/")
-                .permitAll()
-            );
+                        // Private Web Pages
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().hasAnyRole("USER", "ADMIN"))
+                .formLogin(form -> form
+                        .loginPage("/login-page")
+                        .failureUrl("/login-error")
+                        .failureHandler(failureHandler)
+                        .defaultSuccessUrl("/", true)
+                        .permitAll())
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/")
+                        .permitAll());
 
         return http.build();
     }

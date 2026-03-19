@@ -22,8 +22,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.util.NumberFormattingUtils;
 
-
-
 /**
  * AdminController: Handles all administrative panel operations
  * 
@@ -50,8 +48,6 @@ public class AdminController {
 
     @Autowired
     private ProductService productService;
-
-    
 
     /**
      * Displays the main admin dashboard with system statistics
@@ -118,12 +114,12 @@ public class AdminController {
 
     @PostMapping("/users/edit/{id}")
     public String updateUserAsAdmin(@PathVariable Long id,
-                                    @RequestParam(required = false) MultipartFile newProfilePhoto,
-                                    @RequestParam(required = false) String newEmail,
-                                    @RequestParam(required = false) String newCardNumber,
-                                    @RequestParam(required = false) String newCardCvv,
-                                    @RequestParam(required = false) String newCardExpiringDate,
-                                    @RequestParam(required = false) String newDescription) throws IOException {
+            @RequestParam(required = false) MultipartFile newProfilePhoto,
+            @RequestParam(required = false) String newEmail,
+            @RequestParam(required = false) String newCardNumber,
+            @RequestParam(required = false) String newCardCvv,
+            @RequestParam(required = false) String newCardExpiringDate,
+            @RequestParam(required = false) String newDescription) throws IOException {
 
         adminService.updateUserAsAdmin(id, newProfilePhoto, newEmail,
                 newCardNumber, newCardCvv, newCardExpiringDate, newDescription);
@@ -137,7 +133,8 @@ public class AdminController {
      */
     @GetMapping("/global-inventory")
     public String showGlobalInventory(Model model, HttpServletRequest request) {
-        model.addAttribute("products", adminService.getInventoryPage(org.springframework.data.domain.Pageable.unpaged()).getContent());
+        model.addAttribute("products",
+                adminService.getInventoryPage(org.springframework.data.domain.Pageable.unpaged()).getContent());
         model.addAttribute("allUsers", userService.findAll());
 
         CsrfToken csrf = (CsrfToken) request.getAttribute("_csrf");
@@ -150,17 +147,17 @@ public class AdminController {
 
     @PostMapping("/products/add")
     public String createProductAsAdmin(@RequestParam Long sellerId,
-                                        @RequestParam("productPhotos") MultipartFile productPhoto,
-                                        @RequestParam String productName,
-                                        @RequestParam String category,
-                                        @RequestParam String description,
-                                        @RequestParam double price,
-                                        @RequestParam String location,
-                                        @RequestParam(defaultValue = "Active") String status) throws IOException {
-        adminService.createProductAsAdmin(sellerId, productName, category, description, price, location, status, productPhoto);
+            @RequestParam("productPhotos") MultipartFile productPhoto,
+            @RequestParam String productName,
+            @RequestParam String category,
+            @RequestParam String description,
+            @RequestParam double price,
+            @RequestParam String location,
+            @RequestParam(defaultValue = "Active") String status) throws IOException {
+        adminService.createProductAsAdmin(sellerId, productName, category, description, price, location, status,
+                productPhoto);
         return "redirect:/admin/global-inventory";
     }
-
 
     /**
      * Permanently deletes a user account from the system
@@ -174,7 +171,6 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-
     @GetMapping("/transactions")
     public String showTransactions(Model model, HttpServletRequest request) { // Add the request here
         var transactionsData = adminService.getAdminTransactionsData();
@@ -183,17 +179,16 @@ public class AdminController {
         model.addAttribute("formattedTotalRevenue", formatInt(transactionsData.totalRevenue()));
         model.addAttribute("formattedNumTransactions", formatInt(transactionsData.numTransactions()));
         model.addAttribute("globalTransactions", transactionsData.globalTransactions());
-        
+
         return "admin-global-transac-page";
     }
 
     @PostMapping("/transactions/delete/{id}")
     public String deleteTransaction(@PathVariable Long id) {
         adminService.deleteTransaction(id);
-        
+
         return "redirect:/admin/transactions";
     }
-    
 
     // Ban / Unban user (toggle)
     @PostMapping("/users/ban/{id}")
@@ -242,12 +237,13 @@ public class AdminController {
 
     /**
      * Updates an existing product's details.
-     * The imageField is optional to allow editing text fields without re-uploading photos.
+     * The imageField is optional to allow editing text fields without re-uploading
+     * photos.
      */
     @PostMapping("/products/edit/{id}")
     public String updateProductAsAdmin(@PathVariable long id,
-                                    Product updatedProduct,
-                                    @RequestParam MultipartFile imageField) throws IOException {
+            Product updatedProduct,
+            @RequestParam MultipartFile imageField) throws IOException {
 
         // Delegate update logic to AdminService
         adminService.updateProductAsAdmin(id, updatedProduct, imageField);

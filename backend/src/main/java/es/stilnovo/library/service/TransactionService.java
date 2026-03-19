@@ -53,7 +53,6 @@ public class TransactionService {
     @Autowired
     private ResourceLoader resourceLoader;
 
-
     /**
      * Executes the business logic for a purchase.
      * Updates product status and creates a permanent transaction record.
@@ -67,11 +66,10 @@ public class TransactionService {
 
         // STEP 2: Create transaction record with buyer, seller, and product details
         Transaction transaction = new Transaction(
-            product.getSeller(),
-            buyer,
-            product,
-            "Completed"
-        );
+                product.getSeller(),
+                buyer,
+                product,
+                "Completed");
 
         // STEP 3: Calculate new seller financial balance
         User seller = product.getSeller();
@@ -81,7 +79,7 @@ public class TransactionService {
 
         sellerBalance += productPrice;
         sellerTotalRevenue += productPrice;
-        
+
         // STEP 4: Persist updated seller financial information
         seller.setBalance(sellerBalance);
         seller.setTotalRevenue(sellerTotalRevenue);
@@ -132,12 +130,13 @@ public class TransactionService {
      * Calculates financial breakdown for payment invoice (VAT, fees, total)
      * VAT rate: 21%, Service fee: 1%
      */
-    public record InvoiceBreakdown(double base, double fees, double vat, double total) {}
+    public record InvoiceBreakdown(double base, double fees, double vat, double total) {
+    }
 
     public InvoiceBreakdown calculateInvoiceBreakdown(double finalPrice) {
         double base = finalPrice;
-        double vat = base * 0.21;      // 21% VAT
-        double fees = base * 0.01;     // 1% Stilnovo service fee
+        double vat = base * 0.21; // 21% VAT
+        double fees = base * 0.01; // 1% Stilnovo service fee
         double total = base + fees + vat;
         return new InvoiceBreakdown(base, fees, vat, total);
     }
@@ -145,65 +144,71 @@ public class TransactionService {
     /**
      * Gets a transaction if the current user is either the buyer or seller.
      * Used for Invoice generation (both parties can see it).
+     * 
      * @param transactionId The ID of the transaction
-     * @param username The authenticated username from Principal
+     * @param username      The authenticated username from Principal
      * @return The transaction if user has access
-     * @throws IllegalStateException if user is not involved or transaction not found
+     * @throws IllegalStateException if user is not involved or transaction not
+     *                               found
      */
     public Transaction getTransactionForInvolvedUser(long transactionId, String username) {
         Transaction transaction = transactionRepository.findById(transactionId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
-        
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
+
         boolean isBuyer = transaction.getBuyer().getName().equals(username);
         boolean isSeller = transaction.getSeller().getName().equals(username);
-        
+
         if (!isBuyer && !isSeller) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
-        
+
         return transaction;
     }
 
     /**
      * Gets a transaction if the current user is the seller.
      * Used for Shipping Label generation (only seller can generate it).
+     * 
      * @param transactionId The ID of the transaction
-     * @param username The authenticated username from Principal
+     * @param username      The authenticated username from Principal
      * @return The transaction if user is the seller
-     * @throws IllegalStateException if user is not the seller or transaction not found
+     * @throws IllegalStateException if user is not the seller or transaction not
+     *                               found
      */
     public Transaction getTransactionForSeller(long transactionId, String username) {
         Transaction transaction = transactionRepository.findById(transactionId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
-        
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
+
         if (!transaction.getSeller().getName().equals(username)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied");
         }
-        
+
         return transaction;
     }
 
     /**
      * Gets all transactions where the user is the seller.
      * Used for statistics and reports (secure via Principal-based username).
+     * 
      * @param username The authenticated username from Principal
      * @return List of transactions where this user is the seller
      */
     public List<Transaction> getSellerTransactions(String username) {
         User seller = userRepository.findByName(username)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
         return transactionRepository.findBySeller(seller);
     }
 
     public Page<Transaction> getSellerTransactions(String username, Pageable pageable) {
         User seller = userRepository.findByName(username)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         return transactionRepository.findBySeller(seller, pageable);
     }
 
     /**
      * This method returns all the transactions at the moment.
+     * 
      * @return a list of transactions
      */
     public List<Transaction> getAllTransactions() {
@@ -212,6 +217,7 @@ public class TransactionService {
 
     /**
      * This method returns the totalRevenue of Stilnovo
+     * 
      * @return the totalRevenue of earnings
      */
     public int getTotalRevenue() {
@@ -305,61 +311,63 @@ public class TransactionService {
     private String createPurchaseConfirmationEmail(String productName, Double price,
             String sellerName, String buyerName, String logoCid) {
         return """
-            <!DOCTYPE html>
-            <html>
-            <body style="margin: 0; padding: 0; background-color: #f4f7f6;">
-                <div style="font-family: Arial, sans-serif; color: #1a1f2e; max-width: 600px; margin: 20px auto; border: 1px solid #e6e9f2; border-radius: 16px; background-color: #ffffff; overflow: hidden;">
-                    <div style="background-color: #ffffff; padding: 30px; text-align: center; border-bottom: 1px solid #f0f0f0;">
-                        <img src="cid:%s" alt="Stilnovo" width="60" style="display: block; margin: 0 auto;">
-                        <h1 style="color: #2f6ced; margin: 15px 0 0; font-size: 24px;">Purchase Successful!</h1>
-                    </div>
-                    <div style="padding: 30px;">
-                        <p style="font-size: 16px;">Congratulations %s! Your purchase has been confirmed.</p>
-                        <h2 style="margin: 10px 0; font-size: 20px; color: #1a1f2e;">%s</h2>
-                        
-                        <div style="background-color: #eef4ff; padding: 20px; border-radius: 12px; margin: 25px 0;">
-                            <p style="margin: 0 0 10px 0; font-weight: bold; color: #2f6ced;">Purchase Details:</p>
-                            <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 1.8;">
-                                <li><strong>Price:</strong> €%.2f</li>
-                                <li><strong>Seller:</strong> %s</li>
-                                <li><strong>Status:</strong> Completed</li>
-                            </ul>
+                <!DOCTYPE html>
+                <html>
+                <body style="margin: 0; padding: 0; background-color: #f4f7f6;">
+                    <div style="font-family: Arial, sans-serif; color: #1a1f2e; max-width: 600px; margin: 20px auto; border: 1px solid #e6e9f2; border-radius: 16px; background-color: #ffffff; overflow: hidden;">
+                        <div style="background-color: #ffffff; padding: 30px; text-align: center; border-bottom: 1px solid #f0f0f0;">
+                            <img src="cid:%s" alt="Stilnovo" width="60" style="display: block; margin: 0 auto;">
+                            <h1 style="color: #2f6ced; margin: 15px 0 0; font-size: 24px;">Purchase Successful!</h1>
+                        </div>
+                        <div style="padding: 30px;">
+                            <p style="font-size: 16px;">Congratulations %s! Your purchase has been confirmed.</p>
+                            <h2 style="margin: 10px 0; font-size: 20px; color: #1a1f2e;">%s</h2>
+
+                            <div style="background-color: #eef4ff; padding: 20px; border-radius: 12px; margin: 25px 0;">
+                                <p style="margin: 0 0 10px 0; font-weight: bold; color: #2f6ced;">Purchase Details:</p>
+                                <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 1.8;">
+                                    <li><strong>Price:</strong> €%.2f</li>
+                                    <li><strong>Seller:</strong> %s</li>
+                                    <li><strong>Status:</strong> Completed</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </body>
-            </html>
-            """.formatted(logoCid, escape(buyerName), escape(productName), price, escape(sellerName));
+                </body>
+                </html>
+                """
+                .formatted(logoCid, escape(buyerName), escape(productName), price, escape(sellerName));
     }
 
     private String createSellerSaleNotificationEmail(String productName, Double price,
             String buyerName, String buyerEmail, String logoCid) {
         return """
-            <!DOCTYPE html>
-            <html>
-            <body style="margin: 0; padding: 0; background-color: #f4f7f6;">
-                <div style="font-family: Arial, sans-serif; color: #1a1f2e; max-width: 600px; margin: 20px auto; border: 1px solid #e6e9f2; border-radius: 16px; background-color: #ffffff; overflow: hidden;">
-                    <div style="background-color: #ffffff; padding: 30px; text-align: center; border-bottom: 1px solid #f0f0f0;">
-                        <img src="cid:%s" alt="Stilnovo" width="60" style="display: block; margin: 0 auto;">
-                        <h1 style="color: #2f6ced; margin: 15px 0 0; font-size: 24px;">Great News! Product Sold!</h1>
-                    </div>
-                    <div style="padding: 30px;">
-                        <p style="font-size: 16px;">Excellent work! Your product has been purchased by a buyer.</p>
-                        <h2 style="margin: 10px 0; font-size: 20px; color: #1a1f2e;">%s</h2>
-                        
-                        <div style="background-color: #eef4ff; padding: 20px; border-radius: 12px; margin: 25px 0;">
-                            <p style="margin: 0 0 10px 0; font-weight: bold; color: #2f6ced;">Sale Details:</p>
-                            <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 1.8;">
-                                <li><strong>Sale Price:</strong> €%.2f</li>
-                                <li><strong>Buyer Name:</strong> %s</li>
-                                <li><strong>Buyer Email:</strong> %s</li>
-                            </ul>
+                <!DOCTYPE html>
+                <html>
+                <body style="margin: 0; padding: 0; background-color: #f4f7f6;">
+                    <div style="font-family: Arial, sans-serif; color: #1a1f2e; max-width: 600px; margin: 20px auto; border: 1px solid #e6e9f2; border-radius: 16px; background-color: #ffffff; overflow: hidden;">
+                        <div style="background-color: #ffffff; padding: 30px; text-align: center; border-bottom: 1px solid #f0f0f0;">
+                            <img src="cid:%s" alt="Stilnovo" width="60" style="display: block; margin: 0 auto;">
+                            <h1 style="color: #2f6ced; margin: 15px 0 0; font-size: 24px;">Great News! Product Sold!</h1>
+                        </div>
+                        <div style="padding: 30px;">
+                            <p style="font-size: 16px;">Excellent work! Your product has been purchased by a buyer.</p>
+                            <h2 style="margin: 10px 0; font-size: 20px; color: #1a1f2e;">%s</h2>
+
+                            <div style="background-color: #eef4ff; padding: 20px; border-radius: 12px; margin: 25px 0;">
+                                <p style="margin: 0 0 10px 0; font-weight: bold; color: #2f6ced;">Sale Details:</p>
+                                <ul style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 1.8;">
+                                    <li><strong>Sale Price:</strong> €%.2f</li>
+                                    <li><strong>Buyer Name:</strong> %s</li>
+                                    <li><strong>Buyer Email:</strong> %s</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </body>
-            </html>
-            """.formatted(logoCid, escape(productName), price, escape(buyerName), escape(buyerEmail));
+                </body>
+                </html>
+                """
+                .formatted(logoCid, escape(productName), price, escape(buyerName), escape(buyerEmail));
     }
 
     private String escape(String value) {

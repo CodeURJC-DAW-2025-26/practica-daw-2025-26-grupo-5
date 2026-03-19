@@ -15,7 +15,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.engine.jdbc.proxy.BlobProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -46,6 +45,7 @@ import es.stilnovo.library.dto.UserDashboardDataDTO;
 import es.stilnovo.library.dto.SellerProfilePageDataDTO;
 import es.stilnovo.library.dto.UserStatisticsDataDTO;
 import es.stilnovo.library.util.NumberFormattingUtils;
+
 /**
  * UserService: Manages all user-related operations
  * 
@@ -60,7 +60,6 @@ import es.stilnovo.library.util.NumberFormattingUtils;
  */
 @Service
 public class UserService {
-
 
     @Autowired
     private UserRepository userRepository;
@@ -103,11 +102,11 @@ public class UserService {
     public Optional<User> findById(long id) {
         return userRepository.findById(id);
     }
-    
+
     public List<User> findAll() {
         return userRepository.findAll();
     }
-    
+
     public boolean existsUser(String name) {
         return userRepository.findByName(name).isPresent();
     }
@@ -133,12 +132,12 @@ public class UserService {
 
         // STEP 2: Fetch all ratings/reviews for this seller
         java.util.List<Valoration> valorations = valorationRepository.findBySeller(seller);
-        
+
         // STEP 3: Handle case where seller has no ratings yet
         if (valorations.isEmpty()) {
             return 0.0;
         }
-        
+
         // STEP 4: Calculate and return average star rating
         return valorations.stream()
                 .mapToInt(Valoration::getStars)
@@ -147,21 +146,25 @@ public class UserService {
     }
 
     /**
-     * Updates the profile settings and billing information for the authenticated user.
-     * This method handles optional profile picture uploads and performs partial updates.
-     * * @param username The name of the authenticated user from the Security Context.
-     * @param newProfilePhoto Optional MultipartFile containing the new avatar.
-     * @param email New email address (if provided).
-     * @param cardNumber New credit card number for billing.
-     * @param cardCvv New CVV security code.
+     * Updates the profile settings and billing information for the authenticated
+     * user.
+     * This method handles optional profile picture uploads and performs partial
+     * updates.
+     * * @param username The name of the authenticated user from the Security
+     * Context.
+     * 
+     * @param newProfilePhoto  Optional MultipartFile containing the new avatar.
+     * @param email            New email address (if provided).
+     * @param cardNumber       New credit card number for billing.
+     * @param cardCvv          New CVV security code.
      * @param cardExpiringDate New expiration date (MM/YY).
-     * @param description New profile description.
+     * @param description      New profile description.
      * @throws IOException If there is an error processing the image stream.
      */
     @Transactional
-    public void updateUserSettings(String username, MultipartFile newProfilePhoto, String email, 
-                                String cardNumber, String cardCvv, String cardExpiringDate, 
-                                String description) throws IOException {
+    public void updateUserSettings(String username, MultipartFile newProfilePhoto, String email,
+            String cardNumber, String cardCvv, String cardExpiringDate,
+            String description) throws IOException {
 
         // 1. Domain Logic: Fetch the managed entity from the database
         User user = userRepository.findByName(username)
@@ -170,19 +173,24 @@ public class UserService {
         // 2. Image Processing: Update profile photo if a new one is provided
         if (newProfilePhoto != null && !newProfilePhoto.isEmpty()) {
             user.setProfileImage(BlobProxy.generateProxy(
-                newProfilePhoto.getInputStream(), 
-                newProfilePhoto.getSize()
-            )); 
+                    newProfilePhoto.getInputStream(),
+                    newProfilePhoto.getSize()));
         }
 
         // 3. Conditional Updates: Only update fields that are not empty
-        if (email != null && !email.trim().isEmpty()) user.setEmail(email);
-        if (cardNumber != null && !cardNumber.trim().isEmpty()) user.setCardNumber(cardNumber);
-        if (cardCvv != null && !cardCvv.trim().isEmpty()) user.setCardCvv(cardCvv);
-        if (cardExpiringDate != null && !cardExpiringDate.trim().isEmpty()) user.setCardExpiringDate(cardExpiringDate);
-        if (description != null && !description.trim().isEmpty()) user.setUserDescription(description);
+        if (email != null && !email.trim().isEmpty())
+            user.setEmail(email);
+        if (cardNumber != null && !cardNumber.trim().isEmpty())
+            user.setCardNumber(cardNumber);
+        if (cardCvv != null && !cardCvv.trim().isEmpty())
+            user.setCardCvv(cardCvv);
+        if (cardExpiringDate != null && !cardExpiringDate.trim().isEmpty())
+            user.setCardExpiringDate(cardExpiringDate);
+        if (description != null && !description.trim().isEmpty())
+            user.setUserDescription(description);
 
-        // 4. Persistence: The @Transactional annotation will automatically flush changes to the DB
+        // 4. Persistence: The @Transactional annotation will automatically flush
+        // changes to the DB
         userRepository.save(user);
     }
 
@@ -237,35 +245,43 @@ public class UserService {
 
     /**
      * Deletes the currently authenticated user based on their username.
+     * 
      * @param username The username of the user performing self-deletion.
      */
     @Transactional
     public void deleteUserSelf(String username) {
         User user = userRepository.findByName(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        
+
         // We reuse the logic by calling the ID-based method
         deleteUserById(user.getUserId());
     }
 
     /**
      * Retrieves the full profile of the authenticated user.
-     * This is used to populate settings and profile views with complete JPA entity data.
+     * This is used to populate settings and profile views with complete JPA entity
+     * data.
+     * 
      * @param username The unique identity string from the Principal object.
      * @return The complete User entity including billing and profile details.
      */
     public User getFullUserProfile(String username) {
-        // We fetch the full entity to ensure fields like email, description, and balance are available 
+        // We fetch the full entity to ensure fields like email, description, and
+        // balance are available
         return userRepository.findByName(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User profile not found"));
     }
-    
+
     /**
      * Retrieves the profile photo of a user as a Resource using their username.
-     * This method is @Transactional to allow the Blob binary stream to be read from the database.
+     * This method is @Transactional to allow the Blob binary stream to be read from
+     * the database.
      * * @param username The unique name of the user whose photo is requested.
-     * @return A Resource containing the image bytes or a default "no-profile-picture" placeholder.
-     * @throws SQLException If there's an error reading the Blob stream from the database.
+     * 
+     * @return A Resource containing the image bytes or a default
+     *         "no-profile-picture" placeholder.
+     * @throws SQLException If there's an error reading the Blob stream from the
+     *                      database.
      */
     @Transactional(readOnly = true)
     public Resource getProfilePhotoResourceByUsername(String username) throws SQLException {
@@ -279,22 +295,29 @@ public class UserService {
      * Fetches the profile photo resource using the internal User ID.
      * Ideal for public profiles where the internal identifier is used in the URL.
      * * @param id The internal database ID of the user.
-     * @return A Resource containing the image bytes or a default "no-profile-picture" placeholder.
-     * @throws SQLException If there's an error reading the Blob stream from the database.
+     * 
+     * @return A Resource containing the image bytes or a default
+     *         "no-profile-picture" placeholder.
+     * @throws SQLException If there's an error reading the Blob stream from the
+     *                      database.
      */
     @Transactional(readOnly = true)
     public Resource getProfilePhotoResourceById(Long id) throws SQLException {
         User user = userRepository.findById(id)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
         return getResourceFromUser(user);
     }
 
     /**
-     * Internal helper to convert a User's profile image Blob into a Spring Resource.
-     * If the image is null, it provides a consistent fallback to the default avatar.
+     * Internal helper to convert a User's profile image Blob into a Spring
+     * Resource.
+     * If the image is null, it provides a consistent fallback to the default
+     * avatar.
      * * @param user The managed User entity.
-     * @return A streamable InputStreamResource or a ClassPathResource for the fallback.
+     * 
+     * @return A streamable InputStreamResource or a ClassPathResource for the
+     *         fallback.
      * @throws SQLException If the Blob binary stream cannot be accessed.
      */
     private Resource getResourceFromUser(User user) throws SQLException {
@@ -331,20 +354,25 @@ public class UserService {
     }
 
     /**
-     * Processes and aggregates all sales and orders data for the authenticated user.
-     * It dynamically checks if each purchase has been rated to update the UI buttons.
-     * * @param username The name of the authenticated user from the Security Context.
-     * @param transactionId Optional ID of the transaction to display in the detail view.
+     * Processes and aggregates all sales and orders data for the authenticated
+     * user.
+     * It dynamically checks if each purchase has been rated to update the UI
+     * buttons.
+     * * @param username The name of the authenticated user from the Security
+     * Context.
+     * 
+     * @param transactionId Optional ID of the transaction to display in the detail
+     *                      view.
      * @return A Map containing lists of transactions and UI state flags.
      */
     @Transactional(readOnly = true)
     public Map<String, Object> getSalesAndOrdersDashboard(String username, Long transactionId) {
         Map<String, Object> data = new HashMap<>();
-        
+
         // 1. Context: Fetch the user and their specific history
         User user = userRepository.findByName(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        
+
         List<Transaction> sales = transactionRepository.findBySellerUserId(user.getUserId());
         List<Transaction> orders = transactionRepository.findByBuyerUserId(user.getUserId());
 
@@ -361,7 +389,7 @@ public class UserService {
                     .filter(t -> t.getSeller().getName().equals(username) || t.getBuyer().getName().equals(username))
                     .orElse(null);
         }
-        
+
         // Default to the most recent sale if no specific transaction is selected
         if (selected == null && !sales.isEmpty()) {
             selected = sales.get(0);
@@ -373,40 +401,39 @@ public class UserService {
         data.put("selectedTransaction", selected);
         data.put("hasSales", !sales.isEmpty());
         data.put("hasOrders", !orders.isEmpty());
-        data.put("shippingAddress", (selected != null) ? selected.getProduct().getLocation() : "No shipping data available");
+        data.put("shippingAddress",
+                (selected != null) ? selected.getProduct().getLocation() : "No shipping data available");
 
         return data;
-    } 
+    }
 
-        public UserDashboardDataDTO getUserDashboardData(String username) {
-            User user = getFullUserProfile(username);
-            List<Transaction> sales = transactionRepository.findBySellerUserId(user.getUserId());
-            Map<String, Long> salesByCategory = getSalesByCategory(sales);
-            List<String> monthLabels = getMonthLabels();
-            List<Double> monthlyRevenues = getRevenueByMonth(sales);
-            BarChartData chartData = getBarChartData(user);
-            List<String> barLabels = chartData.labels();
-            List<Long> visitsData = barLabels.stream()
+    public UserDashboardDataDTO getUserDashboardData(String username) {
+        User user = getFullUserProfile(username);
+        List<Transaction> sales = transactionRepository.findBySellerUserId(user.getUserId());
+        Map<String, Long> salesByCategory = getSalesByCategory(sales);
+        List<String> monthLabels = getMonthLabels();
+        List<Double> monthlyRevenues = getRevenueByMonth(sales);
+        BarChartData chartData = getBarChartData(user);
+        List<String> barLabels = chartData.labels();
+        List<Long> visitsData = barLabels.stream()
                 .map(cat -> chartData.visitsByCategory().getOrDefault(cat, 0L))
                 .toList();
-            List<Long> interestData = barLabels.stream()
+        List<Long> interestData = barLabels.stream()
                 .map(cat -> chartData.interestByCategory().getOrDefault(cat, 0L))
                 .toList();
 
-
-            return new UserDashboardDataDTO(
-                    user,
-                    getFormattedDate(),
-                    sales,
-                    new ArrayList<>(salesByCategory.keySet()), 
-                    new ArrayList<>(salesByCategory.values()), 
-                    monthLabels,
-                    monthlyRevenues,
-                    barLabels,
-                    visitsData,
-                    interestData
-                );
-        }
+        return new UserDashboardDataDTO(
+                user,
+                getFormattedDate(),
+                sales,
+                new ArrayList<>(salesByCategory.keySet()),
+                new ArrayList<>(salesByCategory.values()),
+                monthLabels,
+                monthlyRevenues,
+                barLabels,
+                visitsData,
+                interestData);
+    }
 
     @Transactional(readOnly = true)
     public UserStatisticsDataDTO getUserStatisticsData(String username) {
@@ -416,20 +443,19 @@ public class UserService {
         double avgRating = getAverageRatingForSeller(username);
 
         return new UserStatisticsDataDTO(
-            dashboardData.user(),
-            NumberFormattingUtils.formatMoney(totalSales),
-            transactions.size(),
-            String.format("%.1f", avgRating),
-            NumberFormattingUtils.formatMoney(calculateInventoryValue(username)),
-            dashboardData.date(),
-            dashboardData.chartLabels(),
-            dashboardData.chartValues(),
-            dashboardData.revenueLabels(),
-            dashboardData.revenueValues(),
-            dashboardData.barLabels(),
-            dashboardData.visitsData(),
-            dashboardData.interestData()
-        );
+                dashboardData.user(),
+                NumberFormattingUtils.formatMoney(totalSales),
+                transactions.size(),
+                String.format("%.1f", avgRating),
+                NumberFormattingUtils.formatMoney(calculateInventoryValue(username)),
+                dashboardData.date(),
+                dashboardData.chartLabels(),
+                dashboardData.chartValues(),
+                dashboardData.revenueLabels(),
+                dashboardData.revenueValues(),
+                dashboardData.barLabels(),
+                dashboardData.visitsData(),
+                dashboardData.interestData());
     }
 
     public double calculateInventoryValue(String username) {
@@ -458,19 +484,19 @@ public class UserService {
 
     public Map<String, Long> getSalesByCategory(List<Transaction> transactions) {
         return transactions.stream()
-            .collect(Collectors.groupingBy(
-                t -> t.getProduct().getCategory(), 
-                Collectors.counting()  
-            ));
+                .collect(Collectors.groupingBy(
+                        t -> t.getProduct().getCategory(),
+                        Collectors.counting()));
     }
-    
+
     public List<String> getMonthLabels() {
         return List.of("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
     }
 
     public List<Double> getRevenueByMonth(List<Transaction> transactions) {
-        Map<Integer, Double> revenueByMonth = new TreeMap<>(); 
-        for (int i = 1; i <= 12; i++) revenueByMonth.put(i, 0.0);
+        Map<Integer, Double> revenueByMonth = new TreeMap<>();
+        for (int i = 1; i <= 12; i++)
+            revenueByMonth.put(i, 0.0);
 
         for (Transaction t : transactions) {
             if (t.getCreatedAt() != null) {
@@ -483,10 +509,10 @@ public class UserService {
     }
 
     private record BarChartData(
-        List<String> labels,
-        Map<String, Long> visitsByCategory,
-        Map<String, Long> interestByCategory
-    ) {}
+            List<String> labels,
+            Map<String, Long> visitsByCategory,
+            Map<String, Long> interestByCategory) {
+    }
 
     public BarChartData getBarChartData(User user) {
         List<UserInteraction> sellerInteractions = interactionRepository.findByProductSeller(user);
@@ -497,8 +523,9 @@ public class UserService {
         for (UserInteraction interaction : sellerInteractions) {
             String category = interaction.getProduct().getCategory();
             allCategories.add(category);
-            
-            // If it's a VIEW, it counts as a visit; if it's a LIKE or BUY, it counts as interest
+
+            // If it's a VIEW, it counts as a visit; if it's a LIKE or BUY, it counts as
+            // interest
             if (interaction.getType() == UserInteraction.InteractionType.VIEW) {
                 visitsByCategory.put(category, visitsByCategory.getOrDefault(category, 0L) + 1);
             } else {
@@ -518,14 +545,6 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
-    private String toJson(Object value) {
-        try {
-            return new ObjectMapper().writeValueAsString(value);
-        } catch (Exception exception) {
-            return "[]";
-        }
-    }
-
     @Transactional
     public void deleteProfilePhotoByUsername(String username) {
         User user = userRepository.findByName(username)
@@ -536,9 +555,11 @@ public class UserService {
         userRepository.save(user);
     }
 
-/**.
+    /**
+     * .
+     * 
      * @param username The name of the authenticated user
-     * @param file File of the new profile photo
+     * @param file     File of the new profile photo
      * @throws IOException If it happens an error read the content of the file
      */
     @Transactional
@@ -550,9 +571,8 @@ public class UserService {
         // 2. Validate if the file is null or is empty
         if (file != null && !file.isEmpty()) {
             user.setProfileImage(BlobProxy.generateProxy(
-                file.getInputStream(), 
-                file.getSize()
-            ));
+                    file.getInputStream(),
+                    file.getSize()));
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The file must not be empty or to be null");
         }

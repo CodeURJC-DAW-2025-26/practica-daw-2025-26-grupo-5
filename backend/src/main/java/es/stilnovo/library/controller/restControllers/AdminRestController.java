@@ -65,7 +65,8 @@ public class AdminRestController {
 	@GetMapping("/users")
 	public PagedResponse<UserDTO> getUsers(@PageableDefault(size = 10) Pageable pageable) {
 		var page = adminService.getUsersPage(pageable);
-		return new PagedResponse<>(userMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(), page.getTotalElements(), page.isLast());
+		return new PagedResponse<>(userMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(),
+				page.getTotalElements(), page.isLast());
 	}
 
 	@PatchMapping("/users/{id}")
@@ -81,7 +82,8 @@ public class AdminRestController {
 	@GetMapping("/products")
 	public PagedResponse<ProductDTO> getProducts(@PageableDefault(size = 10) Pageable pageable) {
 		var page = adminService.getInventoryPage(pageable);
-		return new PagedResponse<>(productMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(), page.getTotalElements(), page.isLast());
+		return new PagedResponse<>(productMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(),
+				page.getTotalElements(), page.isLast());
 	}
 
 	@DeleteMapping("/products/{id}")
@@ -92,7 +94,8 @@ public class AdminRestController {
 	@GetMapping("/transactions")
 	public PagedResponse<TransactionDTO> getTransactions(@PageableDefault(size = 10) Pageable pageable) {
 		var page = adminService.getTransactionsPage(pageable);
-		return new PagedResponse<>(transactionMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(), page.getTotalElements(), page.isLast());
+		return new PagedResponse<>(transactionMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(),
+				page.getTotalElements(), page.isLast());
 	}
 
 	@DeleteMapping("/transactions/{id}")
@@ -100,10 +103,11 @@ public class AdminRestController {
 		transactionService.deleteTransaction(id);
 	}
 
-	@GetMapping("/reviews")
+	@GetMapping("/reviews") // cambia esto por valoration y no reviews
 	public PagedResponse<ValorationDTO> getValorations(@PageableDefault(size = 10) Pageable pageable) {
 		var page = adminService.getValorationsPage(pageable);
-		return new PagedResponse<>(valorationMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(), page.getTotalElements(), page.isLast());
+		return new PagedResponse<>(valorationMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(),
+				page.getTotalElements(), page.isLast());
 	}
 
 	@DeleteMapping("/reviews/{id}")

@@ -21,7 +21,7 @@ public class PaymentService {
     private UserService userService;
 
     public CheckoutData prepareCheckout(long productId, String username) {
-        //Checks authentication and if it is a self purchase
+        // Checks authentication and if it is a self purchase
         if (username == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
         }
@@ -52,7 +52,8 @@ public class PaymentService {
             CheckoutData checkoutData = prepareCheckout(productId, username);
             return new PaymentPageResolution("payment-page", checkoutData);
         } catch (IllegalStateException exception) {
-            return new PaymentPageResolution("redirect:/info-product-page/" + productId + "?error=" + exception.getMessage(), null);
+            return new PaymentPageResolution(
+                    "redirect:/info-product-page/" + productId + "?error=" + exception.getMessage(), null);
         }
     }
 }

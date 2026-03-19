@@ -32,7 +32,6 @@ import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.UserService;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
 @RestController
 @RequestMapping("/api/v1/users")
 public class UserWebRestController {
@@ -65,7 +64,7 @@ public class UserWebRestController {
         userService.deleteUserSelf(principal.getName());
         return ResponseEntity.noContent().build();
     }
-    
+
     @GetMapping("/me/profile-photo")
     public ResponseEntity<Resource> getMyProfilePhoto(Principal principal) throws SQLException {
         Resource my_image = userService.getProfilePhotoResourceByUsername(principal.getName());
@@ -75,15 +74,17 @@ public class UserWebRestController {
     }
 
     @PutMapping("/me/profile-photo")
-    public ResponseEntity<UserDTO> putMethodName(Principal principal, @RequestParam("image") MultipartFile file) throws IOException{
+    public ResponseEntity<UserDTO> putMethodName(Principal principal, @RequestParam("image") MultipartFile file)
+            throws IOException {
         String nameToModify = principal.getName();
         UserDTO updatedUser = userMapper.toDTO(userService.getFullUserProfile(nameToModify));
-    
+
         return ResponseEntity.ok(updatedUser);
     }
 
     @PutMapping(value = "/me/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public UserDTO updateMySettings(@ModelAttribute UserSettingsUpdateDTO request, Principal principal) throws IOException {
+    public UserDTO updateMySettings(@ModelAttribute UserSettingsUpdateDTO request, Principal principal)
+            throws IOException {
         userService.updateUserSettings(
                 principal.getName(),
                 request.getNewProfilePhoto(),
@@ -99,19 +100,18 @@ public class UserWebRestController {
     @GetMapping("/me/dashboard")
     public ResponseEntity<Map<String, Object>> getDashboardData(Principal principal) {
         var dashboardData = userService.getUserDashboardData(principal.getName());
-        
+
         return ResponseEntity.ok(Map.of(
-            "user", userMapper.toDTO(dashboardData.user()),
-            "totalRevenue", dashboardData.user().getTotalRevenue(),
-            "balance", dashboardData.user().getBalance(),
-            "chartLabels", dashboardData.chartLabels(),
-            "chartValues", dashboardData.chartValues(),
-            "salesCount", dashboardData.userSales()
-        ));
+                "user", userMapper.toDTO(dashboardData.user()),
+                "totalRevenue", dashboardData.user().getTotalRevenue(),
+                "balance", dashboardData.user().getBalance(),
+                "chartLabels", dashboardData.chartLabels(),
+                "chartValues", dashboardData.chartValues(),
+                "salesCount", dashboardData.userSales()));
     }
 
     @GetMapping("/me/transactions")
-    public ResponseEntity<Map<String, Object>> getMyTransactions(Principal principal, 
+    public ResponseEntity<Map<String, Object>> getMyTransactions(Principal principal,
             @RequestParam(required = false) Long transactionId) {
         Map<String, Object> data = userService.getSalesAndOrdersDashboard(principal.getName(), transactionId);
         // Note: Here we should map the Map objects to DTOs if they contain JPA entities
@@ -125,7 +125,7 @@ public class UserWebRestController {
     }
 
     @GetMapping("me/statistics")
-    public ResponseEntity<UserStatisticsDataDTO> getStatictis(Principal principal){
+    public ResponseEntity<UserStatisticsDataDTO> getStatictis(Principal principal) {
         var statisticsData = userService.getUserStatisticsData(principal.getName());
 
         return ResponseEntity.ok(statisticsData);
@@ -147,28 +147,27 @@ public class UserWebRestController {
     public ResponseEntity<Resource> getPublicProfilePhoto(@PathVariable Long id) throws SQLException {
         Resource image = userService.getProfilePhotoResourceById(id);
         return ResponseEntity.ok()
-            .contentType(MediaType.IMAGE_PNG)
-            .body(image);
+                .contentType(MediaType.IMAGE_PNG)
+                .body(image);
     }
 
     @GetMapping("{id}/contact-info")
-    public ResponseEntity<Map<String, Object>> getContactInfo(@PathVariable int id, Principal principal){
+    public ResponseEntity<Map<String, Object>> getContactInfo(@PathVariable int id, Principal principal) {
         try {
             var pageData = contactSellerService.getContactSellerPageData(id, principal.getName());
-            
+
             Map<String, Object> responseData = Map.of(
-                "product", productMapper.toDTO(pageData.product()), 
-                "seller", userMapper.toDTO(pageData.seller()),
-                "buyerName", pageData.buyerName(),
-                "buyerEmail", pageData.buyerEmail()
-            );
-        
+                    "product", productMapper.toDTO(pageData.product()),
+                    "seller", userMapper.toDTO(pageData.seller()),
+                    "buyerName", pageData.buyerName(),
+                    "buyerEmail", pageData.buyerEmail());
+
             return ResponseEntity.ok(responseData);
-        
+
         } catch (IllegalStateException exception) {
             return ResponseEntity.badRequest().body(Map.of("error", "You cannot self order a product"));
         }
 
     }
-    
+
 }

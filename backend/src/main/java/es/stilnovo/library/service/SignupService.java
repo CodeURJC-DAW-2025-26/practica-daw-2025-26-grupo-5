@@ -24,7 +24,8 @@ public class SignupService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public User registerUser(MultipartFile profilePicture, String username, String email, String password, String confirmPassword)
+    public User registerUser(MultipartFile profilePicture, String username, String email, String password,
+            String confirmPassword)
             throws IOException {
         if (!password.equals(confirmPassword)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passwords do not match");
@@ -38,7 +39,8 @@ public class SignupService {
 
         String encodedPassword = passwordEncoder.encode(password);
         Blob imageBlob = resolveProfileImage(profilePicture);
-        User newUser = new User(username, encodedPassword, email, imageBlob, 0.0, null, null, null, 0, 0.0, 0.0, null, "ROLE_USER");
+        User newUser = new User(username, encodedPassword, email, imageBlob, 0.0, null, null, null, 0, 0.0, 0.0, null,
+                "ROLE_USER");
         userService.save(newUser);
         return newUser;
     }

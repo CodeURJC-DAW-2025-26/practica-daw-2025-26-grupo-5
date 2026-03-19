@@ -1,6 +1,5 @@
 package es.stilnovo.library.model;
 
-
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -36,13 +35,13 @@ public class Product {
 
     /** Product name/title */
     private String name;
-    
+
     /** Category of product (Electronics, Books, etc.) */
     private String category;
-    
+
     /** Price of the product */
     private double price;
-    
+
     /** Location where product is available */
     private String location;
 
@@ -52,7 +51,7 @@ public class Product {
 
     /** Product status: Active, Inactive, or Sold */
     private String status; // active, inactive
-    
+
     /** Product primary image. */
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "image_id")
@@ -66,7 +65,10 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserInteraction> interactions;
 
-    /** Temporary flag: whether current user marked this as favorite (not saved to DB) */
+    /**
+     * Temporary flag: whether current user marked this as favorite (not saved to
+     * DB)
+     */
     @Transient
     private boolean favorite; // Temporary flag for the view
 
@@ -80,9 +82,11 @@ public class Product {
     }
 
     // CONSTRUCTORS
-    public Product() {}
+    public Product() {
+    }
 
-    public Product(String name, String category, double price, String description, String status, User seller, String location) {
+    public Product(String name, String category, double price, String description, String status, User seller,
+            String location) {
         this.name = name;
         this.category = category;
         this.price = price;
@@ -92,29 +96,58 @@ public class Product {
         this.location = location;
     }
 
-
     // GETTERS AND SETTERS
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
+    public String getName() {
+        return name;
+    }
 
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
 
     public String getFormattedPrice() {
         return NumberFormattingUtils.formatMoney(this.price);
     }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public String getDescription() {
+        return description;
+    }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public Image getImage() {
         return image;
@@ -124,15 +157,30 @@ public class Product {
         this.image = image;
     }
 
-    public User getSeller() { return seller; }
-    public void setSeller(User seller) { this.seller = seller; }
+    public User getSeller() {
+        return seller;
+    }
 
-    public List<UserInteraction> getInteractions() { return interactions; }
-    public void setInteractions(List<UserInteraction> interactions) { this.interactions = interactions; }
+    public void setSeller(User seller) {
+        this.seller = seller;
+    }
 
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
-    
+    public List<UserInteraction> getInteractions() {
+        return interactions;
+    }
+
+    public void setInteractions(List<UserInteraction> interactions) {
+        this.interactions = interactions;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
     // Inside Product.java class
 
     /**
@@ -159,4 +207,4 @@ public class Product {
         return "Sold".equalsIgnoreCase(this.status);
     }
 
-}   
+}

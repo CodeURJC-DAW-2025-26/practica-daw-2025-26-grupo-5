@@ -46,21 +46,22 @@ public class MailService {
 
     /**
      * Sends a professional HTML email with an embedded inline image (like a logo).
-     * This ensures the image is visible even if the user is offline or external links are blocked.
+     * This ensures the image is visible even if the user is offline or external
+     * links are blocked.
      */
-    public void sendHtmlWithInline(String to, String subject, String htmlBody, 
-                                String contentId, Resource inlineResource) throws MessagingException {
-        
+    public void sendHtmlWithInline(String to, String subject, String htmlBody,
+            String contentId, Resource inlineResource) throws MessagingException {
+
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-        
+
         helper.setFrom(fromAddress);
         helper.setTo(to);
         helper.setSubject(subject);
         helper.setText(htmlBody, true);
-        
+
         helper.addInline(contentId, inlineResource);
-        
+
         mailSender.send(message);
     }
 }
