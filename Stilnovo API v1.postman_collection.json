@@ -1,11 +1,8 @@
 {
 	"info": {
-		"_postman_id": "f703ee4b-fbc3-406f-965a-9a060303e7db",
 		"name": "Stilnovo API v1",
 		"description": "Example collection for testing the REST API of Practice 2. Configure the environment variable {{baseUrl}} (for example: https://localhost:8443).",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "47547404",
-		"_collection_link": "https://alongutisan-6959724.postman.co/workspace/Alonso-%E2%80%9CAlonso%E2%80%9D-Gutierrez's-Wor~4aa561d9-01c9-48e8-83c2-a0a5fbc21a2e/collection/47547404-f703ee4b-fbc3-406f-965a-9a060303e7db?action=share&source=collection_link&creator=47547404"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
