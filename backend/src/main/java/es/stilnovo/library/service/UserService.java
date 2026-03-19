@@ -393,41 +393,44 @@ public class UserService {
                 .map(cat -> chartData.interestByCategory().getOrDefault(cat, 0L))
                 .toList();
 
+
             return new UserDashboardDataDTO(
-                user,
-                getFormattedDate(),
-                sales,
-                toJson(salesByCategory.keySet()),
-                toJson(salesByCategory.values()),
-                toJson(monthLabels),
-                toJson(monthlyRevenues),
-                toJson(barLabels),
-                toJson(visitsData),
-                toJson(interestData));
+                    user,
+                    getFormattedDate(),
+                    sales,
+                    new ArrayList<>(salesByCategory.keySet()), 
+                    new ArrayList<>(salesByCategory.values()), 
+                    monthLabels,
+                    monthlyRevenues,
+                    barLabels,
+                    visitsData,
+                    interestData
+                );
         }
 
-        @Transactional(readOnly = true)
-        public UserStatisticsDataDTO getUserStatisticsData(String username) {
-            UserDashboardDataDTO dashboardData = getUserDashboardData(username);
-            List<Transaction> transactions = transactionRepository.findBySellerUserId(dashboardData.user().getUserId());
-            double totalSales = transactions.stream().mapToDouble(Transaction::getFinalPrice).sum();
-            double avgRating = getAverageRatingForSeller(username);
+    @Transactional(readOnly = true)
+    public UserStatisticsDataDTO getUserStatisticsData(String username) {
+        UserDashboardDataDTO dashboardData = getUserDashboardData(username);
+        List<Transaction> transactions = transactionRepository.findBySellerUserId(dashboardData.user().getUserId());
+        double totalSales = transactions.stream().mapToDouble(Transaction::getFinalPrice).sum();
+        double avgRating = getAverageRatingForSeller(username);
 
-            return new UserStatisticsDataDTO(
-                dashboardData.user(),
-                NumberFormattingUtils.formatMoney(totalSales),
-                transactions.size(),
-                String.format("%.1f", avgRating),
-                NumberFormattingUtils.formatMoney(calculateInventoryValue(username)),
-                dashboardData.date(),
-                dashboardData.chartLabels(),
-                dashboardData.chartValues(),
-                dashboardData.revenueLabels(),
-                dashboardData.revenueValues(),
-                dashboardData.barLabels(),
-                dashboardData.visitsData(),
-                dashboardData.interestData());
-        }
+        return new UserStatisticsDataDTO(
+            dashboardData.user(),
+            NumberFormattingUtils.formatMoney(totalSales),
+            transactions.size(),
+            String.format("%.1f", avgRating),
+            NumberFormattingUtils.formatMoney(calculateInventoryValue(username)),
+            dashboardData.date(),
+            dashboardData.chartLabels(),
+            dashboardData.chartValues(),
+            dashboardData.revenueLabels(),
+            dashboardData.revenueValues(),
+            dashboardData.barLabels(),
+            dashboardData.visitsData(),
+            dashboardData.interestData()
+        );
+    }
 
     public double calculateInventoryValue(String username) {
         // 1. Find the user

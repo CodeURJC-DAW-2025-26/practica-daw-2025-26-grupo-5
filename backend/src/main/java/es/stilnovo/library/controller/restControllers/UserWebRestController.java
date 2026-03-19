@@ -24,6 +24,7 @@ import es.stilnovo.library.dto.ProductMapper;
 import es.stilnovo.library.dto.SellerProfileDTO;
 import es.stilnovo.library.dto.UserDTO;
 import es.stilnovo.library.dto.UserSettingsUpdateDTO;
+import es.stilnovo.library.dto.UserStatisticsDataDTO;
 import es.stilnovo.library.dto.ValorationDTO;
 import es.stilnovo.library.dto.UserMapper;
 import es.stilnovo.library.dto.ValorationMapper;
@@ -167,5 +168,12 @@ public class UserWebRestController {
             return ResponseEntity.badRequest().body(Map.of("error", "You cannot self order a product"));
         }
 
+    }
+
+    @GetMapping("me/statistics")
+    public ResponseEntity<UserStatisticsDataDTO> getStatictis(Principal principal){
+        var statisticsData = userService.getUserStatisticsData(principal.getName());
+
+        return ResponseEntity.ok(statisticsData);
     }
 }

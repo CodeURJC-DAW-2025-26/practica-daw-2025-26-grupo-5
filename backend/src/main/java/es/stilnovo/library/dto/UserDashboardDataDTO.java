@@ -9,12 +9,12 @@ public record UserDashboardDataDTO(
         User user,
         String date,
         List<Transaction> userSales,
-        String chartLabels,
-        String chartValues,
-        String revenueLabels,
-        String revenueValues,
-        String barLabels,
-        String visitsData,
-        String interestData
+        List<String> chartLabels,
+        List<Long> chartValues,
+        List<String> revenueLabels,
+        List<Double> revenueValues,
+        List<String> barLabels,
+        List<Long> visitsData,
+        List<Long> interestData
 ) {
 }
