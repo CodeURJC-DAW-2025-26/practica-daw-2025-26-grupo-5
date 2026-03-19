@@ -135,5 +135,5 @@ public class DataBaseInitializer {
         productService.save(product8);
         productService.save(product9);
         productService.save(product10);
-    }
+        }
 }
