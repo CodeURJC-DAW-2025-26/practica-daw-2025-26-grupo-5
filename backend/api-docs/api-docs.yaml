@@ -1,0 +1,1670 @@
+openapi: 3.1.0
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: https://localhost:8443
+  description: Generated server url
+paths:
+  /api/v1/users/me/profile:
+    put:
+      tags:
+      - user-web-rest-controller
+      operationId: updateMySettings
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UserSettingsUpdateDTO"
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+  /api/v1/users/me/profile-photo:
+    get:
+      tags:
+      - user-web-rest-controller
+      operationId: getMyProfilePhoto
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+    put:
+      tags:
+      - user-web-rest-controller
+      operationId: putMethodName
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+              required:
+              - image
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+  /api/v1/products/{id}:
+    get:
+      tags:
+      - product-rest-controller
+      operationId: getProductDetails
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDetailsDTO"
+    put:
+      tags:
+      - product-rest-controller
+      operationId: updateProduct
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ProductWriteRequestDTO"
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+    delete:
+      tags:
+      - product-rest-controller
+      operationId: deleteProduct
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+  /api/v1/admin/users/{id}:
+    get:
+      tags:
+      - admin-rest-controller
+      operationId: getUserById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+    put:
+      tags:
+      - admin-rest-controller
+      operationId: updateUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: email
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: cardNumber
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: cardCvv
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: cardExpiringDate
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: description
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+    delete:
+      tags:
+      - admin-rest-controller
+      operationId: deleteUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+    patch:
+      tags:
+      - admin-rest-controller
+      operationId: updateUserBanStatus
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminUserBanRequestDTO"
+        required: true
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+  /api/v1/admin/products/{id}:
+    get:
+      tags:
+      - admin-rest-controller
+      operationId: getProductById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+    put:
+      tags:
+      - admin-rest-controller
+      operationId: updateProduct_1
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: name
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: category
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: price
+        in: query
+        required: false
+        schema:
+          type: number
+          format: double
+      - name: description
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: location
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+    delete:
+      tags:
+      - admin-rest-controller
+      operationId: deleteProduct_1
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+  /api/v1/valorations:
+    get:
+      tags:
+      - valoration-rest-controller
+      operationId: getAllValorations
+      parameters:
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedResponseValorationDTO"
+    post:
+      tags:
+      - valoration-rest-controller
+      operationId: createValoration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ValorationDTO"
+        required: true
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ValorationDTO"
+  /api/v1/users:
+    post:
+      tags:
+      - signup-web-rest-controller
+      operationId: signup
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/SignupRequestDTO"
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+  /api/v1/transactions:
+    post:
+      tags:
+      - transaction-rest-controller
+      operationId: createTransaction
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionCreateRequestDTO"
+        required: true
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransactionDTO"
+  /api/v1/products:
+    get:
+      tags:
+      - product-rest-controller
+      operationId: getProducts
+      parameters:
+      - name: query
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: category
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedResponseProductDTO"
+    post:
+      tags:
+      - product-rest-controller
+      operationId: createProduct
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/ProductWriteRequestDTO"
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+  /api/v1/products/{productId}/image:
+    get:
+      tags:
+      - image-rest-controller
+      operationId: getProductImage
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ImageDTO"
+    post:
+      tags:
+      - image-rest-controller
+      operationId: replaceProductImage
+      parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+              required:
+              - file
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+  /api/v1/notifications/inquiries:
+    post:
+      tags:
+      - notification-rest-controller
+      operationId: sendInquiry
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InquiryRequestDTO"
+        required: true
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NotificationResultDTO"
+  /api/v1/auth/refresh:
+    post:
+      tags:
+      - login-rest-controller
+      operationId: refresh
+      parameters:
+      - name: RefreshToken
+        in: cookie
+        required: false
+        schema:
+          type: string
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+  /api/v1/auth/logout:
+    post:
+      tags:
+      - login-rest-controller
+      operationId: logout
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+  /api/v1/auth/login:
+    post:
+      tags:
+      - login-rest-controller
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+  /api/v1/admin/products:
+    get:
+      tags:
+      - admin-rest-controller
+      operationId: getProducts_1
+      parameters:
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedResponseProductDTO"
+    post:
+      tags:
+      - admin-rest-controller
+      operationId: createProduct_1
+      parameters:
+      - name: sellerId
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: name
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: category
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: description
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: price
+        in: query
+        required: true
+        schema:
+          type: number
+          format: double
+      - name: location
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+          default: Active
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+  /api/v1/valorations/{id}:
+    get:
+      tags:
+      - valoration-rest-controller
+      operationId: getValoration
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ValorationDTO"
+  /api/v1/users/{id}/profile:
+    get:
+      tags:
+      - user-web-rest-controller
+      operationId: getSellerProfile
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SellerProfileDTO"
+  /api/v1/users/{id}/profile-photo:
+    get:
+      tags:
+      - user-web-rest-controller
+      operationId: getPublicProfilePhoto
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+  /api/v1/users/{id}/contact-info:
+    get:
+      tags:
+      - user-web-rest-controller
+      operationId: getContactInfo
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
+  /api/v1/users/me:
+    get:
+      tags:
+      - user-web-rest-controller
+      operationId: getCurrentUser
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+    delete:
+      tags:
+      - user-web-rest-controller
+      operationId: deleteMyAccount
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+  /api/v1/users/me/valorations:
+    get:
+      tags:
+      - user-web-rest-controller
+      operationId: getMyValorations
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ValorationDTO"
+  /api/v1/users/me/transactions:
+    get:
+      tags:
+      - user-web-rest-controller
+      operationId: getMyTransactions
+      parameters:
+      - name: transactionId
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
+  /api/v1/users/me/statistics:
+    get:
+      tags:
+      - user-web-rest-controller
+      operationId: getStatistics
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserStatisticsDataDTO"
+  /api/v1/users/me/statistics-report:
+    get:
+      tags:
+      - pdf-rest-controller
+      operationId: exportStatistics
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+  /api/v1/users/me/dashboard:
+    get:
+      tags:
+      - user-web-rest-controller
+      operationId: getDashboardData
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
+  /api/v1/transactions/{transactionId}/shipping-label:
+    get:
+      tags:
+      - pdf-rest-controller
+      operationId: exportShippingLabel
+      parameters:
+      - name: transactionId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+  /api/v1/transactions/{transactionId}/invoice:
+    get:
+      tags:
+      - pdf-rest-controller
+      operationId: exportInvoice
+      parameters:
+      - name: transactionId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
+  /api/v1/transactions/{id}:
+    get:
+      tags:
+      - transaction-rest-controller
+      operationId: getTransaction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransactionDTO"
+  /api/v1/transactions/{id}/checkout:
+    get:
+      tags:
+      - transaction-rest-controller
+      operationId: getCheckout
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CheckoutDTO"
+  /api/v1/transactions/sales:
+    get:
+      tags:
+      - transaction-rest-controller
+      operationId: getSellerTransactions
+      parameters:
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedResponseTransactionDTO"
+  /api/v1/products/{id}/contact:
+    get:
+      tags:
+      - product-rest-controller
+      operationId: getContactSellerData
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ContactSellerPageDTO"
+  /api/v1/products/recommendations:
+    get:
+      tags:
+      - product-rest-controller
+      operationId: getRecommendations
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductDTO"
+  /api/v1/products/me:
+    get:
+      tags:
+      - product-rest-controller
+      operationId: getMyProducts
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductDTO"
+  /api/v1/notifications/inquiries/{id}:
+    get:
+      tags:
+      - notification-rest-controller
+      operationId: getInquiry
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InquiryDTO"
+  /api/v1/images/{imageId}/file:
+    get:
+      tags:
+      - image-rest-controller
+      operationId: getImageFile
+      parameters:
+      - name: imageId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+  /api/v1/catalog:
+    get:
+      tags:
+      - main-rest-controller
+      operationId: getHomePage
+      parameters:
+      - name: query
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: category
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/HomePageDTO"
+  /api/v1/admin/valorations:
+    get:
+      tags:
+      - admin-rest-controller
+      operationId: getValorations
+      parameters:
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedResponseValorationDTO"
+  /api/v1/admin/users:
+    get:
+      tags:
+      - admin-rest-controller
+      operationId: getUsers
+      parameters:
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedResponseUserDTO"
+  /api/v1/admin/transactions:
+    get:
+      tags:
+      - admin-rest-controller
+      operationId: getTransactions
+      parameters:
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedResponseTransactionDTO"
+  /api/v1/admin/summary:
+    get:
+      tags:
+      - admin-rest-controller
+      operationId: getAdminPanel
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AdminSummaryDTO"
+  /api/v1/admin/valorations/{id}:
+    delete:
+      tags:
+      - admin-rest-controller
+      operationId: deleteValoration
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+  /api/v1/admin/transactions/{id}:
+    delete:
+      tags:
+      - admin-rest-controller
+      operationId: deleteTransaction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "200":
+          description: OK
+components:
+  schemas:
+    UserSettingsUpdateDTO:
+      type: object
+      properties:
+        newProfilePhoto:
+          type: string
+          format: binary
+        newEmail:
+          type: string
+        newCardNumber:
+          type: string
+        newCardCvv:
+          type: string
+        newCardExpiringDate:
+          type: string
+        newDescription:
+          type: string
+    UserDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        email:
+          type: string
+        rating:
+          type: number
+          format: double
+        numRatings:
+          type: integer
+          format: int32
+        description:
+          type: string
+        roles:
+          type: array
+          items:
+            type: string
+        banned:
+          type: boolean
+    ProductWriteRequestDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+        price:
+          type: number
+          format: double
+        location:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        file:
+          type: string
+          format: binary
+    ImageDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+    ProductDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        category:
+          type: string
+        price:
+          type: number
+          format: double
+        location:
+          type: string
+        description:
+          type: string
+        status:
+          type: string
+        image:
+          $ref: "#/components/schemas/ImageDTO"
+        seller:
+          $ref: "#/components/schemas/UserDTO"
+        userInteractions:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserInteractionDTO"
+        favorite:
+          type: boolean
+    UserInteractionDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        userId:
+          type: integer
+          format: int64
+        type:
+          type: string
+          enum:
+          - VIEW
+          - LIKE
+          - BUY
+    ValorationDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        stars:
+          type: integer
+          format: int32
+        comment:
+          type: string
+        buyerName:
+          type: string
+        transactionId:
+          type: integer
+          format: int64
+    SignupRequestDTO:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        confirmPassword:
+          type: string
+    TransactionCreateRequestDTO:
+      type: object
+      properties:
+        productId:
+          type: integer
+          format: int64
+    TransactionDTO:
+      type: object
+      properties:
+        transactionId:
+          type: integer
+          format: int64
+        finalPrice:
+          type: number
+          format: double
+        createdAt:
+          type: string
+          format: date-time
+        formattedDate:
+          type: string
+        transactionStatus:
+          type: string
+        rated:
+          type: boolean
+        stars:
+          type: integer
+          format: int32
+        seller:
+          $ref: "#/components/schemas/UserDTO"
+        buyer:
+          $ref: "#/components/schemas/UserDTO"
+        product:
+          $ref: "#/components/schemas/ProductDTO"
+    InquiryRequestDTO:
+      type: object
+      properties:
+        productId:
+          type: integer
+          format: int64
+        phone:
+          type: string
+        type:
+          type: string
+        message:
+          type: string
+    InquiryDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        productName:
+          type: string
+        sellerEmail:
+          type: string
+        buyerName:
+          type: string
+        buyerEmail:
+          type: string
+        buyerPhone:
+          type: string
+        inquiryType:
+          type: string
+        message:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+        product:
+          $ref: "#/components/schemas/ProductDTO"
+        buyer:
+          $ref: "#/components/schemas/UserDTO"
+    NotificationResultDTO:
+      type: object
+      properties:
+        inquiry:
+          $ref: "#/components/schemas/InquiryDTO"
+        sent:
+          type: boolean
+        cooldownMinutes:
+          type: integer
+          format: int64
+        errorCode:
+          type: string
+    AuthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - SUCCESS
+          - FAILURE
+        message:
+          type: string
+        error:
+          type: string
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    AdminUserBanRequestDTO:
+      type: object
+      properties:
+        banned:
+          type: boolean
+    Pageable:
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int32
+          minimum: 0
+        size:
+          type: integer
+          format: int32
+          minimum: 1
+        sort:
+          type: array
+          items:
+            type: string
+    PagedResponseValorationDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValorationDTO"
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        last:
+          type: boolean
+    SellerProfileDTO:
+      type: object
+      properties:
+        seller:
+          $ref: "#/components/schemas/UserDTO"
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductDTO"
+        valorations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValorationDTO"
+        fullStars:
+          type: integer
+          format: int32
+        owner:
+          type: boolean
+    UserStatisticsDataDTO:
+      type: object
+      properties:
+        totalSales:
+          type: string
+        itemsSold:
+          type: integer
+          format: int32
+        avgRating:
+          type: string
+        inventoryValue:
+          type: string
+        date:
+          type: string
+        chartLabels:
+          type: array
+          items:
+            type: string
+        chartValues:
+          type: array
+          items:
+            type: integer
+            format: int64
+        revenueLabels:
+          type: array
+          items:
+            type: string
+        revenueValues:
+          type: array
+          items:
+            type: number
+            format: double
+        barLabels:
+          type: array
+          items:
+            type: string
+        visitsData:
+          type: array
+          items:
+            type: integer
+            format: int64
+        interestData:
+          type: array
+          items:
+            type: integer
+            format: int64
+    CheckoutDTO:
+      type: object
+      properties:
+        product:
+          $ref: "#/components/schemas/ProductDTO"
+        buyer:
+          $ref: "#/components/schemas/UserDTO"
+    PagedResponseTransactionDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/TransactionDTO"
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        last:
+          type: boolean
+    PagedResponseProductDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductDTO"
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        last:
+          type: boolean
+    ProductDetailsDTO:
+      type: object
+      properties:
+        product:
+          $ref: "#/components/schemas/ProductDTO"
+        recommendedProducts:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductDTO"
+        logged:
+          type: boolean
+    ContactSellerPageDTO:
+      type: object
+      properties:
+        product:
+          $ref: "#/components/schemas/ProductDTO"
+        seller:
+          $ref: "#/components/schemas/UserDTO"
+        buyerName:
+          type: string
+        buyerEmail:
+          type: string
+    HomePageDTO:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductDTO"
+        recommendedProducts:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductDTO"
+        user:
+          $ref: "#/components/schemas/UserDTO"
+        logged:
+          type: boolean
+        admin:
+          type: boolean
+        query:
+          type: string
+        searching:
+          type: boolean
+        last:
+          type: boolean
+        nextOffset:
+          type: integer
+          format: int32
+    PagedResponseUserDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserDTO"
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        last:
+          type: boolean
+    AdminSummaryDTO:
+      type: object
+      properties:
+        numUsers:
+          type: integer
+          format: int32
+        numBanneds:
+          type: integer
+          format: int32
+        memoryUsage:
+          type: string
+        recentUsers:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserDTO"
+        recentProducts:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductDTO"
