@@ -1,21 +1,22 @@
 # ============================================================
 #  Stilnovo - Docker Compose
 # ============================================================
+#  NOTE: user means the personal user of each developer
 #
-#  PRIMER ARRANQUE (crea esquema + carga datos de ejemplo):
+#  FIRST RUN (creates schema + loads sample data):
 #    Linux/macOS:
-#      DDL_AUTO=create docker compose -f oci://<usuario>/stilnovo-compose:latest up
+#      DDL_AUTO=create docker compose -f oci://<user>/stilnovo-compose:latest up
 #
 #    Windows PowerShell:
 #      $env:DDL_AUTO="create"
-#      docker compose -f oci://<usuario>/stilnovo-compose:latest up
+#      docker compose -f oci://<user>/stilnovo-compose:latest up
 #
-#  ARRANQUES POSTERIORES (esquema intacto, sin borrar datos):
-#    docker compose -f oci://<usuario>/stilnovo-compose:latest up
+#  SUBSEQUENT RUNS (intact schema, without deleting data):
+#    docker compose -f oci://<user>/stilnovo-compose:latest up
 #
-#  APP_IMAGE: imagen de la aplicacion publicada en DockerHub.
-#    Linux/macOS:  APP_IMAGE=<usuario>/stilnovo:latest docker compose ... up
-#    PowerShell:   $env:APP_IMAGE="<usuario>/stilnovo:latest"
+#  APP_IMAGE: application image published on DockerHub.
+#    Linux/macOS:  APP_IMAGE=<user>/stilnovo:latest docker compose ... up
+#    PowerShell:   $env:APP_IMAGE="<user>/stilnovo:latest"
 # ============================================================
 
 services:
