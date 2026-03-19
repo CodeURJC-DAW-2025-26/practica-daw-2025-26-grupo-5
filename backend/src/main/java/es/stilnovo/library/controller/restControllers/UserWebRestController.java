@@ -31,6 +31,7 @@ import es.stilnovo.library.service.ContactSellerService;
 import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.UserService;
 import org.springframework.web.bind.annotation.RequestParam;
+import io.swagger.v3.oas.annotations.Operation;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -175,6 +176,20 @@ public class UserWebRestController {
             return ResponseEntity.badRequest().body(Map.of("error", "You cannot self order a product"));
         }
 
+    }
+
+    @Operation(summary = "Saves the updated user settings and returns the updated user profile")
+    @GetMapping("/me/dashboard")
+    public ResponseEntity<Object> getMyDashboard(Principal principal) {
+        var dashboardData = userService.getUserDashboardData(principal.getName());
+        return ResponseEntity.ok(dashboardData);
+    }
+
+    @Operation(summary = "Saves the statistics data of the user and returns the updated statistics data")
+    @GetMapping("/me/statistics")
+    public ResponseEntity<Object> getMyStatistics(Principal principal) {
+        var statsData = userService.getUserStatisticsData(principal.getName());
+        return ResponseEntity.ok(statsData);
     }
 
 }
