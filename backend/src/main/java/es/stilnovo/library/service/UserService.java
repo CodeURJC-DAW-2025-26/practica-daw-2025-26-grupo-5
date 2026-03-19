@@ -522,4 +522,39 @@ public class UserService {
             return "[]";
         }
     }
+
+    @Transactional
+    public void deleteProfilePhotoByUsername(String username) {
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        user.setProfileImage(null);
+
+        userRepository.save(user);
+    }
+
+/**.
+     * @param username The name of the authenticated user
+     * @param file File of the new profile photo
+     * @throws IOException If it happens an error read the content of the file
+     */
+    @Transactional
+    public void updateProfilePhotoByUsername(String username, MultipartFile file) throws IOException {
+        // 1. Search the user on the db
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // 2. Validate if the file is null or is empty
+        if (file != null && !file.isEmpty()) {
+            user.setProfileImage(BlobProxy.generateProxy(
+                file.getInputStream(), 
+                file.getSize()
+            ));
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The file must not be empty or to be null");
+        }
+
+        // 3. Save the user updated on the db
+        userRepository.save(user);
+    }
 }

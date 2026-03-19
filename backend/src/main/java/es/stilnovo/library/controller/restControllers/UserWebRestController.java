@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.io.IOException;
+import java.io.ObjectInput;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -25,9 +27,12 @@ import es.stilnovo.library.dto.UserSettingsUpdateDTO;
 import es.stilnovo.library.dto.ValorationDTO;
 import es.stilnovo.library.dto.UserMapper;
 import es.stilnovo.library.dto.ValorationMapper;
+import es.stilnovo.library.service.ContactSellerService;
 import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.UserService;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
+
 
 
 
@@ -40,6 +45,9 @@ public class UserWebRestController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private ContactSellerService contactSellerService;
 
     @Autowired
     private UserMapper userMapper;
@@ -131,5 +139,33 @@ public class UserWebRestController {
         return ResponseEntity.ok()
             .contentType(MediaType.IMAGE_PNG)
             .body(image);
+    }
+
+    @PutMapping("me/profile-photo")
+    public ResponseEntity<UserDTO> putMethodName(Principal principal, @RequestParam("image") MultipartFile file) throws IOException{
+        String nameToModify = principal.getName();
+        UserDTO updatedUser = userMapper.toDTO(userService.getFullUserProfile(nameToModify));
+    
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @GetMapping("{id}/contact-info")
+    public ResponseEntity<Map<String, Object>> getContactInfo(@PathVariable int id, Principal principal){
+        try {
+            var pageData = contactSellerService.getContactSellerPageData(id, principal.getName());
+            
+            Map<String, Object> responseData = Map.of(
+                "product", productMapper.toDTO(pageData.product()), 
+                "seller", userMapper.toDTO(pageData.seller()),
+                "buyerName", pageData.buyerName(),
+                "buyerEmail", pageData.buyerEmail()
+            );
+        
+            return ResponseEntity.ok(responseData);
+        
+        } catch (IllegalStateException exception) {
+            return ResponseEntity.badRequest().body(Map.of("error", "You cannot self order a product"));
+        }
+
     }
 }
