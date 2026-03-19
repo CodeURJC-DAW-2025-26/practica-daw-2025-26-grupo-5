@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestPart;
 
 import es.stilnovo.library.dto.ProductMapper;
 import es.stilnovo.library.dto.SellerProfileDTO;
@@ -76,12 +77,13 @@ public class UserWebRestController {
                 .body(my_image);
     }
 
-    @PutMapping("/me/profile-photo")
-    public ResponseEntity<UserDTO> putMethodName(Principal principal, @RequestParam("image") MultipartFile file)
+    @PutMapping(value = "/me/profile-photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UserDTO> putMethodName(Principal principal, @RequestPart("image")MultipartFile file)
             throws IOException {
+        System.out.print("Entra en el bucle");
         String nameToModify = principal.getName();
+        userService.updateProfilePhotoByUsername(nameToModify, file);
         UserDTO updatedUser = userMapper.toDTO(userService.getFullUserProfile(nameToModify));
-
         return ResponseEntity.ok(updatedUser);
     }
 

@@ -35,3 +35,6 @@ target
 hs_err_pid*
 .idea/
 .vscode/
+
+#ENV file
+*.env

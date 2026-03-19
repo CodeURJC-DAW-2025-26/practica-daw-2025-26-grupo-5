@@ -533,7 +533,7 @@
 							"formdata": [
 								{
 									"key": "newEmail",
-									"value": "user1@stilnovo.es",
+									"value": "user99@stilnovo.es",
 									"type": "text"
 								},
 								{
@@ -643,7 +643,7 @@
 					"response": []
 				},
 				{
-					"name": "New Request",
+					"name": "Get Valorations",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -664,7 +664,7 @@
 					"response": []
 				},
 				{
-					"name": "Get profile-photo",
+					"name": "Get profile-photo by id",
 					"request": {
 						"method": "GET",
 						"header": [],

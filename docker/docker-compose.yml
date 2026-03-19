@@ -37,7 +37,7 @@ services:
       - mysql_data:/var/lib/mysql
 
   app:
-    image: ${APP_IMAGE:-yourdockerhubuser/stilnovo:latest}
+    image: ${DOCKER_USER}/stilnovo:latest
     container_name: stilnovo-app
     depends_on:
       db:
@@ -50,7 +50,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/stilnovo?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO:-none}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create
 
 volumes:
   mysql_data:

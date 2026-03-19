@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.Blob;
 
+import org.springframework.boot.CommandLineRunner;
+
 import jakarta.annotation.PostConstruct;
 
 import org.hibernate.engine.jdbc.proxy.BlobProxy;
@@ -23,7 +25,7 @@ import es.stilnovo.library.repository.UserRepository;
  * Automatically populates database with sample data on application startup
  */
 @Service
-public class DataBaseInitializer {
+public class DataBaseInitializer implements CommandLineRunner{
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -51,8 +53,8 @@ public class DataBaseInitializer {
         product.setImage(createdImage);
     }
 
-    @PostConstruct
-    public void init() throws IOException, URISyntaxException {
+    @Override
+    public void run(String... args) throws IOException, URISyntaxException {
         if (userRepository.count() > 0) {
             return; // Database already has data, skip sample data loading
         }
