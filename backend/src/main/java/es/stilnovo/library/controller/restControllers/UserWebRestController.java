@@ -83,7 +83,6 @@ public class UserWebRestController {
     @PutMapping(value = "/me/profile-photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDTO> putMethodName(Principal principal, @RequestPart("image")MultipartFile file)
             throws IOException {
-        System.out.print("Entra en el bucle");
         String nameToModify = principal.getName();
         userService.updateProfilePhotoByUsername(nameToModify, file);
         UserDTO updatedUser = userMapper.toDTO(userService.getFullUserProfile(nameToModify));
