@@ -3,16 +3,17 @@ package es.stilnovo.library.controller.restControllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.stilnovo.library.dto.AdminUserBanRequestDTO;
 import es.stilnovo.library.dto.AdminSummaryDTO;
+import es.stilnovo.library.dto.AdminUserBanRequestDTO;
 import es.stilnovo.library.dto.PagedResponse;
 import es.stilnovo.library.dto.ProductDTO;
 import es.stilnovo.library.dto.ProductMapper;
@@ -75,8 +76,9 @@ public class AdminRestController {
 	}
 
 	@DeleteMapping("/users/{id}")
-	public void deleteUser(@PathVariable Long id) {
+	public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
 		adminService.deleteUser(id);
+		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("/products")
@@ -87,8 +89,9 @@ public class AdminRestController {
 	}
 
 	@DeleteMapping("/products/{id}")
-	public void deleteProduct(@PathVariable Long id) {
+	public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
 		adminService.deleteProductAsAdmin(id);
+		return ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("/transactions")
@@ -99,19 +102,21 @@ public class AdminRestController {
 	}
 
 	@DeleteMapping("/transactions/{id}")
-	public void deleteTransaction(@PathVariable Long id) {
+	public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) {
 		transactionService.deleteTransaction(id);
+		return ResponseEntity.noContent().build();
 	}
 
-	@GetMapping("/reviews") // cambia esto por valoration y no reviews
+	@GetMapping("/valorations")
 	public PagedResponse<ValorationDTO> getValorations(@PageableDefault(size = 10) Pageable pageable) {
 		var page = adminService.getValorationsPage(pageable);
 		return new PagedResponse<>(valorationMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(),
 				page.getTotalElements(), page.isLast());
 	}
 
-	@DeleteMapping("/reviews/{id}")
-	public void deleteValoration(@PathVariable Long id) {
+	@DeleteMapping("/valorations/{id}")
+	public ResponseEntity<Void> deleteValoration(@PathVariable Long id) {
 		valorationService.deleteById(id);
+		return ResponseEntity.noContent().build();
 	}
 }
