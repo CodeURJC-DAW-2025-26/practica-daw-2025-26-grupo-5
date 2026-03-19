@@ -1,0 +1,6 @@
+# Use this workspace to collaborate
+workspace:
+  id: 52ec4818-ff9e-4521-83ca-7bf61d37269d
+localResources:
+  collections:
+    - ..\Stilnovo API v1.postman_collection.json
