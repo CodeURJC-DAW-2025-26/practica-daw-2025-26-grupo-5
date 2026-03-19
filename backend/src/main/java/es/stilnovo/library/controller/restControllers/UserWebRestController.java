@@ -54,6 +54,10 @@ public class UserWebRestController {
     @Autowired
     private ValorationMapper valorationMapper;
 
+
+    /**
+     * This section refers to the current (principal) user.
+     */
     @GetMapping("/me")
     public UserDTO getCurrentUser(Principal principal) {
         return userMapper.toDTO(userService.getFullUserProfile(principal.getName()));
@@ -131,6 +135,9 @@ public class UserWebRestController {
         return ResponseEntity.ok(statisticsData);
     }
 
+    /**
+     * This section refers to other users (sellers).
+     */
     @GetMapping("/{id}/profile")
     public SellerProfileDTO getSellerProfile(@PathVariable long id, Principal principal) {
         var seller = userService.getPublicProfileById(id);
