@@ -24,6 +24,9 @@ import es.stilnovo.library.util.NumberFormattingUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 /**
  * UserWebController: Manages user profile and account pages
  * 
@@ -158,31 +161,36 @@ public class UserWebController {
     @GetMapping("/user-page")
     public String showUserPage(Model model, Principal principal) {
 
-        // STEP 1: Validate user session exists
-        // Safety Check: If the user session is lost, redirect to login
         if (principal == null) {
             return "redirect:/login-page";
         }
 
         var dashboardData = userService.getUserDashboardData(principal.getName());
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            // Convert lists to JSON Strings so that Mustache doesn't break the formatting
+            model.addAttribute("chartLabels", mapper.writeValueAsString(dashboardData.chartLabels()));
+            model.addAttribute("chartValues", mapper.writeValueAsString(dashboardData.chartValues()));
+            model.addAttribute("revenueLabels", mapper.writeValueAsString(dashboardData.revenueLabels()));
+            model.addAttribute("revenueValues", mapper.writeValueAsString(dashboardData.revenueValues()));
+            model.addAttribute("barLabels", mapper.writeValueAsString(dashboardData.barLabels()));
+            model.addAttribute("visitsData", mapper.writeValueAsString(dashboardData.visitsData()));
+            model.addAttribute("interestData", mapper.writeValueAsString(dashboardData.interestData()));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            // Fallback handling in case of error
+        }
 
         model.addAttribute("user", dashboardData.user());
         model.addAttribute("isOwner", true);
         model.addAttribute("date", dashboardData.date());
         model.addAttribute("userSales", dashboardData.userSales());
-        model.addAttribute("chartLabels", dashboardData.chartLabels());
-        model.addAttribute("chartValues", dashboardData.chartValues());
-        model.addAttribute("revenueLabels", dashboardData.revenueLabels());
-        model.addAttribute("revenueValues", dashboardData.revenueValues());
-        model.addAttribute("barLabels", dashboardData.barLabels());
-        model.addAttribute("visitsData", dashboardData.visitsData());
-        model.addAttribute("interestData", dashboardData.interestData());
         model.addAttribute("formattedTotalRevenue", formatCurrency(dashboardData.user().getTotalRevenue()));
         model.addAttribute("formattedBalance", formatCurrency(dashboardData.user().getBalance()));
 
         return "user-page";
     }
-
     private String formatCurrency(double value) {
         return NumberFormattingUtils.formatMoney(value);
     }
@@ -311,6 +319,20 @@ public class UserWebController {
     @GetMapping("/statistics-page")
     public String showStatisticsPage(Model model, Principal principal) {
         var statisticsData = userService.getUserStatisticsData(principal.getName());
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            // Add the mapper here too
+            model.addAttribute("chartLabels", mapper.writeValueAsString(statisticsData.chartLabels()));
+            model.addAttribute("chartValues", mapper.writeValueAsString(statisticsData.chartValues()));
+            model.addAttribute("revenueLabels", mapper.writeValueAsString(statisticsData.revenueLabels()));
+            model.addAttribute("revenueValues", mapper.writeValueAsString(statisticsData.revenueValues()));
+            model.addAttribute("barLabels", mapper.writeValueAsString(statisticsData.barLabels()));
+            model.addAttribute("visitsData", mapper.writeValueAsString(statisticsData.visitsData()));
+            model.addAttribute("interestData", mapper.writeValueAsString(statisticsData.interestData()));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
 
         model.addAttribute("user", statisticsData.user());
         model.addAttribute("userId", statisticsData.user().getUserId());
@@ -319,13 +341,6 @@ public class UserWebController {
         model.addAttribute("avgRating", statisticsData.avgRating());
         model.addAttribute("inventoryValue", statisticsData.inventoryValue());
         model.addAttribute("date", statisticsData.date());
-        model.addAttribute("chartLabels", statisticsData.chartLabels());
-        model.addAttribute("chartValues", statisticsData.chartValues());
-        model.addAttribute("revenueLabels", statisticsData.revenueLabels());
-        model.addAttribute("revenueValues", statisticsData.revenueValues());
-        model.addAttribute("barLabels", statisticsData.barLabels());
-        model.addAttribute("visitsData", statisticsData.visitsData());
-        model.addAttribute("interestData", statisticsData.interestData());
 
         return "statistics-page";
     }

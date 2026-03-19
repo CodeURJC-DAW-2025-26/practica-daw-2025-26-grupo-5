@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    if (chartLabels && typeof chartLabels !== 'undefinded' && chartLabels.length > 0) {
+    if (chartLabels && typeof chartLabels !== 'undefined' && chartLabels.length > 0) {
         const ctx = document.getElementById('salesByCategoryChart').getContext('2d');
 
         const brandPalette = [
