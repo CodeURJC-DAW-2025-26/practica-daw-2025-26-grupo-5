@@ -245,8 +245,15 @@ public class AdminController {
             Product updatedProduct,
             @RequestParam MultipartFile imageField) throws IOException {
 
-        // Delegate update logic to AdminService
-        adminService.updateProductAsAdmin(id, updatedProduct, imageField);
+        adminService.updateProductAsAdmin(
+                id, 
+                updatedProduct.getName(), 
+                updatedProduct.getCategory(), 
+                updatedProduct.getPrice(), 
+                updatedProduct.getDescription(), 
+                updatedProduct.getLocation(), 
+                updatedProduct.getStatus(), 
+                imageField);
 
         return "redirect:/admin/global-inventory";
     }

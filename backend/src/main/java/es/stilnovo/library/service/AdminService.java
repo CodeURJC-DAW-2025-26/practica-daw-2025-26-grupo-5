@@ -219,7 +219,14 @@ public class AdminService {
     }
 
     @Transactional
-    public void updateProductAsAdmin(long id, Product updatedData, MultipartFile imageFile) throws IOException {
+    public void updateProductAsAdmin(long id,
+                                     String name,
+                                     String category,
+                                     Double price,
+                                     String description,
+                                     String location,
+                                     String status,
+                                     MultipartFile imageFile) throws IOException {
 
         // 1. Retrieve the existing product from the database
         Product existingProduct = productRepository.findById(id)
@@ -227,29 +234,32 @@ public class AdminService {
 
         // 2. Update fields only if new data is provided and not blank (prevents
         // accidental deletion)
-        if (updatedData.getName() != null && !updatedData.getName().isBlank()) {
-            existingProduct.setName(updatedData.getName());
+        if (name != null && !name.isBlank()) {
+            existingProduct.setName(name);
         }
 
-        if (updatedData.getPrice() <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Price must be greater than 0");
-        }
-        existingProduct.setPrice(updatedData.getPrice());
-
-        if (updatedData.getDescription() != null && !updatedData.getDescription().isBlank()) {
-            existingProduct.setDescription(updatedData.getDescription());
-        }
-
-        if (updatedData.getCategory() != null && !updatedData.getCategory().isBlank()) {
-            existingProduct.setCategory(updatedData.getCategory());
+        // We only check if price is valid if it's actually provided
+        if (price != null) {
+            if (price <= 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Price must be greater than 0");
+            }
+            existingProduct.setPrice(price);
         }
 
-        if (updatedData.getLocation() != null && !updatedData.getLocation().isBlank()) {
-            existingProduct.setLocation(updatedData.getLocation());
+        if (description != null && !description.isBlank()) {
+            existingProduct.setDescription(description);
         }
 
-        if (updatedData.getStatus() != null && !updatedData.getStatus().isBlank()) {
-            existingProduct.setStatus(updatedData.getStatus());
+        if (category != null && !category.isBlank()) {
+            existingProduct.setCategory(category);
+        }
+
+        if (location != null && !location.isBlank()) {
+            existingProduct.setLocation(location);
+        }
+
+        if (status != null && !status.isBlank()) {
+            existingProduct.setStatus(status);
         }
 
         // 3. Handle image update only if a new file was actually uploaded
@@ -262,7 +272,7 @@ public class AdminService {
         // 4. Save the updated product back to the repository
         productRepository.save(existingProduct);
     }
-
+    
     @Transactional
     public Product createProductAsAdmin(Long sellerId,
             String productName,

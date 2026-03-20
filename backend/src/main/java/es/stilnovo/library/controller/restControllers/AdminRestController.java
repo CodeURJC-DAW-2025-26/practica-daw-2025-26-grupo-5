@@ -6,8 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,11 +17,15 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import es.stilnovo.library.dto.AdminProductCreateRequestDTO;
+import es.stilnovo.library.dto.AdminProductUpdateRequestDTO;
 import es.stilnovo.library.dto.AdminSummaryDTO;
 import es.stilnovo.library.dto.AdminUserBanRequestDTO;
+import es.stilnovo.library.dto.AdminUserUpdateRequestDTO;
 import es.stilnovo.library.dto.PagedResponse;
 import es.stilnovo.library.dto.ProductDTO;
 import es.stilnovo.library.dto.ProductMapper;
@@ -95,23 +101,20 @@ public class AdminRestController {
 		return userMapper.toDTO(user);
 	}
 
-	@PutMapping("/users/{id}")
+	@PutMapping(value = "/users/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<UserDTO> updateUser(
-			@PathVariable Long id,
-			@RequestParam(required = false) String email,
-			@RequestParam(required = false) String cardNumber,
-			@RequestParam(required = false) String cardCvv,
-			@RequestParam(required = false) String cardExpiringDate,
-			@RequestParam(required = false) String description) throws IOException {
+		@PathVariable Long id,
+        @RequestPart("data") AdminUserUpdateRequestDTO request,
+        @RequestPart(value = "newProfilePhoto", required = false) MultipartFile newProfilePhoto) throws IOException {
 
 		adminService.updateUserAsAdmin(
 				id,
-				null,
-				email,
-				cardNumber,
-				cardCvv,
-				cardExpiringDate,
-				description);
+				newProfilePhoto,
+				request.email(),
+				request.cardNumber(),
+				request.cardCvv(),
+				request.cardExpiringDate(),
+				request.description());
 
 		User updatedUser = userService.findById(id).orElseThrow();
 		return ResponseEntity.ok(userMapper.toDTO(updatedUser));
@@ -123,9 +126,9 @@ public class AdminRestController {
 	}
 
 	@DeleteMapping("/users/{id}")
-	public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+	public ResponseEntity<String> deleteUser(@PathVariable Long id) {
 		adminService.deleteUser(id);
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.ok("User deleted correctly");
 	}
 
 
@@ -144,61 +147,54 @@ public class AdminRestController {
 		return productMapper.toDTO(product);
 	}
 
-	@PostMapping(value = "/products", consumes = "multipart/form-data")
-	public ResponseEntity<ProductDTO> createProduct(
-			@RequestParam Long sellerId,
-			@RequestParam String name,
-			@RequestParam String category,
-			@RequestParam String description,
-			@RequestParam Double price,
-			@RequestParam String location,
-			@RequestParam(defaultValue = "Active") String status,
-			@RequestParam(required = false) MultipartFile file) throws IOException {
+	@PostMapping(value = "/products", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProductDTO> createProduct(
+            @RequestPart("data") AdminProductCreateRequestDTO request,
+            @RequestPart(value = "image", required = false) MultipartFile file) throws IOException {
 
-		Product product = adminService.createProductAsAdmin(
-				sellerId,
-				name,
-				category,
-				description,
-				price,
-				location,
-				status,
-				file);
+        Product product = adminService.createProductAsAdmin(
+                request.sellerId(),
+                request.name(),
+                request.category(),
+                request.description(),
+                request.price(),
+                request.location(),
+                request.status() != null ? request.status() : "Active",
+                file);
 
-		return ResponseEntity.ok(productMapper.toDTO(product));
-	}
+        return ResponseEntity.ok(productMapper.toDTO(product));
+    }
 
+    @PutMapping(value = "/products/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ProductDTO> updateProduct(
+            @PathVariable Long id,
+            @RequestPart("data") AdminProductUpdateRequestDTO request,
+            @RequestPart(value = "image", required = false) MultipartFile file) throws IOException {
 
-	@PutMapping(value = "/products/{id}", consumes = "multipart/form-data")
-	public ResponseEntity<ProductDTO> updateProduct(
-			@PathVariable Long id,
-			@RequestParam(required = false) String name,
-			@RequestParam(required = false) String category,
-			@RequestParam(required = false) Double price,
-			@RequestParam(required = false) String description,
-			@RequestParam(required = false) String location,
-			@RequestParam(required = false) String status,
-			@RequestParam(required = false) MultipartFile file) throws IOException {
+        // IMPORTANTE: Para cumplir la norma de "no usar entidades en el controlador REST",
+        // lo ideal es que pases el DTO o sus campos sueltos a tu servicio, y sea el SERVICIO 
+        // el que haga el "new Product()" o actualice el existente.
+        
+        // Asumiendo que adaptas tu adminService para recibir los datos sueltos 
+        // (igual que hiciste con el updateUserAsAdmin):
+        adminService.updateProductAsAdmin(
+                id,
+                request.name(),
+                request.category(),
+                request.price(),
+                request.description(),
+                request.location(),
+                request.status(),
+                file);
 
-		Product updated = new Product();
-
-		updated.setName(name);
-		if (price != null) updated.setPrice(price);
-		updated.setCategory(category);
-		updated.setDescription(description);
-		updated.setLocation(location);
-		updated.setStatus(status);
-
-		adminService.updateProductAsAdmin(id, updated, file);
-
-		Product finalProduct = productService.findById(id).orElseThrow();
-		return ResponseEntity.ok(productMapper.toDTO(finalProduct));
-	}
+        Product finalProduct = productService.findById(id).orElseThrow();
+        return ResponseEntity.ok(productMapper.toDTO(finalProduct));
+    }
 
 	@DeleteMapping("/products/{id}")
-	public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+	public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
 		adminService.deleteProductAsAdmin(id);
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.ok("Product deleted correctly");
 	}
 
 
@@ -210,12 +206,10 @@ public class AdminRestController {
 	}
 
 	@DeleteMapping("/transactions/{id}")
-	public ResponseEntity<Void> deleteTransaction(@PathVariable Long id) {
+	public ResponseEntity<String> deleteTransaction(@PathVariable Long id) {
 		transactionService.deleteTransaction(id);
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.ok("Transaction deleted correctly");
 	}
-
-
 
 	@GetMapping("/valorations")
 	public PagedResponse<ValorationDTO> getValorations(@PageableDefault(size = 10) Pageable pageable) {
@@ -225,8 +219,8 @@ public class AdminRestController {
 	}
 
 	@DeleteMapping("/valorations/{id}")
-	public ResponseEntity<Void> deleteValoration(@PathVariable Long id) {
+	public ResponseEntity<String> deleteValoration(@PathVariable Long id) {
 		valorationService.deleteById(id);
-		return ResponseEntity.noContent().build();
+		return ResponseEntity.ok("Valorations deleted correctly");
 	}
 }
