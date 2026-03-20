@@ -47,7 +47,7 @@ services:
     environment:
       SERVER_PORT: 8443
       APP_PUBLIC_BASE_URL: https://localhost:8443
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/stilnovo?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_URL: jdbc:mysql:///stilnovo-db:3306/stilnovo?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: password
       SPRING_JPA_HIBERNATE_DDL_AUTO: create
