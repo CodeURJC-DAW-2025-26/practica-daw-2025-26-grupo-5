@@ -158,31 +158,11 @@ paths:
         schema:
           type: integer
           format: int64
-      - name: email
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: cardNumber
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: cardCvv
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: cardExpiringDate
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: description
-        in: query
-        required: false
-        schema:
-          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AdminUserUpdateRequestDTO"
       responses:
         "404":
           description: Not Found
@@ -208,6 +188,10 @@ paths:
           description: Not Found
         "200":
           description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
     patch:
       tags:
       - admin-rest-controller
@@ -266,46 +250,11 @@ paths:
         schema:
           type: integer
           format: int64
-      - name: name
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: category
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: price
-        in: query
-        required: false
-        schema:
-          type: number
-          format: double
-      - name: description
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: location
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: status
-        in: query
-        required: false
-        schema:
-          type: string
       requestBody:
         content:
           multipart/form-data:
             schema:
-              type: object
-              properties:
-                file:
-                  type: string
-                  format: binary
+              $ref: "#/components/schemas/AdminProductUpdateRequestDTO"
       responses:
         "404":
           description: Not Found
@@ -331,6 +280,10 @@ paths:
           description: Not Found
         "200":
           description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/v1/valorations:
     get:
       tags:
@@ -607,54 +560,11 @@ paths:
       tags:
       - admin-rest-controller
       operationId: createProduct_1
-      parameters:
-      - name: sellerId
-        in: query
-        required: true
-        schema:
-          type: integer
-          format: int64
-      - name: name
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: category
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: description
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: price
-        in: query
-        required: true
-        schema:
-          type: number
-          format: double
-      - name: location
-        in: query
-        required: true
-        schema:
-          type: string
-      - name: status
-        in: query
-        required: false
-        schema:
-          type: string
-          default: Active
       requestBody:
         content:
           multipart/form-data:
             schema:
-              type: object
-              properties:
-                file:
-                  type: string
-                  format: binary
+              $ref: "#/components/schemas/AdminProductCreateRequestDTO"
       responses:
         "404":
           description: Not Found
@@ -777,7 +687,13 @@ paths:
     get:
       tags:
       - user-web-rest-controller
-      operationId: getMyValorations
+      operationId: getMySentValorations
+      parameters:
+      - name: pageable
+        in: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/Pageable"
       responses:
         "404":
           description: Not Found
@@ -786,9 +702,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ValorationDTO"
+                $ref: "#/components/schemas/PageValorationDTO"
   /api/v1/users/me/transactions:
     get:
       tags:
@@ -1178,6 +1092,10 @@ paths:
           description: Not Found
         "200":
           description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/v1/admin/transactions/{id}:
     delete:
       tags:
@@ -1195,6 +1113,10 @@ paths:
           description: Not Found
         "200":
           description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
 components:
   schemas:
     UserSettingsUpdateDTO:
@@ -1306,6 +1228,35 @@ components:
           - VIEW
           - LIKE
           - BUY
+    AdminUserUpdateRequestDTO:
+      type: object
+      properties:
+        email:
+          type: string
+        cardNumber:
+          type: string
+        cardCvv:
+          type: string
+        cardExpiringDate:
+          type: string
+        description:
+          type: string
+    AdminProductUpdateRequestDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        category:
+          type: string
+        price:
+          type: number
+          format: double
+        description:
+          type: string
+        location:
+          type: string
+        status:
+          type: string
     ValorationDTO:
       type: object
       properties:
@@ -1325,6 +1276,9 @@ components:
     SignupRequestDTO:
       type: object
       properties:
+        profilePicture:
+          type: string
+          format: binary
         username:
           type: string
         email:
@@ -1438,6 +1392,28 @@ components:
           type: string
         password:
           type: string
+    AdminProductCreateRequestDTO:
+      type: object
+      properties:
+        sellerId:
+          type: integer
+          format: int64
+        name:
+          type: string
+        category:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: double
+        location:
+          type: string
+        status:
+          type: string
+        image:
+          type: string
+          format: binary
     AdminUserBanRequestDTO:
       type: object
       properties:
@@ -1493,6 +1469,65 @@ components:
           type: integer
           format: int32
         owner:
+          type: boolean
+    PageValorationDTO:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValorationDTO"
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: "#/components/schemas/SortObject"
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        paged:
+          type: boolean
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        unpaged:
+          type: boolean
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: "#/components/schemas/SortObject"
+    SortObject:
+      type: object
+      properties:
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+        empty:
           type: boolean
     UserStatisticsDataDTO:
       type: object
