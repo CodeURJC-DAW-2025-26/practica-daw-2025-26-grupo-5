@@ -1,29 +1,27 @@
 # ============================================================
 # Docker Compose - Stilnovo Application
 # ============================================================
-# Complete development and production environment setup with:
-# - MySQL 8.4 database with health checks
-# - Spring Boot application service
-# - Persistent database volume
-# - Environment variable parametrization for flexibility
+# Orchestrates MySQL 8.4 database + Spring Boot application containers
+# All infrastructure configured via environment variables for flexibility.
 #
-# Two-mode Operation:
-#   FIRST RUN (Database initialization):
-#     1. Set DDL_AUTO=create (Hibernate creates schema + loads sample data)
-#     2. Run docker compose up
-#     
-#     Command: docker compose -e DDL_AUTO=create up
-
-#   SUBSEQUENT RUNS (Data preservation):
-#     1. DDL_AUTO defaults to 'none' (Hibernate doesn't touch schema)
-#     2. Existing data remains intact
-
-#     Command: docker compose up  
-# 
-# Environment Variables:
-#   DDL_AUTO: Hibernate DDL strategy (create, update, validate, none)
-#   APP_IMAGE: Application image from DockerHub (e.g., user/stilnovo:latest)
-#   APP_PUBLIC_BASE_URL: External URL for redirect/email links
+# REQUIRED ENVIRONMENT VARIABLES:
+#   MYSQL_ROOT_PASSWORD: Database root password (default: 'password')
+#   MYSQL_DATABASE: Initial schema name (default: 'stilnovo')
+#   DDL_AUTO: Hibernate DDL strategy (default: 'update')
+#             Values: create|update|validate|none
+#
+# EXECUTION MODES:
+#   FIRST RUN (initialize schema):
+#     $ docker compose -e DDL_AUTO=create up
+#   
+#   SUBSEQUENT RUNS (preserve data):
+#     $ docker compose up
+#
+# SERVICES:
+#   db: MySQL 8.4 with health checks and persistent volume
+#   app: Spring Boot application (depends on database readiness)
+#
+# Features: Multi-stage build, health checks, auto-retry, persistent storage
 # ============================================================
 
 services:
