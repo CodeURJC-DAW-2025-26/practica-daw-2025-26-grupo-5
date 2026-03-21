@@ -60,18 +60,18 @@
 				{
 					"name": "Logout",
 					"request": {
-						"method": "DELETE",
+						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/sessions/current",
+							"raw": "{{baseUrl}}/api/v1/auth/logout",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"sessions",
-								"current"
+								"auth",
+								"logout"
 							]
 						}
 					},
@@ -86,20 +86,42 @@
 					"name": "Create User",
 					"request": {
 						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
+						"header": [],
 						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"username\": \"newuser\",\n  \"email\": \"newuser@example.com\",\n  \"password\": \"Password123!\",\n  \"confirmPassword\": \"Password123!\"\n}"
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "username",
+									"value": "newuser",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "newuser@example.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Password123!",
+									"type": "text"
+								},
+								{
+									"key": "confirmPassword",
+									"value": "Password123!",
+									"type": "text"
+								},
+								{
+									"key": "profilePicture",
+									"type": "file",
+									"src": [],
+									"description": "Opcional: Selecciona una imagen desde Postman"
+								}
+							]
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/users",
+							"raw": "{{baseurl}}/api/v1/users",
 							"host": [
-								"{{baseUrl}}"
+								"{{baseurl}}"
 							],
 							"path": [
 								"api",
