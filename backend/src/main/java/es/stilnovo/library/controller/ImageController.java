@@ -13,7 +13,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import es.stilnovo.library.service.ImageService;
 
-/** Controller for serving product images */
+/**
+ * ImageController: Handles product image serving
+ * 
+ * This controller manages:
+ * - Product image retrieval by ID
+ * - HTTP response with appropriate media type (JPEG, PNG, etc.)
+ * - Image caching optimization with MediaType detection
+ * 
+ * Uses: ImageService
+ */
 @Controller
 public class ImageController {
 

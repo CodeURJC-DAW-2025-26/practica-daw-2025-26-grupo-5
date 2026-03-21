@@ -1,43 +1,59 @@
 # ============================================================
-#  Stilnovo - Docker Compose
+# Docker Compose - Stilnovo Application
 # ============================================================
-#  NOTE: user means the personal user of each developer
+# Complete development and production environment setup with:
+# - MySQL 8.4 database with health checks
+# - Spring Boot application service
+# - Persistent database volume
+# - Environment variable parametrization for flexibility
 #
-#  FIRST RUN (creates schema + loads sample data):
-#    Linux/macOS:
-#      DDL_AUTO=create docker compose -f oci://<user>/stilnovo-compose:latest up
-#
-#    Windows PowerShell:
-#      $env:DDL_AUTO="create"
-#      docker compose -f oci://<user>/stilnovo-compose:latest up
-#
-#  SUBSEQUENT RUNS (intact schema, without deleting data):
-#    docker compose -f oci://<user>/stilnovo-compose:latest up
-#
-#  APP_IMAGE: application image published on DockerHub.
-#    Linux/macOS:  APP_IMAGE=<user>/stilnovo:latest docker compose ... up
-#    PowerShell:   $env:APP_IMAGE="<user>/stilnovo:latest"
+# Two-mode Operation:
+#   FIRST RUN (Database initialization):
+#     1. Set DDL_AUTO=create (Hibernate creates schema + loads sample data)
+#     2. Run docker compose up
+#     
+#     Command: docker compose -e DDL_AUTO=create up
+
+#   SUBSEQUENT RUNS (Data preservation):
+#     1. DDL_AUTO defaults to 'none' (Hibernate doesn't touch schema)
+#     2. Existing data remains intact
+
+#     Command: docker compose up  
+# 
+# Environment Variables:
+#   DDL_AUTO: Hibernate DDL strategy (create, update, validate, none)
+#   APP_IMAGE: Application image from DockerHub (e.g., user/stilnovo:latest)
+#   APP_PUBLIC_BASE_URL: External URL for redirect/email links
 # ============================================================
 
 services:
+  # MySQL Database Service
+  # Initializes on first run, persists data in named volume
+  # Health check ensures app doesn't start until DB is ready
   db:
     image: mysql:8.4
     container_name: stilnovo-db
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: stilnovo
+      # Database root password - configurable via env variable
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-password}
+      # Initial schema name - configurable via env variable
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-stilnovo}
     ports:
       - "3306:3306"
+    # Health check: waits for MySQL to be ready before app starts
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-ppassword"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-password}"]
       interval: 10s
       timeout: 5s
       retries: 10
     volumes:
       - mysql_data:/var/lib/mysql
 
+  # Spring Boot Application Service
+  # Depends on database health check before starting
+  # Configure via environment variables for dev/prod flexibility
   app:
-    image: ${DOCKER_USER}/stilnovo:latest
+    image: stilnovo/stilnovo:latest
     container_name: stilnovo-app
     depends_on:
       db:
@@ -45,13 +61,17 @@ services:
     ports:
       - "8443:8443"
     environment:
+      # Server port
       SERVER_PORT: 8443
-      APP_PUBLIC_BASE_URL: https://localhost:8443
-      SPRING_DATASOURCE_URL: jdbc:mysql:///stilnovo-db:3306/stilnovo?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
+      # Database connection URL - points to 'db' service
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/${MYSQL_DATABASE:-stilnovo}?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false
+      # Database credentials - root user with configurable password
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_HIBERNATE_DDL_AUTO: create
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-password}
+      # Hibernate DDL strategy: create (init) or update (preserve data)
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO:-update}
 
+# Persistent named volume for MySQL data
 volumes:
   mysql_data:
 

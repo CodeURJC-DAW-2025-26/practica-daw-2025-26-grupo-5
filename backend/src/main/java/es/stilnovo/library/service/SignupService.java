@@ -15,6 +15,16 @@ import org.springframework.web.server.ResponseStatusException;
 
 import es.stilnovo.library.model.User;
 
+/**
+ * SignupService: Handles user registration and account creation
+ * 
+ * This service manages:
+ * - User input validation (password matching, username/email uniqueness)
+ * - Password encoding with bcrypt
+ * - Profile picture upload and handling
+ * - Default profile image assignment if none provided
+ * - New user account creation with default roles and settings
+ */
 @Service
 public class SignupService {
 
@@ -24,6 +34,17 @@ public class SignupService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    /**
+     * Registers a new user in the system with validation and profile setup
+     * @param profilePicture Optional profile picture file
+     * @param username Unique username for the new account
+     * @param email Unique email address
+     * @param password Account password
+     * @param confirmPassword Confirmation of password
+     * @return Created User entity with default settings
+     * @throws IOException If image processing fails
+     * @throws ResponseStatusException 400 if passwords don't match, 409 if username/email exists
+     */
     public User registerUser(MultipartFile profilePicture, String username, String email, String password,
             String confirmPassword)
             throws IOException {

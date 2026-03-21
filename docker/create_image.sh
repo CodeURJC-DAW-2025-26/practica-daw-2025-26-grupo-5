@@ -1,3 +1,26 @@
+#!/bin/bash
+# ============================================================
+# Script: Build Docker Image from Source
+# ============================================================
+# Builds a Docker image using the Dockerfile in the current directory
+# Compiles Maven project, creates optimized multi-stage image
+#
+# Prerequisites:
+#   - Docker installed and running
+#   - Dockerfile present in docker/ folder
+#   - Backend source code in backend/ folder (relative to docker)
+#
+# Usage:
+#   ./create_image.sh image-name:tag
+#
+# Example:
+#   ./create_image.sh mystilnovo:latest
+#   ./create_image.sh myregistry.azurecr.io/stilnovo:v1
+#
+# Arguments:
+#   $ImageName: Desired image name with optional tag (e.g., myuser/app:v1.0)
+# ============================================================
+
 param(
     [Parameter(Mandatory = $true)]
     [string]$ImageName

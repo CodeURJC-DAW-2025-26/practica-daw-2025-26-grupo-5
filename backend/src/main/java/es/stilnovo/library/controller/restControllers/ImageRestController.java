@@ -25,6 +25,10 @@ import es.stilnovo.library.dto.ProductMapper;
 import es.stilnovo.library.service.ImageService;
 import es.stilnovo.library.service.ProductService;
 
+/**
+ * REST Controller for image operations
+ * Provides endpoints for retrieving and replacing product images
+ */
 @RestController
 @RequestMapping("/api/v1")
 public class ImageRestController {
@@ -41,11 +45,22 @@ public class ImageRestController {
 	@Autowired
 	private ProductMapper productMapper;
 
+	/**
+	 * Retrieves image metadata for a specific product
+	 * @param productId The ID of the product
+	 * @return ImageDTO containing the image ID
+	 */
 	@GetMapping("/products/{productId}/image")
 	public ImageDTO getProductImage(@PathVariable long productId) {
 		return imageMapper.toDTO(imageService.getProductImage(productId));
 	}
 
+	/**
+	 * Retrieves the actual image file bytes
+	 * @param imageId The ID of the image to retrieve
+	 * @return JPEG image content as ResponseEntity
+	 * @throws SQLException If database access fails
+	 */
 	@GetMapping(value = "/images/{imageId}/file", produces = MediaType.IMAGE_JPEG_VALUE)
 	public ResponseEntity<Resource> getImageFile(@PathVariable long imageId) throws SQLException {
 		return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageService.getImageFile(imageId));

@@ -12,6 +12,16 @@ import org.springframework.web.server.ResponseStatusException;
 import es.stilnovo.library.dto.ApiErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
+/**
+ * Global REST Controller Advice: Centralized exception handling for REST endpoints
+ * 
+ * This component handles:
+ * - ResponseStatusException mapping with detailed error responses
+ * - NoSuchElementException conversion to 404 responses
+ * - IllegalStateException conversion to 409 Conflict responses
+ * - Generic Exception handling with 500 Internal Server Error
+ * - Standardized API error response format (ApiErrorResponse)
+ */
 @RestControllerAdvice
 public class GlobalRestControllerAdvice {
 

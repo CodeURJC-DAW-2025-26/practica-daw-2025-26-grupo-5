@@ -15,6 +15,10 @@ import es.stilnovo.library.dto.ProductMapper;
 import es.stilnovo.library.dto.UserMapper;
 import es.stilnovo.library.service.MainService;
 
+/**
+ * REST Controller for catalog and homepage operations
+ * Provides endpoints for browsing products with search and filtering
+ */
 @RestController
 @RequestMapping("/api/v1/catalog")
 public class MainRestController {
@@ -28,6 +32,14 @@ public class MainRestController {
         @Autowired
         private UserMapper userMapper;
 
+        /**
+         * Retrieves home page data with filtered products and recommendations
+         * @param query Optional search query
+         * @param category Optional category filter
+         * @param pageable Pagination parameters
+         * @param principal Authenticated user (optional)
+         * @return HomePageDTO with products, recommendations, and metadata
+         */
         @GetMapping
         public HomePageDTO getHomePage(
                         @RequestParam(required = false) String query,

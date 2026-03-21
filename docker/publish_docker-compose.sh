@@ -1,3 +1,8 @@
+#!/bin/bash
+# Script: Publish Docker Compose as OCI Artifact
+# Packages docker-compose.yml as OCI Artifact for remote deployment
+# Prerequisites: ORAS CLI tool, docker login
+
 param(
     [Parameter(Mandatory = $true)]
     [string]$DockerHubImage
@@ -5,10 +10,11 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$composeFile = Join-Path $PSScriptRoot "docker_compose.yml"
+# Locate docker-compose.yml in same directory as script
+$composeFile = Join-Path $PSScriptRoot "docker-compose.yml"
 
 if (-not (Test-Path $composeFile)) {
-    throw "No se encuentra docker_compose.yml en $PSScriptRoot"
+    throw "docker-compose.yml not found in $PSScriptRoot - script must run from docker/ directory"
 }
 
 if (-not (Get-Command oras -ErrorAction SilentlyContinue)) {

@@ -22,6 +22,10 @@ import es.stilnovo.library.dto.NotificationResultDTO;
 import es.stilnovo.library.service.InquiryService;
 import es.stilnovo.library.service.NotificationService;
 
+/**
+ * REST Controller for buyer-to-seller inquiries
+ * Provides endpoints for creating and retrieving product inquiries
+ */
 @RestController
 @RequestMapping("/api/v1/notifications")
 public class NotificationRestController {
@@ -35,11 +39,22 @@ public class NotificationRestController {
 	@Autowired
 	private InquiryService inquiryService;
 
+	/**
+	 * Retrieves a specific inquiry by ID
+	 * @param id The ID of the inquiry
+	 * @return InquiryDTO with inquiry details
+	 */
 	@GetMapping("/inquiries/{id}")
 	public InquiryDTO getInquiry(@PathVariable Long id) {
 		return inquiryMapper.toDTO(inquiryService.findById(id));
 	}
 
+	/**
+	 * Submits a new inquiry from buyer to seller
+	 * @param request InquiryRequestDTO with product, message, and contact info
+	 * @param principal Authenticated buyer
+	 * @return 201 Created with NotificationResultDTO and inquiry location URI
+	 */
 	@PostMapping("/inquiries")
 	public ResponseEntity<NotificationResultDTO> sendInquiry(@RequestBody InquiryRequestDTO request,
 			Principal principal) {

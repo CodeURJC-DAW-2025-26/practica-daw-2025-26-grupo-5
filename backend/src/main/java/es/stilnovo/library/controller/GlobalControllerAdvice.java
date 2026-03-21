@@ -12,6 +12,17 @@ import java.security.Principal;
 @ControllerAdvice
 public class GlobalControllerAdvice {
 
+    /**
+     * Global Controller Advice: Adds common model attributes to all views
+     * 
+     * This component manages:
+     * - User authentication data binding to templates
+     * - CSRF token injection for form operations
+     * - Admin role availability in all views
+     * - Login status tracking for conditional UI rendering
+     * 
+     * Uses: UserService
+     */
     @Autowired
     private UserService userService;
 

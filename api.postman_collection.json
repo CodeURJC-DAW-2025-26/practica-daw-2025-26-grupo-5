@@ -143,7 +143,7 @@
 									"key": "profilePicture",
 									"type": "file",
 									"src": [],
-									"description": "Opcional: Selecciona una imagen desde Postman"
+									"description": "Optional: Select an image from Postman"
 								}
 							]
 						},
@@ -795,7 +795,7 @@
 									"key": "file",
 									"type": "file",
 									"src": [],
-									"description": "Selecciona la imagen del producto aquí"
+									"description": "Select the product image here"
 								}
 							]
 						},
@@ -1159,7 +1159,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"stars\": 4,\n  \"comment\": \"Buon prodotto, ma spedizione lenta\"\n}"
+							"raw": "{\n  \"stars\": 4,\n  \"comment\": \"Good product, but slow shipping\"\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/valorations/1",

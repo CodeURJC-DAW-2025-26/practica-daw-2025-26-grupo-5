@@ -265,10 +265,10 @@ public class ValorationService {
      * Fetches paginated ratings submitted BY the user to other sellers.
      */
     public Page<ValorationDTO> getMyGivenValorations(String username, Pageable pageable) {
-        // 1. Buscamos en el repo usando el nuevo método por comprador
+        // 1. We search the repository using the new method by buyer
         Page<Valoration> valorations = valorationRepository.findByBuyerName(username, pageable);
         
-        // 2. Mapeamos a DTO para no devolver entidades
+        // 2. We map to DTO so as not to return entities
         return valorations.map(valorationMapper::toDTO);
     }
 }

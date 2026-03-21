@@ -2,6 +2,10 @@ package es.stilnovo.library.dto;
 
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Request body for creating or updating product listings with file upload capability.
+ * Contains product details and an optional image file to be uploaded.
+ */
 public class ProductWriteRequestDTO {
 
     private String name;

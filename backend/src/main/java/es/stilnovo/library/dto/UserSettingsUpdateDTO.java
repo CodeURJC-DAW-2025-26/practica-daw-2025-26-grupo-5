@@ -2,6 +2,10 @@ package es.stilnovo.library.dto;
 
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * Request body for updating user account settings and profile information.
+ * Supports updating profile picture, email, payment card details, and description.
+ */
 public class UserSettingsUpdateDTO {
 
     private MultipartFile newProfilePhoto;
