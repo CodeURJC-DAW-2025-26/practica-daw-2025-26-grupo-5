@@ -119,9 +119,9 @@
 							]
 						},
 						"url": {
-							"raw": "{{baseurl}}/api/v1/users",
+							"raw": "{{baseUrl}}/api/v1/users",
 							"host": [
-								"{{baseurl}}"
+								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
