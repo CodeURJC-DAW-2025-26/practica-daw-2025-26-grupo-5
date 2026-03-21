@@ -1,4 +1,4 @@
-package es.stilnovo.library.controller.Auth;
+package es.stilnovo.library.controller.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +31,7 @@ public class LoginRestController {
 			@CookieValue(name = "RefreshToken", required = false) String refreshToken,
 			HttpServletResponse response) {
 		if (refreshToken == null || refreshToken.isBlank()) {
-			return ResponseEntity.ok(new AuthResponse(AuthResponse.Status.FAILURE, "Missing refresh token"));
+			return ResponseEntity.badRequest().body((new AuthResponse(AuthResponse.Status.FAILURE, "Missing refresh token")));
 		}
 		return userLoginService.refresh(response, refreshToken);
 	}
