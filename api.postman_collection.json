@@ -76,35 +76,6 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Forgot Password",
-					"request": {
-						"method": "POST",
-						"header": [
-							{
-								"key": "Content-Type",
-								"value": "application/json"
-							}
-						],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n  \"email\": \"user@example.com\"\n}"
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/auth/forgot-password",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"auth",
-								"forgot-password"
-							]
-						}
-					},
-					"response": []
 				}
 			]
 		},

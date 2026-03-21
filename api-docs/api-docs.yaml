@@ -595,6 +595,22 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ValorationDTO"
+    delete:
+      tags:
+      - valoration-rest-controller
+      operationId: deleteValoration
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Not Found
+        "204":
+          description: No Content
   /api/v1/users/{id}/profile:
     get:
       tags:
