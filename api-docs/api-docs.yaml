@@ -462,7 +462,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ProductDTO"
-  /api/v1/notifications/inquiries:
+  /api/v1/inquiries:
     post:
       tags:
       - notification-rest-controller
@@ -928,7 +928,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ProductDTO"
-  /api/v1/notifications/inquiries/{id}:
+  /api/v1/inquiries/{id}:
     get:
       tags:
       - notification-rest-controller

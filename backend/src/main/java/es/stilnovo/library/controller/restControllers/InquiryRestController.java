@@ -27,8 +27,8 @@ import es.stilnovo.library.service.NotificationService;
  * Provides endpoints for creating and retrieving product inquiries
  */
 @RestController
-@RequestMapping("/api/v1/notifications")
-public class NotificationRestController {
+@RequestMapping("/api/v1/inquiries")
+public class InquiryRestController {
 
 	@Autowired
 	private NotificationService notificationService;
@@ -44,7 +44,7 @@ public class NotificationRestController {
 	 * @param id The ID of the inquiry
 	 * @return InquiryDTO with inquiry details
 	 */
-	@GetMapping("/inquiries/{id}")
+	@GetMapping("/{id}")
 	public InquiryDTO getInquiry(@PathVariable Long id) {
 		return inquiryMapper.toDTO(inquiryService.findById(id));
 	}
@@ -55,7 +55,7 @@ public class NotificationRestController {
 	 * @param principal Authenticated buyer
 	 * @return 201 Created with NotificationResultDTO and inquiry location URI
 	 */
-	@PostMapping("/inquiries")
+	@PostMapping()
 	public ResponseEntity<NotificationResultDTO> sendInquiry(@RequestBody InquiryRequestDTO request,
 			Principal principal) {
 		var result = notificationService.sendInquiry(
@@ -76,7 +76,7 @@ public class NotificationRestController {
 		}
 
 		URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-				.path("/api/v1/notifications/inquiries/{id}")
+				.path("/api/v1/inquiries/{id}")
 				.buildAndExpand(result.inquiry().getId())
 				.toUri();
 

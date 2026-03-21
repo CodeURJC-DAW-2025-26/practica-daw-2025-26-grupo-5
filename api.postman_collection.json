@@ -991,7 +991,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/notifications/inquiries/1",
+							"raw": "{{baseUrl}}/api/v1/inquiries/1",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -1021,7 +1021,7 @@
 							"raw": "{\n  \"productId\": 1,\n  \"phone\": \"+34600111222\",\n  \"type\": \"QUESTION\",\n  \"message\": \"Hola, sigue disponible?\"\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/notifications/inquiries",
+							"raw": "{{baseUrl}}/api/v1/inquiries",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -1041,7 +1041,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/notifications/inquiries?page=0&size=10",
+							"raw": "{{baseUrl}}/api/v1/inquiries?page=0&size=10",
 							"host": [
 								"{{baseUrl}}"
 							],
