@@ -92,8 +92,8 @@ public class WebSecurityConfig {
                                                 .anyRequest().hasAnyRole("USER", "ADMIN"));
 
                 // REST Security best practices
-                http.formLogin(form -> form.disable());
                 http.csrf(csrf -> csrf.disable());
+                http.formLogin(form -> form.disable());
                 http.httpBasic(basic -> basic.disable());
                 http.sessionManagement(mgmt -> mgmt.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
