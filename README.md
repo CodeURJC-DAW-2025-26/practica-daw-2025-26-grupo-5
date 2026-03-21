@@ -603,7 +603,7 @@ Diagrama actualizado incluyendo los @RestController y su relación con los @Serv
 
 ### **URL de la Aplicación Desplegada**
 
-🌐 **URL de acceso**: `https://[nombre-app].etsii.urjc.es:8443`
+🌐 **URL de acceso remota (URJC)**: `https://appweb05.dawgis.etsii.urjc.es:8443`
 
 #### **Credenciales de Usuarios de Ejemplo**
 
@@ -643,17 +643,17 @@ Diagrama actualizado incluyendo los @RestController y su relación con los @Serv
 
 ---
 
-#### **Alumno 3 - [Nombre Completo]**
+#### **Alumno 3 - Raúl Tejada Merinero**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+He extraído gran parte de la lógica de negocio de los controladores hacia los servicios, mejorando significativamente la mantenibilidad y testabilidad del código base. Implementé los controllers REST de PDF, Image, Notification y Transaction, además de diseñar y desarrollar los DTOs que aseguran una comunicación correcta entre frontend y backend. He sido responsable de la creación y configuración completa de la infraestructura Docker: Dockerfile con multi-stage build, docker-compose.yml parametrizado para multi-entorno, y scripts de publicación en DockerHub. Agregué documentación comprehensiva con JavaDoc en 40+ archivos (controladores, servicios, DTOs, configuración Docker), asegurando coherencia en inglés. Responsable de la grabación del vídeo de la entrega de Práctica 2.
 
 | Nº    | Commits      | Files      |
 |:------------: |:------------:| :------------:|
-|1| [Descripción commit 1](URL_commit_1)  | [Archivo1](URL_archivo_1)   |
-|2| [Descripción commit 2](URL_commit_2)  | [Archivo2](URL_archivo_2)   |
-|3| [Descripción commit 3](URL_commit_3)  | [Archivo3](URL_archivo_3)   |
-|4| [Descripción commit 4](URL_commit_4)  | [Archivo4](URL_archivo_4)   |
-|5| [Descripción commit 5](URL_commit_5)  | [Archivo5](URL_archivo_5)   |
+|1| [feat: implement REST endpoints, refactor services, add Docker config, mobile dashboards and validations](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/683a6a0b174c203ec5e1937c562e079530cc413d)  | [NotificationService.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/service/NotificationService.java)   |
+|2| [feat: internationalize codebase with English docs and fix docker parametrization](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/53db67b80c5e91283329f71f39252fab772a465f)  | [UserWebController.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/UserWebController.java)   |
+|3| [chore: format numbers the same way in backend and templates](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/60dc3215315075456ab7d9c28f9a07ad25cb8e7d)  | [AdminService.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/service/AdminService.java)   |
+|4| [Revert changes that was an error](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/5c4d0a20fe5f8afa31229f7579531665444a44b3)  | [ProductService.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/service/ProductService.java)   |
+|5| [Create /docker folder but need to be revised](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/a5d4b03c3588c9919628f71729407a4b8a448f3b)  | [TransactionService.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/service/TransactionService.java)   |
 
 ---
 
