@@ -50,16 +50,6 @@ public class UserWebController {
     @Autowired
     private ContactSellerService contactSellerService;
 
-    @GetMapping("/about-page")
-    public String showAboutPage() {
-        return "about-page";
-    }
-
-    @GetMapping("/help-center-page")
-    public String showHelpPage() {
-        return "help-center-page";
-    }
-
     /**
      * GET method to retrieve the profile photo of the currently authenticated user.
      * Uses 'me' in the URL to hide the ID and rely on the session Principal.
@@ -218,19 +208,25 @@ public class UserWebController {
         return "sales-and-orders-page";
     }
 
-    @GetMapping("/help-center-page/{id}")
-    public String showHelpCenterPage(Model model, @PathVariable long id, HttpServletRequest request) {
-
-        // Use service layer instead of direct repository access
-        User user = userService.findById(id).orElseThrow();
-
-        if (request.getUserPrincipal() == null || !request.getUserPrincipal().getName().equals(user.getName())) {
-            return "redirect:/error";
+    /**
+     * Renders the help center page. 
+     * If the user is logged in, it provides personalized support data.
+     */
+    @GetMapping("/help-center-page")
+    public String showHelpPage(Model model, Principal principal) {
+        // If there is a session, we add the user data to the sidebar/header
+        if (principal != null) {
+            User user = userService.findByName(principal.getName()).orElseThrow();
+            model.addAttribute("user", user);
+            model.addAttribute("isLoggedIn", true);
         }
-
-        model.addAttribute("user", user);
-
+        
         return "help-center-page";
+    }
+
+    @GetMapping("/about-page")
+    public String showAboutPage() {
+        return "about-page";
     }
 
     /* USER SETTING PAGE (PERSONAL INFORMATION) */
