@@ -82,4 +82,24 @@ public class ValorationRestController {
 
         return ResponseEntity.created(location).body(new ValorationDTO(created));
     }
+
+    /**
+     * Deletes a valoration by its ID.
+     * Only the author of the valoration or an admin can delete it.
+     *
+     * @param id        The ID of the valoration to delete.
+     * @param principal The security context of the authenticated user.
+     * @return ResponseEntity with 204 No Content status on success.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteValoration(@PathVariable Long id, Principal principal) {
+        // 1. Resolve the authenticated user
+        var currentUser = userService.findByName(principal.getName()).orElseThrow();
+
+        // 2. Call service to delete (security checks are done inside the service)
+        valorationService.deleteValoration(id, currentUser);
+
+        // 3. Return 204 No Content
+        return ResponseEntity.noContent().build();
+    }
 }
