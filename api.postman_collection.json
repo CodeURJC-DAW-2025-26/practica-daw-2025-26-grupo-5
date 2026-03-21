@@ -43,14 +43,14 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/sessions/refresh",
+							"raw": "{{baseUrl}}/api/v1/auth/refresh",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
 								"v1",
-								"sessions",
+								"auth",
 								"refresh"
 							]
 						}
