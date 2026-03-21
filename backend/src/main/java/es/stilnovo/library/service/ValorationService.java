@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 
 import es.stilnovo.library.model.Valoration;
 import es.stilnovo.library.model.User;
+import es.stilnovo.library.dto.ValorationDTO;
+import es.stilnovo.library.dto.ValorationMapper;
 import es.stilnovo.library.model.Transaction;
 
 import es.stilnovo.library.repository.ValorationRepository;
@@ -41,6 +43,9 @@ public class ValorationService {
 
     @Autowired
     private TransactionRepository transactionRepository;
+
+    @Autowired
+    private ValorationMapper valorationMapper;
 
     /**
      * Filters transactions that have been completed by the buyer but have no rating yet.
@@ -254,5 +259,16 @@ public class ValorationService {
         if (seller != null) {
             updateSellerStats(seller);
         }
+    }
+
+    /**
+     * Fetches paginated ratings submitted BY the user to other sellers.
+     */
+    public Page<ValorationDTO> getMyGivenValorations(String username, Pageable pageable) {
+        // 1. Buscamos en el repo usando el nuevo método por comprador
+        Page<Valoration> valorations = valorationRepository.findByBuyerName(username, pageable);
+        
+        // 2. Mapeamos a DTO para no devolver entidades
+        return valorations.map(valorationMapper::toDTO);
     }
 }

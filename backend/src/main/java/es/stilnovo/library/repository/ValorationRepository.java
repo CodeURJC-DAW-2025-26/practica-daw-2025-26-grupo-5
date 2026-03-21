@@ -1,5 +1,7 @@
 package es.stilnovo.library.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -49,4 +51,6 @@ public interface ValorationRepository extends JpaRepository<Valoration, Long> {
     @Modifying
     @Query("DELETE FROM Valoration v WHERE v.transaction IN :transactions")
     void deleteByTransactionIn(List<Transaction> transactions);
+
+    Page<Valoration> findByBuyerName(String name, Pageable pageable);
 }

@@ -45,7 +45,7 @@ public class TransactionRestController {
     private UserMapper userMapper;
 
     /**
-     * Processes and confirms a new product purchase.
+     * Processes and confirms a **new product purchase**.
      * The buyer identity is resolved from the security context, and the transaction
      * is created based on the provided product ID.
      *
@@ -105,15 +105,13 @@ public class TransactionRestController {
 
     /**
      * Prepares the checkout summary for a potential purchase.
-     * This endpoint aggregates the product to be bought and the authenticated
-     * buyer's
-     * profile data to facilitate the final review step in the payment process.
+     * This endpoint aggregates the product details and the authenticated
+     * buyer's profile data to facilitate the final review step.
      *
      * @param id        The unique identifier of the product to be purchased.
-     * @param principal The security context of the authenticated user (prospective
-     *                  buyer).
-     * @return CheckoutDTO containing the product details and the buyer's
-     *         information.
+     * @param principal The security context of the authenticated user.
+     * @return CheckoutDTO containing the product details and the buyer's information.
+     * Note: This is a read-only preview and does not execute the transaction.
      */
     @GetMapping("/{id}/checkout")
     public CheckoutDTO getCheckout(@PathVariable long id, Principal principal) {

@@ -3,11 +3,12 @@ package es.stilnovo.library.controller.restControllers;
 import java.io.IOException;
 import java.security.Principal;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,6 +33,7 @@ import es.stilnovo.library.dto.ValorationMapper;
 import es.stilnovo.library.service.ContactSellerService;
 import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.UserService;
+import es.stilnovo.library.service.ValorationService;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -45,6 +47,9 @@ public class UserWebRestController {
 
     @Autowired
     private ContactSellerService contactSellerService;
+
+    @Autowired
+    private ValorationService valorationService;
 
     @Autowired
     private UserMapper userMapper;
@@ -121,10 +126,19 @@ public class UserWebRestController {
         return ResponseEntity.ok(data);
     }
 
+    /**
+     * GET /api/v1/users/me/valorations
+     * Retrieves a paginated list of ratings for the authenticated user.
+     */
     @GetMapping("/me/valorations")
-    public ResponseEntity<List<ValorationDTO>> getMyValorations(Principal principal) {
-        var user = userService.getFullUserProfile(principal.getName());
-        return ResponseEntity.ok(valorationMapper.toDTOs(user.getValorations()));
+    public ResponseEntity<Page<ValorationDTO>> getMySentValorations(
+            Principal principal, 
+            Pageable pageable) {
+
+        // my valorations
+        Page<ValorationDTO> valorations = valorationService.getMyGivenValorations(principal.getName(), pageable);
+        
+        return ResponseEntity.ok(valorations);
     }
 
     @GetMapping("/me/statistics")

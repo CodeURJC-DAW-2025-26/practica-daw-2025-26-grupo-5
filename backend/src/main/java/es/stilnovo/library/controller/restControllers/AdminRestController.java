@@ -7,150 +7,178 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import es.stilnovo.library.dto.AdminProductCreateRequestDTO;
-import es.stilnovo.library.dto.AdminProductUpdateRequestDTO;
-import es.stilnovo.library.dto.AdminSummaryDTO;
-import es.stilnovo.library.dto.AdminUserBanRequestDTO;
-import es.stilnovo.library.dto.AdminUserUpdateRequestDTO;
-import es.stilnovo.library.dto.PagedResponse;
-import es.stilnovo.library.dto.ProductDTO;
-import es.stilnovo.library.dto.ProductMapper;
-import es.stilnovo.library.dto.TransactionDTO;
-import es.stilnovo.library.dto.TransactionMapper;
-import es.stilnovo.library.dto.UserDTO;
-import es.stilnovo.library.dto.UserMapper;
-import es.stilnovo.library.dto.ValorationDTO;
-import es.stilnovo.library.dto.ValorationMapper;
+import es.stilnovo.library.dto.*;
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
-import es.stilnovo.library.service.AdminService;
-import es.stilnovo.library.service.ProductService;
-import es.stilnovo.library.service.TransactionService;
-import es.stilnovo.library.service.UserService;
-import es.stilnovo.library.service.ValorationService;
+import es.stilnovo.library.service.*;
 
+/**
+ * REST controller for administrative operations.
+ * Provides management endpoints for users, products, transactions, and valorations.
+ */
 @RestController
 @RequestMapping("/api/v1/admin")
 public class AdminRestController {
 
-	@Autowired
-	private AdminService adminService;
+    @Autowired
+    private AdminService adminService;
 
-	@Autowired
-	private UserService userService;
+    @Autowired
+    private UserService userService;
 
-	@Autowired
-	private ProductService productService;
+    @Autowired
+    private ProductService productService;
 
-	@Autowired
-	private UserMapper userMapper;
+    @Autowired
+    private TransactionService transactionService;
 
-	@Autowired
-	private ProductMapper productMapper;
+    @Autowired
+    private ValorationService valorationService;
 
-	@Autowired
-	private TransactionMapper transactionMapper;
+    @Autowired
+    private UserMapper userMapper;
 
-	@Autowired
-	private ValorationMapper valorationMapper;
+    @Autowired
+    private ProductMapper productMapper;
 
-	@Autowired
-	private TransactionService transactionService;
+    @Autowired
+    private TransactionMapper transactionMapper;
 
-	@Autowired
-	private ValorationService valorationService;
+    @Autowired
+    private ValorationMapper valorationMapper;
 
+    // --- ADMIN SUMMARY ---
 
-	@GetMapping("/summary")
-	public AdminSummaryDTO getAdminPanel() {
-		var panelData = adminService.getAdminPanelData();
-		return new AdminSummaryDTO(
-				panelData.numUsers(),
-				panelData.numBanneds(),
-				panelData.memoryUsage(),
-				userMapper.toDTOs(panelData.users()),
-				productMapper.toDTOs(panelData.products()));
-	}
+    /**
+     * Retrieves high-level administrative statistics and data overview.
+     * @return AdminSummaryDTO containing user counts, memory usage, and recent items.
+     */
+    @GetMapping("/summary")
+    public AdminSummaryDTO getAdminPanel() {
+        var panelData = adminService.getAdminPanelData();
+        return new AdminSummaryDTO(
+                panelData.numUsers(),
+                panelData.numBanneds(),
+                panelData.memoryUsage(),
+                userMapper.toDTOs(panelData.users()),
+                productMapper.toDTOs(panelData.products()));
+    }
 
-	
-	@GetMapping("/users")
-	public PagedResponse<UserDTO> getUsers(@PageableDefault(size = 10) Pageable pageable) {
-		var page = adminService.getUsersPage(pageable);
-		return new PagedResponse<>(userMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(),
-				page.getTotalElements(), page.isLast());
-	}
+    // --- USER MANAGEMENT ---
 
-	@GetMapping("/users/{id}")
-	public UserDTO getUserById(@PathVariable Long id) {
-		User user = userService.findById(id)
-				.orElseThrow(() -> new RuntimeException("User not found"));
-		return userMapper.toDTO(user);
-	}
+    /**
+     * Retrieves a paginated list of all users.
+     * @param pageable Pagination and sorting information.
+     * @return PagedResponse of UserDTOs.
+     */
+    @GetMapping("/users")
+    public PagedResponse<UserDTO> getUsers(@PageableDefault(size = 10) Pageable pageable) {
+        var page = adminService.getUsersPage(pageable);
+        return new PagedResponse<>(userMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(),
+                page.getTotalElements(), page.isLast());
+    }
 
-	@PutMapping(value = "/users/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<UserDTO> updateUser(
-		@PathVariable Long id,
-        @RequestPart("data") AdminUserUpdateRequestDTO request,
-        @RequestPart(value = "newProfilePhoto", required = false) MultipartFile newProfilePhoto) throws IOException {
+    /**
+     * Retrieves details of a specific user.
+     * @param id The ID of the user.
+     * @return UserDTO representing the requested user.
+     */
+    @GetMapping("/users/{id}")
+    public UserDTO getUserById(@PathVariable Long id) {
+        User user = userService.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return userMapper.toDTO(user);
+    }
 
-		adminService.updateUserAsAdmin(
-				id,
-				newProfilePhoto,
-				request.email(),
-				request.cardNumber(),
-				request.cardCvv(),
-				request.cardExpiringDate(),
-				request.description());
+    /**
+     * Updates an existing user's information and profile photo.
+     * @param id The ID of the user to update.
+     * @param request DTO containing updated user fields.
+     * @param newProfilePhoto Optional multipart file for the new profile image.
+     * @return Updated UserDTO.
+     * @throws IOException If image processing fails.
+     */
+    @PutMapping(value = "/users/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UserDTO> updateUser(
+        @PathVariable Long id,
+        @ModelAttribute AdminUserUpdateRequestDTO request,
+        @RequestParam(value = "newProfilePhoto", required = false) MultipartFile newProfilePhoto) throws IOException {
 
-		User updatedUser = userService.findById(id).orElseThrow();
-		return ResponseEntity.ok(userMapper.toDTO(updatedUser));
-	}
+        adminService.updateUserAsAdmin(
+                id,
+                newProfilePhoto,
+                request.email(),
+                request.cardNumber(),
+                request.cardCvv(),
+                request.cardExpiringDate(),
+                request.description());
 
-	@PatchMapping("/users/{id}")
-	public UserDTO updateUserBanStatus(@PathVariable Long id, @RequestBody AdminUserBanRequestDTO request) {
-		return userMapper.toDTO(adminService.setBanStatus(id, request.banned()));
-	}
+        User updatedUser = userService.findById(id).orElseThrow();
+        return ResponseEntity.ok(userMapper.toDTO(updatedUser));
+    }
 
-	@DeleteMapping("/users/{id}")
-	public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-		adminService.deleteUser(id);
-		return ResponseEntity.ok("User deleted correctly");
-	}
+    /**
+     * Updates the ban status of a user.
+     * @param id The ID of the user.
+     * @param request DTO containing the desired ban status.
+     * @return UserDTO with updated ban status.
+     */
+    @PatchMapping("/users/{id}")
+    public UserDTO updateUserBanStatus(@PathVariable Long id, @RequestBody AdminUserBanRequestDTO request) {
+        return userMapper.toDTO(adminService.setBanStatus(id, request.banned()));
+    }
 
+    /**
+     * Deletes a user from the system.
+     * @param id The ID of the user to remove.
+     * @return Success message.
+     */
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        adminService.deleteUser(id);
+        return ResponseEntity.ok("User deleted correctly");
+    }
 
-	@GetMapping("/products")
-	public PagedResponse<ProductDTO> getProducts(@PageableDefault(size = 10) Pageable pageable) {
-		var page = adminService.getInventoryPage(pageable);
-		return new PagedResponse<>(productMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(),
-				page.getTotalElements(), page.isLast());
-	}
+    // --- PRODUCT MANAGEMENT ---
 
+    /**
+     * Retrieves a paginated list of all products in the inventory.
+     * @param pageable Pagination and sorting information.
+     * @return PagedResponse of ProductDTOs.
+     */
+    @GetMapping("/products")
+    public PagedResponse<ProductDTO> getProducts(@PageableDefault(size = 10) Pageable pageable) {
+        var page = adminService.getInventoryPage(pageable);
+        return new PagedResponse<>(productMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(),
+                page.getTotalElements(), page.isLast());
+    }
 
-	@GetMapping("/products/{id}")
-	public ProductDTO getProductById(@PathVariable Long id) {
-		Product product = productService.findById(id)
-				.orElseThrow(() -> new RuntimeException("Product not found"));
-		return productMapper.toDTO(product);
-	}
+    /**
+     * Retrieves details of a specific product.
+     * @param id The ID of the product.
+     * @return ProductDTO representing the requested product.
+     */
+    @GetMapping("/products/{id}")
+    public ProductDTO getProductById(@PathVariable Long id) {
+        Product product = productService.findById(id)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        return productMapper.toDTO(product);
+    }
 
-	@PostMapping(value = "/products", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    /**
+     * Creates a new product as an administrator.
+     * @param request DTO containing product details.
+     * @param file Optional multipart file for the product image.
+     * @return Created ProductDTO.
+     * @throws IOException If image processing fails.
+     */
+    @PostMapping(value = "/products", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductDTO> createProduct(
-            @RequestPart("data") AdminProductCreateRequestDTO request,
-            @RequestPart(value = "image", required = false) MultipartFile file) throws IOException {
+            @ModelAttribute AdminProductCreateRequestDTO request,
+            @RequestParam(value = "image", required = false) MultipartFile file) throws IOException {
 
         Product product = adminService.createProductAsAdmin(
                 request.sellerId(),
@@ -165,18 +193,20 @@ public class AdminRestController {
         return ResponseEntity.ok(productMapper.toDTO(product));
     }
 
+    /**
+     * Updates an existing product's details and image.
+     * @param id The ID of the product to update.
+     * @param request DTO containing updated product fields.
+     * @param file Optional multipart file for the new product image.
+     * @return Updated ProductDTO.
+     * @throws IOException If image processing fails.
+     */
     @PutMapping(value = "/products/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductDTO> updateProduct(
             @PathVariable Long id,
-            @RequestPart("data") AdminProductUpdateRequestDTO request,
-            @RequestPart(value = "image", required = false) MultipartFile file) throws IOException {
+            @ModelAttribute AdminProductUpdateRequestDTO request,
+            @RequestParam(value = "image", required = false) MultipartFile file) throws IOException {
 
-        // IMPORTANTE: Para cumplir la norma de "no usar entidades en el controlador REST",
-        // lo ideal es que pases el DTO o sus campos sueltos a tu servicio, y sea el SERVICIO 
-        // el que haga el "new Product()" o actualice el existente.
-        
-        // Asumiendo que adaptas tu adminService para recibir los datos sueltos 
-        // (igual que hiciste con el updateUserAsAdmin):
         adminService.updateProductAsAdmin(
                 id,
                 request.name(),
@@ -191,36 +221,64 @@ public class AdminRestController {
         return ResponseEntity.ok(productMapper.toDTO(finalProduct));
     }
 
-	@DeleteMapping("/products/{id}")
-	public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
-		adminService.deleteProductAsAdmin(id);
-		return ResponseEntity.ok("Product deleted correctly");
-	}
+    /**
+     * Deletes a product from the inventory.
+     * @param id The ID of the product to remove.
+     * @return Success message.
+     */
+    @DeleteMapping("/products/{id}")
+    public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
+        adminService.deleteProductAsAdmin(id);
+        return ResponseEntity.ok("Product deleted correctly");
+    }
 
+    // --- TRANSACTION MANAGEMENT ---
 
-	@GetMapping("/transactions")
-	public PagedResponse<TransactionDTO> getTransactions(@PageableDefault(size = 10) Pageable pageable) {
-		var page = adminService.getTransactionsPage(pageable);
-		return new PagedResponse<>(transactionMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(),
-				page.getTotalElements(), page.isLast());
-	}
+    /**
+     * Retrieves a paginated list of all system transactions.
+     * @param pageable Pagination and sorting information.
+     * @return PagedResponse of TransactionDTOs.
+     */
+    @GetMapping("/transactions")
+    public PagedResponse<TransactionDTO> getTransactions(@PageableDefault(size = 10) Pageable pageable) {
+        var page = adminService.getTransactionsPage(pageable);
+        return new PagedResponse<>(transactionMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(),
+                page.getTotalElements(), page.isLast());
+    }
 
-	@DeleteMapping("/transactions/{id}")
-	public ResponseEntity<String> deleteTransaction(@PathVariable Long id) {
-		transactionService.deleteTransaction(id);
-		return ResponseEntity.ok("Transaction deleted correctly");
-	}
+    /**
+     * Deletes a specific transaction record.
+     * @param id The ID of the transaction to remove.
+     * @return Success message.
+     */
+    @DeleteMapping("/transactions/{id}")
+    public ResponseEntity<String> deleteTransaction(@PathVariable Long id) {
+        transactionService.deleteTransaction(id);
+        return ResponseEntity.ok("Transaction deleted correctly");
+    }
 
-	@GetMapping("/valorations")
-	public PagedResponse<ValorationDTO> getValorations(@PageableDefault(size = 10) Pageable pageable) {
-		var page = adminService.getValorationsPage(pageable);
-		return new PagedResponse<>(valorationMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(),
-				page.getTotalElements(), page.isLast());
-	}
+    // --- VALORATION MANAGEMENT ---
 
-	@DeleteMapping("/valorations/{id}")
-	public ResponseEntity<String> deleteValoration(@PathVariable Long id) {
-		valorationService.deleteById(id);
-		return ResponseEntity.ok("Valorations deleted correctly");
-	}
+    /**
+     * Retrieves a paginated list of all user valorations/reviews.
+     * @param pageable Pagination and sorting information.
+     * @return PagedResponse of ValorationDTOs.
+     */
+    @GetMapping("/valorations")
+    public PagedResponse<ValorationDTO> getValorations(@PageableDefault(size = 10) Pageable pageable) {
+        var page = adminService.getValorationsPage(pageable);
+        return new PagedResponse<>(valorationMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(),
+                page.getTotalElements(), page.isLast());
+    }
+
+    /**
+     * Deletes a specific valoration.
+     * @param id The ID of the valoration to remove.
+     * @return Success message.
+     */
+    @DeleteMapping("/valorations/{id}")
+    public ResponseEntity<String> deleteValoration(@PathVariable Long id) {
+        valorationService.deleteById(id);
+        return ResponseEntity.ok("Valorations deleted correctly");
+    }
 }

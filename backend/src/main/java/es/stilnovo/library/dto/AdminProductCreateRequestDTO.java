@@ -1,5 +1,7 @@
 package es.stilnovo.library.dto;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public record AdminProductCreateRequestDTO(
         Long sellerId,
         String name,
@@ -7,6 +9,7 @@ public record AdminProductCreateRequestDTO(
         String description,
         Double price,
         String location,
-        String status
+        String status,
+        MultipartFile image
 ) {
 }
