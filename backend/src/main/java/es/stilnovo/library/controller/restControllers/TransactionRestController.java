@@ -6,9 +6,11 @@ import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,9 +23,12 @@ import es.stilnovo.library.dto.ProductMapper;
 import es.stilnovo.library.dto.TransactionCreateRequestDTO;
 import es.stilnovo.library.dto.TransactionDTO;
 import es.stilnovo.library.dto.TransactionMapper;
+import es.stilnovo.library.dto.TransactionUpdateRequestDTO;
 import es.stilnovo.library.dto.UserMapper;
+import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.service.PaymentService;
 import es.stilnovo.library.service.TransactionService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/transactions")
@@ -55,7 +60,7 @@ public class TransactionRestController {
      *         transaction, and the confirmed TransactionDTO.
      */
     @PostMapping
-    public ResponseEntity<TransactionDTO> createTransaction(@RequestBody TransactionCreateRequestDTO request,
+    public ResponseEntity<TransactionDTO> createTransaction(@Valid @RequestBody TransactionCreateRequestDTO request,
             Principal principal) {
         // 1. Confirm the purchase via service (handles balance checks and inventory)
         var created = transactionService.confirmPurchase(request.productId(), principal.getName());
@@ -123,5 +128,38 @@ public class TransactionRestController {
         return new CheckoutDTO(
                 productMapper.toDTO(checkoutData.product()),
                 userMapper.toDTO(checkoutData.buyer()));
+    }
+    /**
+     * Updates an existing transaction.
+     * * @param id The unique identifier of the transaction to update.
+     * @param request The DTO containing the updated fields.
+     * @param principal The security context of the authenticated user.
+     * @return ResponseEntity with 200 OK and the updated TransactionDTO.
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<TransactionDTO> updateTransaction(
+            @PathVariable long id,
+            @Valid @RequestBody TransactionUpdateRequestDTO request,
+            Principal principal) {
+        
+        Transaction updatedTransaction = transactionService.updateTransaction(id, request, principal.getName());
+        
+        return ResponseEntity.ok(transactionMapper.toDTO(updatedTransaction));
+    }
+
+    /**
+     * Deletes a specific transaction by its ID.
+     * * @param id The unique identifier of the transaction to delete.
+     * @param principal The security context of the authenticated user.
+     * @return ResponseEntity with 204 No Content status, standard for successful deletions.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTransaction(
+            @PathVariable long id,
+            Principal principal) {
+
+        transactionService.deleteTransaction(id);
+        
+        return ResponseEntity.noContent().build();
     }
 }

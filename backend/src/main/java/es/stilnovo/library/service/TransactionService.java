@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.mail.MessagingException;
-
+import es.stilnovo.library.dto.TransactionUpdateRequestDTO;
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.model.User;
@@ -231,6 +231,37 @@ public class TransactionService {
 
     public int getTotalNumOfTransactions() {
         return getAllTransactions().size();
+    }
+    /**
+     * Updates the details of an existing transaction.
+     * It relies on getTransactionForInvolvedUser to ensure that only an involved 
+     * user (buyer or seller) can access and modify it.
+     *
+     * @param transactionId The ID of the transaction to update
+     * @param request       The DTO containing the updated fields
+     * @param username      The username of the currently authenticated user
+     * @return The updated Transaction entity
+     */
+    @Transactional
+    public Transaction updateTransaction(long transactionId, TransactionUpdateRequestDTO request, String username) {
+        // 1. Retrieve the transaction. This helper method already checks if the user 
+        // is involved (buyer/seller) and throws 404 (Not Found) or 403 (Forbidden) if necessary.
+        Transaction transaction = getTransactionForInvolvedUser(transactionId, username);
+
+        // 2. Update the fields based on the provided request DTO.
+        // Assuming your Transaction entity has these standard setters.
+        if (request.transactionStatus() != null) {
+            transaction.setTransactionStatus(request.transactionStatus());
+        }
+        
+        transaction.setRated(request.rated());
+        
+        if (request.stars() != null) {
+            transaction.setStars(request.stars());
+        }
+
+        // 3. Save and return the updated transaction
+        return transactionRepository.save(transaction);
     }
 
     /**

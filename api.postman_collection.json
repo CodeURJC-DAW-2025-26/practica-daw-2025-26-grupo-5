@@ -423,12 +423,7 @@
 						}
 					},
 					"response": []
-				}
-			]
-		},
-		{
-			"name": "Users",
-			"item": [
+				},
 				{
 					"name": "Get Me",
 					"request": {
@@ -508,6 +503,27 @@
 									"key": "size",
 									"value": "10"
 								}
+							]
+						}
+					},
+					"response": []
+				},
+								{
+					"name": "Get Contact Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/products/1/contact",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"products",
+								"1",
+								"contact"
 							]
 						}
 					},
@@ -771,7 +787,7 @@
 							]
 						},
 						"url": {
-							"raw": "{{baseurl}}/api/v1/products/1/image",
+							"raw": "{{baseUrl}}/api/v1/products/1/image",
 							"host": [
 								"{{baseurl}}"
 							],
@@ -920,32 +936,6 @@
 								"products",
 								"1",
 								"checkout"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Contact Seller",
-			"item": [
-				{
-					"name": "Get Contact Data",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/products/1/contact",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"products",
-								"1",
-								"contact"
 							]
 						}
 					},
