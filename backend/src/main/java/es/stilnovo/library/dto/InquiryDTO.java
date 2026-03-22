@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-import jakarta.validation.constraints.Size;
-
 /**
  * Represents a customer inquiry about a product with contact and product information.
  * 
