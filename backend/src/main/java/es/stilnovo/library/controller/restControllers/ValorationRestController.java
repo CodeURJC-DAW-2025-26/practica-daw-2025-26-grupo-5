@@ -1,21 +1,27 @@
 package es.stilnovo.library.controller.restControllers;
 
-import es.stilnovo.library.dto.PagedResponse;
-import es.stilnovo.library.dto.ValorationDTO;
-import es.stilnovo.library.dto.ValorationMapper;
-import es.stilnovo.library.service.ValorationService;
-import org.springframework.web.bind.annotation.*;
+import java.net.URI;
+import java.security.Principal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import es.stilnovo.library.dto.PagedResponse;
+import es.stilnovo.library.dto.ValorationDTO;
+import es.stilnovo.library.dto.ValorationMapper;
 import es.stilnovo.library.service.UserService;
-
-import java.security.Principal;
-import java.net.URI;
-
+import es.stilnovo.library.service.ValorationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -103,6 +109,40 @@ public class ValorationRestController {
                 .toUri();
 
         return ResponseEntity.created(location).body(new ValorationDTO(created));
+    }
+
+    /**
+     * Updates an existing valoration (review).
+     *
+     * @param id        The ID of the valoration to update.
+     * @param dto       The updated valoration data (stars and comment).
+     * @param principal The security context of the authenticated user.
+     * @return ResponseEntity containing the updated ValorationDTO.
+     */
+    @PutMapping("/{id}")
+    @Operation(summary = "Update a valoration", description = "Updates an existing valoration (stars and comment)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Valoration updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
+        @ApiResponse(responseCode = "403", description = "Forbidden (not the author)"),
+        @ApiResponse(responseCode = "404", description = "Valoration not found")
+    })
+    public ResponseEntity<ValorationDTO> updateValoration(
+            @PathVariable Long id,
+            @RequestBody ValorationDTO dto,
+            Principal principal) {
+
+        
+        var currentUser = userService.findByName(principal.getName()).orElseThrow();
+
+        
+        valorationService.updateValoration(id, dto.stars(), dto.comment(), currentUser);
+
+        
+        var updated = valorationService.findById(id);
+
+        return ResponseEntity.ok(valorationMapper.toDTO(updated));
     }
 
     /**
