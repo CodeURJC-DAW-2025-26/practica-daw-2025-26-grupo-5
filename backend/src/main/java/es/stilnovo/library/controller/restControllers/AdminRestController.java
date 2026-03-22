@@ -355,6 +355,18 @@ public class AdminRestController {
         return ResponseEntity.ok("Transaction deleted correctly");
     }
 
+    /**
+     * Retrieves the detailed information of a specific transaction.
+     * * @param id The unique identifier of the transaction.
+     * @return ResponseEntity containing the TransactionDTO.
+     */
+    @GetMapping("/transactions/{id}")
+    public ResponseEntity<TransactionDTO> getTransactionById(@PathVariable Long id) {
+        TransactionDTO transaction = transactionService.getTransactionById(id);
+        
+        return ResponseEntity.ok(transaction);
+    }
+
     // --- VALORATION MANAGEMENT ---
 
     /**

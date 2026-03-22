@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import jakarta.mail.MessagingException;
+import es.stilnovo.library.dto.TransactionDTO;
+import es.stilnovo.library.dto.TransactionMapper;
 import es.stilnovo.library.dto.TransactionUpdateRequestDTO;
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.Transaction;
@@ -52,6 +54,9 @@ public class TransactionService {
 
     @Autowired
     private ResourceLoader resourceLoader;
+
+    @Autowired
+    private TransactionMapper transactionMapper;
 
     /**
      * Executes the business logic for a purchase.
@@ -410,5 +415,16 @@ public class TransactionService {
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;")
                 .replace("'", "&#39;");
+    }
+    /**
+     * Retrieves a single transaction by its ID and converts it to a DTO.
+     * @param id The ID of the transaction.
+     * @return The TransactionDTO if found.
+     */
+    public TransactionDTO getTransactionById(Long id) {
+        Transaction transaction = transactionRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Transaction not found"));
+        
+        return transactionMapper.toDTO(transaction);
     }
 }

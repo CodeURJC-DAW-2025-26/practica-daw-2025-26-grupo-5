@@ -1486,6 +1486,27 @@
 					"response": []
 				},
 				{
+					"name": "Get Transaction Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/admin/transactions/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"admin",
+								"transactions",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Valorations Page",
 					"request": {
 						"method": "GET",
