@@ -15,12 +15,18 @@ import es.stilnovo.library.dto.ProductMapper;
 import es.stilnovo.library.dto.UserMapper;
 import es.stilnovo.library.service.MainService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * REST Controller for catalog and homepage operations
  * Provides endpoints for browsing products with search and filtering
  */
 @RestController
 @RequestMapping("/api/v1/catalog")
+@Tag(name = "Catalog", description = "REST API for catalog and homepage operations (browsing, searching, and filtering products)")
 public class MainRestController {
 
         @Autowired
@@ -41,6 +47,10 @@ public class MainRestController {
          * @return HomePageDTO with products, recommendations, and metadata
          */
         @GetMapping
+        @Operation(summary = "Get home page data", description = "Retrieves home page data including filtered products, recommendations, and pagination metadata")
+        @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Catalog data retrieved successfully")
+        })
         public HomePageDTO getHomePage(
                         @RequestParam(required = false) String query,
                         @RequestParam(required = false) String category,

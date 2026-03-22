@@ -28,12 +28,18 @@ import es.stilnovo.library.service.NotificationService;
 import jakarta.validation.Valid;
 import es.stilnovo.library.dto.PagedResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * REST Controller for buyer-to-seller inquiries
  * Provides endpoints for creating and retrieving product inquiries
  */
 @RestController
 @RequestMapping("/api/v1/inquiries")
+@Tag(name = "Inquiries", description = "REST API for buyer-to-seller inquiries")
 public class InquryRestController {
 
 	@Autowired
@@ -51,6 +57,12 @@ public class InquryRestController {
 	 * @return InquiryDTO with inquiry details
 	 */
 	@GetMapping("/{id}")
+	@Operation(summary = "Get inquiry by ID", description = "Retrieves a specific inquiry by its ID")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Inquiry retrieved successfully"),
+		@ApiResponse(responseCode = "401", description = "Unauthorized user"),
+		@ApiResponse(responseCode = "404", description = "Inquiry not found")
+	})
 	public InquiryDTO getInquiry(@PathVariable Long id) {
 		return inquiryMapper.toDTO(inquiryService.findById(id));
 	}
@@ -62,6 +74,13 @@ public class InquryRestController {
 	 * @return 201 Created with NotificationResultDTO and inquiry location URI
 	 */
 	@PostMapping()
+	@Operation(summary = "Submit inquiry", description = "Submits a new inquiry from a buyer to a seller")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "Inquiry created successfully"),
+		@ApiResponse(responseCode = "400", description = "Invalid input data"),
+		@ApiResponse(responseCode = "401", description = "Unauthorized user"),
+		@ApiResponse(responseCode = "409", description = "Inquiry could not be created (e.g., cooldown active)")
+	})
 	public ResponseEntity<NotificationResultDTO> sendInquiry(@RequestBody InquiryRequestDTO request,
 			Principal principal) {
 		var result = notificationService.sendInquiry(
@@ -98,6 +117,11 @@ public class InquryRestController {
 	 * @return A paginated response containing a list of InquiryDTOs.
 	 */
 	@GetMapping
+	@Operation(summary = "List user inquiries", description = "Retrieves a paginated list of inquiries for the authenticated user")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Inquiries retrieved successfully"),
+		@ApiResponse(responseCode = "401", description = "Unauthorized user")
+	})
 	public PagedResponse<InquiryDTO> listInquiries(
 			Principal principal,
 			@PageableDefault(size = 10) Pageable pageable) {
@@ -125,6 +149,13 @@ public class InquryRestController {
 	 * @return ResponseEntity with 204 No Content status.
 	 */
 	@DeleteMapping("/{id}")
+	@Operation(summary = "Delete inquiry", description = "Deletes a specific inquiry by its ID. The requesting user must be the owner.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "204", description = "Inquiry deleted successfully"),
+		@ApiResponse(responseCode = "401", description = "Unauthorized user"),
+		@ApiResponse(responseCode = "403", description = "Forbidden (user is not the owner)"),
+		@ApiResponse(responseCode = "404", description = "Inquiry not found")
+	})
 	public ResponseEntity<Void> deleteInquiry(
 			@PathVariable Long id) {
 		var inquiryToDelete = inquiryService.findById(id);
