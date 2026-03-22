@@ -540,7 +540,7 @@ Nota: Para probar los endpoints POST/PUT que requieren imágenes en Postman, por
 📄 **[Especificación OpenAPI (YAML)](/api-docs/api-docs.yaml)**
 
 #### **Documentación HTML**
-📑 **[Documentación API REST (HTML)](https://raw.githack.com/[usuario]/[repositorio]/main/api-docs/api-docs.html)**
+📑 **[Documentación API REST (HTML)](https://raw.githack.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/main/api-docs/api-docs.html)**
 
 > La documentación de la API REST se encuentra en la carpeta `/api-docs` del repositorio. Se ha generado automáticamente con SpringDoc a partir de las anotaciones en el código Java.
 
@@ -548,7 +548,7 @@ Nota: Para probar los endpoints POST/PUT que requieren imágenes en Postman, por
 
 Diagrama actualizado incluyendo los @RestController y su relación con los @Service compartidos:
 
-![Diagrama de Clases Actualizado](images/complete-classes-diagram.png)
+![Diagrama de Clases Actualizado](Readme-Images/Practice2/Stilnovo-Diagrama-Clases-2.png)
 
 ### **Instrucciones de Ejecución con Docker**
 
@@ -560,32 +560,91 @@ Diagrama actualizado incluyendo los @RestController y su relación con los @Serv
 
 1. **Clonar el repositorio** (si no lo has hecho ya):
    ```bash
-   git clone https://github.com/[usuario]/[repositorio].git
-   cd [repositorio]
+   git clone https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5.git
+   cd practica-daw-2025-26-grupo-5
    ```
 
-2. **AQUÍ LOS SIGUIENTES PASOS**:
+2. **Asegurarse que Docker está corriendo**:
+   - En Windows/Mac: Abre Docker Desktop
+   - En Linux: Verifica que el daemon de Docker está activo
+   ```bash
+   docker --version
+   docker-compose --version
+   ```
+
+3. **Ejecutar docker-compose**:
+   ```bash
+   docker-compose up
+   ```
+   - Primera ejecución: Crea el esquema de la base de datos
+   ```bash
+   docker-compose -e DDL_AUTO=create up
+   ```
+   - Ejecuciones posteriores: Usa el modo `none` (seguro, sin modificaciones)
+   ```bash
+   docker-compose -e DDL_AUTO=none up
+   ```
+
+4. **Acceder a la aplicación**:
+   - URL: `https://localhost:8443`
+   - Documentación API: `https://localhost:8443/swagger-ui.html`
+   - API OpenAPI YAML: `https://localhost:8443/v3/api-docs`
+
+5. **Detener la aplicación**:
+   ```bash
+   docker-compose down
+   ```
 
 ### **Construcción de la Imagen Docker**
 
 #### **Requisitos:**
-- Docker instalado en el sistema
+- Docker instalado en el sistema (versión 20.10 o superior)
+- Cuenta en DockerHub (para publicar la imagen)
+- Credenciales de DockerHub configuradas localmente
 
 #### **Pasos para construir y publicar la imagen:**
 
-1. **Navegar al directorio de Docker**:
+1. **Navegar al directorio raíz del proyecto**:
    ```bash
-   cd docker
+   cd practica-daw-2025-26-grupo-5
    ```
 
-2. **AQUÍ LOS SIGUIENTES PASOS**
+2. **Construir la imagen Docker** (multi-stage build):
+   ```bash
+   docker build -f docker/Dockerfile -t stilnovo-app:latest .
+   ```
+   - Alternativa con tag de DockerHub:
+   ```bash
+   docker build -f docker/Dockerfile -t tu-usuario-dockerhub/stilnovo-app:latest .
+   ```
+
+3. **Verificar que la imagen se construyó correctamente**:
+   ```bash
+   docker images | grep stilnovo-app
+   ```
+
+4. **Publicar la imagen en DockerHub**:
+   ```bash
+   docker login
+   docker push tu-usuario-dockerhub/stilnovo-app:latest
+   ```
+   - Reemplaza `tu-usuario-dockerhub` con tu nombre de usuario en DockerHub
+
+5. **Publicar el OCI Artifact** (imagen como artefacto versionado):
+   ```bash
+   docker tag stilnovo-app:latest tu-usuario-dockerhub/stilnovo-app:v1.0
+   docker push tu-usuario-dockerhub/stilnovo-app:v1.0
+   ```
+   - Esto crea una versión específica (v1.0) que se puede referenciar en el futuro
+   - Ideal para mantener un historial de versiones de despliegue
 
 ### **Despliegue en Máquina Virtual**
 
 #### **Requisitos:**
-- Acceso a la máquina virtual (SSH)
+- Acceso a la máquina virtual via SSH
 - Clave privada para autenticación
 - Conexión a la red correspondiente o VPN configurada
+- Docker y Docker Compose instalados en la VM
 
 #### **Pasos para desplegar:**
 
@@ -596,10 +655,49 @@ Diagrama actualizado incluyendo los @RestController y su relación con los @Serv
    
    Ejemplo:
    ```bash
-   ssh -i ssh-keys/app.key vmuser@10.100.139.XXX
+   ssh -i ssh-keys/app.key vmuser@appweb05.dawgis.etsii.urjc.es
    ```
 
-2. **AQUÍ LOS SIGUIENTES PASOS**:
+2. **Clonar el repositorio en la VM**:
+   ```bash
+   git clone https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5.git
+   cd practica-daw-2025-26-grupo-5
+   ```
+
+3. **Verificar que Docker está activo en la VM**:
+   ```bash
+   docker --version
+   docker-compose --version
+   ```
+
+4. **Ejecutar docker-compose con la imagen publicada**:
+   ```bash
+   docker-compose -e DOCKER_HUB_USER=tu-usuario-dockerhub -e DDL_AUTO=create up -d
+   ```
+   - Primera ejecución: Usa `DDL_AUTO=create` para inicializar el esquema
+   - El flag `-d` ejecuta los contenedores en background
+
+5. **Verificar que la aplicación está corriendo**:
+   ```bash
+   docker ps
+   docker logs stilnovo-app
+   ```
+
+6. **Acceder a la aplicación desplegada**:
+   - URL: `https://appweb05.dawgis.etsii.urjc.es:8443`
+   - Documentación API: `https://appweb05.dawgis.etsii.urjc.es:8443/swagger-ui.html`
+
+7. **Para actualizar la aplicación** (con nuevas versiones):
+   ```bash
+   docker-compose pull
+   docker-compose -e DOCKER_HUB_USER=tu-usuario-dockerhub -e DDL_AUTO=none up -d
+   ```
+   - En actualizaciones posteriores siempre usa `DDL_AUTO=none` (evita cambios en el esquema)
+
+8. **Para detener la aplicación**:
+   ```bash
+   docker-compose down
+   ```
 
 ### **URL de la Aplicación Desplegada**
 

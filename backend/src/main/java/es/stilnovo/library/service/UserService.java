@@ -585,7 +585,7 @@ public class UserService {
      * Adds a product to the user's favorites by creating a FAVORITE interaction.
      */
     @Transactional
-    public void addProductToFavorites(String username, Long productId) {
+    public Product addProductToFavorites(String username, Long productId) {
         User user = userRepository.findByName(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         
@@ -599,6 +599,8 @@ public class UserService {
             UserInteraction favorite = new UserInteraction(user, product, UserInteraction.InteractionType.LIKE);
             interactionRepository.save(favorite);
         }
+        
+        return product;
     }
 
     /**

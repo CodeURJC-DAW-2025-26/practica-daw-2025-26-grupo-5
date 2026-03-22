@@ -4,31 +4,47 @@
 # Orchestrates MySQL 8.4 database + Spring Boot application containers
 # All infrastructure configured via environment variables for flexibility.
 #
+# Key Features (Questions 27-30):
+# Q27: No Maven/JDK required on host - multi-stage Docker build handles compilation
+# Q28: MySQL healthcheck ensures DB is ready before app starts (service_healthy condition)
+# Q29: Official MySQL image from DockerHub (mysql:8.4) - maintained by Oracle
+# Q30: DDL_AUTO mode can be set to 'none' for read-only execution without schema changes
+#
 # REQUIRED ENVIRONMENT VARIABLES:
 #   MYSQL_ROOT_PASSWORD: Database root password (default: 'password')
 #   MYSQL_DATABASE: Initial schema name (default: 'stilnovo')
-#   DDL_AUTO: Hibernate DDL strategy (default: 'update')
+#   DDL_AUTO: Hibernate DDL strategy (default: 'none')
 #             Values: create|update|validate|none
+#             - create: Creates schema from scratch (dev mode)
+#             - update: Modifies existing schema (migration mode)
+#             - validate: Only validates existing schema (safe read-only mode - Q30)
+#             - none: Does NOT modify schema at all (production read-only mode - Q30)
 #
 # EXECUTION MODES:
 #   FIRST RUN (initialize schema):
 #     $ docker compose -e DDL_AUTO=create up
 #   
-#   SUBSEQUENT RUNS (preserve data):
-#     $ docker compose up
+#   PRODUCTION RUN (no schema modifications - Q30):
+#     $ docker compose -e DDL_AUTO=none up
+#   
+#   SCHEMA VALIDATION ONLY:
+#     $ docker compose -e DDL_AUTO=validate up
 #
 # SERVICES:
-#   db: MySQL 8.4 with health checks and persistent volume
-#   app: Spring Boot application (depends on database readiness)
+#   db: MySQL 8.4 (official DockerHub image - Q29) with health checks (Q28) and persistent volume
+#   app: Spring Boot application (depends on database readiness via healthcheck - Q28)
 #
-# Features: Multi-stage build, health checks, auto-retry, persistent storage
+# Features: Multi-stage build (Q27), health checks (Q28), auto-retry, persistent storage, flexible DDL modes (Q30)
 # ============================================================
 
 services:
   # MySQL Database Service
+  # Q29: Uses official MySQL 8.4 image from DockerHub
   # Initializes on first run, persists data in named volume
-  # Health check ensures app doesn't start until DB is ready
+  # Q28: Health check ensures app doesn't start until DB is ready (service_healthy condition)
   db:
+    # Q29: Official MySQL image from DockerHub maintained by Oracle
+    # Ensures security updates and reliability from official maintainers
     image: mysql:8.4
     container_name: stilnovo-db
     environment:
@@ -38,21 +54,32 @@ services:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-stilnovo}
     ports:
       - "3306:3306"
-    # Health check: waits for MySQL to be ready before app starts
+    # Q28: Health check implementation
+    # Verifies MySQL is accessible and ready to accept connections
+    # The application will NOT start until this check passes (service_healthy)
+    # This prevents race conditions where the app starts before DB is ready
     healthcheck:
+      # Test command: mysqladmin ping checks if MySQL daemon is responding
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-password}"]
+      # Check every 10 seconds
       interval: 10s
+      # Wait max 5 seconds for response
       timeout: 5s
+      # Retry up to 10 times (100 seconds total before failure)
       retries: 10
     volumes:
       - mysql_data:/var/lib/mysql
 
   # Spring Boot Application Service
-  # Depends on database health check before starting
+  # Q28: Depends on database health check before starting
+  # The app will NOT start until db.service_healthy = true
+  # This ensures database connectivity is available at startup
   # Configure via environment variables for dev/prod flexibility
   app:
     image: ${DOCKER_HUB_USER:-stilnovo}/stilnovo-app:latest
     container_name: stilnovo-app
+    # Q28: Application waits for database to be healthy before starting
+    # service_healthy ensures the MySQL health check has passed
     depends_on:
       db:
         condition: service_healthy
@@ -66,7 +93,14 @@ services:
       # Database credentials - root user with configurable password
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-password}
-      # Hibernate DDL strategy: none
+      # Q30: Hibernate DDL strategy - controls schema modification behavior
+      # Set via environment variable DDL_AUTO=<mode>
+      # Modes:
+      #   - create: Drops schema and creates from scratch (dev: schema reset)
+      #   - update: Updates schema with entity changes (migration: additive only)
+      #   - validate: Validates schema matches entities, fails if mismatch (safe read-only)
+      #   - none: Does NOT touch schema at all (production: zero schema risk) ← Recommended for Q30
+      # Default in docker-compose: none (safest for production)
       SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO:-none}
 
 # Persistent named volume for MySQL data

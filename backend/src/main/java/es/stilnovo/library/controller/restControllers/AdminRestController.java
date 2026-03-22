@@ -1,6 +1,7 @@
 package es.stilnovo.library.controller.restControllers;
 
 import java.io.IOException;
+import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import es.stilnovo.library.dto.AdminProductCreateRequestDTO;
 import es.stilnovo.library.dto.AdminProductUpdateRequestDTO;
@@ -251,7 +253,7 @@ public class AdminRestController {
     @PostMapping(value = "/products", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Create product", description = "Creates a new product as an administrator")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Product created successfully"),
+        @ApiResponse(responseCode = "201", description = "Product created successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid input or image processing failed")
     })
     public ResponseEntity<ProductDTO> createProduct(
@@ -268,7 +270,12 @@ public class AdminRestController {
                 request.status() != null ? request.status() : "Active",
                 file);
 
-        return ResponseEntity.ok(productMapper.toDTO(product));
+        // Set Location header pointing to the newly created product resource
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/api/v1/products/{id}")
+                .buildAndExpand(product.getId())
+                .toUri();
+        return ResponseEntity.created(location).body(productMapper.toDTO(product));
     }
 
     /**

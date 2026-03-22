@@ -1,6 +1,7 @@
 package es.stilnovo.library.controller.restControllers;
 
 import java.io.IOException;
+import java.net.URI;
 import java.security.Principal;
 import java.sql.SQLException;
 import java.util.Map;
@@ -22,7 +23,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import es.stilnovo.library.dto.ProductDTO;
 import es.stilnovo.library.dto.ProductMapper;
 import es.stilnovo.library.dto.SellerProfileDTO;
 import es.stilnovo.library.dto.UserDTO;
@@ -31,6 +34,7 @@ import es.stilnovo.library.dto.UserSettingsUpdateDTO;
 import es.stilnovo.library.dto.UserStatisticsDataDTO;
 import es.stilnovo.library.dto.ValorationDTO;
 import es.stilnovo.library.dto.ValorationMapper;
+import es.stilnovo.library.model.Product;
 import es.stilnovo.library.service.ContactSellerService;
 import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.UserService;
@@ -147,13 +151,18 @@ public class UserWebRestController {
     @PostMapping("/me/favorites/{productId}")
     @Operation(summary = "Add product to favorites", description = "Adds a product to the authenticated user's favorites list")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Product added to favorites successfully"),
+        @ApiResponse(responseCode = "201", description = "Product added to favorites successfully"),
         @ApiResponse(responseCode = "401", description = "Unauthorized user"),
         @ApiResponse(responseCode = "404", description = "Product not found")
     })
-    public ResponseEntity<String> addProductToFavorites(Principal principal, @PathVariable Long productId) {
-        userService.addProductToFavorites(principal.getName(), productId);
-        return ResponseEntity.ok("Product added to favorites successfully");
+    public ResponseEntity<ProductDTO> addProductToFavorites(Principal principal, @PathVariable Long productId) {
+        Product product = userService.addProductToFavorites(principal.getName(), productId);
+        // Set Location header pointing to the favorited product resource
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/api/v1/products/{id}")
+                .buildAndExpand(productId)
+                .toUri();
+        return ResponseEntity.created(location).body(productMapper.toDTO(product));
     }
 
     /**
