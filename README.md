@@ -713,17 +713,17 @@ Diagrama actualizado incluyendo los @RestController y su relación con los @Serv
 
 ### **Participación de Miembros en la Práctica 2**
 
-#### **Alumno 1 - [Nombre Completo]**
+#### **Alumno 1 - Victor Hugo Oliveira Petroceli**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+Mi contribución principal se ha centrado en la transición de la lógica de negocio a una arquitectura de API REST basada en entidades y la robustez del sistema. He formado parte de la reestructuración de los controladores siguiendo el principio de "Agrupación por Entidad", consolidando la lógica de Transactions, Products y Users. He implementado el sistema de gestión de perfil de usuario (incluyendo carga de imágenes multipart y dashboards de estadísticas) y la lógica de transacciones/valoraciones. Además, configuré la seguridad, la especificación OpenAPI 3.0 y he diseñado un manejador de errores global (ApiErrorController) capaz de distinguir entre peticiones API (JSON) y Web (HTML) para evitar conflictos de rutas.
 
-| Nº    | Commits      | Files      |
-|:------------: |:------------:| :------------:|
-|1| [Descripción commit 1](URL_commit_1)  | [Archivo1](URL_archivo_1)   |
-|2| [Descripción commit 2](URL_commit_2)  | [Archivo2](URL_archivo_2)   |
-|3| [Descripción commit 3](URL_commit_3)  | [Archivo3](URL_archivo_3)   |
-|4| [Descripción commit 4](URL_commit_4)  | [Archivo4](URL_archivo_4)   |
-|5| [Descripción commit 5](URL_commit_5)  | [Archivo5](URL_archivo_5)   |
+| Nº | Commits | Files |
+|:--:|:-------:|:-----:|
+|1| [feat: complete UserWebRestController with full product CRUD and profile management](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/a0a3f06540e924d537c6eff5b40dd7fec9f4bf49) | [UserWebRestController](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/restControllers/UserWebRestController.java) |
+|2| [feat & refactor: implement entity-based REST API and consolidate controller layer](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/8f096222e021ddfedbaaca7f62555b4363dca53b) | [ProductRestController](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/restControllers/ProductRestController.java) |
+|3| [docs: implement OpenAPI specification, configure CORS security and project cleanup](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/d210145246dc74473854b13175eac14f6c9a6273) | [api-docs](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/tree/main/api-docs) |
+|4| [refactor: clean controllers, fix multipart handling, and validate API endpoints](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/b48f6cac888d36adec13a1475c7c953c4facbd76) | [UserWebRestController](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/restControllers/UserWebRestController.java) |
+|5| [fix: implement custom error handler and resolve route mapping conflict](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/f864e4105c934738a7baaadde171239ea6e1a913) | [ApiErrorController](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/restControllers/ApiErrorController.java) |
 
 ---
 
