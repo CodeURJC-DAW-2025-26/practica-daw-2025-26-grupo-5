@@ -113,7 +113,7 @@ public class UserWebRestController {
         @ApiResponse(responseCode = "400", description = "Invalid file or processing error"),
         @ApiResponse(responseCode = "401", description = "Unauthorized user")
     })
-    public ResponseEntity<UserDTO> putMethodName(Principal principal, @RequestPart("image")MultipartFile file)
+    public ResponseEntity<UserDTO> updateMyProfilePhoto(Principal principal, @RequestPart("image")MultipartFile file)
             throws IOException {
         String nameToModify = principal.getName();
         userService.updateProfilePhotoByUsername(nameToModify, file);
@@ -145,6 +145,12 @@ public class UserWebRestController {
      * @return ResponseEntity with a success message.
      */
     @PostMapping("/me/favorites/{productId}")
+    @Operation(summary = "Add product to favorites", description = "Adds a product to the authenticated user's favorites list")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Product added to favorites successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
+        @ApiResponse(responseCode = "404", description = "Product not found")
+    })
     public ResponseEntity<String> addProductToFavorites(Principal principal, @PathVariable Long productId) {
         userService.addProductToFavorites(principal.getName(), productId);
         return ResponseEntity.ok("Product added to favorites successfully");
@@ -157,6 +163,12 @@ public class UserWebRestController {
      * @return ResponseEntity with a success message.
      */
     @DeleteMapping("/me/favorites/{productId}")
+    @Operation(summary = "Remove product from favorites", description = "Removes a product from the authenticated user's favorites list")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Product removed from favorites successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
+        @ApiResponse(responseCode = "404", description = "Product not found")
+    })
     public ResponseEntity<String> removeProductFromFavorites(Principal principal, @PathVariable Long productId) {
         userService.removeProductFromFavorites(principal.getName(), productId);
         return ResponseEntity.ok("Product removed from favorites successfully");
