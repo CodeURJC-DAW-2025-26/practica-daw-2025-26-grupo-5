@@ -35,6 +35,8 @@ public class TransactionController {
      */
     @PostMapping("/transactions/confirm/{productId}")
     public String confirmPayment(@PathVariable long productId, Principal principal) {
+        // Delegate to service which validates balance, product availability, ownership
+        // Returns redirect URL: either /sales-and-orders-page or error page
         return transactionService.resolveConfirmPurchaseRedirect(
                 productId,
                 principal != null ? principal.getName() : null);

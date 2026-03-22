@@ -12,10 +12,10 @@ public record ProductDTO(
         @Schema(description = "Unique product identifier", example = "1")
         Long id,
         
-        @Schema(description = "Product name or title", example = "Bicicleta de montaña")
+        @Schema(description = "Product name or title", example = "Mountain Bike")
         String name,
         
-        @Schema(description = "Product category classification", example = "Deportes")
+        @Schema(description = "Product category classification", example = "Sports")
         String category,
         
         @Schema(description = "Current selling price of the product", example = "120.50")
@@ -24,7 +24,7 @@ public record ProductDTO(
         @Schema(description = "Geographic location where the product is listed", example = "Madrid")
         String location,
         
-        @Schema(description = "Detailed product description", example = "Bicicleta casi nueva, muy poco uso.")
+        @Schema(description = "Detailed product description", example = "Mountain bike almost new, very little use.")
         String description,
         
         @Schema(description = "Product status (e.g., available, sold, inactive)", example = "available")

@@ -14,7 +14,7 @@ public record ContactSellerPageDTO(
         @Schema(description = "The seller of the product")
         UserDTO seller,
         
-        @Schema(description = "Name of the buyer contacting the seller", example = "Juan Pérez")
+        @Schema(description = "Name of the buyer contacting the seller", example = "John Smith")
         String buyerName,
         
         @Schema(description = "Email address of the buyer", example = "juan.perez@example.com")

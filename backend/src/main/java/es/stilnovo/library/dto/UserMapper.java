@@ -6,14 +6,41 @@ import es.stilnovo.library.model.User;
 
 import java.util.List;
 
+/**
+ * UserMapper: Converts between User entity and UserDTO (MapStruct).
+ * 
+ * Security feature: Deliberately excludes sensitive data:
+ * - encodedPassword: Never exposed in API responses
+ * - profileImage: Handled separately via image endpoints
+ * - Card data: NEVER exposed in API (sensitive financial information)
+ * - Seller revenue/balance: Hidden from public profiles
+ */
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
+    /**
+     * Convert User entity to UserDTO for API responses.
+     * Excludes all sensitive fields (password, card, etc.).
+     * @param user the User entity to convert
+     * @return UserDTO with id, name, email, and public profile data
+     */
     @Mapping(source = "userId", target = "id")
     UserDTO toDTO(User user);
     
+    /**
+     * Batch convert multiple User entities to DTOs.
+     * @param users list of User entities
+     * @return list of UserDTO objects
+     */
     List<UserDTO> toDTOs(List<User> users);
 
+    /**
+     * Convert UserDTO to User entity for database persistence.
+     * Deliberately ignores sensitive fields for security.
+     * Password and financial data must be handled separately.
+     * @param userDTO the DTO containing user data
+     * @return User entity with basic fields only
+     */
     @Mapping(source = "id", target = "userId")
     @Mapping(target = "encodedPassword", ignore = true) 
     @Mapping(target = "profileImage", ignore = true)

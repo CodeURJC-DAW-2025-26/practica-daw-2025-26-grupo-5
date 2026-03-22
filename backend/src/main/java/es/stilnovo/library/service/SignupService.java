@@ -48,29 +48,42 @@ public class SignupService {
     public User registerUser(MultipartFile profilePicture, String username, String email, String password,
             String confirmPassword)
             throws IOException {
+        // STEP 1: Validate password confirmation match
         if (!password.equals(confirmPassword)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passwords do not match");
         }
+        // STEP 2: Check username uniqueness - prevent duplicate usernames
         if (userService.usernameExists(username)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "The username is already taken");
         }
+        // STEP 3: Check email uniqueness - prevent duplicate accounts per email
         if (userService.emailExists(email)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "The email is already registered");
         }
 
+        // STEP 4: Encode password with bcrypt algorithm for secure storage
         String encodedPassword = passwordEncoder.encode(password);
+        // STEP 5: Handle profile image: upload if provided, else assign default
         Blob imageBlob = resolveProfileImage(profilePicture);
+        // STEP 6: Create new user entity with default values (0 balance, ROLE_USER)
         User newUser = new User(username, encodedPassword, email, imageBlob, 0.0, null, null, null, 0, 0.0, 0.0, null,
                 "ROLE_USER");
+        // STEP 7: Persist to database
         userService.save(newUser);
         return newUser;
     }
 
+    /**
+     * Resolves user profile image: uploads if provided, otherwise assigns default.
+     * Default image prevents null profile pictures for new users.
+     */
     private Blob resolveProfileImage(MultipartFile profilePicture) throws IOException {
+        // If user uploaded a profile picture, use it
         if (profilePicture != null && !profilePicture.isEmpty()) {
             return BlobProxy.generateProxy(profilePicture.getInputStream(), profilePicture.getSize());
         }
 
+        // Default fallback: load default "no profile picture" image from resources
         Resource defaultUserImage = new ClassPathResource("static/images/no-profile-picture.png");
         return BlobProxy.generateProxy(defaultUserImage.getInputStream(), defaultUserImage.contentLength());
     }

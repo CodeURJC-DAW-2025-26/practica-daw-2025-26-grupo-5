@@ -24,7 +24,7 @@ public record HomePageDTO(
         @Schema(description = "Boolean indicating if the logged-in user is an administrator", example = "false")
         boolean admin,
         
-        @Schema(description = "Search query string if applicable", example = "cámara de fotos")
+        @Schema(description = "Search query string if applicable", example = "photo camera")
         String query,
         
         @Schema(description = "Boolean indicating if a search is active", example = "true")

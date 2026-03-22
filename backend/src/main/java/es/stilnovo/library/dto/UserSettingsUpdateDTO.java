@@ -13,7 +13,7 @@ public class UserSettingsUpdateDTO {
     @Schema(description = "New profile picture image file")
     private MultipartFile newProfilePhoto;
     
-    @Schema(description = "Updated email address", example = "nuevo.email@example.com")
+    @Schema(description = "Updated email address", example = "new.email@example.com")
     private String newEmail;
     
     @Schema(description = "Updated payment card number", example = "1234567890123456")
@@ -25,7 +25,7 @@ public class UserSettingsUpdateDTO {
     @Schema(description = "Updated card expiration date", example = "11/26")
     private String newCardExpiringDate;
     
-    @Schema(description = "Updated user profile description", example = "Actualizando mi biografía de vendedor.")
+    @Schema(description = "Updated user profile description", example = "Updating my seller biography.")
     private String newDescription;
 
     public MultipartFile getNewProfilePhoto() {

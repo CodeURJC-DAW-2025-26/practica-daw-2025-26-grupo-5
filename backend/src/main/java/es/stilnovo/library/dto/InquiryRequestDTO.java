@@ -14,10 +14,10 @@ public record InquiryRequestDTO(
         @Schema(description = "Customer's phone number", example = "+34611223344")
         String phone,
         
-        @Schema(description = "Type or category of the inquiry", example = "Estado del producto")
+        @Schema(description = "Type or category of the inquiry", example = "Product status")
         String type,
         
-        @Schema(description = "The inquiry message content", example = "¿Tiene algún rasguño la pantalla?")
+        @Schema(description = "The inquiry message content", example = "Does the screen have any scratches?")
         String message
 ) {
 }

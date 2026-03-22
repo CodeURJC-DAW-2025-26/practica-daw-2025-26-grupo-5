@@ -28,6 +28,18 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * WebSecurityConfig: Configures Spring Security for both API (REST) and web form-based authentication.
+ * 
+ * Security layers:
+ * - API Security (Filter Chain Order 1): Stateless JWT authentication for REST endpoints
+ * - Form Security (Filter Chain Order 2): Session-based authentication for web forms
+ * - CORS: Cross-Origin Resource Sharing configuration
+ * - Password Encoding: BCrypt for secure password storage
+ * - Authentication Provider: DAO-based authentication with custom user details service
+ * 
+ * All REST endpoints require JWT tokens. Web endpoints use form-based login with CSRF protection.
+ */
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
@@ -44,16 +56,31 @@ public class WebSecurityConfig {
         @Autowired
         private RepositoryUserDetailsService userDetailsService;
 
+        /**
+         * Creates a BCryptPasswordEncoder bean for secure password hashing.
+         * @return password encoder instance configured with default strength
+         */
         @Bean
         public PasswordEncoder passwordEncoder() {
                 return new BCryptPasswordEncoder();
         }
 
+        /**
+         * Provides the authentication manager for processing authentication requests.
+         * @param authConfig Spring's authentication configuration
+         * @return authentication manager instance
+         * @throws Exception if configuration fails
+         */
         @Bean
         public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
                 return authConfig.getAuthenticationManager();
         }
 
+        /**
+         * Creates the authentication provider using DAO-based user lookup.
+         * Combines user details service with password encoder for credential validation.
+         * @return configured authentication provider
+         */
         @Bean
         public DaoAuthenticationProvider authenticationProvider() {
                 DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);

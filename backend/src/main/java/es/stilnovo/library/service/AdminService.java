@@ -86,9 +86,14 @@ public class AdminService {
             double avgRating) {
     }
 
+    /**
+     * Deletes a user account completely from the system.
+     * Cascade delete: removes all user products, transactions, valorations, and interactions.
+     * Transactional: all-or-nothing operation to maintain database integrity.
+     */
     @Transactional
     public void deleteUser(Long userId) {
-        // Delegate all responsability to userService
+        // Delegate to userService which handles cascade deletion of related entities
         userService.deleteUserById(userId);
     }
 
@@ -106,10 +111,17 @@ public class AdminService {
         return productRepository.findAll();
     }
 
+    /**
+     * Prepares admin dashboard data: system statistics and preview samples.
+     * Shows overview of users, products, and system resources.
+     */
     @Transactional(readOnly = true)
     public AdminPanelData getAdminPanelData() {
+        // Fetch recent users (limited to 3) for dashboard widget
         List<User> dashboardUsers = userService.findAll().stream().limit(3).toList();
+        // Fetch recent products (limited to 3) for quick inventory view
         List<Product> dashboardProducts = productRepository.findAll().stream().limit(3).toList();
+        // Calculate JVM memory usage: (total - free) = used memory in MB
         long usedMemory = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024);
         return new AdminPanelData(
                 getNumTotalUsers(),
@@ -124,11 +136,17 @@ public class AdminService {
         return toPage(userService.findAll(), pageable);
     }
 
+    /**
+     * Retrieves paginated inventory view of unsold products only.
+     * Filters out "Sold" products from the inventory display.
+     */
     @Transactional(readOnly = true)
     public Page<Product> getInventoryPage(Pageable pageable) {
+        // Stream all products and filter: keep only Active/Inactive statuses, exclude Sold
         List<Product> productsToDisplay = getAllProducts().stream()
                 .filter(p -> !"Sold".equalsIgnoreCase(p.getStatus()))
                 .toList();
+        // Convert filtered list to Page object with pagination info (size, number, etc)
         return toPage(productsToDisplay, pageable);
     }
 

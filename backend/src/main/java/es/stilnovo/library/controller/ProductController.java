@@ -53,16 +53,21 @@ public class ProductController {
             @RequestParam(required = false) String category,
             Principal principal,
             Model model) {
+        // Extract user context for personalized filtering (null if anonymous)
         User user = mainService.getUserContext(principal != null ? principal.getName() : null);
         int pageSize = 10;
+        // Convert offset to page number: offset=20 with pageSize=10 = page 2
         int pageNumber = calculatePageNumber(offset, pageSize);
 
+        // Query products with search/filter/pagination - returns fragment for AJAX insertion
         CatalogPageResult page = productService.getCatalogPage(query, category, user,
                 PageRequest.of(pageNumber, pageSize));
 
+        // Add data to model for Thymeleaf template fragment rendering
         model.addAttribute("products", page.products());
         model.addAttribute("isLast", page.last());
 
+        // Return HTML fragment (product_items.html) for AJAX replaces, not full page
         return "product_items";
     }
 

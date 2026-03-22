@@ -10,19 +10,19 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Request body for creating or updating product listings with file upload capability")
 public class ProductWriteRequestDTO {
 
-    @Schema(description = "Product name or title", example = "Ordenador Portátil")
+    @Schema(description = "Product name or title", example = "Laptop Computer")
     private String name;
     
-    @Schema(description = "Product category classification", example = "Electrónica")
+    @Schema(description = "Product category classification", example = "Electronics")
     private String category;
     
     @Schema(description = "Current selling price of the product", example = "450.00")
     private Double price;
     
-    @Schema(description = "Geographic location where the product is listed", example = "Valencia")
+    @Schema(description = "Geographic location where the product is listed", example = "Barcelona")
     private String location;
     
-    @Schema(description = "Detailed product description", example = "Portátil con 16GB de RAM y procesador i7.")
+    @Schema(description = "Detailed product description", example = "Laptop with 16GB RAM and i7 processor.")
     private String description;
     
     @Schema(description = "Product status (e.g., available, sold, inactive)", example = "available")

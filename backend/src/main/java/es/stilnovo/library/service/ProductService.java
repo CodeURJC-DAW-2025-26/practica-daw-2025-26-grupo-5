@@ -86,10 +86,16 @@ public class ProductService {
     }
 
     // Logic to either return all products or filter them by name
+    /**
+     * Searches products by name or returns all if query is empty.
+     * Case-insensitive search for better UX.
+     */
     public List<Product> findByQuery(String query) {
+        // Empty query returns all products - acts as default catalog view
         if (query == null || query.isEmpty()) {
             return productRepository.findAll();
         }
+        // Case-insensitive partial match - "laptop" matches "LAPTOP", "MacBook Laptop", etc.
         return productRepository.findByNameContainingIgnoreCase(query);
     }
 
@@ -101,25 +107,34 @@ public class ProductService {
         return productRepository.countBySeller(seller);
     }
 
-    // ALGORITHM METHODS
+    // ALGORITHM METHODS - Personalized recommendations based on user behavior
+    /**
+     * Retrieves personalized product recommendations for a user.
+     * Uses user interaction history (views, likes, purchases) to suggest relevant products.
+     * Returns empty list for anonymous users.
+     */
     public List<Product> getRecommendations(User user) {
-        // STEP 1: Handle null user (anonymous browsing)
+        // STEP 1: Handle null user (anonymous browsing) - no personalization without login
         if (user == null) {
             return Collections.emptyList();
         }
 
         // STEP 2: Query database for recommended products based on user interaction
-        // history
+        // history - queries custom repository method that joins user interactions
         List<Product> recommendations = productRepository.findRecommendedProducts(user.getUserId());
 
-        // STEP 3: Return filtered recommendations
+        // STEP 3: Return filtered recommendations (excludes user's own listings automatically)
         return recommendations;
     }
 
+    /**
+     * Records user interactions (views, likes, purchases) for behavior tracking.
+     * Used for building personalization and analytics data.
+     */
     public void saveInteraction(User user, Product product, UserInteraction.InteractionType type) {
-        // STEP 1: Validate inputs before recording interaction
+        // STEP 1: Validate inputs before recording interaction - null checks prevent orphaned records
         if (user != null && product != null) {
-            // STEP 2: Create and persist interaction record
+            // STEP 2: Create and persist interaction record with timestamp (auto-set by JPA)
             UserInteraction interaction = new UserInteraction(user, product, type);
             userInteractionRepository.save(interaction);
         }

@@ -15,10 +15,10 @@ public record ValorationDTO(
                 @Schema(description = "Rating given by the buyer (1-5 stars)", example = "5")
                 int stars,
                 
-                @Schema(description = "Review comment from the buyer", example = "El producto llegó en perfecto estado y muy rápido. Vendedor recomendado.")
+                @Schema(description = "Review comment from the buyer", example = "Product arrived in perfect condition and very fast. Recommended seller.")
                 String comment,
                 
-                @Schema(description = "Name of the buyer who provided the rating", example = "Carlos García")
+                @Schema(description = "Name of the buyer who provided the rating", example = "Carlos Garcia")
                 String buyerName,
                 
                 @Schema(description = "ID of the transaction this rating is for", example = "1001")

@@ -55,9 +55,13 @@ public class SignupWebController {
             @RequestParam String password,
             @RequestParam String confirmPassword) throws IOException {
         try {
+            // Delegate to service: validates password match, email uniqueness, username uniqueness
+            // Creates new user with profile picture and default settings
             signupService.registerUser(profilePicture, username, email, password, confirmPassword);
+            // 302 redirect to login page on success (user must log in with new credentials)
             return "redirect:/login-page";
         } catch (org.springframework.web.server.ResponseStatusException exception) {
+            // Re-display form with error message if validation fails (username exists, etc)
             model.addAttribute("error", exception.getReason());
             model.addAttribute("username", username);
             model.addAttribute("email", email);

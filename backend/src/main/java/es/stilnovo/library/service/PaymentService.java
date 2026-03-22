@@ -43,25 +43,30 @@ public class PaymentService {
      * @throws IllegalStateException if self-purchase or product unavailable
      */
     public CheckoutData prepareCheckout(long productId, String username) {
-        // Checks authentication and if it is a self purchase
+        // STEP 1: Check authentication - username required to proceed (Principal validation)
         if (username == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
         }
 
+        // STEP 2: Query product by ID - throw 404 if not found
         Product product = productService.findById(productId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
 
+        // STEP 3: Query buyer user by username
         User buyer = userService.findByName(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
+        // STEP 4: Prevent self-purchase (user cannot buy their own products)
         if (product.getSeller().getUserId().equals(buyer.getUserId())) {
             throw new IllegalStateException("self_purchase");
         }
 
+        // STEP 5: Check product availability (must be "active" to purchase)
         if (!"active".equalsIgnoreCase(product.getStatus())) {
             throw new IllegalStateException("not_available");
         }
 
+        // STEP 6: Return validated checkout data for payment processing
         return new CheckoutData(product, buyer);
     }
 

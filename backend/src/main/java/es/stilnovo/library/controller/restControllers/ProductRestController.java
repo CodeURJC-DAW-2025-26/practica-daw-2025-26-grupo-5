@@ -80,9 +80,13 @@ public class ProductRestController {
             @PageableDefault(size = 10) Pageable pageable,
             Principal principal) {
 
+        // Extract user context from Principal for personalized results (null if anonymous)
         User user = mainService.getUserContext(principal != null ? principal.getName() : null);
+        
+        // Query products with filters and pagination - applies search/category logic
         CatalogPageResult page = productService.getCatalogPage(query, category, user, pageable);
 
+        // Convert domain objects to DTOs and wrap with pagination metadata
         return new PagedResponse<>(
                 productMapper.toDTOs(page.products()),
                 page.page(),

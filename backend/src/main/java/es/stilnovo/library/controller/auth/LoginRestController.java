@@ -48,6 +48,8 @@ public class LoginRestController {
 		@ApiResponse(responseCode = "401", description = "Invalid credentials")
 	})
 	public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+		// Delegate to service: authenticates credentials and generates JWT tokens
+		// Sets authentication cookies in HTTP response for stateless JWT auth
 		return userLoginService.login(response, loginRequest);
 	}
 

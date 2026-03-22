@@ -81,30 +81,43 @@ public class NotificationService {
         return "redirect:/contact-seller-page/" + productId + "?sent=true";
     }
 
+    /**
+     * Sends inquiry message from buyer to seller.
+     * Implements spam prevention: 30-minute cooldown between inquiries for same product/buyer.
+     * Sends HTML emails to both seller (notification) and buyer (confirmation).
+     */
     public InquirySubmissionResult sendInquiry(long productId, String phone, String type, String message, String username) {
+        // Validate product and buyer exist
         Product product = productService.findById(productId).orElseThrow();
         User buyer = userService.findByName(username)
                 .orElseThrow(() -> new ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "User not found"));
 
+        // Prevent self-inquiry (buyer cannot inquire about their own products)
         if (product.getSeller().getUserId().equals(buyer.getUserId())) {
             return new InquirySubmissionResult(null, false, null, "self_purchase");
         }
 
+        // Check cooldown: prevent spam by enforcing 30-minute wait between inquiries
         Inquiry lastInquiry = inquiryService.getLastInquiry(buyer.getUserId(), product.getId()).orElse(null);
         if (lastInquiry != null) {
+            // Calculate seconds elapsed since last inquiry
             long secondsSince = Duration.between(lastInquiry.getCreatedAt(), LocalDateTime.now()).getSeconds();
+            // 1800 seconds = 30 minutes cooldown period
             long cooldown = 1800 - secondsSince;
             if (cooldown > 0) {
+                // Return remaining cooldown in minutes (rounded up)
                 long minutes = (long) Math.ceil(cooldown / 60.0);
                 return new InquirySubmissionResult(lastInquiry, false, minutes, "cooldown");
             }
         }
 
+        // Prepare email resources and content
         Resource logoResource = resourceLoader.getResource("classpath:static/images/logo.png");
-        String logoCid = "stilnovoLogo";
+        String logoCid = "stilnovoLogo"; // Content-ID for embedding logo in email
         String sellerEmail = product.getSeller().getEmail();
         String phoneValue = (phone == null || phone.isBlank()) ? "Not provided" : phone;
 
+        // Generate HTML email templates for seller and buyer
         String sellerHtml = MailTemplates.proSellerInquiry(
                 publicBaseUrl,
                 product.getId(), product.getName(), type, message,
@@ -112,9 +125,11 @@ public class NotificationService {
         String buyerHtml = MailTemplates.buyerConfirmation(publicBaseUrl, product.getName(), type, message, logoCid);
 
         try {
+            // Send seller notification and buyer confirmation (with embedded logo)
             mailService.sendHtmlWithInline(sellerEmail, "New Inquiry: " + product.getName(), sellerHtml, logoCid, logoResource);
             mailService.sendHtmlWithInline(buyer.getEmail(), "Confirmation: Message sent to seller", buyerHtml, logoCid, logoResource);
 
+            // Create inquiry record with SENT status
             Inquiry inquiry = inquiryService.createInquiry(
                     product.getId(),
                     product.getName(),
@@ -129,6 +144,7 @@ public class NotificationService {
                     "SENT");
             return new InquirySubmissionResult(inquiry, true, null, null);
         } catch (MailException | MessagingException exception) {
+            // If email fails, still create inquiry record with FAILED_MAIL status for audit trail
             Inquiry inquiry = inquiryService.createInquiry(
                     product.getId(),
                     product.getName(),

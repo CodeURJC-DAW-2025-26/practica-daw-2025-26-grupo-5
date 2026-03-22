@@ -12,7 +12,7 @@ public record UserDTO(
         @Schema(description = "Unique user identifier", example = "5")
         Long id,
         
-        @Schema(description = "User's display name", example = "Laura Martínez")
+        @Schema(description = "User's display name", example = "Laura Martinez")
         String name,
         
         @Schema(description = "User's email address", example = "laura.martinez@example.com")
@@ -24,7 +24,7 @@ public record UserDTO(
         @Schema(description = "Total number of ratings received", example = "34")
         int numRatings,
         
-        @Schema(description = "User's profile description or biography", example = "Vendedora de artículos de fotografía vintage.")
+        @Schema(description = "User's profile description or biography", example = "Seller of vintage photography items.")
         String description,
         
         @Schema(description = "List of assigned security roles (e.g., ROLE_USER, ROLE_ADMIN)")

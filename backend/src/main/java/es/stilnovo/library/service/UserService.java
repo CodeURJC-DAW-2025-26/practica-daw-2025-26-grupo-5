@@ -122,23 +122,24 @@ public class UserService {
     private ValorationRepository valorationRepository;
 
     /**
-     * Calculates the average rating received by a seller.
+     * Calculates the average rating (stars) received by a seller from all customers.
+     * Used for seller profile and reputation display.
      */
     @Transactional(readOnly = true)
     public double getAverageRatingForSeller(String username) {
-        // STEP 1: Query for seller by username
+        // STEP 1: Query for seller by username - throws 404 if not found
         User seller = userRepository.findByName(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        // STEP 2: Fetch all ratings/reviews for this seller
+        // STEP 2: Fetch all ratings/reviews for this seller from database
         java.util.List<Valoration> valorations = valorationRepository.findBySeller(seller);
 
-        // STEP 3: Handle case where seller has no ratings yet
+        // STEP 3: Handle case where seller has no ratings yet (new sellers)
         if (valorations.isEmpty()) {
             return 0.0;
         }
 
-        // STEP 4: Calculate and return average star rating
+        // STEP 4: Calculate average by mapping stars to integers and computing average
         return valorations.stream()
                 .mapToInt(Valoration::getStars)
                 .average()
@@ -166,18 +167,19 @@ public class UserService {
             String cardNumber, String cardCvv, String cardExpiringDate,
             String description) throws IOException {
 
-        // 1. Domain Logic: Fetch the managed entity from the database
+        // 1. Fetch managed user entity from database for update
         User user = userRepository.findByName(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
-        // 2. Image Processing: Update profile photo if a new one is provided
+        // 2. Image Processing: Update profile photo only if a new file is provided and not empty
         if (newProfilePhoto != null && !newProfilePhoto.isEmpty()) {
+            // Convert MultipartFile stream to BLOB for database storage
             user.setProfileImage(BlobProxy.generateProxy(
                     newProfilePhoto.getInputStream(),
                     newProfilePhoto.getSize()));
         }
 
-        // 3. Conditional Updates: Only update fields that are not empty
+        // 3. Conditional Updates: Only update fields with non-empty values to prevent overwriting with blanks
         if (email != null && !email.trim().isEmpty())
             user.setEmail(email);
         if (cardNumber != null && !cardNumber.trim().isEmpty())
@@ -189,8 +191,7 @@ public class UserService {
         if (description != null && !description.trim().isEmpty())
             user.setUserDescription(description);
 
-        // 4. Persistence: The @Transactional annotation will automatically flush
-        // changes to the DB
+        // 4. Persistence: @Transactional annotation automatically flushes changes to database
         userRepository.save(user);
     }
 

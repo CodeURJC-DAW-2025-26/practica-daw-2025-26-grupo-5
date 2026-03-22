@@ -21,11 +21,21 @@ public final class NumberFormattingUtils {
         // Utility class
     }
 
+    /**
+     * Formats an integer quantity using locale-specific thousands separator.
+     * @param value the number to format
+     * @return formatted quantity string (e.g., "1.000" in ES locale)
+     */
     public static String formatQuantity(long value) {
         NumberFormat integerFormat = NumberFormat.getIntegerInstance(ES_LOCALE);
         return integerFormat.format(value);
     }
 
+    /**
+     * Formats a monetary value with proper decimal separator and precision.
+     * @param value the amount to format
+     * @return formatted money string (e.g., "150,50" in ES locale)
+     */
     public static String formatMoney(double value) {
         if (isWholeNumber(value)) {
             return formatQuantity(Math.round(value));
@@ -39,6 +49,11 @@ public final class NumberFormattingUtils {
         return decimalFormat.format(value);
     }
 
+    /**
+     * Formats a percentage value with proper decimal separator and % symbol.
+     * @param value the percentage to format
+     * @return formatted percentage string (e.g., "85,50%" in ES locale)
+     */
     public static String formatPercentage(double value) {
         if (isWholeNumber(value)) {
             return formatQuantity(Math.round(value)) + "%";
@@ -52,6 +67,11 @@ public final class NumberFormattingUtils {
         return decimalFormat.format(value) + "%";
     }
 
+    /**
+     * Checks if a double value is effectively an integer within epsilon tolerance.
+     * @param value the number to check
+     * @return true if the value is a whole number
+     */
     private static boolean isWholeNumber(double value) {
         return Math.abs(value - Math.rint(value)) < EPSILON;
     }
