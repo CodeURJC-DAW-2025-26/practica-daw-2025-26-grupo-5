@@ -20,8 +20,14 @@ import es.stilnovo.library.dto.UserDTO;
 import es.stilnovo.library.dto.UserMapper;
 import es.stilnovo.library.service.SignupService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/v1/users")
+@Tag(name = "Users", description = "REST API for user management and registration")
 public class SignupWebRestController {
 
 	@Autowired
@@ -37,12 +43,18 @@ public class SignupWebRestController {
 	 * simultaneously.
 	 *
 	 * @param request        DTO containing the user registration data (username,
-	 *                       email, password, etc.).
+	 * email, password, etc.).
 	 * @param profilePicture The optional profile image file sent from the client.
 	 * @return 201 Created status with the new UserDTO and the profile location URI.
 	 * @throws IOException If image processing fails during registration.
 	 */
 	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@Operation(summary = "Register a new user", description = "Registers a new user in the system. Supports multipart/form-data for profile picture uploads.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "User registered successfully"),
+		@ApiResponse(responseCode = "400", description = "Invalid input data (e.g., passwords do not match or file processing error)"),
+		@ApiResponse(responseCode = "409", description = "Conflict (e.g., username or email already exists)")
+	})
 	public ResponseEntity<UserDTO> signup(
 			@ModelAttribute SignupRequestDTO request,
 			@RequestParam(required = false) MultipartFile profilePicture) throws IOException {

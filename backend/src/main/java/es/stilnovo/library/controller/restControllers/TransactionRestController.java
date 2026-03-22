@@ -30,8 +30,14 @@ import es.stilnovo.library.service.PaymentService;
 import es.stilnovo.library.service.TransactionService;
 import jakarta.validation.Valid;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/v1/transactions")
+@Tag(name = "Transactions", description = "REST API for managing purchases, sales, and checkout operations")
 public class TransactionRestController {
 
     @Autowired
@@ -57,9 +63,17 @@ public class TransactionRestController {
      * @param request   DTO containing the target product ID for the purchase.
      * @param principal The security context of the authenticated buyer.
      * @return ResponseEntity with 201 Created status, the URI location of the new
-     *         transaction, and the confirmed TransactionDTO.
+     * transaction, and the confirmed TransactionDTO.
      */
     @PostMapping
+    @Operation(summary = "Create a transaction", description = "Processes and confirms a new product purchase")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Transaction created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
+        @ApiResponse(responseCode = "404", description = "Product not found"),
+        @ApiResponse(responseCode = "409", description = "Conflict (e.g., insufficient balance or product already sold)")
+    })
     public ResponseEntity<TransactionDTO> createTransaction(@Valid @RequestBody TransactionCreateRequestDTO request,
             Principal principal) {
         // 1. Confirm the purchase via service (handles balance checks and inventory)
@@ -82,9 +96,16 @@ public class TransactionRestController {
      * @param id        The unique identifier of the transaction.
      * @param principal The security context of the user requesting the data.
      * @return TransactionDTO containing the full deal details (price, date,
-     *         participants).
+     * participants).
      */
     @GetMapping("/{id}")
+    @Operation(summary = "Get transaction details", description = "Retrieves the details of a specific transaction by its ID. Access is restricted to the buyer or seller.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Transaction details retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
+        @ApiResponse(responseCode = "403", description = "Forbidden (user is not involved in this transaction)"),
+        @ApiResponse(responseCode = "404", description = "Transaction not found")
+    })
     public TransactionDTO getTransaction(@PathVariable long id, Principal principal) {
         return transactionMapper.toDTO(transactionService.getTransactionForInvolvedUser(id, principal.getName()));
     }
@@ -96,9 +117,14 @@ public class TransactionRestController {
      * @param principal The security context of the authenticated seller.
      * @param pageable  Pagination and sorting parameters (page, size, sort).
      * @return PagedResponse containing a list of TransactionDTOs representing
-     *         sales.
+     * sales.
      */
     @GetMapping("/sales")
+    @Operation(summary = "Get seller transactions", description = "Retrieves a paginated list of all sales for the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Sales retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user")
+    })
     public PagedResponse<TransactionDTO> getSellerTransactions(Principal principal,
             @PageableDefault(size = 10) Pageable pageable) {
 
@@ -119,6 +145,12 @@ public class TransactionRestController {
      * Note: This is a read-only preview and does not execute the transaction.
      */
     @GetMapping("/{id}/checkout")
+    @Operation(summary = "Get checkout summary", description = "Prepares the checkout summary for a potential purchase")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Checkout summary retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
+        @ApiResponse(responseCode = "404", description = "Product not found")
+    })
     public CheckoutDTO getCheckout(@PathVariable long id, Principal principal) {
         // 1. Prepare checkout data through the payment service
         // Resolves the buyer's name from the Principal for a personalized summary
@@ -129,6 +161,7 @@ public class TransactionRestController {
                 productMapper.toDTO(checkoutData.product()),
                 userMapper.toDTO(checkoutData.buyer()));
     }
+    
     /**
      * Updates an existing transaction.
      * * @param id The unique identifier of the transaction to update.
@@ -137,6 +170,14 @@ public class TransactionRestController {
      * @return ResponseEntity with 200 OK and the updated TransactionDTO.
      */
     @PutMapping("/{id}")
+    @Operation(summary = "Update transaction", description = "Updates an existing transaction")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Transaction updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
+        @ApiResponse(responseCode = "403", description = "Forbidden (user lacks permissions to update)"),
+        @ApiResponse(responseCode = "404", description = "Transaction not found")
+    })
     public ResponseEntity<TransactionDTO> updateTransaction(
             @PathVariable long id,
             @Valid @RequestBody TransactionUpdateRequestDTO request,
@@ -154,6 +195,13 @@ public class TransactionRestController {
      * @return ResponseEntity with 204 No Content status, standard for successful deletions.
      */
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete transaction", description = "Deletes a specific transaction by its ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Transaction deleted successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
+        @ApiResponse(responseCode = "403", description = "Forbidden (user lacks permissions to delete)"),
+        @ApiResponse(responseCode = "404", description = "Transaction not found")
+    })
     public ResponseEntity<Void> deleteTransaction(
             @PathVariable long id,
             Principal principal) {

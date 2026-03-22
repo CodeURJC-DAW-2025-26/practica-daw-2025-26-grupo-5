@@ -16,8 +16,14 @@ import es.stilnovo.library.service.UserService;
 import java.security.Principal;
 import java.net.URI;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/v1/valorations")
+@Tag(name = "Valorations", description = "REST API for managing user reviews and ratings (valorations) for transactions")
 public class ValorationRestController {
 
     @Autowired
@@ -35,9 +41,13 @@ public class ValorationRestController {
      *
      * @param pageable Pagination and sorting information (default size: 10).
      * @return PagedResponse containing a list of ValorationDTOs and paging
-     *         metadata.
+     * metadata.
      */
     @GetMapping
+    @Operation(summary = "Get all valorations", description = "Retrieves a paginated list of all valorations in the system")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Valorations retrieved successfully")
+    })
     public PagedResponse<ValorationDTO> getAllValorations(@PageableDefault(size = 10) Pageable pageable) {
         var page = valorationService.findAll(pageable);
         return new PagedResponse<>(valorationMapper.toDTOs(page.getContent()),
@@ -49,9 +59,14 @@ public class ValorationRestController {
      *
      * @param id The ID of the valoration to retrieve.
      * @return ValorationDTO containing the feedback, stars, and associated user
-     *         data.
+     * data.
      */
     @GetMapping("/{id}")
+    @Operation(summary = "Get a valoration by ID", description = "Retrieves the details of a specific valoration by its unique identifier")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Valoration retrieved successfully"),
+        @ApiResponse(responseCode = "404", description = "Valoration not found")
+    })
     public ValorationDTO getValoration(@PathVariable Long id) {
         return valorationMapper.toDTO(valorationService.findById(id));
     }
@@ -61,12 +76,19 @@ public class ValorationRestController {
      * The buyer identity is automatically resolved from the security context.
      *
      * @param dto       The valoration data including stars, comment, and
-     *                  transactionId.
+     * transactionId.
      * @param principal The security context of the authenticated buyer.
      * @return ResponseEntity with 201 Created status, the URI of the new resource,
-     *         and the ValorationDTO.
+     * and the ValorationDTO.
      */
     @PostMapping
+    @Operation(summary = "Create a valoration", description = "Submits a new valoration for a completed transaction")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Valoration created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
+        @ApiResponse(responseCode = "404", description = "Transaction not found")
+    })
     public ResponseEntity<ValorationDTO> createValoration(@RequestBody ValorationDTO dto, Principal principal) {
         // 1. Resolve buyer from current session
         var buyer = userService.findByName(principal.getName()).orElseThrow();
@@ -92,6 +114,13 @@ public class ValorationRestController {
      * @return ResponseEntity with 204 No Content status on success.
      */
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a valoration", description = "Deletes a valoration by its ID. Only the author or an admin can delete it.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Valoration deleted successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
+        @ApiResponse(responseCode = "403", description = "Forbidden (user is not the author nor an admin)"),
+        @ApiResponse(responseCode = "404", description = "Valoration not found")
+    })
     public ResponseEntity<Void> deleteValoration(@PathVariable Long id, Principal principal) {
         // 1. Resolve the authenticated user
         var currentUser = userService.findByName(principal.getName()).orElseThrow();

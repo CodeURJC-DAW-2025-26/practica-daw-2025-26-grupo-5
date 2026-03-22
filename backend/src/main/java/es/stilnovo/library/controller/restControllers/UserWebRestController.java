@@ -35,8 +35,14 @@ import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.UserService;
 import es.stilnovo.library.service.ValorationService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/v1/users")
+@Tag(name = "User Profiles", description = "REST API for managing user profiles, settings, dashboard data, and public seller profiles")
 public class UserWebRestController {
 
     @Autowired
@@ -63,18 +69,35 @@ public class UserWebRestController {
     /**
      * This section refers to the current (principal) user.
      */
+    
     @GetMapping("/me")
+    @Operation(summary = "Get current user profile", description = "Retrieves the full profile of the currently authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "User profile retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user")
+    })
     public UserDTO getCurrentUser(Principal principal) {
         return userMapper.toDTO(userService.getFullUserProfile(principal.getName()));
     }
 
     @DeleteMapping("/me")
+    @Operation(summary = "Delete my account", description = "Deletes the authenticated user's account and associated data")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Account deleted successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user")
+    })
     public ResponseEntity<Void> deleteMyAccount(Principal principal) {
         userService.deleteUserSelf(principal.getName());
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/me/profile-photo")
+    @GetMapping(value = "/me/profile-photo", produces = MediaType.IMAGE_PNG_VALUE)
+    @Operation(summary = "Get my profile photo", description = "Retrieves the profile photo of the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Profile photo retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
+        @ApiResponse(responseCode = "404", description = "Profile photo not found")
+    })
     public ResponseEntity<Resource> getMyProfilePhoto(Principal principal) throws SQLException {
         Resource myImage = userService.getProfilePhotoResourceByUsername(principal.getName());
         return ResponseEntity.ok()
@@ -83,6 +106,12 @@ public class UserWebRestController {
     }
 
     @PutMapping(value = "/me/profile-photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Update my profile photo", description = "Uploads and updates the profile photo for the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Profile photo updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid file or processing error"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user")
+    })
     public ResponseEntity<UserDTO> putMethodName(Principal principal, @RequestPart("image")MultipartFile file)
             throws IOException {
         String nameToModify = principal.getName();
@@ -92,6 +121,12 @@ public class UserWebRestController {
     }
 
     @PutMapping(value = "/me/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Update my settings", description = "Updates the settings and profile information of the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Settings updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user")
+    })
     public UserDTO updateMySettings(@ModelAttribute UserSettingsUpdateDTO request, Principal principal)
             throws IOException {
         userService.updateUserSettings(
@@ -107,6 +142,11 @@ public class UserWebRestController {
     }
 
     @GetMapping("/me/dashboard")
+    @Operation(summary = "Get dashboard data", description = "Retrieves dashboard overview statistics for the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Dashboard data retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user")
+    })
     public ResponseEntity<Map<String, Object>> getDashboardData(Principal principal) {
         var dashboardData = userService.getUserDashboardData(principal.getName());
 
@@ -120,6 +160,11 @@ public class UserWebRestController {
     }
 
     @GetMapping("/me/transactions")
+    @Operation(summary = "Get my transactions summary", description = "Retrieves sales and orders transaction dashboard data for the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Transactions data retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user")
+    })
     public ResponseEntity<Map<String, Object>> getMyTransactions(Principal principal,
             @RequestParam(required = false) Long transactionId) {
         Map<String, Object> data = userService.getSalesAndOrdersDashboard(principal.getName(), transactionId);
@@ -131,6 +176,11 @@ public class UserWebRestController {
      * Retrieves a paginated list of ratings for the authenticated user.
      */
     @GetMapping("/me/valorations")
+    @Operation(summary = "Get my sent valorations", description = "Retrieves a paginated list of ratings/valorations given by the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Valorations retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user")
+    })
     public ResponseEntity<Page<ValorationDTO>> getMySentValorations(
             Principal principal, 
             Pageable pageable) {
@@ -142,6 +192,11 @@ public class UserWebRestController {
     }
 
     @GetMapping("/me/statistics")
+    @Operation(summary = "Get my statistics", description = "Retrieves advanced statistics data for the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Statistics retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user")
+    })
     public ResponseEntity<UserStatisticsDataDTO> getStatistics(Principal principal) {
         var statisticsData = userService.getUserStatisticsData(principal.getName());
         return ResponseEntity.ok(statisticsData);
@@ -150,7 +205,13 @@ public class UserWebRestController {
     /**
      * This section refers to other users (sellers).
      */
+    
     @GetMapping("/{id}/profile")
+    @Operation(summary = "Get seller profile", description = "Retrieves the public profile of a specific seller by their ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Seller profile retrieved successfully"),
+        @ApiResponse(responseCode = "404", description = "User not found")
+    })
     public SellerProfileDTO getSellerProfile(@PathVariable long id, Principal principal) {
         var seller = userService.getPublicProfileById(id);
         boolean owner = principal != null && principal.getName().equals(seller.getName());
@@ -162,7 +223,12 @@ public class UserWebRestController {
                 owner);
     }
 
-    @GetMapping("/{id}/profile-photo")
+    @GetMapping(value = "/{id}/profile-photo", produces = MediaType.IMAGE_PNG_VALUE)
+    @Operation(summary = "Get public profile photo", description = "Retrieves the public profile photo of a specific user by ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Profile photo retrieved successfully"),
+        @ApiResponse(responseCode = "404", description = "User or photo not found")
+    })
     public ResponseEntity<Resource> getPublicProfilePhoto(@PathVariable Long id) throws SQLException {
         Resource image = userService.getProfilePhotoResourceById(id);
         return ResponseEntity.ok()
@@ -171,6 +237,13 @@ public class UserWebRestController {
     }
 
     @GetMapping("/{id}/contact-info")
+    @Operation(summary = "Get contact information", description = "Retrieves contact information layout for communicating with a specific seller")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Contact information retrieved successfully"),
+        @ApiResponse(responseCode = "400", description = "Bad request (e.g., trying to contact oneself)"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
+        @ApiResponse(responseCode = "404", description = "User or product not found")
+    })
     public ResponseEntity<Map<String, Object>> getContactInfo(@PathVariable int id, Principal principal) {
         try {
             var pageData = contactSellerService.getContactSellerPageData(id, principal.getName());

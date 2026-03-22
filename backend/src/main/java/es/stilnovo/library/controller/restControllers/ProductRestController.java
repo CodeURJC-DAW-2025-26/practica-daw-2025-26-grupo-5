@@ -29,6 +29,11 @@ import es.stilnovo.library.service.ContactSellerService;
 import es.stilnovo.library.service.MainService;
 import es.stilnovo.library.service.ProductService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * REST Controller for managing Product-related operations.
  * Provides endpoints for catalog browsing, personalized recommendations,
@@ -36,6 +41,7 @@ import es.stilnovo.library.service.ProductService;
  */
 @RestController
 @RequestMapping("/api/v1/products")
+@Tag(name = "Products", description = "REST API for catalog browsing, recommendations, and product management (CRUD)")
 public class ProductRestController {
 
     @Autowired
@@ -64,6 +70,10 @@ public class ProductRestController {
      * @return PagedResponse containing product data and pagination metadata.
      */
     @GetMapping
+    @Operation(summary = "Get global catalog products", description = "Retrieves a paginated list of products from the global catalog, with optional search and category filters")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Products retrieved successfully")
+    })
     public PagedResponse<ProductDTO> getProducts(
             @RequestParam(required = false) String query,
             @RequestParam(required = false) String category,
@@ -90,13 +100,19 @@ public class ProductRestController {
      * facilitate communication.
      *
      * @param id        The unique identifier of the product the user is interested
-     *                  in.
+     * in.
      * @param principal The security context of the authenticated user (prospective
-     *                  buyer).
+     * buyer).
      * @return ContactSellerPageDTO containing the product DTO, seller DTO, and
-     *         buyer's basic info.
+     * buyer's basic info.
      */
     @GetMapping("/{id}/contact")
+    @Operation(summary = "Get contact seller data", description = "Retrieves necessary data to populate the 'Contact Seller' interface for a specific product")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Contact data retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
+        @ApiResponse(responseCode = "404", description = "Product or seller not found")
+    })
     public ContactSellerPageDTO getContactSellerData(@PathVariable long id, Principal principal) {
         // 1. Delegate business logic to fetch aggregated page data
         var pageData = contactSellerService.getContactSellerPageData(id, principal.getName());
@@ -117,6 +133,11 @@ public class ProductRestController {
      * @return List of products owned by the current user.
      */
     @GetMapping("/me")
+    @Operation(summary = "Get my products", description = "Retrieves the authenticated user's personal inventory")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Personal inventory retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user")
+    })
     public ResponseEntity<List<ProductDTO>> getMyProducts(Principal principal) {
         var user = productService.getAuthenticatedUserWithProducts(principal.getName());
         return ResponseEntity.ok(productMapper.toDTOs(user.getProducts()));
@@ -129,6 +150,10 @@ public class ProductRestController {
      * @return List of recommended products.
      */
     @GetMapping("/recommendations")
+    @Operation(summary = "Get recommendations", description = "Retrieves a list of recommended products for the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Recommendations retrieved successfully")
+    })
     public List<ProductDTO> getRecommendations(Principal principal) {
         User user = mainService.getUserContext(principal != null ? principal.getName() : null);
         return productMapper.toDTOs(productService.getRecommendations(user));
@@ -141,14 +166,18 @@ public class ProductRestController {
      * items.
      *
      * InfoProductPage
-     * 
-     * @param id        Unique identifier of the product.
+     * * @param id        Unique identifier of the product.
      * @param principal The security context of the user (optional).
      * @return ProductDetailsDTO containing the main product, recommendations, and
-     *         login status.
+     * login status.
      * @throws ResponseStatusException 404 if the product is not found.
      */
     @GetMapping("/{id}")
+    @Operation(summary = "Get product details", description = "Retrieves full product details including recommendations and tracks the visit")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Product details retrieved successfully"),
+        @ApiResponse(responseCode = "404", description = "Product not found")
+    })
     public ProductDetailsDTO getProductDetails(@PathVariable long id, Principal principal) {
         // 1. Get user context if logged in
         User user = principal != null ? mainService.getUserContext(principal.getName()) : null;
@@ -184,6 +213,12 @@ public class ProductRestController {
      * @throws IOException If file processing fails.
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Create a product", description = "Creates a new product for the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Product created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data or file processing error"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user")
+    })
     public ResponseEntity<ProductDTO> createProduct(
             @ModelAttribute ProductWriteRequestDTO request,
             Principal principal) throws IOException {
@@ -226,6 +261,14 @@ public class ProductRestController {
      * @throws IOException If file processing fails.
      */
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Update a product", description = "Performs a partial update on an existing product owned by the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Product updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data or file processing error"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
+        @ApiResponse(responseCode = "403", description = "Forbidden (user is not the owner)"),
+        @ApiResponse(responseCode = "404", description = "Product not found")
+    })
     public ResponseEntity<ProductDTO> updateProduct(
             @PathVariable long id,
             @ModelAttribute ProductWriteRequestDTO request,
@@ -263,6 +306,13 @@ public class ProductRestController {
      * @return 204 No Content response on success.
      */
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a product", description = "Deletes a specific product. The requesting user must be the owner.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Product deleted successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
+        @ApiResponse(responseCode = "403", description = "Forbidden (user is not the owner)"),
+        @ApiResponse(responseCode = "404", description = "Product not found")
+    })
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id, Principal principal) {
         productService.deleteProduct(id, principal.getName());
         return ResponseEntity.noContent().build();
