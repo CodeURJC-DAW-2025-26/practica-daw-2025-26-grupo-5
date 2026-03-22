@@ -486,6 +486,28 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Add Product to Favorites",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/me/favorites/2",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"me",
+								"favorites",
+								"2"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},

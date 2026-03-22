@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -130,6 +131,18 @@ public class UserWebRestController {
         // Remove the custom profile photo from the database
         userService.deleteProfilePhotoByUsername(principal.getName());
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Adds a product to the authenticated user's favorites list.
+     * @param principal The security context of the authenticated user.
+     * @param productId The ID of the product to favorite.
+     * @return ResponseEntity with a success message.
+     */
+    @PostMapping("/me/favorites/{productId}")
+    public ResponseEntity<String> addProductToFavorites(Principal principal, @PathVariable Long productId) {
+        userService.addProductToFavorites(principal.getName(), productId);
+        return ResponseEntity.ok("Product added to favorites successfully");
     }
 
     @PutMapping(value = "/me/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
