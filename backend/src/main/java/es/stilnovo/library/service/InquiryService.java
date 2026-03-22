@@ -14,6 +14,7 @@ import es.stilnovo.library.model.User;
 import es.stilnovo.library.repository.InquiryRepository;
 import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.UserRepository;
+import es.stilnovo.library.dto.InquiryDTO;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
 import jakarta.transaction.Transactional;
@@ -130,7 +131,7 @@ public class InquiryService {
      * @return The updated Inquiry entity.
      */
     @Transactional
-    public Inquiry updateInquiry(Long id, es.stilnovo.library.dto.InquiryUpdateRequestDTO request) {
+    public Inquiry updateInquiry(Long id, InquiryDTO request) {
         Inquiry inquiry = findById(id);
 
         inquiry.setMessage(request.message());

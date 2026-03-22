@@ -27,7 +27,6 @@ import es.stilnovo.library.service.InquiryService;
 import es.stilnovo.library.service.NotificationService;
 import jakarta.validation.Valid;
 import es.stilnovo.library.dto.PagedResponse;
-import es.stilnovo.library.dto.InquiryUpdateRequestDTO;
 
 /**
  * REST Controller for buyer-to-seller inquiries
@@ -35,7 +34,7 @@ import es.stilnovo.library.dto.InquiryUpdateRequestDTO;
  */
 @RestController
 @RequestMapping("/api/v1/inquiries")
-public class NotificationRestController {
+public class InquryRestController {
 
 	@Autowired
 	private NotificationService notificationService;
@@ -114,27 +113,6 @@ public class NotificationRestController {
 				page.getTotalElements(),
 				page.isLast()
 		);
-	}
-
-	/**
-	 * Updates an existing inquiry (e.g., updating its status or message).
-	 * Security: Only authorized users (the owner) can perform this action.
-	 *
-	 * @param id The ID of the inquiry to update.
-	 * @param request The DTO containing the updated fields.
-	 * @param principal The security context of the authenticated user.
-	 * @return ResponseEntity with 200 OK and the updated InquiryDTO.
-	 */
-	@PutMapping("/{id}")
-	public ResponseEntity<InquiryDTO> updateInquiry(
-			@PathVariable Long id,
-			@Valid @RequestBody InquiryUpdateRequestDTO request,
-			Principal principal) {
-
-		// The service will verify ownership and perform the update
-		var updatedInquiry = inquiryService.updateInquiry(id, request);
-		
-		return ResponseEntity.ok(inquiryMapper.toDTO(updatedInquiry));
 	}
 
 	/**

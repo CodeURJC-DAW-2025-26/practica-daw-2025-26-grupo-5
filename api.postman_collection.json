@@ -958,7 +958,7 @@
 			]
 		},
 		{
-			"name": "Notifications",
+			"name": "Inqurys",
 			"item": [
 				{
 					"name": "Get Inquiry By ID",
@@ -1033,35 +1033,6 @@
 									"value": "10"
 								}
 							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Update Inquiry",
-					"request": {
-						"method": "PUT",
-						"header": [
-						{
-							"key": "Content-Type",
-							"value": "application/json"
-						}
-						],
-						"body": {
-						"mode": "raw",
-						"raw": "{\n  \"message\": \"Hi, is the price still negotiable?\",\n  \"status\": \"PENDING\"\n}"
-						},
-						"url": {
-						"raw": "{{baseUrl}}/api/v1/inquiries/1",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"api",
-							"v1",
-							"inquiries",
-							"1"
-						]
 						}
 					},
 					"response": []

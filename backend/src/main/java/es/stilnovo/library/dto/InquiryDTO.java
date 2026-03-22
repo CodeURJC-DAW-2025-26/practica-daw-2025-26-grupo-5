@@ -1,6 +1,10 @@
 package es.stilnovo.library.dto;
 
 import java.time.LocalDateTime;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
+import jakarta.validation.constraints.Size;
 
 /**
  * Represents a customer inquiry about a product with contact and product information.
@@ -26,8 +30,11 @@ public record InquiryDTO(
         String buyerEmail,
         String buyerPhone,
         String inquiryType,
+        @NotNull(message = "Message cannot be null")
+        @Size(min = 5, max = 1000, message = "Message must be between 5 and 1000 characters")
         String message,
         LocalDateTime createdAt,
+        @NotNull(message = "Status cannot be null")
         String status,
         
         ProductDTO product,
