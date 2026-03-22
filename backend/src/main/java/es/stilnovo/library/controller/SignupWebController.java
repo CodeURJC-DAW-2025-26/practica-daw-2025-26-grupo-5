@@ -31,11 +31,6 @@ import jakarta.servlet.http.HttpServletRequest;
 @Controller
 public class SignupWebController {
 
-    @GetMapping("/error")
-    public String signupError() {
-        return "error";
-    }
-
     @Autowired
     private SignupService signupService;
 
