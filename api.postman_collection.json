@@ -425,12 +425,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Me",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/users/1/contact-info",
+					"name": "Get Contact Info","request": {"method": "GET","header": [],"url": {"raw": "{{baseUrl}}/api/v1/users/1/contact-info",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -446,7 +441,7 @@
 					"response": []
 				},
 				{
-					"name": "Get Statictis",
+					"name": "Get Statistics",
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -1023,7 +1018,7 @@
 			]
 		},
 		{
-			"name": "Inquries",
+			"name": "Inquiries",
 			"item": [
 				{
 					"name": "Get Inquiry By ID",
