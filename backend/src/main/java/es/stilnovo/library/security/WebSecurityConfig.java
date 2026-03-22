@@ -19,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import es.stilnovo.library.security.jwt.JwtRequestFilter;
 import es.stilnovo.library.security.jwt.JwtTokenProvider;
 import es.stilnovo.library.security.jwt.UnauthorizedHandlerJwt;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.security.config.Customizer;
 import org.springframework.web.cors.CorsConfiguration;
@@ -69,31 +70,37 @@ public class WebSecurityConfig {
 
                 http.authenticationProvider(authenticationProvider());
                 http.cors(Customizer.withDefaults());
-                http
-                                .securityMatcher("/api/v1/**")
-                                .exceptionHandling(
-                                                handling -> handling.authenticationEntryPoint(unauthorizedHandlerJwt));
 
-                http
-                                .authorizeHttpRequests(authorize -> authorize
-                                                // Public API Endpoints
-                                                .requestMatchers("/api/v1/auth/**", "/api/v1/sessions/**").permitAll()
-                                                .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll() // Sign
-                                                                                                               // up
-                                                .requestMatchers(HttpMethod.GET,
-                                                                "/api/v1/catalog/**",
-                                                                "/api/v1/products/**",
-                                                                "/api/v1/images/**")
-                                                .permitAll()
-                                                .requestMatchers(HttpMethod.GET, "/api/v1/users/*/profile").permitAll()
+                http.securityMatcher("/api/v1/**")
+                                .exceptionHandling(handling -> handling
+                                                // 401 (Unauthorized)
+                                                .authenticationEntryPoint(unauthorizedHandlerJwt)
+                                                // 403 (Forbidden)
+                                                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                                        response.setContentType("application/json");
+                                                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                                                        response.getWriter().write(
+                                                                        "{\"status\": 403, \"message\": \"Endpoint error: Forbidden access\"}");
+                                                }));
 
-                                                // Private API Endpoints
-                                                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                                                .anyRequest().hasAnyRole("USER", "ADMIN"));
+                http.authorizeHttpRequests(authorize -> authorize
+                                // Public API Endpoints
+                                .requestMatchers("/api/v1/auth/**", "/api/v1/sessions/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
+                                .requestMatchers(HttpMethod.GET,
+                                                "/api/v1/catalog/**",
+                                                "/api/v1/products/**",
+                                                "/api/v1/images/**")
+                                .permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/users/*/profile").permitAll()
+
+                                // Private API Endpoints
+                                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                                .anyRequest().hasAnyRole("USER", "ADMIN"));
 
                 // REST Security best practices
-                http.csrf(csrf -> csrf.disable());
                 http.formLogin(form -> form.disable());
+                http.csrf(csrf -> csrf.disable());
                 http.httpBasic(basic -> basic.disable());
                 http.sessionManagement(mgmt -> mgmt.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
@@ -156,16 +163,16 @@ public class WebSecurityConfig {
          */
         @Bean
         public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        
-        // Allows requests from any origin for documentation tools
-        configuration.setAllowedOriginPatterns(List.of("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Cache-Control"));
-        configuration.setAllowCredentials(true);
+                CorsConfiguration configuration = new CorsConfiguration();
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
+                // Allows requests from any origin for documentation tools
+                configuration.setAllowedOriginPatterns(List.of("*"));
+                configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Cache-Control"));
+                configuration.setAllowCredentials(true);
+
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", configuration);
+                return source;
         }
 }
