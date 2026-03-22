@@ -1,13 +1,16 @@
 #!/bin/bash
+# Check if image name is provided 
+if [ -z "$1" ]; then
+    echo "Usage: ./create_image.sh <image_name>"
+    exit 1
+fi
 
-# Build Docker image
-docker build -t lcdd_daw -f Dockerfile ..
+# Build image using the provided name 
+docker build -t $1 -f Dockerfile ..
 
-# Error check
-if [ $? -eq 0 ]
-then
-    echo "Docker image built successfully."
+if [ $? -eq 0 ]; then
+    echo "Image '$1' built successfully."
 else
-    echo "There was an error building the Docker image."
+    echo "Error building image."
     exit 1
 fi

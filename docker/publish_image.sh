@@ -1,30 +1,15 @@
 #!/bin/bash
-
-# Check if Docker Hub username is provided
-if [ -z "$1" ]
-then
-    echo "Error. Execution mode: ./publish_image.sh <docker_hub_username>"
+if [ -z "$1" ]; then
+    echo "Usage: ./publish_image.sh <docker_hub_username>"
     exit 1
 fi
 
-# Check if the Docker image exists locally
-if [[ "$(docker images -q lcdd_daw 2> /dev/null)" == "" ]]
-then
-    echo "Error: Docker image 'lcdd_daw' not found locally."
-    echo "Please run ./create_image.sh first."
-    exit 1
-fi
+# We assume the local image is named 'stilnovo-app' [cite: 624]
+docker tag stilnovo-app $1/stilnovo-app:latest
+docker push $1/stilnovo-app:latest
 
-# Tag the Docker image
-docker tag lcdd_daw $1/lcdd_daw:latest
-
-# Publish Docker image
-docker push $1/lcdd_daw:latest
-
-# Error check
-if [ $? -eq 0 ]
-then
-    echo "Docker image published successfully."
+if [ $? -eq 0 ]; then
+    echo "Image pushed to $1/stilnovo-app:latest"
 else
-    echo "There was an error publishing the Docker image."
+    echo "Push failed."
 fi

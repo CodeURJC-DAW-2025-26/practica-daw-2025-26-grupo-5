@@ -51,7 +51,7 @@ services:
   # Depends on database health check before starting
   # Configure via environment variables for dev/prod flexibility
   app:
-    image: stilnovo/stilnovo:latest
+    image: ${DOCKER_HUB_USER:-stilnovo}/stilnovo-app:latest
     container_name: stilnovo-app
     depends_on:
       db:
@@ -66,8 +66,8 @@ services:
       # Database credentials - root user with configurable password
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-password}
-      # Hibernate DDL strategy: create (init) or update (preserve data)
-      SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO:-update}
+      # Hibernate DDL strategy: none
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO:-none}
 
 # Persistent named volume for MySQL data
 volumes:
