@@ -4,6 +4,12 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
+ * DTO: Data Transfer Object - Converts to/from JSON in REST API responses.
+ * 
+ * This record is ONLY used in REST Controllers as request/response bodies.
+ * Benefits of record: Auto-generates no-arg constructor, getters, toString, equals, and hashCode.
+ * Ensures clean separation between entity layer and API communication layer.
+ * 
  * Represents a product with its core details, seller information, and user interactions.
  */
 @Schema(description = "Represents a product with its core details, seller information, and user interactions")

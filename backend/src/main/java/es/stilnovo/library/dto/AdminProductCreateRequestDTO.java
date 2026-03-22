@@ -4,6 +4,12 @@ import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
+ * DTO: Data Transfer Object - Converts to/from JSON in REST API responses.
+ * 
+ * This record is ONLY used in REST Controllers as request/response bodies.
+ * Benefits of record: Auto-generates getters, constructor, toString, equals, and hashCode.
+ * Ensures no business logic belongs in DTOs - only data transfer layer.
+ * 
  * Request body for administrators to create a product on behalf of a seller.
  */
 @Schema(description = "Request body for administrators to create a product on behalf of a seller")

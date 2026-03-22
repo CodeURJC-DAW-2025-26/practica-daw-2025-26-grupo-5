@@ -7,6 +7,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 
 /**
+ * DTO: Data Transfer Object - Converts to/from JSON in REST API responses.
+ * 
+ * This record is ONLY used in REST Controllers as request/response bodies.
+ * Record automatically generates: no-arg constructor, getters, toString, equals, hashCode.
+ * Aggregates dashboard data from multiple sources into single immutable structure.
+ * 
  * Contains comprehensive dashboard data for a seller including sales, statistics, and charts.
  */
 @Schema(description = "Contains comprehensive dashboard data for a seller including sales, statistics, and charts")

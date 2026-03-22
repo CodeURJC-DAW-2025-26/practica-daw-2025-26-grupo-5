@@ -6,6 +6,12 @@ import jakarta.validation.constraints.Size;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
+ * DTO: Data Transfer Object - Converts to/from JSON in REST API responses.
+ * 
+ * This record is ONLY used in REST Controllers as request/response bodies.
+ * Record automatically provides all boilerplate: constructor, getters, toString, equals, hashCode.
+ * Ensures clean separation between entity layer and API communication layer.
+ * 
  * Represents a customer inquiry about a product with contact and product information.
  */
 @Schema(description = "Represents a customer inquiry about a product with contact and product information")

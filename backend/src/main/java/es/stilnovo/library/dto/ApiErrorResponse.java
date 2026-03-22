@@ -4,6 +4,12 @@ import java.time.Instant;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
+ * DTO: Data Transfer Object - Converts to/from JSON in REST API responses.
+ * 
+ * This record is ONLY used in REST Controllers as request/response bodies.
+ * Record automatically generates: no-arg constructor, getters, toString, equals, hashCode.
+ * Provides consistent error information to API clients for all error scenarios.
+ * 
  * Standardized API error response with detailed error information.
  */
 @Schema(description = "Standardized API error response with detailed error information")

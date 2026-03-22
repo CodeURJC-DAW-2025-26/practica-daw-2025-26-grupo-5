@@ -3,6 +3,12 @@ package es.stilnovo.library.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
+ * DTO: Data Transfer Object - Converts to/from JSON in REST API responses.
+ * 
+ * This record is ONLY used in REST Controllers as request/response bodies.
+ * Record automatically generates: no-arg constructor, getters, toString, equals, hashCode.
+ * Packages multi-source data into immutable structure for contact form scenarios.
+ * 
  * Contains data for the contact seller page with product and buyer information.
  */
 @Schema(description = "Contains data for the contact seller page with product and buyer information")

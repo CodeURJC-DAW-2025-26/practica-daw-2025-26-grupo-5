@@ -4,6 +4,12 @@ import es.stilnovo.library.model.Valoration;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
+ * DTO: Data Transfer Object - Converts to/from JSON in REST API responses.
+ * 
+ * This record is ONLY used in REST Controllers as request/response bodies.
+ * Record suppresses all boilerplate: getters, setters, no-arg constructor, toString, equals, hashCode.
+ * Perfect for type-safe data transfer in REST APIs without business logic exposure.
+ * 
  * Represents a product rating and review from a buyer.
  */
 @Schema(description = "Represents a product rating and review from a buyer")

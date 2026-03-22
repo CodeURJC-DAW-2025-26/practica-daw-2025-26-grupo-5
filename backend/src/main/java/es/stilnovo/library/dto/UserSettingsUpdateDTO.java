@@ -4,6 +4,12 @@ import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
+ * DTO: Data Transfer Object - Converts to/from JSON in REST API responses.
+ * 
+ * This class is ONLY used in REST Controllers as request/response bodies.
+ * Separates API request validation from business logic for clean architecture.
+ * Supports file uploads (MultipartFile) for profile picture updates.
+ * 
  * Request body for updating user account settings and profile information.
  * Supports updating profile picture, email, payment card details, and description.
  */

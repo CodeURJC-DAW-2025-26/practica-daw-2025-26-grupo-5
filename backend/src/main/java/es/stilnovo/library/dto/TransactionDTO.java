@@ -4,6 +4,12 @@ import java.time.LocalDateTime;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
+ * DTO: Data Transfer Object - Converts to/from JSON in REST API responses.
+ * 
+ * This record is ONLY used in REST Controllers as request/response bodies.
+ * Record automatically generates: no-arg constructor, getters, toString, equals, hashCode.
+ * Provides complete transaction information to clients without exposing internal details.
+ * 
  * Represents a completed transaction between seller and buyer.
  */
 @Schema(description = "Represents a completed transaction between seller and buyer")

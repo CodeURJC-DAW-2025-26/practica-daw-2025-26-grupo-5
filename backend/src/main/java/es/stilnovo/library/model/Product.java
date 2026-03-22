@@ -52,7 +52,7 @@ public class Product {
     /** Product status: Active, Inactive, or Sold */
     private String status; // active, inactive
 
-    /** Product primary image. */
+    /** Product primary image. Each product has only one image. OneToOne relationship managed by Product. */
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "image_id")
     private Image image;
