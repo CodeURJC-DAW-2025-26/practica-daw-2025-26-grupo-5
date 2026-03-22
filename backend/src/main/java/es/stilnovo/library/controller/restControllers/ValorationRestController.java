@@ -97,7 +97,8 @@ public class ValorationRestController {
     })
     public ResponseEntity<ValorationDTO> createValoration(@RequestBody ValorationDTO dto, Principal principal) {
         // 1. Resolve buyer from current session
-        var buyer = userService.findByName(principal.getName()).orElseThrow();
+        var buyer = userService.findByName(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found: " + principal.getName()));
 
         // 2. Create the valoration via service layer
         var created = valorationService.createValoration(dto.transactionId(), dto.stars(), dto.comment(), buyer);
@@ -134,7 +135,8 @@ public class ValorationRestController {
             Principal principal) {
 
         
-        var currentUser = userService.findByName(principal.getName()).orElseThrow();
+        var currentUser = userService.findByName(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found: " + principal.getName()));
 
         
         valorationService.updateValoration(id, dto.stars(), dto.comment(), currentUser);
@@ -163,7 +165,8 @@ public class ValorationRestController {
     })
     public ResponseEntity<Void> deleteValoration(@PathVariable Long id, Principal principal) {
         // 1. Resolve the authenticated user
-        var currentUser = userService.findByName(principal.getName()).orElseThrow();
+        var currentUser = userService.findByName(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found: " + principal.getName()));
 
         // 2. Call service to delete (security checks are done inside the service)
         valorationService.deleteValoration(id, currentUser);

@@ -6,6 +6,7 @@ import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -136,16 +137,18 @@ public class TransactionRestController {
 
     /**
      * Prepares the checkout summary for a potential purchase.
+     * Security: Only authenticated buyers can retrieve checkout information.
      * This endpoint aggregates the product details and the authenticated
      * buyer's profile data to facilitate the final review step.
      *
      * @param id        The unique identifier of the product to be purchased.
-     * @param principal The security context of the authenticated user.
+     * @param principal The security context of the authenticated user (guaranteed to be non-null).
      * @return CheckoutDTO containing the product details and the buyer's information.
      * Note: This is a read-only preview and does not execute the transaction.
      */
     @GetMapping("/{id}/checkout")
-    @Operation(summary = "Get checkout summary", description = "Prepares the checkout summary for a potential purchase")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get checkout summary", description = "Prepares the checkout summary for a potential purchase. Only authenticated users can access.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Checkout summary retrieved successfully"),
         @ApiResponse(responseCode = "401", description = "Unauthorized user"),
@@ -154,7 +157,8 @@ public class TransactionRestController {
     public CheckoutDTO getCheckout(@PathVariable long id, Principal principal) {
         // 1. Prepare checkout data through the payment service
         // Resolves the buyer's name from the Principal for a personalized summary
-        var checkoutData = paymentService.prepareCheckout(id, principal != null ? principal.getName() : null);
+        // Principal is guaranteed by Spring Security, no null check needed
+        var checkoutData = paymentService.prepareCheckout(id, principal.getName());
 
         // 2. Map domain objects to DTOs for the final response
         return new CheckoutDTO(
