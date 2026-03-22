@@ -357,10 +357,15 @@ public class AdminRestController {
 
     /**
      * Retrieves the detailed information of a specific transaction.
-     * * @param id The unique identifier of the transaction.
+     * @param id The unique identifier of the transaction.
      * @return ResponseEntity containing the TransactionDTO.
      */
     @GetMapping("/transactions/{id}")
+    @Operation(summary = "Get transaction by ID", description = "Retrieves the detailed information of a specific transaction")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Transaction retrieved successfully"),
+        @ApiResponse(responseCode = "404", description = "Transaction not found")
+    })
     public ResponseEntity<TransactionDTO> getTransactionById(@PathVariable Long id) {
         TransactionDTO transaction = transactionService.getTransactionById(id);
         

@@ -122,10 +122,15 @@ public class UserWebRestController {
 
     /**
      * Deletes the profile photo of the authenticated user, restoring the default avatar.
-     * * @param principal The security context of the authenticated user.
+     * @param principal The security context of the authenticated user.
      * @return ResponseEntity with 204 No Content status on success.
      */
     @DeleteMapping("/me/profile-photo")
+    @Operation(summary = "Delete my profile photo", description = "Deletes the profile photo of the authenticated user, restoring the default avatar")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Profile photo deleted successfully"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized user")
+    })
     public ResponseEntity<Void> deleteMyProfilePhoto(Principal principal) {
         // Remove the custom profile photo from the database
         userService.deleteProfilePhotoByUsername(principal.getName());

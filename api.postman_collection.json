@@ -810,7 +810,7 @@
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/products/1/image",
 							"host": [
-								"{{baseurl}}"
+								"{{baseUrl}}"
 							],
 							"path": [
 								"api",
@@ -1711,9 +1711,9 @@
 		}
 	],
 	"variable": [
-		{
-			"key": "{{baseUrl}}",
-			"value": ""
-		}
-	]
+    {
+        "key": "baseUrl",
+        "value": "https://localhost:8443" 
+    }
+]
 }
