@@ -76,7 +76,10 @@ services:
   # This ensures database connectivity is available at startup
   # Configure via environment variables for dev/prod flexibility
   app:
-    image: ${DOCKER_HUB_USER:-stilnovo}/stilnovo-app:latest
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: raultejada24/stilnovo-app:latest
     container_name: stilnovo-app
     # Q28: Application waits for database to be healthy before starting
     # service_healthy ensures the MySQL health check has passed
