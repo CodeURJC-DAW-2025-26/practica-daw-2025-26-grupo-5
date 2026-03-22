@@ -45,6 +45,20 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+/**
+ * REST Controller for user profile and seller management API operations.
+ * 
+ * Provides endpoints for:
+ * - User registration and profile management
+ * - Public user profile viewing (seller information with ratings)
+ * - User profile picture and settings updates
+ * - Seller dashboard and statistics retrieval
+ * - Valoration (rating) listing for sellers
+ * 
+ * All responses return DTOs (no entity exposure). Authenticated endpoints require valid JWT token.
+ * Uses: UserService, ProductService, ContactSellerService, ValorationService
+ * Mappers: UserMapper, ProductMapper, ValorationMapper
+ */
 @RestController
 @RequestMapping("/api/v1/users")
 @Tag(name = "User Profiles", description = "REST API for managing user profiles, settings, dashboard data, and public seller profiles")
