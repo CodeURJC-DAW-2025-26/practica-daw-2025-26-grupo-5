@@ -120,6 +120,18 @@ public class UserWebRestController {
         return ResponseEntity.ok(updatedUser);
     }
 
+    /**
+     * Deletes the profile photo of the authenticated user, restoring the default avatar.
+     * * @param principal The security context of the authenticated user.
+     * @return ResponseEntity with 204 No Content status on success.
+     */
+    @DeleteMapping("/me/profile-photo")
+    public ResponseEntity<Void> deleteMyProfilePhoto(Principal principal) {
+        // Remove the custom profile photo from the database
+        userService.deleteProfilePhotoByUsername(principal.getName());
+        return ResponseEntity.noContent().build();
+    }
+
     @PutMapping(value = "/me/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Update my settings", description = "Updates the settings and profile information of the authenticated user")
     @ApiResponses(value = {
