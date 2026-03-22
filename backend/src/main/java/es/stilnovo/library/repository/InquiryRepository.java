@@ -3,6 +3,8 @@ package es.stilnovo.library.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import es.stilnovo.library.model.Inquiry;
 import es.stilnovo.library.model.Product;
@@ -23,6 +25,7 @@ public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
     
     // Find inquiries sent by a specific buyer
     List<Inquiry> findByBuyer(User buyer);
+    Page<Inquiry> findByBuyer(User buyer, Pageable pageable);
     
     // Find inquiries related to a list of products
     List<Inquiry> findByProductIn(List<Product> products);

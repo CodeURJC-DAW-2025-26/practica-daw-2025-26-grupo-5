@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import es.stilnovo.library.model.Inquiry;
 import es.stilnovo.library.model.Product;
@@ -118,10 +120,46 @@ public class InquiryService {
         return inquiryRepository.save(inquiry);
     }
 
+    /**
+     * Updates an existing inquiry securely.
+     * Validates that the user requesting the update is involved in the inquiry.
+     *
+     * @param id The ID of the inquiry.
+     * @param request The DTO with the updated data.
+     * @param username The username of the requester.
+     * @return The updated Inquiry entity.
+     */
+    @Transactional
+    public Inquiry updateInquiry(Long id, es.stilnovo.library.dto.InquiryUpdateRequestDTO request) {
+        Inquiry inquiry = findById(id);
+
+        inquiry.setMessage(request.message());
+        inquiry.setStatus(request.status());
+
+        return inquiryRepository.save(inquiry);
+    }
+
     @Transactional
     public void deleteInquiry(Inquiry inquiry) {
         if (inquiry != null) {
             inquiryRepository.delete(inquiry);
         }
+    }
+
+    /**
+     * Retrieves a paginated list of inquiries made by a specific user.
+     * This ensures users can only see their own inquiries.
+     * * @param username The authenticated user's name
+     * @param pageable Pagination and sorting parameters
+     * @return A Page of inquiries belonging to the user
+     */
+    @Transactional
+    public Page<Inquiry> getUserInquiries(String username, Pageable pageable) {
+        User buyer = userRepository.findByName(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // NOTE: You must ensure your InquiryRepository interface has this method:
+        // Page<Inquiry> findByBuyer(User buyer, Pageable pageable);
+        return inquiryRepository.findByBuyer(buyer, pageable);
     }
 }
