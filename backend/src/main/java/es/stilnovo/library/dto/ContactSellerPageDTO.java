@@ -1,17 +1,23 @@
 package es.stilnovo.library.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * Contains data for the contact seller page with product and buyer information.
- * 
- * @param product The product being inquired about
- * @param seller The seller of the product
- * @param buyerName Name of the buyer contacting the seller
- * @param buyerEmail Email address of the buyer
  */
+@Schema(description = "Contains data for the contact seller page with product and buyer information")
 public record ContactSellerPageDTO(
+        
+        @Schema(description = "The product being inquired about")
         ProductDTO product,
+        
+        @Schema(description = "The seller of the product")
         UserDTO seller,
+        
+        @Schema(description = "Name of the buyer contacting the seller", example = "Juan Pérez")
         String buyerName,
+        
+        @Schema(description = "Email address of the buyer", example = "juan.perez@example.com")
         String buyerEmail
 ) {
 }

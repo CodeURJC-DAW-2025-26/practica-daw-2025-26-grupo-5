@@ -1,19 +1,26 @@
 package es.stilnovo.library.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * Request body for administrators to update user account details.
- * 
- * @param email Updated email address
- * @param cardNumber Updated payment card number
- * @param cardCvv Updated card CVV security code
- * @param cardExpiringDate Updated card expiration date
- * @param description Updated user profile description
  */
+@Schema(description = "Request body for administrators to update user account details")
 public record AdminUserUpdateRequestDTO(
+        
+        @Schema(description = "Updated email address", example = "user.updated@example.com")
         String email,
+        
+        @Schema(description = "Updated payment card number", example = "1234567890123456")
         String cardNumber,
+        
+        @Schema(description = "Updated card CVV security code", example = "123")
         String cardCvv,
+        
+        @Schema(description = "Updated card expiration date", example = "12/25")
         String cardExpiringDate,
+        
+        @Schema(description = "Updated user profile description", example = "Reliable buyer and seller since 2024.")
         String description
 ) {
 }

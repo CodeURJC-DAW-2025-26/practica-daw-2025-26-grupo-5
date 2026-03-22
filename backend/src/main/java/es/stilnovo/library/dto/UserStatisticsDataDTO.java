@@ -4,35 +4,51 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import es.stilnovo.library.model.User;
 import java.util.List;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * Contains sales statistics and performance metrics for a seller.
- * 
- * @param user The user entity whose statistics are displayed (excluded from JSON)
- * @param totalSales Total sales amount as a formatted string
- * @param itemsSold Total number of items sold
- * @param avgRating Average rating received as a formatted string
- * @param inventoryValue Total value of active inventory as a formatted string
- * @param date Date or period for the statistics
- * @param chartLabels Labels for sales chart
- * @param chartValues Values for sales chart visualization
- * @param revenueLabels Labels for revenue chart
- * @param revenueValues Revenue values for chart display
- * @param barLabels Labels for bar chart
- * @param visitsData Number of product visits over time
  */
+@Schema(description = "Contains sales statistics and performance metrics for a seller")
 public record UserStatisticsDataDTO(
-        @JsonIgnore User user,
+        
+        @JsonIgnore 
+        @Schema(hidden = true, description = "The user entity whose statistics are displayed (excluded from JSON)")
+        User user,
+        
+        @Schema(description = "Total sales amount as a formatted string", example = "1,250.00 €")
         String totalSales,
+        
+        @Schema(description = "Total number of items sold", example = "45")
         int itemsSold,
+        
+        @Schema(description = "Average rating received as a formatted string", example = "4.5/5")
         String avgRating,
+        
+        @Schema(description = "Total value of active inventory as a formatted string", example = "350.00 €")
         String inventoryValue,
+        
+        @Schema(description = "Date or period for the statistics", example = "2024")
         String date,
+        
+        @Schema(description = "Labels for sales chart")
         List<String> chartLabels,   
+        
+        @Schema(description = "Values for sales chart visualization")
         List<Long> chartValues,     
+        
+        @Schema(description = "Labels for revenue chart")
         List<String> revenueLabels, 
+        
+        @Schema(description = "Revenue values for chart display")
         List<Double> revenueValues, 
+        
+        @Schema(description = "Labels for bar chart")
         List<String> barLabels,    
+        
+        @Schema(description = "Number of product visits over time")
         List<Long> visitsData,  
+        
+        @Schema(description = "Interest engagement data metrics over time")
         List<Long> interestData
 ) {}
