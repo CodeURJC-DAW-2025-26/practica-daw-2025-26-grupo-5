@@ -599,4 +599,19 @@ public class UserService {
             interactionRepository.save(favorite);
         }
     }
+
+    /**
+     * Removes a product from the user's favorites by deleting the LIKE interaction.
+     */
+    @Transactional
+    public void removeProductFromFavorites(String username, Long productId) {
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
+
+        // Nota: Qui usiamo deleteByUserAndProductAndType che aggiungeremo tra poco al Repository
+        interactionRepository.deleteByUserAndProductAndType(user, product, UserInteraction.InteractionType.LIKE);
+    }
 }

@@ -42,4 +42,9 @@ public interface UserInteractionRepository extends JpaRepository<UserInteraction
      * @param product the product to clean up
      */
     void deleteByProduct(Product product);
+
+    /**
+     * Deletes a specific interaction (like a Favorite/LIKE) for a user and product.
+     */
+    void deleteByUserAndProductAndType(User user, Product product, UserInteraction.InteractionType type);
 }

@@ -145,6 +145,18 @@ public class UserWebRestController {
         return ResponseEntity.ok("Product added to favorites successfully");
     }
 
+    /**
+     * Removes a product from the authenticated user's favorites list.
+     * @param principal The security context of the authenticated user.
+     * @param productId The ID of the product to unfavorite.
+     * @return ResponseEntity with a success message.
+     */
+    @DeleteMapping("/me/favorites/{productId}")
+    public ResponseEntity<String> removeProductFromFavorites(Principal principal, @PathVariable Long productId) {
+        userService.removeProductFromFavorites(principal.getName(), productId);
+        return ResponseEntity.ok("Product removed from favorites successfully");
+    }
+
     @PutMapping(value = "/me/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Update my settings", description = "Updates the settings and profile information of the authenticated user")
     @ApiResponses(value = {
