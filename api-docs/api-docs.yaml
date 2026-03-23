@@ -398,85 +398,8 @@ paths:
           description: Unauthorized user
         "403":
           description: Forbidden (user is not the owner)
-  /api/v1/admin/users/{id}:
-    get:
-      tags:
-      - Admin
-      summary: Get user by ID
-      description: Retrieves details of a specific user by their ID
-      operationId: getUserById
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      responses:
-        "404":
-          description: User not found
-        "200":
-          description: User retrieved successfully
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/UserDTO"
+  /api/v1/admin/users/ban/{id}:
     put:
-      tags:
-      - Admin
-      summary: Update user
-      description: Updates an existing user's information and profile photo
-      operationId: updateUser
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/AdminUserUpdateRequestDTO"
-      responses:
-        "404":
-          description: User not found
-        "200":
-          description: User updated successfully
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/UserDTO"
-        "400":
-          description: Invalid input or image processing failed
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/UserDTO"
-    delete:
-      tags:
-      - Admin
-      summary: Delete user
-      description: Deletes a user from the system
-      operationId: deleteUser
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      responses:
-        "404":
-          description: User not found
-        "200":
-          description: User deleted successfully
-          content:
-            '*/*':
-              schema:
-                type: string
-    patch:
       tags:
       - Admin
       summary: Update user ban status
@@ -504,84 +427,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/UserDTO"
-  /api/v1/admin/products/{id}:
-    get:
-      tags:
-      - Admin
-      summary: Get product by ID
-      description: Retrieves details of a specific product by its ID
-      operationId: getProductById
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      responses:
-        "404":
-          description: Product not found
-        "200":
-          description: Product retrieved successfully
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ProductDTO"
-    put:
-      tags:
-      - Admin
-      summary: Update product
-      description: Updates an existing product's details and image
-      operationId: updateProduct_1
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/AdminProductUpdateRequestDTO"
-      responses:
-        "404":
-          description: Product not found
-        "200":
-          description: Product updated successfully
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ProductDTO"
-        "400":
-          description: Invalid input or image processing failed
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ProductDTO"
-    delete:
-      tags:
-      - Admin
-      summary: Delete product
-      description: Deletes a product from the inventory
-      operationId: deleteProduct_1
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      responses:
-        "404":
-          description: Product not found
-        "200":
-          description: Product deleted successfully
-          content:
-            '*/*':
-              schema:
-                type: string
   /api/v1/valorations:
     get:
       tags:
@@ -1046,6 +891,162 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/UserDTO"
+  /api/v1/admin/users/{id}:
+    get:
+      tags:
+      - Admin
+      summary: Get user by ID
+      description: Retrieves details of a specific user by their ID
+      operationId: getUserById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: User not found
+        "200":
+          description: User retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+    delete:
+      tags:
+      - Admin
+      summary: Delete user
+      description: Deletes a user from the system
+      operationId: deleteUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: User not found
+        "200":
+          description: User deleted successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+    patch:
+      tags:
+      - Admin
+      summary: Update user
+      description: Updates an existing user's information and profile photo
+      operationId: updateUser
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AdminUserUpdateRequestDTO"
+      responses:
+        "404":
+          description: User not found
+        "200":
+          description: User updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+        "400":
+          description: Invalid input or image processing failed
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+  /api/v1/admin/products/{id}:
+    get:
+      tags:
+      - Admin
+      summary: Get product by ID
+      description: Retrieves details of a specific product by its ID
+      operationId: getProductById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Product not found
+        "200":
+          description: Product retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+    delete:
+      tags:
+      - Admin
+      summary: Delete product
+      description: Deletes a product from the inventory
+      operationId: deleteProduct_1
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Product not found
+        "200":
+          description: Product deleted successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+    patch:
+      tags:
+      - Admin
+      summary: Update product
+      description: Updates an existing product's details and image
+      operationId: updateProduct_1
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/AdminProductUpdateRequestDTO"
+      responses:
+        "404":
+          description: Product not found
+        "200":
+          description: Product updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+        "400":
+          description: Invalid input or image processing failed
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
   /api/v1/users/{id}/profile:
     get:
       tags:
@@ -1738,7 +1739,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: string
+                $ref: "#/components/schemas/TransactionDTO"
   /api/v1/admin/summary:
     get:
       tags:
@@ -1777,7 +1778,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: string
+                $ref: "#/components/schemas/ValorationDTO"
 components:
   schemas:
     ValorationDTO:
@@ -2030,59 +2031,15 @@ components:
           type: string
           format: binary
           description: Product image file to be uploaded
-    AdminUserUpdateRequestDTO:
+    AdminUserBanRequestDTO:
       type: object
-      description: Request body for administrators to update user account details
+      description: Request body for administrators to ban or unban a user account
       properties:
-        email:
-          type: string
-          description: Updated email address
-          example: user.updated@example.com
-        cardNumber:
-          type: string
-          description: Updated payment card number
-          example: 1234567890123456
-        cardCvv:
-          type: string
-          description: Updated card CVV security code
-          example: 123
-        cardExpiringDate:
-          type: string
-          description: Updated card expiration date
-          example: 12/25
-        description:
-          type: string
-          description: Updated user profile description
-          example: Reliable buyer and seller since 2024.
-    AdminProductUpdateRequestDTO:
-      type: object
-      description: Request body for administrators to update product details
-      properties:
-        name:
-          type: string
-          description: Updated product name
-          example: Vintage Camera - Updated
-        category:
-          type: string
-          description: Updated product category
-          example: Photography
-        price:
-          type: number
-          format: double
-          description: Updated product price
-          example: 135.0
-        description:
-          type: string
-          description: Updated product description
-          example: Price reduced! Classic 35mm film camera.
-        location:
-          type: string
-          description: Updated product location
-          example: Barcelona
-        status:
-          type: string
-          description: Updated product status
-          example: inactive
+        banned:
+          type: boolean
+          description: Boolean indicating whether to ban (true) or unban (false) the
+            user
+          example: true
     SignupRequestDTO:
       type: object
       description: Request body for user account registration with profile picture
@@ -2305,15 +2262,59 @@ components:
           type: string
           description: Updated user profile description
           example: Updating my seller biography.
-    AdminUserBanRequestDTO:
+    AdminUserUpdateRequestDTO:
       type: object
-      description: Request body for administrators to ban or unban a user account
+      description: Request body for administrators to update user account details
       properties:
-        banned:
-          type: boolean
-          description: Boolean indicating whether to ban (true) or unban (false) the
-            user
-          example: true
+        email:
+          type: string
+          description: Updated email address
+          example: user.updated@example.com
+        cardNumber:
+          type: string
+          description: Updated payment card number
+          example: 1234567890123456
+        cardCvv:
+          type: string
+          description: Updated card CVV security code
+          example: 123
+        cardExpiringDate:
+          type: string
+          description: Updated card expiration date
+          example: 12/25
+        description:
+          type: string
+          description: Updated user profile description
+          example: Reliable buyer and seller since 2024.
+    AdminProductUpdateRequestDTO:
+      type: object
+      description: Request body for administrators to update product details
+      properties:
+        name:
+          type: string
+          description: Updated product name
+          example: Vintage Camera - Updated
+        category:
+          type: string
+          description: Updated product category
+          example: Photography
+        price:
+          type: number
+          format: double
+          description: Updated product price
+          example: 135.0
+        description:
+          type: string
+          description: Updated product description
+          example: Price reduced! Classic 35mm film camera.
+        location:
+          type: string
+          description: Updated product location
+          example: Barcelona
+        status:
+          type: string
+          description: Updated product status
+          example: inactive
     Pageable:
       type: object
       properties:
@@ -2393,13 +2394,13 @@ components:
         totalPages:
           type: integer
           format: int32
+        numberOfElements:
+          type: integer
+          format: int32
         first:
           type: boolean
         last:
           type: boolean
-        numberOfElements:
-          type: integer
-          format: int32
         pageable:
           $ref: "#/components/schemas/PageableObject"
         size:
