@@ -548,7 +548,7 @@ Nota: Para probar los endpoints POST/PUT que requieren imágenes en Postman, por
 
 Diagrama actualizado incluyendo los @RestController y su relación con los @Service compartidos:
 
-![Diagrama de Clases Actualizado](Readme-Images/Practice2/Stilnovo-Diagrama-Clases-2.png)
+![Diagrama de Clases Actualizado](Readme-Images/Practice2/Stilnovo-Diagrama-Clases-2.jpg)
 
 Este diagrama detalla la arquitectura lógica de **Stilnovo**, estructurada en un modelo de capas que garantiza la separación de responsabilidades y la escalabilidad del sistema.
 > 
@@ -560,7 +560,6 @@ Este diagrama detalla la arquitectura lógica de **Stilnovo**, estructurada en u
 > * **Servicios (Rojo):** Núcleo de la aplicación donde se procesa la lógica de negocio. Centraliza funciones complejas como el cálculo de inventarios, el enfriamiento de notificaciones y la integración con servicios de infraestructura (Email y PDF).
 > * **Repositorios (Azul):** Capa de persistencia que utiliza Spring Data JPA para abstraer y gestionar el acceso a los datos de forma eficiente.
 > * **Entidades/Modelos (Gris):** Representación de los objetos de dominio, definiendo las reglas de integridad y las relaciones de composición esenciales para el negocio (User, Product, Transaction, etc.).
-![Diagrama de Clases Actualizado](Readme-Images/Practice2/Stilnovo-Diagrama-Clases-2.jpg)
 
 > **Recomendación:** Para una mejor visualización y claridad de los detalles, se recomienda descargar la imagen y abrirla en el ordenador personal. El diagrama cuenta con suficiente resolución para una experiencia óptima al hacer zoom sobre áreas específicas de interés.
 
