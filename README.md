@@ -1230,8 +1230,8 @@ He extraído gran parte de la lógica de negocio de los controladores hacia los 
 |2| [feat: add DELETE endpoint for user profile photo](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/faab91cb583ad04e751327b55745b892b529e7dd)  | [api.postman_collection.json](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/api.postman_collection.json)   |
 |3| [feat: add GET endpoint to retrieve transaction details by ID](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/2af83e47f68eb92bf3990a029b542a7c5ec4fa75)  | [AdminRestController.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/2af83e47f68eb92bf3990a029b542a7c5ec4fa75/backend/src/main/java/es/stilnovo/library/controller/restControllers/AdminRestController.java)   |
 |4| [feat: implement add product to favorites functionality](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/be248dc29bea30d80b0799c4a7f66137d0db2e52)  | [UserInteractionRepository.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/be248dc29bea30d80b0799c4a7f66137d0db2e52/backend/src/main/java/es/stilnovo/library/repository/UserInteractionRepository.java)   |
-
 |5| [feat: add functionality to remove product from favorites](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/2e5b84281e8d9ee94bb64a676aa7fb011ee7f1ea)  | [UserService.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/be248dc29bea30d80b0799c4a7f66137d0db2e52/backend/src/main/java/es/stilnovo/library/service/UserService.java)   |
+
 ---
 
 #### **Alumno 5 - Ariel Rodriguez Lozano**
