@@ -550,6 +550,17 @@ Diagrama actualizado incluyendo los @RestController y su relación con los @Serv
 
 ![Diagrama de Clases Actualizado](Readme-Images/Practice2/Stilnovo-Diagrama-Clases-2.png)
 
+Este diagrama detalla la arquitectura lógica de **Stilnovo**, estructurada en un modelo de capas que garantiza la separación de responsabilidades y la escalabilidad del sistema.
+> 
+> **Organización de Componentes:**
+> * **Vistas (Morado):** Capa de presentación que gestiona la interfaz de usuario, integrando tanto páginas completas como fragmentos HTML dinámicos para una experiencia fluida.
+> * **Controladores (Verde):** Encargados de interceptar las peticiones del cliente, coordinar el flujo de navegación y delegar la ejecución de reglas de negocio.
+> * **Controladores REST (Verde Oscuro):** Puntos de entrada de la API. Interceptan las peticiones HTTP (GET, POST, PUT, DELETE), orquestan las operaciones y devuelven respuestas estructuradas exclusivamente en formato JSON.
+> * **DTOs / Objetos de Transferencia (Azul Oscuro):** Estructuras de datos ligeras (Data Transfer Objects) diseñadas para transportar información entre el cliente y el servidor. Aíslan y protegen las entidades del modelo, exponiendo solo los datos necesarios y optimizando el rendimiento.
+> * **Servicios (Rojo):** Núcleo de la aplicación donde se procesa la lógica de negocio. Centraliza funciones complejas como el cálculo de inventarios, el enfriamiento de notificaciones y la integración con servicios de infraestructura (Email y PDF).
+> * **Repositorios (Azul):** Capa de persistencia que utiliza Spring Data JPA para abstraer y gestionar el acceso a los datos de forma eficiente.
+> * **Entidades/Modelos (Gris):** Representación de los objetos de dominio, definiendo las reglas de integridad y las relaciones de composición esenciales para el negocio (User, Product, Transaction, etc.).
+
 ### **Instrucciones de Ejecución con Docker**
 
 #### **Requisitos previos:**
