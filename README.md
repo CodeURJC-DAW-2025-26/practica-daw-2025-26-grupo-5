@@ -1222,15 +1222,15 @@ He extraído gran parte de la lógica de negocio de los controladores hacia los 
 
 #### **Alumno 5 - Ariel Rodriguez Lozano**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+Mi contribución se ha centrado en la mejora y consolidación de la capa REST de la aplicación. He completado endpoints clave en el área de administración, especialmente en la gestión de usuarios, asegurando que sigan correctamente las convenciones REST. Además, he implementado un manejador global de errores para unificar las respuestas de la API en formato JSON y he añadido el endpoint de actualización de valoraciones, integrándolo con la lógica de negocio existente y garantizando la validación de permisos y el recálculo de ratings.
 
 | Nº    | Commits      | Files      |
 |:------------: |:------------:| :------------:|
-|1| [Descripción commit 1](URL_commit_1)  | [Archivo1](URL_archivo_1)   |
-|2| [Descripción commit 2](URL_commit_2)  | [Archivo2](URL_archivo_2)   |
-|3| [Descripción commit 3](URL_commit_3)  | [Archivo3](URL_archivo_3)   |
-|4| [Descripción commit 4](URL_commit_4)  | [Archivo4](URL_archivo_4)   |
-|5| [Descripción commit 5](URL_commit_5)  | [Archivo5](URL_archivo_5)   |
+|1| [implemented full product managment endpoints of admin (GET, POST, PUT)](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/5c43db888f297e17dd1ec8e69ca94a02e526ec4b)  | [GlobalExceptionHandler.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/restControllers/GlobalExceptionHandler.java)   |
+|2| [feat(rest): add global JSON error handling and proper HTTP status codes](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/aebbbc851433d3645f2a4e390d607f61e674f17b)  | [AdminRestController.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/restControllers/AdminRestController.java)   |
+|3| [add user detail and update endpoints (GET/PUT)](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/896cc46197f0f78e803bf930de523c216b5ab12d)  | [ValorationRestController.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/restControllers/ValorationRestController.java)   |
+|4| [feat(rest): add update valoration endpoint](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/688ca28feec1726d1bea4787b24220687017e34a)  | [UserWebRestController.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/restControllers/UserWebRestController.java)   |
+|5| [fix(rest): clean duplicate endpoints and fix profile photo update](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/db08a71b1038f3a1795c79f47a1e4e46507a1a1e)  | [WebSecurityConfig.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/security/WebSecurityConfig.java)   |
 
 ---
 
