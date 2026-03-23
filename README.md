@@ -867,10 +867,66 @@ O alternativamente desde la raíz:
 docker compose -f docker/docker-compose.yml --env-file .env up
 ```
 
-**Resultado:** 
+**Resultado esperado:**
 - ✅ MySQL se inicia en el puerto 3306
 - ✅ Spring Boot se inicia en el puerto 8443
 - ✅ Accede a `https://localhost:8443`
+
+**Verifica que todo funciona correctamente** viendo estos logs en la terminal:
+
+```
+stilnovo-db    | MySQL Server is now ready for connections
+stilnovo-app   | Started StilnovoApplication in X.XXX seconds (JVM running for X.XXX)
+stilnovo-app   | Application ready to serve requests
+```
+
+---
+
+#### **Paso E: Acceder a la aplicación (después de que inicie)**
+
+Abre tu navegador y accede a:
+
+```
+https://localhost:8443
+```
+
+⚠️ **Advertencia:** Es HTTPS con certificado autofirmado, así que verás una advertencia de seguridad. **Ignórala** y continúa (haz clic en "Avanzado" → "Continuar").
+
+**Credenciales para probar:** Están en el readme un poco más arriba (user1, user2 y admin).
+
+#### **Verificación de componentes**
+
+Mientras `docker compose up` está corriendo, puedes verificar en otra terminal:
+
+```powershell
+# Ver contenedores activos
+docker ps
+
+# Ver logs de MySQL
+docker logs stilnovo-db
+
+# Ver logs de la app
+docker logs stilnovo-app
+
+# Verificar conectividad a BD (desde otra terminal)
+docker exec stilnovo-app mysql -h db -u root -ppassword stilnovo -e "SELECT COUNT(*) FROM UserTable;"
+```
+
+**Deberías ver:** Tabla `UserTable` con 3 usuarios (admin, user1, user2)
+
+---
+
+#### **Detener la aplicación**
+
+Cuando termines de probar, detén los contenedores:
+
+```powershell
+# En la terminal donde está corriendo docker compose:
+Ctrl + C
+
+# O desde otra terminal:
+docker compose down
+```
 
 ---
 
