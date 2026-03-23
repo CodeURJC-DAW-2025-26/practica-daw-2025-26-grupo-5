@@ -223,7 +223,7 @@
 				{
 					"name": "Update My Settings",
 					"request": {
-						"method": "PUT",
+						"method": "PATCH",
 						"header": [],
 						"body": {
 							"mode": "formdata",
@@ -392,7 +392,7 @@
 					"name": "Update profile-photo",
 					"protocolProfileBehavior": {
 						"disabledSystemHeaders": {
-							"content-type": true
+							"content-type": false
 						}
 					},
 					"request": {
@@ -404,7 +404,7 @@
 								{
 									"key": "image",
 									"type": "file",
-									"src": "{{imageFilePath}}"
+									"src": ""
 								}
 							]
 						},
@@ -421,11 +421,15 @@
 								"profile-photo"
 							]
 						}
-					},
-					"response": []
+					}
 				},
 				{
-					"name": "Get Contact Info","request": {"method": "GET","header": [],"url": {"raw": "{{baseUrl}}/api/v1/users/1/contact-info",
+					"name": "Get Contact Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/users/1/contact-info",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -524,7 +528,7 @@
 					},
 					"response": []
 				},
-								{
+				{
 					"name": "Get Contact Data",
 					"request": {
 						"method": "GET",
@@ -667,7 +671,7 @@
 				{
 					"name": "Update Product",
 					"request": {
-						"method": "PUT",
+						"method": "PATCH",
 						"header": [],
 						"body": {
 							"mode": "formdata",
@@ -705,7 +709,7 @@
 							]
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/products/1",
+							"raw": "{{baseUrl}}/api/v1/products/5",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -907,7 +911,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/transactions/1/checkout",
+							"raw": "{{baseUrl}}/api/v1/transactions/3/checkout",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -934,7 +938,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"transactionStatus\": \"Shipped\",\n  \"rated\": true,\n  \"stars\": 5\n}"
+							"raw": "{\n  \"transactionStatus\": \"Completed\",\n  \"rated\": true,\n  \"stars\": 5\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/transactions/1",
@@ -957,16 +961,16 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-						"raw": "{{baseUrl}}/api/v1/transactions/1",
-						"host": [
-							"{{baseUrl}}"
-						],
-						"path": [
-							"api",
-							"v1",
-							"transactions",
-							"1"
-						]
+							"raw": "{{baseUrl}}/api/v1/transactions/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"transactions",
+								"1"
+							]
 						}
 					},
 					"response": []
@@ -1090,7 +1094,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"id\": null,\n  \"stars\": 5,\n  \"comment\": \"Muy buen vendedor\",\n  \"buyerName\": \"buyer\",\n  \"transactionId\": 1\n}"
+							"raw": "{\n  \"id\": 1,\n  \"stars\": 5,\n  \"comment\": \"Muy buen vendedor\",\n  \"buyerName\": \"buyer\",\n  \"transactionId\": 1\n}"
 						},
 						"url": {
 							"raw": "{{baseUrl}}/api/v1/valorations",
@@ -1109,7 +1113,7 @@
 				{
 					"name": "Update Valoration",
 					"request": {
-						"method": "PUT",
+						"method": "PATCH",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -1302,7 +1306,7 @@
 				{
 					"name": "Update Ban User",
 					"request": {
-						"method": "PATCH",
+						"method": "PUT",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -1314,7 +1318,7 @@
 							"raw": "{\n    \"banned\": true\n}"
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/admin/users/1",
+							"raw": "{{baseUrl}}/api/v1/admin/users/ban/1",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -1386,7 +1390,7 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/admin/products/2",
+							"raw": "{{baseUrl}}/api/v1/admin/products/10",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -1527,7 +1531,7 @@
 				{
 					"name": "Update User",
 					"request": {
-						"method": "PUT",
+						"method": "PATCH",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -1600,7 +1604,7 @@
 				{
 					"name": "Update Product Admin",
 					"request": {
-						"method": "PUT",
+						"method": "PATCH",
 						"header": [],
 						"body": {
 							"mode": "formdata",
@@ -1678,9 +1682,9 @@
 		}
 	],
 	"variable": [
-    {
-        "key": "baseUrl",
-        "value": "https://localhost:8443" 
-    }
-]
+		{
+			"key": "baseUrl",
+			"value": "https://localhost:8443"
+		}
+	]
 }

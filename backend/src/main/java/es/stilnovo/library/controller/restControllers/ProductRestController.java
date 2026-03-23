@@ -264,7 +264,7 @@ public class ProductRestController {
      * @return The updated ProductDTO.
      * @throws IOException If file processing fails.
      */
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Update a product", description = "Performs a partial update on an existing product owned by the authenticated user")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Product updated successfully"),

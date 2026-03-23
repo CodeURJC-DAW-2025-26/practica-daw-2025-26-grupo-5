@@ -79,7 +79,7 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    image: raultejada24/stilnovo-app:latest
+    image: codvictor/stilnovo-app:latest
     container_name: stilnovo-app
     # Q28: Application waits for database to be healthy before starting
     # service_healthy ensures the MySQL health check has passed
