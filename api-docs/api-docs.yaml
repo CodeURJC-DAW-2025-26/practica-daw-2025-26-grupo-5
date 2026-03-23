@@ -5,45 +5,157 @@ info:
 servers:
 - url: https://localhost:8443
   description: Generated server url
+tags:
+- name: Admin
+  description: "REST API for administrative operations (users, products, transactions,\
+    \ valorations)"
+- name: Users
+  description: REST API for user management and registration
+- name: User Profiles
+  description: "REST API for managing user profiles, settings, dashboard data, and\
+    \ public seller profiles"
+- name: Images
+  description: REST API for image operations (retrieving and uploading product images)
+- name: Transactions
+  description: "REST API for managing purchases, sales, and checkout operations"
+- name: Valorations
+  description: REST API for managing user reviews and ratings (valorations) for transactions
+- name: Products
+  description: "REST API for catalog browsing, recommendations, and product management\
+    \ (CRUD)"
+- name: Authentication
+  description: REST API for JWT Authentication
+- name: Catalog
+  description: "REST API for catalog and homepage operations (browsing, searching,\
+    \ and filtering products)"
+- name: PDF Export
+  description: "REST API for generating and exporting PDF documents (invoices, shipping\
+    \ labels, and statistics)"
+- name: Inquiries
+  description: REST API for buyer-to-seller inquiries
 paths:
-  /api/v1/users/me/profile:
-    put:
+  /api/v1/valorations/{id}:
+    get:
       tags:
-      - user-web-rest-controller
-      operationId: updateMySettings
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: "#/components/schemas/UserSettingsUpdateDTO"
+      - Valorations
+      summary: Get a valoration by ID
+      description: Retrieves the details of a specific valoration by its unique identifier
+      operationId: getValoration
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
       responses:
         "404":
-          description: Not Found
+          description: Valoration not found
         "200":
-          description: OK
+          description: Valoration retrieved successfully
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/UserDTO"
+                $ref: "#/components/schemas/ValorationDTO"
+    put:
+      tags:
+      - Valorations
+      summary: Update a valoration
+      description: Updates an existing valoration (stars and comment)
+      operationId: updateValoration
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ValorationDTO"
+        required: true
+      responses:
+        "404":
+          description: Valoration not found
+        "200":
+          description: Valoration updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ValorationDTO"
+        "400":
+          description: Invalid input data
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ValorationDTO"
+        "401":
+          description: Unauthorized user
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ValorationDTO"
+        "403":
+          description: Forbidden (not the author)
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ValorationDTO"
+    delete:
+      tags:
+      - Valorations
+      summary: Delete a valoration
+      description: Deletes a valoration by its ID. Only the author or an admin can
+        delete it.
+      operationId: deleteValoration
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Valoration not found
+        "204":
+          description: Valoration deleted successfully
+        "401":
+          description: Unauthorized user
+        "403":
+          description: Forbidden (user is not the author nor an admin)
   /api/v1/users/me/profile-photo:
     get:
       tags:
-      - user-web-rest-controller
+      - User Profiles
+      summary: Get my profile photo
+      description: Retrieves the profile photo of the authenticated user
       operationId: getMyProfilePhoto
       responses:
         "404":
-          description: Not Found
+          description: Profile photo not found
         "200":
-          description: OK
+          description: Profile photo retrieved successfully
           content:
-            '*/*':
+            image/png:
+              schema:
+                type: string
+                format: binary
+        "401":
+          description: Unauthorized user
+          content:
+            image/png:
               schema:
                 type: string
                 format: binary
     put:
       tags:
-      - user-web-rest-controller
-      operationId: putMethodName
+      - User Profiles
+      summary: Update my profile photo
+      description: Uploads and updates the profile photo for the authenticated user
+      operationId: updateMyProfilePhoto
       requestBody:
         content:
           multipart/form-data:
@@ -59,15 +171,148 @@ paths:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Profile photo updated successfully
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/UserDTO"
+        "400":
+          description: Invalid file or processing error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+        "401":
+          description: Unauthorized user
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+    delete:
+      tags:
+      - User Profiles
+      summary: Delete my profile photo
+      description: "Deletes the profile photo of the authenticated user, restoring\
+        \ the default avatar"
+      operationId: deleteMyProfilePhoto
+      responses:
+        "404":
+          description: Not Found
+        "204":
+          description: Profile photo deleted successfully
+        "401":
+          description: Unauthorized user
+  /api/v1/transactions/{id}:
+    get:
+      tags:
+      - Transactions
+      summary: Get transaction details
+      description: Retrieves the details of a specific transaction by its ID. Access
+        is restricted to the buyer or seller.
+      operationId: getTransaction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Transaction not found
+        "200":
+          description: Transaction details retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransactionDTO"
+        "401":
+          description: Unauthorized user
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransactionDTO"
+        "403":
+          description: Forbidden (user is not involved in this transaction)
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransactionDTO"
+    put:
+      tags:
+      - Transactions
+      summary: Update transaction
+      description: Updates an existing transaction
+      operationId: updateTransaction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionUpdateRequestDTO"
+        required: true
+      responses:
+        "404":
+          description: Transaction not found
+        "200":
+          description: Transaction updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransactionDTO"
+        "400":
+          description: Invalid input data
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransactionDTO"
+        "401":
+          description: Unauthorized user
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransactionDTO"
+        "403":
+          description: Forbidden (user lacks permissions to update)
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransactionDTO"
+    delete:
+      tags:
+      - Transactions
+      summary: Delete transaction
+      description: Deletes a specific transaction by its ID
+      operationId: deleteTransaction
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Transaction not found
+        "204":
+          description: Transaction deleted successfully
+        "401":
+          description: Unauthorized user
+        "403":
+          description: Forbidden (user lacks permissions to delete)
   /api/v1/products/{id}:
     get:
       tags:
-      - product-rest-controller
+      - Products
+      summary: Get product details
+      description: Retrieves full product details including recommendations and tracks
+        the visit
       operationId: getProductDetails
       parameters:
       - name: id
@@ -78,16 +323,19 @@ paths:
           format: int64
       responses:
         "404":
-          description: Not Found
+          description: Product not found
         "200":
-          description: OK
+          description: Product details retrieved successfully
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ProductDetailsDTO"
     put:
       tags:
-      - product-rest-controller
+      - Products
+      summary: Update a product
+      description: Performs a partial update on an existing product owned by the authenticated
+        user
       operationId: updateProduct
       parameters:
       - name: id
@@ -103,16 +351,36 @@ paths:
               $ref: "#/components/schemas/ProductWriteRequestDTO"
       responses:
         "404":
-          description: Not Found
+          description: Product not found
         "200":
-          description: OK
+          description: Product updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+        "400":
+          description: Invalid input data or file processing error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+        "401":
+          description: Unauthorized user
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+        "403":
+          description: Forbidden (user is not the owner)
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ProductDTO"
     delete:
       tags:
-      - product-rest-controller
+      - Products
+      summary: Delete a product
+      description: Deletes a specific product. The requesting user must be the owner.
       operationId: deleteProduct
       parameters:
       - name: id
@@ -123,13 +391,19 @@ paths:
           format: int64
       responses:
         "404":
-          description: Not Found
-        "200":
-          description: OK
+          description: Product not found
+        "204":
+          description: Product deleted successfully
+        "401":
+          description: Unauthorized user
+        "403":
+          description: Forbidden (user is not the owner)
   /api/v1/admin/users/{id}:
     get:
       tags:
-      - admin-rest-controller
+      - Admin
+      summary: Get user by ID
+      description: Retrieves details of a specific user by their ID
       operationId: getUserById
       parameters:
       - name: id
@@ -140,16 +414,18 @@ paths:
           format: int64
       responses:
         "404":
-          description: Not Found
+          description: User not found
         "200":
-          description: OK
+          description: User retrieved successfully
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/UserDTO"
     put:
       tags:
-      - admin-rest-controller
+      - Admin
+      summary: Update user
+      description: Updates an existing user's information and profile photo
       operationId: updateUser
       parameters:
       - name: id
@@ -165,16 +441,24 @@ paths:
               $ref: "#/components/schemas/AdminUserUpdateRequestDTO"
       responses:
         "404":
-          description: Not Found
+          description: User not found
         "200":
-          description: OK
+          description: User updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+        "400":
+          description: Invalid input or image processing failed
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/UserDTO"
     delete:
       tags:
-      - admin-rest-controller
+      - Admin
+      summary: Delete user
+      description: Deletes a user from the system
       operationId: deleteUser
       parameters:
       - name: id
@@ -185,16 +469,18 @@ paths:
           format: int64
       responses:
         "404":
-          description: Not Found
+          description: User not found
         "200":
-          description: OK
+          description: User deleted successfully
           content:
             '*/*':
               schema:
                 type: string
     patch:
       tags:
-      - admin-rest-controller
+      - Admin
+      summary: Update user ban status
+      description: Updates the ban status of a specific user
       operationId: updateUserBanStatus
       parameters:
       - name: id
@@ -211,9 +497,9 @@ paths:
         required: true
       responses:
         "404":
-          description: Not Found
+          description: User not found
         "200":
-          description: OK
+          description: Ban status updated successfully
           content:
             '*/*':
               schema:
@@ -221,7 +507,9 @@ paths:
   /api/v1/admin/products/{id}:
     get:
       tags:
-      - admin-rest-controller
+      - Admin
+      summary: Get product by ID
+      description: Retrieves details of a specific product by its ID
       operationId: getProductById
       parameters:
       - name: id
@@ -232,16 +520,18 @@ paths:
           format: int64
       responses:
         "404":
-          description: Not Found
+          description: Product not found
         "200":
-          description: OK
+          description: Product retrieved successfully
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ProductDTO"
     put:
       tags:
-      - admin-rest-controller
+      - Admin
+      summary: Update product
+      description: Updates an existing product's details and image
       operationId: updateProduct_1
       parameters:
       - name: id
@@ -257,16 +547,24 @@ paths:
               $ref: "#/components/schemas/AdminProductUpdateRequestDTO"
       responses:
         "404":
-          description: Not Found
+          description: Product not found
         "200":
-          description: OK
+          description: Product updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+        "400":
+          description: Invalid input or image processing failed
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ProductDTO"
     delete:
       tags:
-      - admin-rest-controller
+      - Admin
+      summary: Delete product
+      description: Deletes a product from the inventory
       operationId: deleteProduct_1
       parameters:
       - name: id
@@ -277,9 +575,9 @@ paths:
           format: int64
       responses:
         "404":
-          description: Not Found
+          description: Product not found
         "200":
-          description: OK
+          description: Product deleted successfully
           content:
             '*/*':
               schema:
@@ -287,7 +585,9 @@ paths:
   /api/v1/valorations:
     get:
       tags:
-      - valoration-rest-controller
+      - Valorations
+      summary: Get all valorations
+      description: Retrieves a paginated list of all valorations in the system
       operationId: getAllValorations
       parameters:
       - name: pageable
@@ -299,14 +599,16 @@ paths:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Valorations retrieved successfully
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PagedResponseValorationDTO"
     post:
       tags:
-      - valoration-rest-controller
+      - Valorations
+      summary: Create a valoration
+      description: Submits a new valoration for a completed transaction
       operationId: createValoration
       requestBody:
         content:
@@ -316,9 +618,21 @@ paths:
         required: true
       responses:
         "404":
-          description: Not Found
-        "200":
-          description: OK
+          description: Transaction not found
+        "201":
+          description: Valoration created successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ValorationDTO"
+        "400":
+          description: Invalid input data
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ValorationDTO"
+        "401":
+          description: Unauthorized user
           content:
             '*/*':
               schema:
@@ -326,7 +640,10 @@ paths:
   /api/v1/users:
     post:
       tags:
-      - signup-web-rest-controller
+      - Users
+      summary: Register a new user
+      description: Registers a new user in the system. Supports multipart/form-data
+        for profile picture uploads.
       operationId: signup
       requestBody:
         content:
@@ -336,8 +653,21 @@ paths:
       responses:
         "404":
           description: Not Found
-        "200":
-          description: OK
+        "201":
+          description: User registered successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+        "400":
+          description: "Invalid input data (e.g., passwords do not match or file processing\
+            \ error)"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+        "409":
+          description: "Conflict (e.g., username or email already exists)"
           content:
             '*/*':
               schema:
@@ -345,7 +675,9 @@ paths:
   /api/v1/transactions:
     post:
       tags:
-      - transaction-rest-controller
+      - Transactions
+      summary: Create a transaction
+      description: Processes and confirms a new product purchase
       operationId: createTransaction
       requestBody:
         content:
@@ -355,9 +687,27 @@ paths:
         required: true
       responses:
         "404":
-          description: Not Found
-        "200":
-          description: OK
+          description: Product not found
+        "201":
+          description: Transaction created successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransactionDTO"
+        "400":
+          description: Invalid input data
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransactionDTO"
+        "401":
+          description: Unauthorized user
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransactionDTO"
+        "409":
+          description: "Conflict (e.g., insufficient balance or product already sold)"
           content:
             '*/*':
               schema:
@@ -365,7 +715,10 @@ paths:
   /api/v1/products:
     get:
       tags:
-      - product-rest-controller
+      - Products
+      summary: Get global catalog products
+      description: "Retrieves a paginated list of products from the global catalog,\
+        \ with optional search and category filters"
       operationId: getProducts
       parameters:
       - name: query
@@ -387,14 +740,16 @@ paths:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Products retrieved successfully
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PagedResponseProductDTO"
     post:
       tags:
-      - product-rest-controller
+      - Products
+      summary: Create a product
+      description: Creates a new product for the authenticated user
       operationId: createProduct
       requestBody:
         content:
@@ -404,8 +759,20 @@ paths:
       responses:
         "404":
           description: Not Found
-        "200":
-          description: OK
+        "201":
+          description: Product created successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+        "400":
+          description: Invalid input data or file processing error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+        "401":
+          description: Unauthorized user
           content:
             '*/*':
               schema:
@@ -413,7 +780,9 @@ paths:
   /api/v1/products/{productId}/image:
     get:
       tags:
-      - image-rest-controller
+      - Images
+      summary: Get product image metadata
+      description: Retrieves image metadata for a specific product
       operationId: getProductImage
       parameters:
       - name: productId
@@ -424,16 +793,19 @@ paths:
           format: int64
       responses:
         "404":
-          description: Not Found
+          description: Product or image not found
         "200":
-          description: OK
+          description: Image metadata retrieved successfully
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ImageDTO"
     post:
       tags:
-      - image-rest-controller
+      - Images
+      summary: Replace product image
+      description: Uploads a new image for a specific product and replaces the existing
+        one
       operationId: replaceProductImage
       parameters:
       - name: productId
@@ -444,7 +816,7 @@ paths:
           format: int64
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -455,9 +827,21 @@ paths:
               - file
       responses:
         "404":
-          description: Not Found
-        "200":
-          description: OK
+          description: Product not found
+        "201":
+          description: Image replaced successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+        "400":
+          description: Invalid input or image processing failed
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+        "401":
+          description: Unauthorized user
           content:
             '*/*':
               schema:
@@ -465,7 +849,9 @@ paths:
   /api/v1/inquiries:
     post:
       tags:
-      - notification-rest-controller
+      - Inquiries
+      summary: Submit inquiry
+      description: Submits a new inquiry from a buyer to a seller
       operationId: sendInquiry
       requestBody:
         content:
@@ -476,8 +862,26 @@ paths:
       responses:
         "404":
           description: Not Found
-        "200":
-          description: OK
+        "201":
+          description: Inquiry created successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NotificationResultDTO"
+        "400":
+          description: Invalid input data
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NotificationResultDTO"
+        "401":
+          description: Unauthorized user
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NotificationResultDTO"
+        "409":
+          description: "Inquiry could not be created (e.g., cooldown active)"
           content:
             '*/*':
               schema:
@@ -485,7 +889,9 @@ paths:
   /api/v1/auth/refresh:
     post:
       tags:
-      - login-rest-controller
+      - Authentication
+      summary: Refresh JWT token
+      description: Refreshes JWT token using a refresh token from HTTP cookies
       operationId: refresh
       parameters:
       - name: RefreshToken
@@ -497,7 +903,19 @@ paths:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Token refreshed successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Missing refresh token
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid or expired refresh token
           content:
             '*/*':
               schema:
@@ -505,13 +923,15 @@ paths:
   /api/v1/auth/logout:
     post:
       tags:
-      - login-rest-controller
+      - Authentication
+      summary: User logout
+      description: Logs out the current user by invalidating session tokens
       operationId: logout
       responses:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Logged out successfully
           content:
             '*/*':
               schema:
@@ -519,7 +939,9 @@ paths:
   /api/v1/auth/login:
     post:
       tags:
-      - login-rest-controller
+      - Authentication
+      summary: User login
+      description: Authenticates user with credentials and returns JWT tokens
       operationId: login
       requestBody:
         content:
@@ -531,7 +953,13 @@ paths:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Successful authentication
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
           content:
             '*/*':
               schema:
@@ -539,7 +967,9 @@ paths:
   /api/v1/admin/products:
     get:
       tags:
-      - admin-rest-controller
+      - Admin
+      summary: Get all products
+      description: Retrieves a paginated list of all products in the inventory
       operationId: getProducts_1
       parameters:
       - name: pageable
@@ -551,14 +981,16 @@ paths:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Products retrieved successfully
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PagedResponseProductDTO"
     post:
       tags:
-      - admin-rest-controller
+      - Admin
+      summary: Create product
+      description: Creates a new product as an administrator
       operationId: createProduct_1
       requestBody:
         content:
@@ -568,53 +1000,58 @@ paths:
       responses:
         "404":
           description: Not Found
-        "200":
-          description: OK
+        "201":
+          description: Product created successfully
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ProductDTO"
-  /api/v1/valorations/{id}:
-    get:
+        "400":
+          description: Invalid input or image processing failed
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProductDTO"
+  /api/v1/users/me/profile:
+    patch:
       tags:
-      - valoration-rest-controller
-      operationId: getValoration
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
+      - User Profiles
+      summary: Update my settings
+      description: Updates the settings and profile information of the authenticated
+        user
+      operationId: updateMySettings
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/UserSettingsUpdateDTO"
       responses:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Settings updated successfully
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ValorationDTO"
-    delete:
-      tags:
-      - valoration-rest-controller
-      operationId: deleteValoration
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      responses:
-        "404":
-          description: Not Found
-        "204":
-          description: No Content
+                $ref: "#/components/schemas/UserDTO"
+        "400":
+          description: Invalid input data
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+        "401":
+          description: Unauthorized user
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
   /api/v1/users/{id}/profile:
     get:
       tags:
-      - user-web-rest-controller
+      - User Profiles
+      summary: Get seller profile
+      description: Retrieves the public profile of a specific seller by their ID
       operationId: getSellerProfile
       parameters:
       - name: id
@@ -625,9 +1062,9 @@ paths:
           format: int64
       responses:
         "404":
-          description: Not Found
+          description: User not found
         "200":
-          description: OK
+          description: Seller profile retrieved successfully
           content:
             '*/*':
               schema:
@@ -635,7 +1072,9 @@ paths:
   /api/v1/users/{id}/profile-photo:
     get:
       tags:
-      - user-web-rest-controller
+      - User Profiles
+      summary: Get public profile photo
+      description: Retrieves the public profile photo of a specific user by ID
       operationId: getPublicProfilePhoto
       parameters:
       - name: id
@@ -646,18 +1085,21 @@ paths:
           format: int64
       responses:
         "404":
-          description: Not Found
+          description: User or photo not found
         "200":
-          description: OK
+          description: Profile photo retrieved successfully
           content:
-            '*/*':
+            image/png:
               schema:
                 type: string
                 format: binary
   /api/v1/users/{id}/contact-info:
     get:
       tags:
-      - user-web-rest-controller
+      - User Profiles
+      summary: Get contact information
+      description: Retrieves contact information layout for communicating with a specific
+        seller
       operationId: getContactInfo
       parameters:
       - name: id
@@ -668,9 +1110,23 @@ paths:
           format: int32
       responses:
         "404":
-          description: Not Found
+          description: User or product not found
         "200":
-          description: OK
+          description: Contact information retrieved successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
+        "400":
+          description: "Bad request (e.g., trying to contact oneself)"
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
+        "401":
+          description: Unauthorized user
           content:
             '*/*':
               schema:
@@ -679,30 +1135,45 @@ paths:
   /api/v1/users/me:
     get:
       tags:
-      - user-web-rest-controller
+      - User Profiles
+      summary: Get current user profile
+      description: Retrieves the full profile of the currently authenticated user
       operationId: getCurrentUser
       responses:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: User profile retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserDTO"
+        "401":
+          description: Unauthorized user
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/UserDTO"
     delete:
       tags:
-      - user-web-rest-controller
+      - User Profiles
+      summary: Delete my account
+      description: Deletes the authenticated user's account and associated data
       operationId: deleteMyAccount
       responses:
         "404":
           description: Not Found
-        "200":
-          description: OK
+        "204":
+          description: Account deleted successfully
+        "401":
+          description: Unauthorized user
   /api/v1/users/me/valorations:
     get:
       tags:
-      - user-web-rest-controller
+      - User Profiles
+      summary: Get my sent valorations
+      description: Retrieves a paginated list of ratings/valorations given by the
+        authenticated user
       operationId: getMySentValorations
       parameters:
       - name: pageable
@@ -714,7 +1185,13 @@ paths:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Valorations retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageValorationDTO"
+        "401":
+          description: Unauthorized user
           content:
             '*/*':
               schema:
@@ -722,7 +1199,10 @@ paths:
   /api/v1/users/me/transactions:
     get:
       tags:
-      - user-web-rest-controller
+      - User Profiles
+      summary: Get my transactions summary
+      description: Retrieves sales and orders transaction dashboard data for the authenticated
+        user
       operationId: getMyTransactions
       parameters:
       - name: transactionId
@@ -735,7 +1215,14 @@ paths:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Transactions data retrieved successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
+        "401":
+          description: Unauthorized user
           content:
             '*/*':
               schema:
@@ -744,13 +1231,21 @@ paths:
   /api/v1/users/me/statistics:
     get:
       tags:
-      - user-web-rest-controller
+      - User Profiles
+      summary: Get my statistics
+      description: Retrieves advanced statistics data for the authenticated user
       operationId: getStatistics
       responses:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Statistics retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/UserStatisticsDataDTO"
+        "401":
+          description: Unauthorized user
           content:
             '*/*':
               schema:
@@ -758,28 +1253,53 @@ paths:
   /api/v1/users/me/statistics-report:
     get:
       tags:
-      - pdf-rest-controller
+      - PDF Export
+      summary: Export user statistics report PDF
+      description: Exports a PDF report of the authenticated user's statistics
       operationId: exportStatistics
       responses:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Statistics report PDF generated successfully
           content:
-            '*/*':
+            application/pdf:
+              schema:
+                type: string
+                format: byte
+        "401":
+          description: Unauthorized user
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: byte
+        "500":
+          description: Error generating the PDF document
+          content:
+            application/pdf:
               schema:
                 type: string
                 format: byte
   /api/v1/users/me/dashboard:
     get:
       tags:
-      - user-web-rest-controller
+      - User Profiles
+      summary: Get dashboard data
+      description: Retrieves dashboard overview statistics for the authenticated user
       operationId: getDashboardData
       responses:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Dashboard data retrieved successfully
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
+        "401":
+          description: Unauthorized user
           content:
             '*/*':
               schema:
@@ -788,7 +1308,9 @@ paths:
   /api/v1/transactions/{transactionId}/shipping-label:
     get:
       tags:
-      - pdf-rest-controller
+      - PDF Export
+      summary: Export shipping label PDF
+      description: Exports the shipping label for a transaction in PDF format
       operationId: exportShippingLabel
       parameters:
       - name: transactionId
@@ -799,18 +1321,41 @@ paths:
           format: int64
       responses:
         "404":
-          description: Not Found
+          description: Transaction not found
         "200":
-          description: OK
+          description: Shipping label PDF generated successfully
           content:
-            '*/*':
+            application/pdf:
+              schema:
+                type: string
+                format: byte
+        "401":
+          description: Unauthorized user
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: byte
+        "403":
+          description: Forbidden (user is not authorized to view this transaction)
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: byte
+        "500":
+          description: Error generating the PDF document
+          content:
+            application/pdf:
               schema:
                 type: string
                 format: byte
   /api/v1/transactions/{transactionId}/invoice:
     get:
       tags:
-      - pdf-rest-controller
+      - PDF Export
+      summary: Export invoice PDF
+      description: Exports a transaction invoice in PDF format
       operationId: exportInvoice
       parameters:
       - name: transactionId
@@ -821,39 +1366,42 @@ paths:
           format: int64
       responses:
         "404":
-          description: Not Found
+          description: Transaction not found
         "200":
-          description: OK
+          description: Invoice PDF generated successfully
           content:
-            '*/*':
+            application/pdf:
               schema:
                 type: string
                 format: byte
-  /api/v1/transactions/{id}:
-    get:
-      tags:
-      - transaction-rest-controller
-      operationId: getTransaction
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      responses:
-        "404":
-          description: Not Found
-        "200":
-          description: OK
+        "401":
+          description: Unauthorized user
           content:
-            '*/*':
+            application/pdf:
               schema:
-                $ref: "#/components/schemas/TransactionDTO"
+                type: string
+                format: byte
+        "403":
+          description: Forbidden (user is not authorized to view this transaction)
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: byte
+        "500":
+          description: Error generating the PDF document
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: byte
   /api/v1/transactions/{id}/checkout:
     get:
       tags:
-      - transaction-rest-controller
+      - Transactions
+      summary: Get checkout summary
+      description: Prepares the checkout summary for a potential purchase. Only authenticated
+        users can access.
       operationId: getCheckout
       parameters:
       - name: id
@@ -864,9 +1412,15 @@ paths:
           format: int64
       responses:
         "404":
-          description: Not Found
+          description: Product not found
         "200":
-          description: OK
+          description: Checkout summary retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CheckoutDTO"
+        "401":
+          description: Unauthorized user
           content:
             '*/*':
               schema:
@@ -874,7 +1428,9 @@ paths:
   /api/v1/transactions/sales:
     get:
       tags:
-      - transaction-rest-controller
+      - Transactions
+      summary: Get seller transactions
+      description: Retrieves a paginated list of all sales for the authenticated user
       operationId: getSellerTransactions
       parameters:
       - name: pageable
@@ -886,7 +1442,13 @@ paths:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Sales retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedResponseTransactionDTO"
+        "401":
+          description: Unauthorized user
           content:
             '*/*':
               schema:
@@ -894,7 +1456,10 @@ paths:
   /api/v1/products/{id}/contact:
     get:
       tags:
-      - product-rest-controller
+      - Products
+      summary: Get contact seller data
+      description: Retrieves necessary data to populate the 'Contact Seller' interface
+        for a specific product
       operationId: getContactSellerData
       parameters:
       - name: id
@@ -905,9 +1470,15 @@ paths:
           format: int64
       responses:
         "404":
-          description: Not Found
+          description: Product or seller not found
         "200":
-          description: OK
+          description: Contact data retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ContactSellerPageDTO"
+        "401":
+          description: Unauthorized user
           content:
             '*/*':
               schema:
@@ -915,13 +1486,16 @@ paths:
   /api/v1/products/recommendations:
     get:
       tags:
-      - product-rest-controller
+      - Products
+      summary: Get recommendations
+      description: Retrieves a list of recommended products for the authenticated
+        user
       operationId: getRecommendations
       responses:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Recommendations retrieved successfully
           content:
             '*/*':
               schema:
@@ -931,13 +1505,23 @@ paths:
   /api/v1/products/me:
     get:
       tags:
-      - product-rest-controller
+      - Products
+      summary: Get my products
+      description: Retrieves the authenticated user's personal inventory
       operationId: getMyProducts
       responses:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Personal inventory retrieved successfully
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProductDTO"
+        "401":
+          description: Unauthorized user
           content:
             '*/*':
               schema:
@@ -947,7 +1531,10 @@ paths:
   /api/v1/inquiries/{id}:
     get:
       tags:
-      - notification-rest-controller
+      - Inquiries
+      summary: Get inquiry by ID
+      description: Retrieves a specific inquiry by its ID. Only the owner can access
+        it.
       operationId: getInquiry
       parameters:
       - name: id
@@ -958,9 +1545,21 @@ paths:
           format: int64
       responses:
         "404":
-          description: Not Found
+          description: Inquiry not found
         "200":
-          description: OK
+          description: Inquiry retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InquiryDTO"
+        "401":
+          description: Unauthorized user
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/InquiryDTO"
+        "403":
+          description: Forbidden (user is not the owner)
           content:
             '*/*':
               schema:
@@ -968,7 +1567,9 @@ paths:
   /api/v1/images/{imageId}/file:
     get:
       tags:
-      - image-rest-controller
+      - Images
+      summary: Get image file
+      description: Retrieves the actual image file bytes as a JPEG
       operationId: getImageFile
       parameters:
       - name: imageId
@@ -979,9 +1580,16 @@ paths:
           format: int64
       responses:
         "404":
-          description: Not Found
+          description: Image not found
         "200":
-          description: OK
+          description: Image file retrieved successfully
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        "500":
+          description: Database error while retrieving the image
           content:
             image/jpeg:
               schema:
@@ -990,7 +1598,10 @@ paths:
   /api/v1/catalog:
     get:
       tags:
-      - main-rest-controller
+      - Catalog
+      summary: Get home page data
+      description: "Retrieves home page data including filtered products, recommendations,\
+        \ and pagination metadata"
       operationId: getHomePage
       parameters:
       - name: query
@@ -1012,7 +1623,7 @@ paths:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Catalog data retrieved successfully
           content:
             '*/*':
               schema:
@@ -1020,7 +1631,9 @@ paths:
   /api/v1/admin/valorations:
     get:
       tags:
-      - admin-rest-controller
+      - Admin
+      summary: Get all valorations
+      description: Retrieves a paginated list of all user valorations/reviews
       operationId: getValorations
       parameters:
       - name: pageable
@@ -1032,7 +1645,7 @@ paths:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Valorations retrieved successfully
           content:
             '*/*':
               schema:
@@ -1040,7 +1653,9 @@ paths:
   /api/v1/admin/users:
     get:
       tags:
-      - admin-rest-controller
+      - Admin
+      summary: Get all users
+      description: Retrieves a paginated list of all users
       operationId: getUsers
       parameters:
       - name: pageable
@@ -1052,7 +1667,7 @@ paths:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Users retrieved successfully
           content:
             '*/*':
               schema:
@@ -1060,7 +1675,9 @@ paths:
   /api/v1/admin/transactions:
     get:
       tags:
-      - admin-rest-controller
+      - Admin
+      summary: Get all transactions
+      description: Retrieves a paginated list of all system transactions
       operationId: getTransactions
       parameters:
       - name: pageable
@@ -1072,21 +1689,68 @@ paths:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Transactions retrieved successfully
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PagedResponseTransactionDTO"
+  /api/v1/admin/transactions/{id}:
+    get:
+      tags:
+      - Admin
+      summary: Get transaction by ID
+      description: Retrieves the detailed information of a specific transaction
+      operationId: getTransactionById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Transaction not found
+        "200":
+          description: Transaction retrieved successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/TransactionDTO"
+    delete:
+      tags:
+      - Admin
+      summary: Delete transaction
+      description: Deletes a specific transaction record
+      operationId: deleteTransaction_1
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "404":
+          description: Transaction not found
+        "200":
+          description: Transaction deleted successfully
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/v1/admin/summary:
     get:
       tags:
-      - admin-rest-controller
+      - Admin
+      summary: Get admin summary
+      description: Retrieves high-level administrative statistics and data overview
       operationId: getAdminPanel
       responses:
         "404":
           description: Not Found
         "200":
-          description: OK
+          description: Summary retrieved successfully
           content:
             '*/*':
               schema:
@@ -1094,8 +1758,10 @@ paths:
   /api/v1/admin/valorations/{id}:
     delete:
       tags:
-      - admin-rest-controller
-      operationId: deleteValoration
+      - Admin
+      summary: Delete valoration
+      description: Deletes a specific valoration
+      operationId: deleteValoration_1
       parameters:
       - name: id
         in: path
@@ -1105,290 +1771,458 @@ paths:
           format: int64
       responses:
         "404":
-          description: Not Found
+          description: Valoration not found
         "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: string
-  /api/v1/admin/transactions/{id}:
-    delete:
-      tags:
-      - admin-rest-controller
-      operationId: deleteTransaction
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      responses:
-        "404":
-          description: Not Found
-        "200":
-          description: OK
+          description: Valoration deleted successfully
           content:
             '*/*':
               schema:
                 type: string
 components:
   schemas:
-    UserSettingsUpdateDTO:
+    ValorationDTO:
       type: object
-      properties:
-        newProfilePhoto:
-          type: string
-          format: binary
-        newEmail:
-          type: string
-        newCardNumber:
-          type: string
-        newCardCvv:
-          type: string
-        newCardExpiringDate:
-          type: string
-        newDescription:
-          type: string
-    UserDTO:
-      type: object
+      description: Represents a product rating and review from a buyer
       properties:
         id:
           type: integer
           format: int64
+          description: Unique valoration identifier
+          example: 305
+        stars:
+          type: integer
+          format: int32
+          description: Rating given by the buyer (1-5 stars)
+          example: 5
+        comment:
+          type: string
+          description: Review comment from the buyer
+          example: Product arrived in perfect condition and very fast. Recommended
+            seller.
+        buyerName:
+          type: string
+          description: Name of the buyer who provided the rating
+          example: Carlos Garcia
+        transactionId:
+          type: integer
+          format: int64
+          description: ID of the transaction this rating is for
+          example: 1001
+    UserDTO:
+      type: object
+      description: Represents a user account with public profile and authentication
+        role information
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique user identifier
+          example: 5
         name:
           type: string
+          description: User's display name
+          example: Laura Martinez
         email:
           type: string
+          description: User's email address
+          example: laura.martinez@example.com
         rating:
           type: number
           format: double
+          description: Average rating received by the user as a seller
+          example: 4.8
         numRatings:
           type: integer
           format: int32
+          description: Total number of ratings received
+          example: 34
         description:
           type: string
+          description: User's profile description or biography
+          example: Seller of vintage photography items.
         roles:
           type: array
+          description: "List of assigned security roles (e.g., ROLE_USER, ROLE_ADMIN)"
           items:
             type: string
         banned:
           type: boolean
-    ProductWriteRequestDTO:
+          description: Boolean indicating if the user account is banned
+          example: false
+    TransactionUpdateRequestDTO:
       type: object
+      description: Request body for updating an existing transaction. Only the fields
+        that are allowed to be modified should be included.
       properties:
-        name:
+        transactionStatus:
           type: string
-        category:
-          type: string
-        price:
-          type: number
-          format: double
-        location:
-          type: string
-        description:
-          type: string
-        status:
-          type: string
-        file:
-          type: string
-          format: binary
+          description: Current status of the transaction
+          example: shipped
+        rated:
+          type: boolean
+          description: Boolean indicating if the buyer has rated this transaction
+          example: true
+        stars:
+          type: integer
+          format: int32
+          description: Rating given by the buyer (1-5 stars)
+          example: 4
+          maximum: 5
+          minimum: 1
+      required:
+      - transactionStatus
     ImageDTO:
       type: object
+      description: Represents a product image reference in the system
       properties:
         id:
           type: integer
           format: int64
+          description: Unique identifier for the image
+          example: 101
     ProductDTO:
       type: object
+      description: "Represents a product with its core details, seller information,\
+        \ and user interactions"
       properties:
         id:
           type: integer
           format: int64
+          description: Unique product identifier
+          example: 1
         name:
           type: string
+          description: Product name or title
+          example: Mountain Bike
         category:
           type: string
+          description: Product category classification
+          example: Sports
         price:
           type: number
           format: double
+          description: Current selling price of the product
+          example: 120.5
         location:
           type: string
+          description: Geographic location where the product is listed
+          example: Madrid
         description:
           type: string
+          description: Detailed product description
+          example: "Mountain bike almost new, very little use."
         status:
           type: string
+          description: "Product status (e.g., available, sold, inactive)"
+          example: available
         image:
           $ref: "#/components/schemas/ImageDTO"
+          description: Product image reference
         seller:
           $ref: "#/components/schemas/UserDTO"
+          description: Information about the product seller
         userInteractions:
           type: array
+          description: "List of user interactions (views, favorites, etc.) on this\
+            \ product"
           items:
             $ref: "#/components/schemas/UserInteractionDTO"
         favorite:
           type: boolean
+          description: Boolean indicating if the current user has favorited this product
+          example: false
+    TransactionDTO:
+      type: object
+      description: Represents a completed transaction between seller and buyer
+      properties:
+        transactionId:
+          type: integer
+          format: int64
+          description: Unique transaction identifier
+          example: 1001
+        finalPrice:
+          type: number
+          format: double
+          description: Final amount paid for the transaction
+          example: 150.75
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the transaction was created
+          example: 2024-05-12T14:30:00
+        formattedDate:
+          type: string
+          description: Human-readable formatted date of the transaction
+          example: 12
+        transactionStatus:
+          type: string
+          description: "Current status of the transaction (e.g., completed, pending\
+            \ delivery)"
+          example: completed
+        rated:
+          type: boolean
+          description: Boolean indicating if the buyer has rated this transaction
+          example: true
+        stars:
+          type: integer
+          format: int32
+          description: Rating given by the buyer (1-5 stars)
+          example: 5
+        seller:
+          $ref: "#/components/schemas/UserDTO"
+          description: Information about the seller in this transaction
+        buyer:
+          $ref: "#/components/schemas/UserDTO"
+          description: Information about the buyer in this transaction
+        product:
+          $ref: "#/components/schemas/ProductDTO"
+          description: The product that was sold in this transaction
     UserInteractionDTO:
       type: object
+      description: "Represents a user interaction event with a product (view, favorite,\
+        \ etc.)"
       properties:
         id:
           type: integer
           format: int64
+          description: Unique interaction identifier
+          example: 204
         userId:
           type: integer
           format: int64
+          description: ID of the user who performed the interaction
+          example: 12
         type:
           type: string
+          description: "Type of interaction (e.g., VIEW, FAVORITE, PURCHASE)"
           enum:
           - VIEW
           - LIKE
           - BUY
-    AdminUserUpdateRequestDTO:
+          example: FAVORITE
+    ProductWriteRequestDTO:
       type: object
-      properties:
-        email:
-          type: string
-        cardNumber:
-          type: string
-        cardCvv:
-          type: string
-        cardExpiringDate:
-          type: string
-        description:
-          type: string
-    AdminProductUpdateRequestDTO:
-      type: object
+      description: Request body for creating or updating product listings with file
+        upload capability
       properties:
         name:
           type: string
+          description: Product name or title
+          example: Laptop Computer
         category:
           type: string
+          description: Product category classification
+          example: Electronics
         price:
           type: number
           format: double
-        description:
-          type: string
+          description: Current selling price of the product
+          example: 450.0
         location:
           type: string
+          description: Geographic location where the product is listed
+          example: Barcelona
+        description:
+          type: string
+          description: Detailed product description
+          example: Laptop with 16GB RAM and i7 processor.
         status:
           type: string
-    ValorationDTO:
+          description: "Product status (e.g., available, sold, inactive)"
+          example: available
+        file:
+          type: string
+          format: binary
+          description: Product image file to be uploaded
+    AdminUserUpdateRequestDTO:
       type: object
+      description: Request body for administrators to update user account details
       properties:
-        id:
-          type: integer
-          format: int64
-        stars:
-          type: integer
-          format: int32
-        comment:
+        email:
           type: string
-        buyerName:
+          description: Updated email address
+          example: user.updated@example.com
+        cardNumber:
           type: string
-        transactionId:
-          type: integer
-          format: int64
+          description: Updated payment card number
+          example: 1234567890123456
+        cardCvv:
+          type: string
+          description: Updated card CVV security code
+          example: 123
+        cardExpiringDate:
+          type: string
+          description: Updated card expiration date
+          example: 12/25
+        description:
+          type: string
+          description: Updated user profile description
+          example: Reliable buyer and seller since 2024.
+    AdminProductUpdateRequestDTO:
+      type: object
+      description: Request body for administrators to update product details
+      properties:
+        name:
+          type: string
+          description: Updated product name
+          example: Vintage Camera - Updated
+        category:
+          type: string
+          description: Updated product category
+          example: Photography
+        price:
+          type: number
+          format: double
+          description: Updated product price
+          example: 135.0
+        description:
+          type: string
+          description: Updated product description
+          example: Price reduced! Classic 35mm film camera.
+        location:
+          type: string
+          description: Updated product location
+          example: Barcelona
+        status:
+          type: string
+          description: Updated product status
+          example: inactive
     SignupRequestDTO:
       type: object
+      description: Request body for user account registration with profile picture
+        upload
       properties:
         profilePicture:
           type: string
           format: binary
+          description: User's profile picture image file
         username:
           type: string
+          description: Desired username for the new account
+          example: johndoe88
         email:
           type: string
+          description: User's email address
+          example: johndoe@example.com
         password:
           type: string
+          description: Account password
+          example: SecurePass123!
         confirmPassword:
           type: string
+          description: Password confirmation for validation
+          example: SecurePass123!
     TransactionCreateRequestDTO:
       type: object
+      description: Request body for initiating a new transaction/purchase
       properties:
         productId:
           type: integer
           format: int64
-    TransactionDTO:
-      type: object
-      properties:
-        transactionId:
-          type: integer
-          format: int64
-        finalPrice:
-          type: number
-          format: double
-        createdAt:
-          type: string
-          format: date-time
-        formattedDate:
-          type: string
-        transactionStatus:
-          type: string
-        rated:
-          type: boolean
-        stars:
-          type: integer
-          format: int32
-        seller:
-          $ref: "#/components/schemas/UserDTO"
-        buyer:
-          $ref: "#/components/schemas/UserDTO"
-        product:
-          $ref: "#/components/schemas/ProductDTO"
+          description: ID of the product being purchased
+          example: 15
+      required:
+      - productId
     InquiryRequestDTO:
       type: object
+      description: Request body for creating a new customer inquiry
       properties:
         productId:
           type: integer
           format: int64
+          description: ID of the product being inquired about
+          example: 12
         phone:
           type: string
+          description: Customer's phone number
+          example: "+34611223344"
         type:
           type: string
+          description: Type or category of the inquiry
+          example: Product status
         message:
           type: string
+          description: The inquiry message content
+          example: Does the screen have any scratches?
     InquiryDTO:
       type: object
+      description: Represents a customer inquiry about a product with contact and
+        product information
       properties:
         id:
           type: integer
           format: int64
+          description: Unique identifier for the inquiry
+          example: 50
         productName:
           type: string
+          description: Name of the product being inquired about
+          example: Canon Reflex Camera
         sellerEmail:
           type: string
+          description: Email address of the product seller
+          example: seller@example.com
         buyerName:
           type: string
+          description: Name of the customer making the inquiry
+          example: Ana Lopez
         buyerEmail:
           type: string
+          description: Email address of the customer
+          example: ana.lopez@example.com
         buyerPhone:
           type: string
+          description: Phone number of the customer
+          example: "+34600123456"
         inquiryType:
           type: string
+          description: Type or category of the inquiry
+          example: Question about delivery
         message:
           type: string
+          description: The inquiry message content
+          example: Do you ship to the Canary Islands?
+          maxLength: 1000
+          minLength: 5
         createdAt:
           type: string
           format: date-time
+          description: Timestamp when the inquiry was created
+          example: 2024-03-24T10:15:30
         status:
           type: string
+          description: "Current status of the inquiry (e.g., pending, answered)"
+          example: pending
         product:
           $ref: "#/components/schemas/ProductDTO"
+          description: The product being inquired about
         buyer:
           $ref: "#/components/schemas/UserDTO"
+          description: The customer making the inquiry
+      required:
+      - message
+      - status
     NotificationResultDTO:
       type: object
+      description: Result of attempting to send a notification about an inquiry
       properties:
         inquiry:
           $ref: "#/components/schemas/InquiryDTO"
+          description: The inquiry that notification was attempted for
         sent:
           type: boolean
+          description: Boolean indicating if the notification was successfully sent
+          example: true
         cooldownMinutes:
           type: integer
           format: int64
+          description: Minutes remaining before another notification can be sent (if
+            cooldown is active)
+          example: 0
         errorCode:
           type: string
+          description: "Error code if notification failed, null if successful"
+          example: null
     AuthResponse:
       type: object
       properties:
@@ -1410,31 +2244,80 @@ components:
           type: string
     AdminProductCreateRequestDTO:
       type: object
+      description: Request body for administrators to create a product on behalf of
+        a seller
       properties:
         sellerId:
           type: integer
           format: int64
+          description: ID of the seller who will own the product
+          example: 1
         name:
           type: string
+          description: Product name or title
+          example: Vintage Camera
         category:
           type: string
+          description: Product category classification
+          example: Electronics
         description:
           type: string
+          description: Detailed product description
+          example: A classic 35mm film camera in perfect condition.
         price:
           type: number
           format: double
+          description: Product listing price
+          example: 150.5
         location:
           type: string
+          description: Geographic location of the product
+          example: Madrid
         status:
           type: string
+          description: "Product status (e.g., available, inactive)"
+          example: available
         image:
           type: string
           format: binary
+          description: Product image file to upload
+    UserSettingsUpdateDTO:
+      type: object
+      description: Request body for updating user account settings and profile information
+      properties:
+        newProfilePhoto:
+          type: string
+          format: binary
+          description: New profile picture image file
+        newEmail:
+          type: string
+          description: Updated email address
+          example: new.email@example.com
+        newCardNumber:
+          type: string
+          description: Updated payment card number
+          example: 1234567890123456
+        newCardCvv:
+          type: string
+          description: Updated card CVV security code
+          example: 123
+        newCardExpiringDate:
+          type: string
+          description: Updated card expiration date
+          example: 11/26
+        newDescription:
+          type: string
+          description: Updated user profile description
+          example: Updating my seller biography.
     AdminUserBanRequestDTO:
       type: object
+      description: Request body for administrators to ban or unban a user account
       properties:
         banned:
           type: boolean
+          description: Boolean indicating whether to ban (true) or unban (false) the
+            user
+          example: true
     Pageable:
       type: object
       properties:
@@ -1452,49 +2335,70 @@ components:
             type: string
     PagedResponseValorationDTO:
       type: object
+      description: Generic paginated response container for list results
       properties:
         content:
           type: array
+          description: List of items for the current page
           items:
             $ref: "#/components/schemas/ValorationDTO"
         page:
           type: integer
           format: int32
+          description: Current page number (typically zero-based)
+          example: 0
         size:
           type: integer
           format: int32
+          description: Number of items per page
+          example: 10
         totalElements:
           type: integer
           format: int64
+          description: Total number of elements across all pages
+          example: 45
         last:
           type: boolean
+          description: Boolean indicating if this is the final page of results
+          example: false
     SellerProfileDTO:
       type: object
+      description: Comprehensive seller profile information with products and customer
+        ratings
       properties:
         seller:
           $ref: "#/components/schemas/UserDTO"
+          description: The seller's user information
         products:
           type: array
+          description: List of products sold by this seller
           items:
             $ref: "#/components/schemas/ProductDTO"
         valorations:
           type: array
+          description: List of customer ratings and reviews for this seller
           items:
             $ref: "#/components/schemas/ValorationDTO"
         fullStars:
           type: integer
           format: int32
+          description: Average rating rounded to nearest integer
+          example: 4
         owner:
           type: boolean
+          description: Boolean indicating if the current user is the profile owner
+          example: true
     PageValorationDTO:
       type: object
       properties:
-        totalElements:
-          type: integer
-          format: int64
         totalPages:
           type: integer
           format: int32
+        totalElements:
+          type: integer
+          format: int64
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         first:
           type: boolean
         last:
@@ -1502,8 +2406,6 @@ components:
         numberOfElements:
           type: integer
           format: int32
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
         size:
           type: integer
           format: int32
@@ -1521,6 +2423,8 @@ components:
     PageableObject:
       type: object
       properties:
+        unpaged:
+          type: boolean
         paged:
           type: boolean
         pageNumber:
@@ -1529,8 +2433,6 @@ components:
         pageSize:
           type: integer
           format: int32
-        unpaged:
-          type: boolean
         offset:
           type: integer
           format: int64
@@ -1539,183 +2441,274 @@ components:
     SortObject:
       type: object
       properties:
-        sorted:
-          type: boolean
         unsorted:
+          type: boolean
+        sorted:
           type: boolean
         empty:
           type: boolean
     UserStatisticsDataDTO:
       type: object
+      description: Contains sales statistics and performance metrics for a seller
       properties:
         totalSales:
           type: string
+          description: Total sales amount as a formatted string
+          example: "1,250.00 €"
         itemsSold:
           type: integer
           format: int32
+          description: Total number of items sold
+          example: 45
         avgRating:
           type: string
+          description: Average rating received as a formatted string
+          example: 4.5/5
         inventoryValue:
           type: string
+          description: Total value of active inventory as a formatted string
+          example: 350.0
         date:
           type: string
+          description: Date or period for the statistics
+          example: 2024
         chartLabels:
           type: array
+          description: Labels for sales chart
           items:
             type: string
         chartValues:
           type: array
+          description: Values for sales chart visualization
           items:
             type: integer
             format: int64
         revenueLabels:
           type: array
+          description: Labels for revenue chart
           items:
             type: string
         revenueValues:
           type: array
+          description: Revenue values for chart display
           items:
             type: number
             format: double
         barLabels:
           type: array
+          description: Labels for bar chart
           items:
             type: string
         visitsData:
           type: array
+          description: Number of product visits over time
           items:
             type: integer
             format: int64
         interestData:
           type: array
+          description: Interest engagement data metrics over time
           items:
             type: integer
             format: int64
     CheckoutDTO:
       type: object
+      description: Contains checkout transaction information with product and buyer
+        details
       properties:
         product:
           $ref: "#/components/schemas/ProductDTO"
+          description: The product being purchased
         buyer:
           $ref: "#/components/schemas/UserDTO"
+          description: The user completing the purchase
     PagedResponseTransactionDTO:
       type: object
+      description: Generic paginated response container for list results
       properties:
         content:
           type: array
+          description: List of items for the current page
           items:
             $ref: "#/components/schemas/TransactionDTO"
         page:
           type: integer
           format: int32
+          description: Current page number (typically zero-based)
+          example: 0
         size:
           type: integer
           format: int32
+          description: Number of items per page
+          example: 10
         totalElements:
           type: integer
           format: int64
+          description: Total number of elements across all pages
+          example: 45
         last:
           type: boolean
+          description: Boolean indicating if this is the final page of results
+          example: false
     PagedResponseProductDTO:
       type: object
+      description: Generic paginated response container for list results
       properties:
         content:
           type: array
+          description: List of items for the current page
           items:
             $ref: "#/components/schemas/ProductDTO"
         page:
           type: integer
           format: int32
+          description: Current page number (typically zero-based)
+          example: 0
         size:
           type: integer
           format: int32
+          description: Number of items per page
+          example: 10
         totalElements:
           type: integer
           format: int64
+          description: Total number of elements across all pages
+          example: 45
         last:
           type: boolean
+          description: Boolean indicating if this is the final page of results
+          example: false
     ProductDetailsDTO:
       type: object
+      description: Comprehensive product details page data including recommended products
       properties:
         product:
           $ref: "#/components/schemas/ProductDTO"
+          description: The main product being displayed
         recommendedProducts:
           type: array
+          description: List of products recommended to the user
           items:
             $ref: "#/components/schemas/ProductDTO"
         logged:
           type: boolean
+          description: Boolean indicating if the user is logged in
+          example: true
     ContactSellerPageDTO:
       type: object
+      description: Contains data for the contact seller page with product and buyer
+        information
       properties:
         product:
           $ref: "#/components/schemas/ProductDTO"
+          description: The product being inquired about
         seller:
           $ref: "#/components/schemas/UserDTO"
+          description: The seller of the product
         buyerName:
           type: string
+          description: Name of the buyer contacting the seller
+          example: John Smith
         buyerEmail:
           type: string
+          description: Email address of the buyer
+          example: juan.perez@example.com
     HomePageDTO:
       type: object
+      description: Contains all data required to render the home page
       properties:
         products:
           type: array
+          description: List of general products to display
           items:
             $ref: "#/components/schemas/ProductDTO"
         recommendedProducts:
           type: array
+          description: List of personalized recommended products
           items:
             $ref: "#/components/schemas/ProductDTO"
         user:
           $ref: "#/components/schemas/UserDTO"
+          description: "Logged-in user information, null if not authenticated"
         logged:
           type: boolean
+          description: Boolean indicating if a user is currently logged in
+          example: true
         admin:
           type: boolean
+          description: Boolean indicating if the logged-in user is an administrator
+          example: false
         query:
           type: string
+          description: Search query string if applicable
+          example: photo camera
         searching:
           type: boolean
+          description: Boolean indicating if a search is active
+          example: true
         last:
           type: boolean
+          description: Boolean indicating if this is the last page of results
+          example: false
         nextOffset:
           type: integer
           format: int32
+          description: Offset value for fetching the next set of products
+          example: 10
     PagedResponseUserDTO:
       type: object
+      description: Generic paginated response container for list results
       properties:
         content:
           type: array
+          description: List of items for the current page
           items:
             $ref: "#/components/schemas/UserDTO"
         page:
           type: integer
           format: int32
+          description: Current page number (typically zero-based)
+          example: 0
         size:
           type: integer
           format: int32
+          description: Number of items per page
+          example: 10
         totalElements:
           type: integer
           format: int64
+          description: Total number of elements across all pages
+          example: 45
         last:
           type: boolean
+          description: Boolean indicating if this is the final page of results
+          example: false
     AdminSummaryDTO:
       type: object
+      description: "Reports administrative summary statistics including user counts,\
+        \ banned users, and memory usage"
       properties:
         numUsers:
           type: integer
           format: int32
+          description: Total number of users in the system
+          example: 150
         numBanneds:
           type: integer
           format: int32
+          description: Total number of banned users
+          example: 3
         memoryUsage:
           type: string
+          description: Current memory usage information
+          example: 512
         recentUsers:
           type: array
+          description: List of recently registered users
           items:
             $ref: "#/components/schemas/UserDTO"
         recentProducts:
           type: array
+          description: List of recently added products
           items:
             $ref: "#/components/schemas/ProductDTO"
