@@ -1317,7 +1317,11 @@ He extraído gran parte de la lógica de negocio de los controladores hacia los 
 
 #### **Alumno 4 - Gabriele Antonio Ricucci**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+Mi contribución se ha centrado en la implementación de endpoints REST para el dashboard de usuarios, 
+estadísticas de transacciones y gestión de productos. He trabajado en la creación de servicios para 
+el manejo de favoritos (add/remove productos), endpoints de perfil de usuario y la integración con 
+la colección de Postman. Además, he colaborado en la validación y mejora de los endpoints existentes 
+para asegurar que sigan correctamente las convenciones REST.
 
 | Nº    | Commits      | Files      |
 |:------------: |:------------:| :------------:|
