@@ -40,6 +40,7 @@ import es.stilnovo.library.dto.ValorationDTO;
 import es.stilnovo.library.dto.ValorationMapper;
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
+import es.stilnovo.library.model.Valoration;
 import es.stilnovo.library.service.AdminService;
 import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.TransactionService;
@@ -151,7 +152,7 @@ public class AdminRestController {
      * @return Updated UserDTO.
      * @throws IOException If image processing fails.
      */
-    @PutMapping(value = "/users/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/users/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Update user", description = "Updates an existing user's information and profile photo")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "User updated successfully"),
@@ -182,7 +183,7 @@ public class AdminRestController {
      * @param request DTO containing the desired ban status.
      * @return UserDTO with updated ban status.
      */
-    @PatchMapping("/users/{id}")
+    @PutMapping("/users/ban/{id}")
     @Operation(summary = "Update user ban status", description = "Updates the ban status of a specific user")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Ban status updated successfully"),
@@ -203,9 +204,11 @@ public class AdminRestController {
         @ApiResponse(responseCode = "200", description = "User deleted successfully"),
         @ApiResponse(responseCode = "404", description = "User not found")
     })
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<UserDTO> deleteUser(@PathVariable Long id) {
+        UserDTO user = userMapper.toDTO(userService.getPublicProfileById(id));
+
         adminService.deleteUser(id);
-        return ResponseEntity.ok("User deleted correctly");
+        return ResponseEntity.ok(user);
     }
 
     // --- PRODUCT MANAGEMENT ---
@@ -286,7 +289,7 @@ public class AdminRestController {
      * @return Updated ProductDTO.
      * @throws IOException If image processing fails.
      */
-    @PutMapping(value = "/products/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/products/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Update product", description = "Updates an existing product's details and image")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Product updated successfully"),
@@ -323,9 +326,15 @@ public class AdminRestController {
         @ApiResponse(responseCode = "200", description = "Product deleted successfully"),
         @ApiResponse(responseCode = "404", description = "Product not found")
     })
-    public ResponseEntity<String> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<ProductDTO> deleteProduct(@PathVariable Long id) {
+        Product productEntity = productService.findById(id)
+            .orElseThrow();
+
+        ProductDTO productDto = productMapper.toDTO(productEntity);
+
         adminService.deleteProductAsAdmin(id);
-        return ResponseEntity.ok("Product deleted correctly");
+
+        return ResponseEntity.ok(productDto);
     }
 
     // --- TRANSACTION MANAGEMENT ---
@@ -357,9 +366,10 @@ public class AdminRestController {
         @ApiResponse(responseCode = "200", description = "Transaction deleted successfully"),
         @ApiResponse(responseCode = "404", description = "Transaction not found")
     })
-    public ResponseEntity<String> deleteTransaction(@PathVariable Long id) {
+    public ResponseEntity<TransactionDTO> deleteTransaction(@PathVariable Long id) {
+        TransactionDTO transaction = transactionService.getTransactionById(id);
         transactionService.deleteTransaction(id);
-        return ResponseEntity.ok("Transaction deleted correctly");
+        return ResponseEntity.ok(transaction);
     }
 
     /**
@@ -408,8 +418,14 @@ public class AdminRestController {
         @ApiResponse(responseCode = "200", description = "Valoration deleted successfully"),
         @ApiResponse(responseCode = "404", description = "Valoration not found")
     })
-    public ResponseEntity<String> deleteValoration(@PathVariable Long id) {
+    public ResponseEntity<ValorationDTO> deleteValoration(@PathVariable Long id) {
+
+        Valoration valorationEntity = valorationService.findById(id);
+
+        ValorationDTO valoration = valorationMapper.toDTO(valorationEntity);
+
         valorationService.deleteById(id);
-        return ResponseEntity.ok("Valorations deleted correctly");
+
+        return ResponseEntity.ok(valoration);
     }
 }
