@@ -729,7 +729,7 @@ Mi contribución principal se ha centrado en la transición de la lógica de neg
 
 #### **Alumno 2 - Alonso Gutiérrez Sánchez**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+Mi contribución ha sido crear los DTOs y mappers de las entidades, implementar y corregir algunos endpoints de la aplicación, aportando también a la creación de el archivo api.postman_collection.json, y la creación de la documentación mediante OpenAPI
 
 | Nº    | Commits      | Files      |
 |:------------: |:------------:| :------------:|
