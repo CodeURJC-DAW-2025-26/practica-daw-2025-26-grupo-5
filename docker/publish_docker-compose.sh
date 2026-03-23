@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # ============================================================
-# Script: Publish Docker Compose Services
-# Purpose: Push services defined in docker-compose.yml to DockerHub
+# Script: Publish Docker Compose Configuration
+# Purpose: Push docker-compose services to DockerHub
 # Usage: ./publish_docker_compose.sh <DockerHubUsername>
 # ============================================================
 
@@ -22,7 +22,12 @@ if [ -z "$DOCKER_HUB_USER_INPUT" ]; then
     exit 1
 fi
 
-echo -e "${CYAN}Publishing docker-compose.yml services...${NC}"
+echo -e "${CYAN}============================================================${NC}"
+echo -e "${CYAN}Docker Compose Publication to DockerHub${NC}"
+echo -e "${CYAN}============================================================${NC}"
+echo ""
+
+echo -e "${CYAN}Publishing docker-compose services...${NC}"
 echo -e "Username: ${YELLOW}$DOCKER_HUB_USER_INPUT${NC}"
 echo ""
 
@@ -31,19 +36,36 @@ echo ""
 export DOCKER_HUB_USER=$DOCKER_HUB_USER_INPUT
 
 echo -e "${CYAN}Pushing services to DockerHub...${NC}"
+echo -e "  ${YELLOW}This publishes all services defined in docker-compose.yml${NC}"
+echo ""
+
 docker compose push
 
 # Check the exit status of the last command
 if [ $? -eq 0 ]; then
     echo ""
-    echo -e "${GREEN}✓ Docker Compose services successfully published${NC}"
-    echo -e "${GREEN}Services available under user: $DOCKER_HUB_USER_INPUT${NC}"
+    echo -e "${GREEN}============================================================${NC}"
+    echo -e "${GREEN}Publication Successful${NC}"
+    echo -e "${GREEN}============================================================${NC}"
     echo ""
-    echo -e "${CYAN}To deploy on a remote server, use:${NC}"
-    echo -e "  ${YELLOW}export DOCKER_HUB_USER='$DOCKER_HUB_USER_INPUT'${NC}"
-    echo -e "  ${GREEN}docker compose up -d${NC}"
+    echo -e "${CYAN}Docker Compose services published:${NC}"
+    echo -e "  ${GREEN}User: $DOCKER_HUB_USER_INPUT${NC}"
+    echo ""
+    echo -e "${CYAN}Next steps:${NC}"
+    echo -e "  1. Deploy on VM: ${GREEN}export DOCKER_HUB_USER='$DOCKER_HUB_USER_INPUT'${NC}"
+    echo -e "  2. Pull and run: ${GREEN}docker compose up -d${NC}"
+    echo -e "  3. Monitor: ${GREEN}docker compose logs -f${NC}"
+    echo ""
 else
-    echo -e "${RED}Error: Failed to publish compose services.${NC}"
-    echo -e "Ensure you are logged in to DockerHub: ${YELLOW}docker login${NC}"
+    echo ""
+    echo -e "${RED}============================================================${NC}"
+    echo -e "${RED}Publication Failed${NC}"
+    echo -e "${RED}============================================================${NC}"
+    echo ""
+    echo -e "${YELLOW}Possible causes:${NC}"
+    echo -e "  1. Not logged in: Run ${GREEN}docker login${NC}"
+    echo -e "  2. Old Docker Compose: Need v2.34.0 or newer"
+    echo -e "  3. Network issue: Check your internet connection"
+    echo ""
     exit 1
 fi

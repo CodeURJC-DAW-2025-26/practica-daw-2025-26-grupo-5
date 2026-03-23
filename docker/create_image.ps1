@@ -37,16 +37,28 @@ docker build -t "$ImageName" -f Dockerfile ..
 if ($LASTEXITCODE -eq 0) {
     Write-Host ""
     Write-Host "============================================================" -ForegroundColor Green
-    Write-Host "Image '$ImageName' built successfully" -ForegroundColor Green
+    Write-Host "Image Build Successful" -ForegroundColor Green
     Write-Host "============================================================" -ForegroundColor Green
     Write-Host ""
+    Write-Host "Image Details:" -ForegroundColor Cyan
+    Write-Host "  Name: $ImageName" -ForegroundColor Green
+    Write-Host ""
     Write-Host "Next steps:" -ForegroundColor Cyan
-    Write-Host "1. Verify image: docker images" -ForegroundColor Green
-    Write-Host "2. Test locally: docker run $ImageName" -ForegroundColor Green
-    Write-Host "3. Publish: .\publish_image.ps1 -DockerHubUsername username" -ForegroundColor Green
+    Write-Host "  1. Verify image: docker images | grep stilnovo" -ForegroundColor Green
+    Write-Host "  2. Test locally: docker run -p 8443:8443 $ImageName" -ForegroundColor Green
+    Write-Host "  3. Publish to DockerHub: .\publish_image.ps1 -DockerHubUsername your-username" -ForegroundColor Green
+    Write-Host ""
 } else {
-    Write-Error "============================================================"
-    Write-Error "Error building image. Check Dockerfile and source code."
-    Write-Error "============================================================"
+    Write-Host ""
+    Write-Host "============================================================" -ForegroundColor Red
+    Write-Host "Build Failed" -ForegroundColor Red
+    Write-Host "============================================================" -ForegroundColor Red
+    Write-Host ""
+    Write-Error "Check the following:"
+    Write-Error "  1. Dockerfile syntax and paths"
+    Write-Error "  2. Backend source code compilation"
+    Write-Error "  3. Maven/Java dependencies"
+    Write-Error "  4. Docker daemon is running"
+    Write-Host ""
     exit 1
 }

@@ -45,7 +45,8 @@ fi
 # STEP 2: Push image to DockerHub
 echo ""
 echo -e "${CYAN}Step 2: Pushing image to DockerHub...${NC}"
-echo -e "  This may take a few minutes depending on image size and connection"
+echo -e "  ${YELLOW}This may take a few minutes depending on image size and connection${NC}"
+echo ""
 
 docker push "$DOCKER_USER/stilnovo-app:latest"
 
@@ -61,9 +62,19 @@ if [ $? -eq 0 ]; then
     echo -e "${CYAN}Next steps:${NC}"
     echo -e "  1. Publish docker-compose: ${GREEN}./publish_docker-compose.sh $DOCKER_USER${NC}"
     echo -e "  2. Deploy to VM:${NC}"
-    echo -e "     ${YELLOW}docker-compose -e DOCKER_HUB_USER=$DOCKER_USER -e DDL_AUTO=create up -d${NC}"
+    echo -e "     ${YELLOW}export DOCKER_HUB_USER=$DOCKER_USER${NC}"
+    echo -e "     ${YELLOW}docker compose -e DDL_AUTO=update up -d${NC}"
     echo ""
 else
-    echo -e "${RED}Push failed. Make sure you are logged in to DockerHub: ${NC}${YELLOW}docker login${NC}"
+    echo ""
+    echo -e "${RED}============================================================${NC}"
+    echo -e "${RED}Push Failed${NC}"
+    echo -e "${RED}============================================================${NC}"
+    echo ""
+    echo -e "${YELLOW}Possible causes:${NC}"
+    echo -e "  1. Not logged in: Run ${GREEN}docker login${NC}"
+    echo -e "  2. Image doesn't exist: Run ${GREEN}./create_image.sh stilnovo-app:latest${NC}"
+    echo -e "  3. Network issue: Check your internet connection"
+    echo ""
     exit 1
 fi
