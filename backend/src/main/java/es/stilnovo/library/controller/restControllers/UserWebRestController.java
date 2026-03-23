@@ -1,7 +1,6 @@
 package es.stilnovo.library.controller.restControllers;
 
 import java.io.IOException;
-import java.net.URI;
 import java.security.Principal;
 import java.sql.SQLException;
 import java.util.Map;
@@ -15,17 +14,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import es.stilnovo.library.dto.ProductDTO;
 import es.stilnovo.library.dto.ProductMapper;
 import es.stilnovo.library.dto.SellerProfileDTO;
 import es.stilnovo.library.dto.UserDTO;
@@ -34,7 +31,6 @@ import es.stilnovo.library.dto.UserSettingsUpdateDTO;
 import es.stilnovo.library.dto.UserStatisticsDataDTO;
 import es.stilnovo.library.dto.ValorationDTO;
 import es.stilnovo.library.dto.ValorationMapper;
-import es.stilnovo.library.model.Product;
 import es.stilnovo.library.service.ContactSellerService;
 import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.UserService;
@@ -156,48 +152,7 @@ public class UserWebRestController {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Adds a product to the authenticated user's favorites list.
-     * @param principal The security context of the authenticated user.
-     * @param productId The ID of the product to favorite.
-     * @return ResponseEntity with a success message.
-     */
-    @PostMapping("/me/favorites/{productId}")
-    @Operation(summary = "Add product to favorites", description = "Adds a product to the authenticated user's favorites list")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Product added to favorites successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
-        @ApiResponse(responseCode = "404", description = "Product not found")
-    })
-    public ResponseEntity<ProductDTO> addProductToFavorites(Principal principal, @PathVariable Long productId) {
-        Product product = userService.addProductToFavorites(principal.getName(), productId);
-        // Set Location header pointing to the favorited product resource
-        URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/api/v1/products/{id}")
-                .buildAndExpand(productId)
-                .toUri();
-        return ResponseEntity.created(location).body(productMapper.toDTO(product));
-    }
-
-    /**
-     * Removes a product from the authenticated user's favorites list.
-     * @param principal The security context of the authenticated user.
-     * @param productId The ID of the product to unfavorite.
-     * @return ResponseEntity with a success message.
-     */
-    @DeleteMapping("/me/favorites/{productId}")
-    @Operation(summary = "Remove product from favorites", description = "Removes a product from the authenticated user's favorites list")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Product removed from favorites successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
-        @ApiResponse(responseCode = "404", description = "Product not found")
-    })
-    public ResponseEntity<String> removeProductFromFavorites(Principal principal, @PathVariable Long productId) {
-        userService.removeProductFromFavorites(principal.getName(), productId);
-        return ResponseEntity.ok("Product removed from favorites successfully");
-    }
-
-    @PutMapping(value = "/me/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/me/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Update my settings", description = "Updates the settings and profile information of the authenticated user")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Settings updated successfully"),
