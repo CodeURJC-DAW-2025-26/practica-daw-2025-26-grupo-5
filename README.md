@@ -547,9 +547,10 @@ Nota: Para probar los endpoints POST/PUT que requieren imágenes en Postman, por
 ### **Diagrama de Clases y Templates Actualizado**
 
 Diagrama actualizado incluyendo los @RestController y su relación con los @Service compartidos:
-
+JPG
+![Diagrama de Clases Actualizado](Readme-Images/Practice2/Stilnovo-Diagrama-Clases-2.jpg)
+PNG
 ![Diagrama de Clases Actualizado](Readme-Images/Practice2/Stilnovo-Diagrama-Clases-2.png)
-
 ### **Instrucciones de Ejecución con Docker**
 
 #### **Requisitos previos:**
