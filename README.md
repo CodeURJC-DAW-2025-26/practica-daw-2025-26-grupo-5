@@ -822,8 +822,11 @@ docker login
 ##### **Paso B: Construir la imagen (primera vez y cuando cambies código)**
 
 ```powershell
-# Desde la raíz del proyecto
-.\docker\create_image.ps1 -ImageName "stilnovo-app:latest"
+# Navega a la carpeta docker primero
+cd docker
+
+# Luego ejecuta:
+.\create_image.ps1 -ImageName "stilnovo-app:latest"
 ```
 
 **Resultado:** Tendrás una imagen Docker llamada `stilnovo-app:latest` lista en tu máquina local.
@@ -831,8 +834,10 @@ docker login
 ##### **Paso C: Publicar la imagen en DockerHub**
 
 ```powershell
-# Desde la raíz del proyecto
-.\docker\publish_image.ps1 -DockerHubUsername "tu-usuario-dockerhub"
+# Desde la carpeta docker (si viniste del paso B, ya estás aquí)
+cd docker  # Solo necesario si saliste de la carpeta
+
+.\publish_image.ps1 -DockerHubUsername "tu-usuario-dockerhub"
 ```
 
 **Resultado:** La imagen se sube a `https://hub.docker.com/r/tu-usuario-dockerhub/stilnovo-app`
@@ -840,8 +845,10 @@ docker login
 ##### **Paso D: Publicar el docker-compose.yml**
 
 ```powershell
-# Desde la raíz del proyecto (o desde docker/)
-.\docker\publish_docker-compose.ps1 -DockerHubUsername "tu-usuario-dockerhub"
+# Desde la carpeta docker (si viniste del paso C, ya estás aquí)
+cd docker  # Solo necesario si saliste de la carpeta
+
+.\publish_docker-compose.ps1 -DockerHubUsername "tu-usuario-dockerhub"
 ```
 
 **Resultado:** El `docker-compose.yml` está disponible en DockerHub como OCI Artifact.
@@ -871,9 +878,10 @@ docker compose -f docker/docker-compose.yml --env-file .env up
 
 | Tarea | Comando | Ubicación |
 |-------|---------|-----------|
-| **1. Crear imagen** | `.\docker\create_image.ps1 -ImageName "stilnovo-app:latest"` | Raíz |
-| **2. Publicar imagen** | `.\docker\publish_image.ps1 -DockerHubUsername "tu-usuario"` | Raíz |
-| **3. Publicar docker-compose** | `.\docker\publish_docker-compose.ps1 -DockerHubUsername "tu-usuario"` | Raíz o `docker/` |
+| **0. Navegar** | `cd docker` | Raíz del proyecto |
+| **1. Crear imagen** | `.\create_image.ps1 -ImageName "stilnovo-app:latest"` | `docker/` |
+| **2. Publicar imagen** | `.\publish_image.ps1 -DockerHubUsername "tu-usuario"` | `docker/` |
+| **3. Publicar docker-compose** | `.\publish_docker-compose.ps1 -DockerHubUsername "tu-usuario"` | `docker/` |
 | **4. Ejecutar localmente** | `docker compose --env-file ..\.env up` | `docker/` |
 | **5. Detener** | `Ctrl+C` o `docker compose down` | Terminal activa |
 
@@ -899,20 +907,22 @@ cd practica-daw-2025-26-grupo-5
 # 2. Crear .env (con tu usuario de DockerHub)
 # ... copia el contenido del .env anterior con tu usuario ...
 
-# 3. Construir imagen (compila Java automáticamente)
-.\docker\create_image.ps1 -ImageName "stilnovo-app:latest"
-
-# 4. Publicar en DockerHub (requiere haber hecho docker login)
-.\docker\publish_image.ps1 -DockerHubUsername "tu-usuario"
-
-# 5. Publicar docker-compose (publicar la configuración)
-.\docker\publish_docker-compose.ps1 -DockerHubUsername "tu-usuario"
-
-# 6. Ejecutar localmente para verificar que funciona
+# 3. Navegar a la carpeta docker
 cd docker
+
+# 4. Construir imagen (compila Java automáticamente)
+.\create_image.ps1 -ImageName "stilnovo-app:latest"
+
+# 5. Publicar en DockerHub (requiere haber hecho docker login)
+.\publish_image.ps1 -DockerHubUsername "tu-usuario"
+
+# 6. Publicar docker-compose (publicar la configuración)
+.\publish_docker-compose.ps1 -DockerHubUsername "tu-usuario"
+
+# 7. Ejecutar localmente para verificar que funciona
 docker compose --env-file ..\.env up
 
-# 7. En otra terminal, accede a:
+# 8. En otra terminal, accede a:
 # https://localhost:8443
 ```
 
