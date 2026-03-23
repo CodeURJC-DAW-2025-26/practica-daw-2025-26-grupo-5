@@ -555,60 +555,118 @@ Diagrama actualizado incluyendo los @RestController y su relación con los @Serv
 #### **Requisitos previos:**
 - Docker instalado (versión 20.10 o superior)
 - Docker Compose instalado (versión 2.0 o superior)
+- Git instalado
 
-#### **Pasos para ejecutar con docker-compose:**
+#### **Paso 1: Clonar el repositorio**
 
-1. **Clonar el repositorio** (si no lo has hecho ya):
-   ```bash
-   git clone https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5.git
-   cd practica-daw-2025-26-grupo-5
-   ```
+```bash
+git clone https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5.git
+cd practica-daw-2025-26-grupo-5
+```
 
-2. **Asegurarse que Docker está corriendo**:
-   - En Windows/Mac: Abre Docker Desktop
-   - En Linux: Verifica que el daemon de Docker está activo
-   ```bash
-   docker --version
-   docker-compose --version
-   ```
+#### **Paso 2: Crear el archivo `.env` en el directorio raíz**
 
-3. **Ejecutar docker-compose**:
-   ```bash
-   docker-compose up
-   ```
-   - Primera ejecución: Crea el esquema de la base de datos
-   ```bash
-   docker-compose -e DDL_AUTO=create up
-   ```
-   - Ejecuciones posteriores: Usa el modo `none` (seguro, sin modificaciones)
-   ```bash
-   docker-compose -e DDL_AUTO=none up
-   ```
+Docker Compose necesita variables de entorno para funcionar. Crea un archivo `.env`:
 
-4. **Acceder a la aplicación**:
-   - URL: `https://localhost:8443`
-   - Documentación API: `https://localhost:8443/swagger-ui.html`
-   - API OpenAPI YAML: `https://localhost:8443/v3/api-docs`
+```bash
+# En Windows (PowerShell)
+New-Item -Path ".env" -ItemType File
 
-5. **Detener la aplicación**:
-   ```bash
-   docker-compose down
-   ```
+# En macOS/Linux (Terminal/Bash)
+touch .env
+```
+
+**Contenido mínimo del `.env` (para desarrollo local):**
+
+```properties
+MYSQL_ROOT_PASSWORD=password
+MYSQL_DATABASE=stilnovo
+SERVER_PORT=8443
+SERVER_SSL_KEY_STORE_PASSWORD=password
+SERVER_SSL_KEY_PASSWORD=secret
+SPRING_JPA_HIBERNATE_DDL_AUTO=create
+SPRING_MAIL_USERNAME=stilnovo.noreply@gmail.com
+SPRING_MAIL_PASSWORD=jzax qigq qeuy jffi
+APP_PUBLIC_BASE_URL=https://localhost:8443
+```
+
+**⚠️ IMPORTANTE:** En ejecuciones posteriores, cambia `SPRING_JPA_HIBERNATE_DDL_AUTO=update` para no perder datos.
+
+#### **Paso 3: Ejecutar docker-compose**
+
+```bash
+# Primera ejecución (crea esquema de BD)
+docker-compose --env-file .env up
+
+# Ejecuciones posteriores (modo seguro, sin modificar BD)
+docker-compose --env-file .env -e SPRING_JPA_HIBERNATE_DDL_AUTO=none up
+```
+
+**Salida esperada:**
+```
+stilnovo-db    | MySQL Server is now ready for connections
+stilnovo-app   | Started StilnovoApplication
+```
+
+#### **Paso 4: Acceder a la aplicación**
+
+Una vez que Docker Compose está ejecutándose:
+
+**Aplicación web:**
+- URL: `https://localhost:8443`
+- Nota: El navegador mostrará una advertencia de certificado no confiable (es normal en desarrollo). Haz clic en "Continuar" o "Proceder".
+
+**Documentación interactiva de la API:**
+- Swagger UI: `https://localhost:8443/swagger-ui.html`
+- Prueba todos los endpoints directamente desde el navegador
+
+**Especificación en formato OpenAPI:**
+- YAML: `https://localhost:8443/v3/api-docs`
+- JSON: `https://localhost:8443/v3/api-docs.json`
+
+#### **Paso 5: Detener la aplicación**
+
+```bash
+# Detiene los contenedores (los datos persisten en la BD)
+docker-compose down
+
+# Ver estado de los contenedores
+docker-compose ps
+```
+
+#### **Solución de problemas comunes:**
+
+| Problema | Causa | Solución |
+|----------|-------|----------|
+| `ERROR: MYSQL_ROOT_PASSWORD is required` | `.env` no encontrado | Asegúrate de que `.env` esté en el directorio raíz |
+| `Permission denied... docker.sock` | Permisos de usuario (Linux) | `sudo usermod -aG docker $USER` y reinicia sesión |
+| `address already in use` | Puerto 8443 ocupado | Cambia `SERVER_PORT` en `.env` a otro puerto (ej: 8444) |
+| `MySQL connection refused` | BD no lista | Espera 15-30 segundos, los contenedores tardan en iniciar |
+| `ERROR: can't find docker-compose.yml` | Estás en el directorio equivocado | Asegúrate de estar en la raíz del proyecto |
 
 ### **Scripts Helper para Construcción y Publicación de la Imagen Docker**
 
-Se proporcionan scripts automatizados para simplificar el proceso de construcción y publicación de la imagen Docker. Estos scripts están disponibles tanto en PowerShell (Windows) como en Bash (Unix/Linux/macOS).
+Se proporcionan scripts automatizados en PowerShell (Windows) y Bash (Unix/Linux/macOS) para simplificar el proceso de construcción y publicación de la imagen Docker. **Estos scripts incluyen validaciones, mensajes de estado detallados y manejo de errores automático.**
 
-#### **Requisitos:**
+#### **¿Cuándo usar los scripts?**
+- **Desarrollo local**: Usa `create_image` para construir la imagen sin publicar
+- **Testing/QA**: Usa `publish_image` para compartir versiones específicas
+- **Despliegue automático**: Usa `publish_docker-compose` para desplegar en producción
+
+#### **Requisitos previos:**
 - Docker instalado en el sistema (versión 20.10 o superior)
-- Cuenta en DockerHub (para publicar la imagen)
-- Credenciales de DockerHub configuradas localmente
-- Para PowerShell: Windows 7+ o PowerShell Core instalado
-- Para Bash: macOS, Linux, o WSL en Windows
+- Cuenta en DockerHub (gratuita en https://hub.docker.com)
+- **Ejecutar `docker login`** antes de usar los scripts de publicación:
+  ```bash
+  docker login
+  # Ingresa tu usuario de DockerHub y token de acceso
+  ```
 
-#### **Scripts disponibles:**
+#### **Script 1: `create_image.ps1` / `create_image.sh` — Construir imagen localmente**
 
-**1. `create_image.ps1` / `create_image.sh`** — Construye la imagen Docker localmente
+✅ **Uso:** Construye la imagen Docker sin publicar. Ideal para probar cambios localmente.
+
+**Requisito:** Estás en el directorio raíz del proyecto.
 
 **Windows (PowerShell):**
 ```powershell
@@ -622,18 +680,40 @@ cd practica-daw-2025-26-grupo-5
 ./docker/create_image.sh stilnovo-app:latest
 ```
 
-**Qué hace:**
-- Valida que Docker esté instalado
-- Ejecuta un multi-stage build desde `/docker/Dockerfile`
-- Genera una imagen local lista para usar
+**Qué hace el script:**
+1. ✓ Valida que Docker esté instalado
+2. ✓ Compila el código Java (Maven, multi-stage build)
+3. ✓ Crea la imagen con el nombre que especificaste
+4. ✓ Muestra mensajes de estado en la consola
+5. ✓ Valida que la imagen se creó correctamente
+
+**Verificar que la imagen se creó:**
+```bash
+docker images | grep stilnovo-app
+```
+
+Debería mostrar algo como:
+```
+REPOSITORY                TAG       IMAGE ID       CREATED
+stilnovo-app              v1.0      a1b2c3d4e5f6   2 minutes ago
+```
 
 ---
 
-**2. `publish_image.ps1` / `publish_image.sh`** — Publica la imagen a DockerHub
+#### **Script 2: `publish_image.ps1` / `publish_image.sh` — Publicar imagen en DockerHub**
+
+✅ **Uso:** Publica la imagen construida hacia DockerHub para compartirla con otros o usarla en producción.
+
+**Requiere:** 
+- Haber ejecutado `create_image` primero
+- Haber ejecutado `docker login` previamente
+- Cuenta en DockerHub
 
 **Windows (PowerShell):**
 ```powershell
-.\docker\publish_image.ps1 -DockerHubUsername "tu-usuario-dockerhub" -ImageName "stilnovo-app:latest" -Version "v1.0"
+.\docker\publish_image.ps1 -DockerHubUsername "tu-usuario-dockerhub" `
+                           -ImageName "stilnovo-app" `
+                           -Version "v1.0"
 ```
 
 **macOS/Linux (Bash):**
@@ -641,15 +721,25 @@ cd practica-daw-2025-26-grupo-5
 ./docker/publish_image.sh tu-usuario-dockerhub stilnovo-app:latest v1.0
 ```
 
-**Qué hace:**
-- Valida credenciales en DockerHub
-- Etiqueta la imagen con el nombre de usuario y versión
-- Publica la imagen a DockerHub
-- Verifica que la publicación fue exitosa
+**Qué hace el script:**
+1. ✓ Valida que estés logueado en DockerHub
+2. ✓ Etiqueta la imagen con `usuario/nombre:versión`
+3. ✓ Publica la imagen a DockerHub
+4. ✓ Genera un resumen con la URL pública de la imagen
+5. ✓ Proporciona comandos para descargar la imagen después
+
+**Tu imagen estará disponible en:**
+```
+https://hub.docker.com/r/tu-usuario-dockerhub/stilnovo-app
+```
 
 ---
 
-**3. `publish_docker-compose.ps1` / `publish_docker-compose.sh`** — Construye y publica imagen + compose completo
+#### **Script 3: `publish_docker-compose.ps1` / `publish_docker-compose.sh` — Despliegue automático completo**
+
+✅ **Uso:** Construye la imagen, la publica y proporciona instrucciones para desplegar el stack completo (BD + aplicación).
+
+**Este es el script más completo y recomendado para despliegue en producción.**
 
 **Windows (PowerShell):**
 ```powershell
@@ -661,92 +751,401 @@ cd practica-daw-2025-26-grupo-5
 ./docker/publish_docker-compose.sh tu-usuario-dockerhub
 ```
 
-**Qué hace:**
-- Construye la imagen Docker automáticamente
-- Publica la imagen a DockerHub
-- Crea un archivo `docker-compose` versionado
-- Proporciona instrucciones para desplegar el stack completo
-- Incluye validaciones y mensajes de estado detallados
+**Qué hace el script (6 pasos automáticos):**
+1. ✓ Valida disponibilidad de Docker
+2. ✓ Construye la imagen Docker (compilación Java incluida)
+3. ✓ Etiqueta con versión semántica (v1.0, v1.1, etc.)
+4. ✓ Publica en DockerHub
+5. ✓ Crea un archivo `docker-compose-prod.yml` versionado
+6. ✓ Muestra instrucciones para desplegar en cualquier servidor
 
-#### **Ejemplo completo de flujo de trabajo:**
+---
+
+#### **Flujo de trabajo recomendado: Desarrollo → Publicación → Despliegue**
+
+**1. Desarrollo local (en tu máquina):**
+```powershell
+# Construir y probar localmente
+.\docker\create_image.ps1 -ImageName "stilnovo-app:latest"
+
+# Ejecutar localmente
+docker-compose --env-file .env up
+
+# Prueba la app en https://localhost:8443
+```
+
+**2. Publicar versión estable (cuando termines de probar):**
+```powershell
+# Publicar en DockerHub con versión específica
+.\docker\publish_image.ps1 -DockerHubUsername "tu-usuario-dockerhub" `
+                           -ImageName "stilnovo-app" `
+                           -Version "v1.0"
+
+# O usar el script completo (recomendado):
+.\docker\publish_docker-compose.ps1 -DockerHubUsername "tu-usuario-dockerhub"
+```
+
+**3. Desplegar en servidor (VM o nube):**
+```bash
+# En el servidor remoto, descargar y ejecutar:
+env $(cat .env | xargs) docker-compose -f oci://docker.io/tu-usuario-dockerhub/stilnovo-app:v1.0 up -d
+```
+
+---
+
+#### **Ejemplo práctico paso a paso:**
 
 ```powershell
-# Clonar repositorio
+# 1. Clonar repositorio
 git clone https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5.git
 cd practica-daw-2025-26-grupo-5
 
-# Construir imagen localmente
+# 2. Crear archivo .env (ver sección anterior)
+# ...crea el .env con tus credenciales...
+
+# 3. Construir imagen localmente
 .\docker\create_image.ps1 -ImageName "stilnovo-app:latest"
 
-# Probar localmente con docker-compose
-docker-compose up
+# 4. Probar localmente
+docker-compose --env-file .env up
 
 # Una vez probado, publicar a DockerHub
 .\docker\publish_docker-compose.ps1 -DockerHubUsername "tu-usuario-dockerhub"
 ```
 
-#### **Solución de problemas:**
+#### **Solución de problemas de los scripts:**
 
-- **Error: "docker command not found"** → Verifica que Docker esté instalado y en el PATH
-- **Error: "not authorized: incorrect username or password"** → Ejecuta `docker login` antes de publicar
-- **Error: "permission denied"** → En Bash, ejecuta `chmod +x docker/*.sh` para hacer los scripts ejecutables
-- **Los scripts no ejecutan en PowerShell** → Ejecuta `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
+| Error | Causa | Solución |
+|-------|-------|----------|
+| `Permission denied` | Script no ejecutable (Linux/Mac) | `chmod +x docker/*.sh` |
+| `cannot find command` | Script no encontrado | Asegúrate de estar en la raíz del proyecto |
+| `docker: not found` | Docker no instalado | Instala Docker desde https://docker.com |
+| `not authorized: incorrect username` | No estás logueado en DockerHub | Ejecuta `docker login` primero |
+| `image not found` | `create_image` no se ejecutó antes | Ejecuta `create_image` antes de `publish_image` |
+| `ExecutionPolicy` (PowerShell) | PowerShell bloquea scripts | `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser` |
 
-### **Despliegue en Máquina Virtual**
+### **Guía de Redepliegue Completo en Producción**
 
-#### **Requisitos:**
-- Acceso a la máquina virtual via SSH
-- Clave privada para autenticación
-- Conexión a la red correspondiente o VPN configurada
-- Docker y Docker Compose instalados en la VM
+Esta guía cubre el proceso **real** de despliegue en dos fases: construir/subir cambios desde desarrollo, y luego descargar/ejecutar en el servidor.
 
-#### **Pasos para desplegar:**
+#### **⚠️ Requisitos previos para redepliegue:**
+- Cambios guardados y commiteados en git (`git commit`)
+- Terminal de VS Code abierta en el directorio raíz del proyecto
+- Conectado a la red de la universidad (o VPN activa) para la fase 2
+- Acceso SSH a `appweb05.dawgis.etsii.urjc.es` con clave privada
 
-1. **Conectar a la máquina virtual**:
-   ```bash
-   ssh -i [ruta/a/clave.key] [usuario]@[IP-o-dominio-VM]
-   ```
-   
-   Ejemplo:
-   ```bash
-   ssh -i ssh-keys/app.key vmuser@appweb05.dawgis.etsii.urjc.es
-   ```
+---
 
-2. **Clonar el repositorio en la VM**:
-   ```bash
-   git clone https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5.git
-   cd practica-daw-2025-26-grupo-5
-   ```
+## **FASE 1: Empaquetar y Subir Cambios (Desarrollo en VS Code)**
 
-3. **Verificar que Docker está activo en la VM**:
-   ```bash
-   docker --version
-   docker-compose --version
-   ```
+Esta fase se ejecuta en tu VS Code local o en el escritorio remoto de MyApps. Construimos la imagen y la subimos a DockerHub.
 
-4. **Ejecutar docker-compose con la imagen publicada**:
-   ```bash
-   docker-compose -e DOCKER_HUB_USER=tu-usuario-dockerhub -e DDL_AUTO=create up -d
-   ```
-   - Primera ejecución: Usa `DDL_AUTO=create` para inicializar el esquema
-   - El flag `-d` ejecuta los contenedores en background
+#### **Paso 1.1: Preparar la terminal**
 
-5. **Verificar que la aplicación está corriendo**:
-   ```bash
-   docker ps
-   docker logs stilnovo-app
-   ```
+Asegúrate de estar logueado en Docker y en la carpeta de scripts:
 
-6. **Acceder a la aplicación desplegada**:
-   - URL: `https://appweb05.dawgis.etsii.urjc.es:8443`
-   - Documentación API: `https://appweb05.dawgis.etsii.urjc.es:8443/swagger-ui.html`
+```powershell
+# Verificar que estás logueado en Docker
+docker login
 
-7. **Para actualizar la aplicación** (con nuevas versiones):
-   ```bash
-   docker-compose pull
-   docker-compose -e DOCKER_HUB_USER=tu-usuario-dockerhub -e DDL_AUTO=none up -d
-   ```
-   - En actualizaciones posteriores siempre usa `DDL_AUTO=none` (evita cambios en el esquema)
+# Navegar al directorio de scripts
+cd docker
+
+# Verificar que estás en el lugar correcto
+ls   # Deberías ver: create_image.ps1, publish_image.ps1, etc.
+```
+
+#### **Paso 1.2: Reconstruir la imagen con los cambios nuevos**
+
+Este comando lee tu código actualizado y genera una imagen Docker en tu ordenador:
+
+```powershell
+.\create_image.ps1 -ImageName stilnovo-app:latest
+```
+
+**Qué hace:**
+- ✓ Compila el código Java (Maven)
+- ✓ Crea la imagen Docker con todos tus cambios
+- ✓ Valida que se creó correctamente
+
+**Salida esperada:**
+```
+Successfully tagged stilnovo-app:latest
+Image created successfully!
+```
+
+#### **Paso 1.3: Subir la imagen a DockerHub**
+
+Enviamos la imagen recién creada a internet para que el servidor pueda descargarla:
+
+```powershell
+.\publish_image.ps1 -DockerHubUsername tu-usuario-dockerhub
+```
+
+**Qué hace:**
+- ✓ Etiqueta la imagen con tu usuario de DockerHub
+- ✓ Sube la imagen a `https://hub.docker.com/r/tu-usuario-dockerhub/stilnovo-app`
+- ✓ La imagen está lista para que el servidor la descargue
+
+**Salida esperada:**
+```
+Pushing image to Docker Hub...
+Successfully pushed tu-usuario-dockerhub/stilnovo-app:latest
+```
+
+#### **Paso 1.4: (Opcional) Actualizar el Docker Compose**
+
+Solo necesario si has cambiado el archivo `docker-compose.yml`:
+
+```powershell
+.\publish_docker-compose.ps1 -DockerHubUsername tu-usuario-dockerhub
+```
+
+---
+
+## **FASE 2: Descargar y Desplegar en el Servidor (AppWeb05)**
+
+⚠️ **IMPORTANTE:** Esta fase **DEBE** hacerse desde la red de la universidad (MyApps, VPN, etc.) debido al firewall. No funcionará desde internet directo.
+
+#### **Paso 2.1: Conectarse a la máquina virtual**
+
+Abre una terminal SSH y conecta con la VM:
+
+```bash
+ssh -i ssh-keys/appWeb05.key vmuser@appWeb05.dawgis.etsii.urjc.es
+```
+
+**Verificación:** Deberías ver el prompt:
+```
+vmuser@appweb05:~$
+```
+
+#### **Paso 2.2: Limpiar la versión antigua (CRÍTICO)**
+
+Detenemos la app vieja y borramos los contenedores + volúmenes para evitar conflictos con datos antiguos:
+
+```bash
+sudo docker compose down -v
+```
+
+**Qué hace:**
+- ✓ Detiene los contenedores (app + BD)
+- ✓ Elimina los volúmenes de datos (esto borra la BD vieja)
+- ✓ Prepara el servidor para una instalación limpia
+
+**Salida esperada:**
+```
+Removing network appweb05_default
+Removing volume appweb05_mysql_data
+```
+
+#### **Paso 2.3: Descargar la imagen nueva de DockerHub (¡PASO CRÍTICO!)**
+
+⚠️ **Este paso es obligatorio.** Sin él, el servidor usará la imagen vieja que tiene en caché:
+
+```bash
+sudo docker compose pull
+```
+
+**Qué hace:**
+- ✓ Va a DockerHub y descarga la imagen nueva que subiste en Fase 1
+- ✓ Descarta la versión vieja en caché del servidor
+
+**Salida esperada:**
+```
+Pulling db ... done
+Pulling app ... done
+Pulling stilnovo-app ... done
+```
+
+**Si ves `Status: Downloaded newer image for ...` entonces funcionó correctamente.**
+
+---
+
+#### **Paso 2.4: Primera ejecución - Crear la base de datos**
+
+Levantamos la aplicación en modo **inicialización**, que recrea el esquema de BD desde cero:
+
+```bash
+sudo SPRING_APPLICATION_JSON='{"spring.jpa.hibernate.ddl-auto":"create"}' docker compose up
+```
+
+**Qué hace:**
+- ✓ Crea la BD de MySQL desde cero
+- ✓ Spring Boot genera todas las tablas automáticamente
+- ✓ Carga los datos de ejemplo
+
+**Espera a ver estos mensajes en los logs:**
+```
+stilnovo-db    | MySQL Server is now ready for connections
+stilnovo-app   | Started StilnovoApplication
+```
+
+**⚠️ IMPORTANTE:** No cierres la terminal aún. Espera a que se estabilice.
+
+---
+
+#### **Paso 2.5: Cambiar a modo normal (SEGUNDO ARRANQUE)**
+
+Para que la BD no se borre la próxima vez, detén la ejecución y reinicia en modo seguro:
+
+**1. Detén los contenedores:**
+```
+Presiona: Ctrl + C
+```
+
+Espera a que salga completamente:
+```
+vmuser@appweb05:~$
+```
+
+**2. Reinicia en modo normal** (sin crear BD, solo ejecutar):
+
+```bash
+sudo docker compose up
+```
+
+**Qué hace ahora:**
+- ✓ Arranca los contenedores (BD + app)
+- ✓ NO modifica el esquema de BD (los datos persisten)
+- ✓ Modo seguro para producción
+
+**Deberías ver:**
+```
+stilnovo-db    | ready for connections
+stilnovo-app   | Started StilnovoApplication
+```
+
+---
+
+#### **Resumen de la FASE 2 (comandos rápidos):**
+
+```bash
+# Paso 2.1: Conectar
+ssh -i ssh-keys/appWeb05.key vmuser@appWeb05.dawgis.etsii.urjc.es
+
+# Paso 2.2: Limpiar
+sudo docker compose down -v
+
+# Paso 2.3: Descargar imagen nueva
+sudo docker compose pull
+
+# Paso 2.4: Primera ejecución (crear BD)
+sudo SPRING_APPLICATION_JSON='{"spring.jpa.hibernate.ddl-auto":"create"}' docker compose up
+
+# [Espera a que se estabilice, luego: Ctrl+C]
+
+# Paso 2.5: Segunda ejecución (modo normal)
+sudo docker compose up
+```
+
+---
+
+#### **Verificar que todo funciona:**
+
+Una vez que la app esté corriendo (paso 2.5), accede desde otro navegador:
+
+```
+https://appweb05.dawgis.etsii.urjc.es:8443
+```
+
+Si ves la aplicación, ¡está funcionando! 🎉
+
+---
+
+#### **Modo Detached (Ejecutar en Background)**
+
+Si quieres que la aplicación siga corriendo aunque cierres SSH, usa el modo `-d`:
+
+```bash
+# En la segunda ejecución (paso 2.5), en lugar de:
+sudo docker compose up
+
+# Haz:
+sudo docker compose up -d
+```
+
+Luego puedes cerrar la terminal SSH sin parar la app:
+
+```bash
+# Ver que está corriendo
+docker ps
+
+# Ver logs incluso después de cerrar SSH
+docker logs -f stilnovo-app
+
+# Presiona Ctrl+C para salir de los logs (la app sigue corriendo)
+```
+
+---
+
+#### **Si necesitas actualizar después de redepliegue:**
+
+Para un nuevo redepliegue con cambios:
+
+```bash
+# En desarrollo (FASE 1): repite pasos 1.2 → 1.3
+# En servidor (FASE 2): solo repite pasos 2.3 → 2.4 → 2.5
+# (No necesitas hacer docker down -v segunda vez, solo pull)
+```
+
+---
+
+#### **Solución de problemas del redepliegue:**
+
+| Problema | Causa | Solución |
+|----------|-------|----------|
+| "Connection refused" en servidor | Contenedores no están corriendo | Verifica: `docker ps` y `docker logs stilnovo-app` |
+| "Image not found" en paso 2.3 | La imagen no se subió a DockerHub | Vuelve a FASE 1, paso 1.3 |
+| App ve datos viejos | No hiciste `docker compose down -v` | Borra todo man y vuelve a empezar: `sudo docker compose down -v` |
+| "Permission denied" en ssh | Clave privada con permisos incorrectos | `chmod 600 ssh-keys/appWeb05.key` |
+| BD corrupta o errores raros | El paso `docker compose pull` no funcionó | Fuerza actualización: `docker rmi $(docker images -q)` y repite paso 2.3 |
+| "Cannot connect to Docker daemon" | Docker no corre en la VM | SSH a la VM y: `sudo systemctl restart docker` |
+
+---
+
+### **📋 Cheat Sheet - Comandos Rápidos de Redespliegue**
+
+**Este es el flujo completo resumido. Cópialo y úsalo:**
+
+#### **FASE 1: Desde tu máquina (VS Code)**
+
+```powershell
+# Login en Docker
+docker login
+
+# Navegar a scripts
+cd docker
+
+# Construir imagen
+.\create_image.ps1 -ImageName stilnovo-app:latest
+
+# Publicar a DockerHub
+.\publish_image.ps1 -DockerHubUsername tu-usuario-dockerhub
+```
+
+#### **FASE 2: Desde el servidor (SSH a AppWeb05)**
+
+```bash
+# Conectar a servidor
+ssh -i ssh-keys/appWeb05.key vmuser@appWeb05.dawgis.etsii.urjc.es
+
+# Limpiar versión vieja
+sudo docker compose down -v
+
+# Descargar imagen nueva (CRÍTICO)
+sudo docker compose pull
+
+# Crear BD desde cero
+sudo SPRING_APPLICATION_JSON='{"spring.jpa.hibernate.ddl-auto":"create"}' docker compose up
+
+# [Ctrl+C cuando se estabilice]
+
+# Ejecutar en modo normal
+sudo docker compose up
+
+# [O en background: sudo docker compose up -d]
+```
 
 8. **Para detener la aplicación**:
    ```bash
