@@ -1990,7 +1990,7 @@ components:
           example: 12
         type:
           type: string
-          description: "Type of interaction (e.g., VIEW, LIKE, BUY)"
+          description: "Type of interaction (e.g., VIEW, PURCHASE)"
           enum:
           - VIEW
           - LIKE
@@ -2387,14 +2387,12 @@ components:
     PageValorationDTO:
       type: object
       properties:
-        totalPages:
-          type: integer
-          format: int32
         totalElements:
           type: integer
           format: int64
-        pageable:
-          $ref: "#/components/schemas/PageableObject"
+        totalPages:
+          type: integer
+          format: int32
         first:
           type: boolean
         last:
@@ -2402,6 +2400,8 @@ components:
         numberOfElements:
           type: integer
           format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
         size:
           type: integer
           format: int32
@@ -2419,8 +2419,6 @@ components:
     PageableObject:
       type: object
       properties:
-        unpaged:
-          type: boolean
         paged:
           type: boolean
         pageNumber:
@@ -2429,6 +2427,8 @@ components:
         pageSize:
           type: integer
           format: int32
+        unpaged:
+          type: boolean
         offset:
           type: integer
           format: int64
@@ -2437,9 +2437,9 @@ components:
     SortObject:
       type: object
       properties:
-        unsorted:
-          type: boolean
         sorted:
+          type: boolean
+        unsorted:
           type: boolean
         empty:
           type: boolean
