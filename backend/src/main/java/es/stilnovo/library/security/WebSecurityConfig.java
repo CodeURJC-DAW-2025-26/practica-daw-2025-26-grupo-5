@@ -112,14 +112,14 @@ public class WebSecurityConfig {
 
                 http.authorizeHttpRequests(authorize -> authorize
                                 // Public API Endpoints
-                                .requestMatchers("/api/v1/auth/**", "/api/v1/sessions/**").permitAll()
+                                .requestMatchers("/api/v1/auth/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
                                 .requestMatchers(HttpMethod.GET,
                                                 "/api/v1/catalog/**",
                                                 "/api/v1/products/**",
                                                 "/api/v1/images/**")
                                 .permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/v1/users/*/profile").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/users/*/profile**").permitAll()
 
                                 // Private API Endpoints
                                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
