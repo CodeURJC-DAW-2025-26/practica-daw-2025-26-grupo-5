@@ -729,17 +729,15 @@ Mi contribución principal se ha centrado en la transición de la lógica de neg
 
 #### **Alumno 2 - Alonso Gutiérrez Sánchez**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+Mi contribución ha sido crear los DTOs y mappers de las entidades, implementar y corregir algunos endpoints de la aplicación, aportando también a la creación de el archivo api.postman_collection.json, y la creación de la documentación mediante OpenAPI
 
-| Nº    | Commits      | Files      |
+| Nº  | Commits | Files |
 |:------------: |:------------:| :------------:|
-|1| [Descripción commit 1](URL_commit_1)  | [Archivo1](URL_archivo_1)   |
-|2| [Descripción commit 2](URL_commit_2)  | [Archivo2](URL_archivo_2)   |
-|3| [Descripción commit 3](URL_commit_3)  | [Archivo3](URL_archivo_3)   |
-|4| [Descripción commit 4](URL_commit_4)  | [Archivo4](URL_archivo_4)   |
-|5| [Descripción commit 5](URL_commit_5)  | [Archivo5](URL_archivo_5)   |
-
----
+|1| [DTOs documented](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/2b3c413) | [UserDTO.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/dto/UserDTO.java) |
+|2| [Class notification done](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/b4d20d6) | [NotificationRestController.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/NotificationRestController.java) |
+|3| [Added some endpoints to AdminRestController, Class AdminRestController DONE](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/6c8b660) | [AdminRestController.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/AdminRestController.java) |
+|4| [Class transaction completed and postman file corrected](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/206c639) | [TransactionRestController.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/controller/TransactionRestController.java) |
+|5| [DTOs and Mappers](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/1a2a1d6) | [UserMapper.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/mapper/UserMapper.java) |
 
 #### **Alumno 3 - Raúl Tejada Merinero**
 
