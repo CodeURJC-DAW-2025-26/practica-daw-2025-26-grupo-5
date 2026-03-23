@@ -695,18 +695,16 @@ Se proporcionan scripts automatizados en PowerShell (Windows) y Bash (Unix/Linux
 
 ✅ **Uso:** Construye la imagen Docker sin publicar. Ideal para probar cambios localmente.
 
-**Requisito:** Estás en el directorio raíz del proyecto.
+**(Ejecutar desde la carpeta `/docker`)**
 
 **Windows (PowerShell):**
 ```powershell
-cd practica-daw-2025-26-grupo-5
-.\docker\create_image.ps1 -ImageName "stilnovo-app:latest"
+.\create_image.ps1 -ImageName "stilnovo-app:latest"
 ```
 
 **macOS/Linux (Bash):**
 ```bash
-cd practica-daw-2025-26-grupo-5
-./docker/create_image.sh stilnovo-app:latest
+./create_image.sh stilnovo-app:latest
 ```
 
 **Qué hace el script:**
@@ -733,6 +731,8 @@ stilnovo-app              v1.0      a1b2c3d4e5f6   2 minutes ago
 
 ✅ **Uso:** Publica la imagen construida hacia DockerHub para compartirla con otros o usarla en producción.
 
+**(Ejecutar desde la carpeta `/docker`)**
+
 **Requiere:** 
 - Haber ejecutado `create_image` primero
 - Haber ejecutado `docker login` previamente
@@ -740,14 +740,14 @@ stilnovo-app              v1.0      a1b2c3d4e5f6   2 minutes ago
 
 **Windows (PowerShell):**
 ```powershell
-.\docker\publish_image.ps1 -DockerHubUsername "tu-usuario-dockerhub" `
-                           -ImageName "stilnovo-app" `
-                           -Version "v1.0"
+.\publish_image.ps1 -DockerHubUsername "tu-usuario-dockerhub" `
+                    -ImageName "stilnovo-app" `
+                    -Version "v1.0"
 ```
 
 **macOS/Linux (Bash):**
 ```bash
-./docker/publish_image.sh tu-usuario-dockerhub stilnovo-app:latest v1.0
+./publish_image.sh tu-usuario-dockerhub stilnovo-app:latest v1.0
 ```
 
 **Qué hace el script:**
@@ -768,16 +768,18 @@ https://hub.docker.com/r/tu-usuario-dockerhub/stilnovo-app
 
 ✅ **Uso:** Construye la imagen, la publica y proporciona instrucciones para desplegar el stack completo (BD + aplicación).
 
+**(Ejecutar desde la carpeta `/docker`)**
+
 **Este es el script más completo y recomendado para despliegue en producción.**
 
 **Windows (PowerShell):**
 ```powershell
-.\docker\publish_docker-compose.ps1 -DockerHubUsername "tu-usuario-dockerhub"
+.\publish_docker-compose.ps1 -DockerHubUsername "tu-usuario-dockerhub"
 ```
 
 **macOS/Linux (Bash):**
 ```bash
-./docker/publish_docker-compose.sh tu-usuario-dockerhub
+./publish_docker-compose.sh tu-usuario-dockerhub
 ```
 
 **Qué hace el script (6 pasos automáticos):**
