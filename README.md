@@ -595,48 +595,102 @@ Diagrama actualizado incluyendo los @RestController y su relación con los @Serv
    docker-compose down
    ```
 
-### **Construcción de la Imagen Docker**
+### **Scripts Helper para Construcción y Publicación de la Imagen Docker**
+
+Se proporcionan scripts automatizados para simplificar el proceso de construcción y publicación de la imagen Docker. Estos scripts están disponibles tanto en PowerShell (Windows) como en Bash (Unix/Linux/macOS).
 
 #### **Requisitos:**
 - Docker instalado en el sistema (versión 20.10 o superior)
 - Cuenta en DockerHub (para publicar la imagen)
 - Credenciales de DockerHub configuradas localmente
+- Para PowerShell: Windows 7+ o PowerShell Core instalado
+- Para Bash: macOS, Linux, o WSL en Windows
 
-#### **Pasos para construir y publicar la imagen:**
+#### **Scripts disponibles:**
 
-1. **Navegar al directorio raíz del proyecto**:
-   ```bash
-   cd practica-daw-2025-26-grupo-5
-   ```
+**1. `create_image.ps1` / `create_image.sh`** — Construye la imagen Docker localmente
 
-2. **Construir la imagen Docker** (multi-stage build):
-   ```bash
-   docker build -f docker/Dockerfile -t stilnovo-app:latest .
-   ```
-   - Alternativa con tag de DockerHub:
-   ```bash
-   docker build -f docker/Dockerfile -t tu-usuario-dockerhub/stilnovo-app:latest .
-   ```
+**Windows (PowerShell):**
+```powershell
+cd practica-daw-2025-26-grupo-5
+.\docker\create_image.ps1 -ImageName "stilnovo-app:latest"
+```
 
-3. **Verificar que la imagen se construyó correctamente**:
-   ```bash
-   docker images | grep stilnovo-app
-   ```
+**macOS/Linux (Bash):**
+```bash
+cd practica-daw-2025-26-grupo-5
+./docker/create_image.sh stilnovo-app:latest
+```
 
-4. **Publicar la imagen en DockerHub**:
-   ```bash
-   docker login
-   docker push tu-usuario-dockerhub/stilnovo-app:latest
-   ```
-   - Reemplaza `tu-usuario-dockerhub` con tu nombre de usuario en DockerHub
+**Qué hace:**
+- Valida que Docker esté instalado
+- Ejecuta un multi-stage build desde `/docker/Dockerfile`
+- Genera una imagen local lista para usar
 
-5. **Publicar el OCI Artifact** (imagen como artefacto versionado):
-   ```bash
-   docker tag stilnovo-app:latest tu-usuario-dockerhub/stilnovo-app:v1.0
-   docker push tu-usuario-dockerhub/stilnovo-app:v1.0
-   ```
-   - Esto crea una versión específica (v1.0) que se puede referenciar en el futuro
-   - Ideal para mantener un historial de versiones de despliegue
+---
+
+**2. `publish_image.ps1` / `publish_image.sh`** — Publica la imagen a DockerHub
+
+**Windows (PowerShell):**
+```powershell
+.\docker\publish_image.ps1 -DockerHubUsername "tu-usuario-dockerhub" -ImageName "stilnovo-app:latest" -Version "v1.0"
+```
+
+**macOS/Linux (Bash):**
+```bash
+./docker/publish_image.sh tu-usuario-dockerhub stilnovo-app:latest v1.0
+```
+
+**Qué hace:**
+- Valida credenciales en DockerHub
+- Etiqueta la imagen con el nombre de usuario y versión
+- Publica la imagen a DockerHub
+- Verifica que la publicación fue exitosa
+
+---
+
+**3. `publish_docker-compose.ps1` / `publish_docker-compose.sh`** — Construye y publica imagen + compose completo
+
+**Windows (PowerShell):**
+```powershell
+.\docker\publish_docker-compose.ps1 -DockerHubUsername "tu-usuario-dockerhub"
+```
+
+**macOS/Linux (Bash):**
+```bash
+./docker/publish_docker-compose.sh tu-usuario-dockerhub
+```
+
+**Qué hace:**
+- Construye la imagen Docker automáticamente
+- Publica la imagen a DockerHub
+- Crea un archivo `docker-compose` versionado
+- Proporciona instrucciones para desplegar el stack completo
+- Incluye validaciones y mensajes de estado detallados
+
+#### **Ejemplo completo de flujo de trabajo:**
+
+```powershell
+# Clonar repositorio
+git clone https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5.git
+cd practica-daw-2025-26-grupo-5
+
+# Construir imagen localmente
+.\docker\create_image.ps1 -ImageName "stilnovo-app:latest"
+
+# Probar localmente con docker-compose
+docker-compose up
+
+# Una vez probado, publicar a DockerHub
+.\docker\publish_docker-compose.ps1 -DockerHubUsername "tu-usuario-dockerhub"
+```
+
+#### **Solución de problemas:**
+
+- **Error: "docker command not found"** → Verifica que Docker esté instalado y en el PATH
+- **Error: "not authorized: incorrect username or password"** → Ejecuta `docker login` antes de publicar
+- **Error: "permission denied"** → En Bash, ejecuta `chmod +x docker/*.sh` para hacer los scripts ejecutables
+- **Los scripts no ejecutan en PowerShell** → Ejecuta `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`
 
 ### **Despliegue en Máquina Virtual**
 
