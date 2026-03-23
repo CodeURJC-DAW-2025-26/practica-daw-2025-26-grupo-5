@@ -548,7 +548,7 @@ Nota: Para probar los endpoints POST/PUT que requieren imágenes en Postman, por
 
 Diagrama actualizado incluyendo los @RestController y su relación con los @Service compartidos:
 
-![Diagrama de Clases Actualizado](Readme-Images/Practice2/Stilnovo-Diagrama-Clases-2.png)
+![Diagrama de Clases Actualizado](Readme-Images/Practice2/Stilnovo-Diagrama-Clases-2.jpg)
 
 Este diagrama detalla la arquitectura lógica de **Stilnovo**, estructurada en un modelo de capas que garantiza la separación de responsabilidades y la escalabilidad del sistema.
 > 
