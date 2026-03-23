@@ -605,7 +605,7 @@ SERVER_SSL_KEY_STORE_PASSWORD=password
 SERVER_SSL_KEY_PASSWORD=secret
 
 # JPA/Hibernante
-SPRING_JPA_HIBERNATE_DDL_AUTO=create
+SPRING_JPA_HIBERNATE_DDL_AUTO=none
 
 # Email
 SPRING_MAIL_USERNAME=stilnovo.noreply@gmail.com
@@ -615,16 +615,18 @@ SPRING_MAIL_PASSWORD=jzax qigq qeuy jffi
 APP_PUBLIC_BASE_URL=https://localhost:8443
 ```
 
-**⚠️ IMPORTANTE:** En ejecuciones posteriores, cambia `SPRING_JPA_HIBERNATE_DDL_AUTO=update` para no perder datos.
+**ℹ️ NOTA:** El valor por defecto es `none` (seguro). Para la **primera ejecución**, necesitarás pasar `-e SPRING_JPA_HIBERNATE_DDL_AUTO=create` para inicializar la base de datos (ver Paso 3).
 
 #### **Paso 3: Ejecutar docker-compose**
 
+**(Ejecutar desde la carpeta `/docker`)**
+
 ```bash
 # Primera ejecución (crea esquema de BD)
-docker-compose --env-file .env up
+docker compose --env-file ../.env -e SPRING_JPA_HIBERNATE_DDL_AUTO=create up
 
 # Ejecuciones posteriores (modo seguro, sin modificar BD)
-docker-compose --env-file .env -e SPRING_JPA_HIBERNATE_DDL_AUTO=none up
+docker compose --env-file ../.env up
 ```
 
 **Salida esperada:**
@@ -651,12 +653,14 @@ Una vez que Docker Compose está ejecutándose:
 
 #### **Paso 5: Detener la aplicación**
 
+**(Ejecutar desde la carpeta `/docker`)**
+
 ```bash
 # Detiene los contenedores (los datos persisten en la BD)
-docker-compose down
+docker compose down
 
 # Ver estado de los contenedores
-docker-compose ps
+docker compose ps
 ```
 
 #### **Solución de problemas comunes:**
