@@ -76,10 +76,7 @@ services:
   # This ensures database connectivity is available at startup
   # Configure via environment variables for dev/prod flexibility
   app:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
-    image: codvictor/stilnovo-app:latest
+    image: ${DOCKER_HUB_USERNAME}/stilnovo-app:latest
     container_name: stilnovo-app
     # Q28: Application waits for database to be healthy before starting
     # service_healthy ensures the MySQL health check has passed
@@ -104,7 +101,7 @@ services:
       #   - validate: Validates schema matches entities, fails if mismatch (safe read-only)
       #   - none: Does NOT touch schema at all (production: zero schema risk) ← Recommended for Q30
       # Default in docker-compose: none (safest for production)
-      SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO:-update}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO:-none}
       
 
 
