@@ -7,7 +7,7 @@ import es.stilnovo.library.model.UserInteraction;
 /**
  * UserInteractionMapper: Converts between UserInteraction entity and UserInteractionDTO (MapStruct).
  * 
- * Tracks user actions: views, favorites, purchases, etc.
+ * Tracks user actions: views, purchases, etc.
  * - Extracts user ID for flat API response
  * - Hides product relationship object (populated by service layer)
  */

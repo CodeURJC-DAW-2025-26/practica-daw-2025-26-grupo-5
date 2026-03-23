@@ -581,40 +581,4 @@ public class UserService {
         // 3. Save the user updated on the db
         userRepository.save(user);
     }
-    /**
-     * Adds a product to the user's favorites by creating a FAVORITE interaction.
-     */
-    @Transactional
-    public Product addProductToFavorites(String username, Long productId) {
-        User user = userRepository.findByName(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
-
-        boolean alreadyFavorited = interactionRepository.existsByUserAndProductAndType(
-                user, product, UserInteraction.InteractionType.LIKE);
-
-        if (!alreadyFavorited) {
-            UserInteraction favorite = new UserInteraction(user, product, UserInteraction.InteractionType.LIKE);
-            interactionRepository.save(favorite);
-        }
-        
-        return product;
-    }
-
-    /**
-     * Removes a product from the user's favorites by deleting the LIKE interaction.
-     */
-    @Transactional
-    public void removeProductFromFavorites(String username, Long productId) {
-        User user = userRepository.findByName(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
-
-        // Nota: Qui usiamo deleteByUserAndProductAndType che aggiungeremo tra poco al Repository
-        interactionRepository.deleteByUserAndProductAndType(user, product, UserInteraction.InteractionType.LIKE);
-    }
 }

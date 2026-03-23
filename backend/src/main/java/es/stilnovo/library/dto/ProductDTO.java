@@ -42,10 +42,7 @@ public record ProductDTO(
         @Schema(description = "Information about the product seller")
         UserDTO seller,
         
-        @Schema(description = "List of user interactions (views, favorites, etc.) on this product")
-        List<UserInteractionDTO> userInteractions,
-        
-        @Schema(description = "Boolean indicating if the current user has favorited this product", example = "false")
-        boolean favorite
+        @Schema(description = "List of user interactions (views, purchases, etc.) on this product")
+        List<UserInteractionDTO> userInteractions
 ) {
 }

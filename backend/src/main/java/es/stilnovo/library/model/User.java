@@ -23,13 +23,13 @@ import jakarta.persistence.OneToMany;
  * - User authentication (username, encrypted password, roles)
  * - User profile (email, description, profile image, rating)
  * - Seller data (products listed, ratings received from buyers)
- * - Buyer data (favorite products, transaction history)
+ * - Buyer data (transaction history)
  * - Financial data (credit card, balance, revenue from sales)
  * - Account status (banned flag for policy violations)
  * 
  * Relationships:
  * - OneToMany: Products (seller's items for sale)
- * - ManyToMany: Favorite products (bookmarked/liked items)
+
  * - OneToMany: Valorations (reviews received from buyers)
  * 
  * Used by: Controllers, Services, Repositories
@@ -94,10 +94,6 @@ public class User {
     /** Products this user is selling */
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> products = new ArrayList<>();
-
-    /** Products this user has marked as favorites */
-    @ManyToMany
-    private List<Product> favoriteProducts = new ArrayList<>();
 
     /** Ratings/reviews received from buyers (as a seller) */
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -297,7 +293,7 @@ public class User {
         this.totalRevenue = totalRevenue;
     }
 
-    /* ----------------- PRODUCTS / FAVORITES / VALORATIONS ----------------- */
+    /* ----------------------------- PRODUCTS / VALORATIONS ----------------------------- */
 
     public List<Product> getProducts() {
         return products;
@@ -314,20 +310,6 @@ public class User {
     public void addProduct(Product product) {
         if (!this.products.contains(product)) {
             this.products.add(product);
-        }
-    }
-
-    public List<Product> getFavoriteProducts() {
-        return favoriteProducts;
-    }
-
-    public void setFavoriteProducts(List<Product> favoriteProducts) {
-        this.favoriteProducts = favoriteProducts;
-    }
-
-    public void addFavorite(Product product) {
-        if (!this.favoriteProducts.contains(product)) {
-            this.favoriteProducts.add(product);
         }
     }
 

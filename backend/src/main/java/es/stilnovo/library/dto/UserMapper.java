@@ -53,7 +53,6 @@ public interface UserMapper {
     @Mapping(target = "balance", ignore = true)
     @Mapping(target = "totalRevenue", ignore = true)
     @Mapping(target = "products", ignore = true)
-    @Mapping(target = "favoriteProducts", ignore = true)
     @Mapping(target = "valorations", ignore = true)
     User toEntity(UserDTO userDTO);
 }

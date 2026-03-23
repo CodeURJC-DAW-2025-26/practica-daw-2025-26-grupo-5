@@ -21,7 +21,6 @@ import es.stilnovo.library.util.NumberFormattingUtils;
  * - OneToOne: Image (single product image)
  * - OneToMany: UserInteraction (views, likes, purchases)
  * 
- * Transient field 'favorite' is used by UI for real-time display
  * Used by: Controllers, Services, Repositories
  */
 @Entity(name = "ProductTable")
@@ -64,22 +63,6 @@ public class Product {
     /** User interactions with this product (for analytics/recommendations) */
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserInteraction> interactions;
-
-    /**
-     * Temporary flag: whether current user marked this as favorite (not saved to
-     * DB)
-     */
-    @Transient
-    private boolean favorite; // Temporary flag for the view
-
-    /** Get/Set favorite status for UI display */
-    public boolean isFavorite() {
-        return favorite;
-    }
-
-    public void setFavorite(boolean favorite) {
-        this.favorite = favorite;
-    }
 
     // CONSTRUCTORS
     public Product() {

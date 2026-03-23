@@ -1227,8 +1227,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/UserInteractionDTO"
-        favorite:
-          type: boolean
     UserInteractionDTO:
       type: object
       properties:

@@ -34,7 +34,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  * - User profile page display
  * - Profile photo upload/retrieval
  * - User settings and preference management
- * - Favorite products management
+ * - User product management
  * - Order/transaction history
  * - User valorations (ratings received)
  * - Password changes and account updates

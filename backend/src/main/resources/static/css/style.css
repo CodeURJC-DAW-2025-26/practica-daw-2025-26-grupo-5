@@ -166,24 +166,24 @@ html {
 }
 
 /* --- SUB-NAV and Styles--- */
-/* Altura completa de la pantalla menos el Header principal */
+/* Full screen height minus main header */
 .hero-wrapper {
     min-height: calc(100vh - 85px);
-    /* Ajusta 85px según la altura de tu navbar */
+    /* Adjust 85px according to your navbar height */
     display: flex;
     flex-direction: column;
 }
 
-/* El Hero ahora es el "músculo" que se estira y centra todo */
+/* The Hero is now the 'muscle' that stretches and centers everything */
 .hero {
     flex: 1;
-    /* Ocupa todo el espacio disponible */
+    /* Occupies all available space */
     display: flex;
     align-items: center;
     /* Centra el Row verticalmente */
 }
 
-/* Ajuste fino del texto para que no parezca que flota sin sentido */
+/* Fine-tune text so it doesn't seem to float meaninglessly */
 .hero-text-block h1 {
     margin-bottom: 20px;
     letter-spacing: -1px;
@@ -312,27 +312,6 @@ html {
     object-fit: cover;
 }
 
-.favorite-btn {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    width: 38px;
-    height: 38px;
-    background: rgba(255, 255, 255, 0.9);
-    border: none;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #cbd5e0;
-    transition: 0.2s;
-}
-
-.favorite-btn:hover {
-    color: #f56565;
-    transform: scale(1.1);
-}
-
 .product-details {
     padding: 20px;
     text-align: left;
@@ -350,7 +329,7 @@ html {
     font-size: 19px;
 }
 
-/* Botón Cargar más (Estilo profesional) */
+/* Load more button (Professional style) */
 .btn-load-more {
     background: transparent;
     border: 2px solid var(--brand-blue);
@@ -609,7 +588,7 @@ html {
 
 .flip-card-container {
     width: 400px;
-    /* Tamaño más grande para Settings */
+    /* Larger size for Settings */
     height: 250px;
     perspective: 1500px;
 }
@@ -655,7 +634,7 @@ html {
     overflow: hidden;
 }
 
-/* Patrón sutil de fondo para textura */
+/* Subtle background pattern for texture */
 .lizard-bg-pattern {
     position: absolute;
     top: 0;
@@ -788,19 +767,19 @@ html {
     min-height: 100vh;
 }
 
-/* Baja la tarjeta para que se centre mejor con el formulario largo */
+/* Lowers the card to center better with the long form */
 .card-column-adjust {
     padding-top: 100px;
-    /* Ajusta este valor si quieres que baje más */
+    /* Adjust this value if you want it to go lower */
 }
 
-/* Tarjeta sin altura fija para que el scroll funcione */
+/* Card without fixed height so scroll works */
 .settings-card {
     height: auto !important;
     min-height: min-content;
 }
 
-/* Danger Zone Minimalista */
+/* Minimalist Danger Zone */
 .btn-delete-minimal {
     background: transparent;
     color: #a0aec0;
@@ -820,7 +799,7 @@ html {
     border-color: #feb2b2;
 }
 
-/* El espaciador visual */
+/* The visual spacer */
 .py-5.my-4 {
     border: none;
     background: transparent;
@@ -850,7 +829,7 @@ html {
 }
 
 /*STATISTICS PAGE*/
-/* --- FIX PARA EL HUECO BLANCO --- */
+/* --- FIX FOR WHITE GAP --- */
 .sidebar-stilnovo {
     width: 280px !important;
     min-width: 280px !important;
@@ -946,7 +925,7 @@ html {
 /*MESSAGE PAGES*/
 /* --- CHAT ELEGANCE REFINEMENTS --- */
 
-/* Sidebar Fija - Evita el encogimiento */
+/* Fixed sidebar - Prevents shrinking */
 .sidebar-stilnovo {
     width: 280px !important;
     min-width: 280px !important;
@@ -1045,7 +1024,7 @@ html {
 /*USER PRODUCTS*/
 /* --- MY PRODUCTS SPECIFIC STYLES --- */
 
-/* Sidebar Fija (Sincronizada con el resto) */
+/* Fixed sidebar (Synchronized with the rest) */
 .sidebar-stilnovo {
     width: 280px !important;
     min-width: 280px !important;
@@ -1053,7 +1032,7 @@ html {
     border-right: 1px solid #f1f4f8 !important;
 }
 
-/* Efecto hover en las tarjetas de producto */
+/* Hover effect on product cards */
 .clay-card {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -1063,14 +1042,14 @@ html {
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Imagen de previsualización */
+/* Preview image */
 .product-img-preview img {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
 }
 
-/* Botones de acción minimalistas */
+/* Minimalist action buttons */
 .btn-about:hover i {
     color: var(--brand-blue);
 }
@@ -1079,14 +1058,14 @@ html {
     background-color: #fff5f5 !important;
 }
 
-/* Ajustes de scroll para móviles en filtros */
+/* Scroll adjustments for mobile in filters */
 .overflow-auto::-webkit-scrollbar {
     display: none;
 }
 
 /* --- SALES & ORDERS STYLES --- */
 
-/* Indicadores de estado en los bordes de las tarjetas */
+/* Status indicators on card borders */
 .border-start-status-success {
     border-left: 5px solid #10b981 !important;
 }
@@ -1095,14 +1074,14 @@ html {
     border-left: 5px solid #f59e0b !important;
 }
 
-/* LA CAJA VERDE DEL MAPA (Placeholder) */
+/* The green map box (Placeholder) */
 .green-map-box {
     width: 100%;
     height: 300px;
     background-color: #f0fdf4;
-    /* Verde muy claro */
+    /* Very light green */
     border: 2px dashed #4caf50;
-    /* Borde verde punteado */
+    /* Dotted green border */
     transition: all 0.3s ease;
 }
 
@@ -1111,7 +1090,7 @@ html {
     border-style: solid;
 }
 
-/* Timeline del envío */
+/* Shipping timeline */
 .timeline-simple {
     display: flex;
     flex-direction: column;
@@ -1137,7 +1116,7 @@ html {
 }
 
 /*ADD PRODUCT*/
-/* --- FIX DEL INPUT DE IMAGEN --- */
+/* --- IMAGE INPUT FIX --- */
 .image-upload-zone {
     border: 2px dashed #e2e8f0;
     background: #fbfcfd;
@@ -1145,30 +1124,30 @@ html {
     transition: all 0.3s;
     position: relative;
     overflow: hidden;
-    /* Evita que el input se salga */
+    /* Prevents the input from escaping */
 }
 
-/* Aseguramos que el main siempre tenga espacio para no cortarse */
+/* We ensure main always has space not to be cut */
 main.overflow-auto {
     height: 100vh;
     padding-bottom: 120px !important;
-    /* Espacio extra al final */
+    /* Extra space at the end */
 }
 
-/* Para que los inputs no hereden estilos raros */
+/* So inputs don't inherit weird styles */
 .search-box input {
     background: transparent;
     outline: none !important;
 }
 
-/* Los selects de bootstrap a veces dan problemas de sombra, los limpiamos */
+/* Bootstrap selects sometimes have shadow issues, we clean them */
 .form-select:focus {
     box-shadow: none !important;
     border-color: #e2e8f0;
 }
 
 /*EDIT PAGE*/
-/* --- FIX DE SCROLL Y SIDEBAR --- */
+/* --- SCROLL AND SIDEBAR FIX --- */
 
 .sidebar-stilnovo {
     width: 280px !important;
@@ -1237,7 +1216,7 @@ main.overflow-auto {
     opacity: 1 !important;
 }
 
-/* Botón de Favorito Circular */
+/* Icon Button Circular */
 .btn-icon-circle {
     width: 45px;
     height: 45px;
@@ -1251,11 +1230,11 @@ main.overflow-auto {
 
 .btn-icon-circle:hover {
     background-color: #fee2e2 !important;
-    /* Rojo claro al pasar el ratón */
+    /* Light red on hover */
     transform: scale(1.1);
 }
 
-/* Badges de atributos más limpios */
+/* Clean attribute badges */
 .badge-attribute {
     font-size: 0.8rem;
     font-weight: 700;
@@ -1266,13 +1245,13 @@ main.overflow-auto {
     border: 1px solid #e2e8f0;
 }
 
-/* Botón outline que se rellena al hover */
+/* Outline button that fills on hover */
 .hover-fill:hover {
     background-color: var(--brand-blue);
     color: white !important;
 }
 
-/* Tarjeta del vendedor */
+/* Seller card */
 .seller-card {
     transition: all 0.3s;
 }
@@ -1283,7 +1262,7 @@ main.overflow-auto {
     border-color: var(--brand-blue) !important;
 }
 
-/* Efecto de elevación para items sugeridos */
+/* Elevation effect for suggested items */
 .transition-up {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -1293,7 +1272,7 @@ main.overflow-auto {
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* Ajuste para móvil: imagen más pequeña */
+/* Mobile adjustment: smaller image */
 @media (max-width: 991px) {
     .product-image-frame {
         height: 350px;
@@ -1301,34 +1280,10 @@ main.overflow-auto {
 
     .sticky-lg-top {
         position: static !important;
-        /* Ya no es sticky en móvil */
+        /* No longer sticky on mobile */
     }
 }
 
-/*FAV PAGE*/
-.favorite-btn.active-fav .material-symbols-outlined {
-    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-    color: #f43f5e;
-    /* Color rojo/rosa de favorito */
-}
-
-/* Por si acaso, reseteamos el botón para que no salgan "pestañas" negras */
-.favorite-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: white;
-    border: none;
-    border-radius: 50%;
-    width: 35px;
-    height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    z-index: 2;
-}
 
 /*PAYMENT PAGE*/
 .main-wrapper {
@@ -1341,13 +1296,13 @@ main.overflow-auto {
     min-height: 70px;
 }
 
-/* Tarjeta de crédito visual (Ancho corregido) */
+/* Visual credit card (Width corrected) */
 .visual-card {
     background: linear-gradient(135deg, #2f6ced 0%, #1a2a6c 100%);
     width: 320px;
-    /* AUMENTADO DE 280px A 320px */
+    /* Increased from 280px to 320px */
     height: 190px;
-    /* Un poco más alta también para proporción */
+    /* A bit taller for proportion */
     border-radius: 20px;
     padding: 25px;
     color: white;
@@ -1439,7 +1394,7 @@ main.overflow-auto {
     border-bottom-width: 0px;
 }
 
-/* Badge de estado específico para admin */
+/* Admin-specific status badge */
 .badge-admin {
     font-size: 0.75rem;
     padding: 6px 12px;
@@ -1455,7 +1410,7 @@ main.overflow-auto {
 
 /*ADMIN USER MANAGMENT*/
 
-/* Badges de Estado "Clay" */
+/* Status Badges 'Clay' */
 .badge-status {
     padding: 8px 12px;
     border-radius: 30px;
@@ -1485,7 +1440,7 @@ main.overflow-auto {
     border: 1px solid #fecaca;
 }
 
-/* Botones de Acción Admin */
+/* Admin Action Buttons */
 .btn-action-admin {
     border: none;
     border-radius: 10px;
@@ -1574,9 +1529,9 @@ main.overflow-auto {
 
 
 /*ADMIN GLOBAL INVENTORY*/
-/* --- ESTILOS DE INVENTARIO (Claymorphism) --- */
+/* --- INVENTORY STYLES (Claymorphism) --- */
 
-/* Badges de Categoría */
+/* Category badges */
 .badge-cat {
     padding: 5px 10px;
     border-radius: 8px;
@@ -1637,7 +1592,7 @@ main.overflow-auto {
     color: #1d4ed8;
 }
 
-/* Botones de Acción */
+/* Action Buttons */
 .btn-icon-clay {
     width: 32px;
     height: 32px;
@@ -1735,7 +1690,7 @@ main.overflow-auto {
     text-decoration: line-through;
 }
 
-/* Botones de Acción Financiera */
+/* Financial action buttons */
 .btn-pdf {
     background-color: #f8fafc;
     color: #64748b;
@@ -2202,7 +2157,7 @@ main.overflow-auto {
 
 .stn-loader {
     width: 2.5em;
-    /* Ajustado para que quede bien junto al botón */
+    /* Adjusted so it fits well next to the button */
     transform-origin: center;
     animation: rotate4 2s linear infinite;
     vertical-align: middle;
@@ -2211,9 +2166,9 @@ main.overflow-auto {
 .stn-loader circle {
     fill: none;
     stroke: #3b82f6;
-    /* Color azul Stilnovo */
+    /* Stilnovo blue color */
     stroke-width: 4;
-    /* Un poco más grueso para que se vea mejor */
+    /* A bit thicker so it looks better */
     stroke-dasharray: 1, 200;
     stroke-dashoffset: 0;
     stroke-linecap: round;

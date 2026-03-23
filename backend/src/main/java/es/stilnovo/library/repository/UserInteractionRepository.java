@@ -11,7 +11,7 @@ import es.stilnovo.library.model.UserInteraction;
 
 /**
  * UserInteractionRepository interface for UserInteraction entity database operations
- * Tracks user actions including views, likes (favorites), and purchases
+ * Tracks user actions including views and purchases
  */
 @Repository
 public interface UserInteractionRepository extends JpaRepository<UserInteraction, Long> {
@@ -44,7 +44,7 @@ public interface UserInteractionRepository extends JpaRepository<UserInteraction
     void deleteByProduct(Product product);
 
     /**
-     * Deletes a specific interaction (like a Favorite/LIKE) for a user and product.
+     * Deletes a specific interaction for a user and product.
      */
     void deleteByUserAndProductAndType(User user, Product product, UserInteraction.InteractionType type);
 }
