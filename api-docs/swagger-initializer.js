@@ -15,9 +15,6 @@ window.onload = function() {
     ],
     layout: "StandaloneLayout" ,
 
-  "configUrl" : "/v3/api-docs/swagger-config",
-  "validatorUrl" : ""
-
   });
 
   //</editor-fold>
