@@ -104,7 +104,9 @@ services:
       #   - validate: Validates schema matches entities, fails if mismatch (safe read-only)
       #   - none: Does NOT touch schema at all (production: zero schema risk) ← Recommended for Q30
       # Default in docker-compose: none (safest for production)
-      SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO:-none}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO:-update}
+      
+
 
 # Persistent named volume for MySQL data
 volumes:
