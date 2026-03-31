@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && rm -rf ../backend/src/main/resources/static/new && mkdir -p ../backend/src/main/resources/static/new && cp -r dist/* ../backend/src/main/resources/static/new/",
+    "build": "tsc -b && vite build && rm -rf ../backend/src/main/resources/static/new && mkdir -p ../backend/src/main/resources/static/new && cp -r build/client/* ../backend/src/main/resources/static/new/",
     "preview": "vite preview"
   },
   "dependencies": {

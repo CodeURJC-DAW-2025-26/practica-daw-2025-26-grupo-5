@@ -34,9 +34,8 @@ FROM maven:3.9-eclipse-temurin-21 AS builder
 WORKDIR /project
 COPY backend/pom.xml /project/
 COPY backend/src /project/src
-# Copy the compiled frontend (dist folder) to SpringBoot's static resources (new folder)
-COPY --from=frontend-builder /frontend-app/dist /project/src/main/resources/static/new/
-# Compile and package the application inside the container
+# Copy the compiled frontend (/build/client) to SpringBoot's static resources (new folder)
+COPY --from=frontend-builder /frontend-app/build/client /project/src/main/resources/static/new/
 RUN mvn clean package -DskipTests 
 
 # STEP 3: Runtime image (JRE only)

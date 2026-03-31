@@ -40,3 +40,12 @@ hs_err_pid*
 
 #ENV file
 *.env
+
+# --- Frontend (React) ---
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.eslintcache
+
+# --- Backend SPA Integration ---
+backend/src/main/resources/static/new/

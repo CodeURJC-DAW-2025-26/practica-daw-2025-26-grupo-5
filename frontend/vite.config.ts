@@ -5,6 +5,10 @@ import react from '@vitejs/plugin-react'
 export default defineConfig(({ mode }) => ({
   base: mode === "production" ? "/new/" : "/",
   plugins: [react()],
+  build: {
+    outDir: 'build/client',
+    emptyOutDir: true,
+  },
   server: {
     proxy: {
       "/api": {
