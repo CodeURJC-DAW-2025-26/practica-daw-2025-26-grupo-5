@@ -1,58 +1,73 @@
 import { Routes, Route } from 'react-router-dom';
-// Bootstrap CSS import (can also be moved to main.tsx)
+// Standard Bootstrap CSS import
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-// Layout and Page components
+// Layout and Global components
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
+import { GlobalSpinner } from './components/GlobalSpinner'; 
+
+// Page components
 import { Home } from './pages/Home';
+import { Login } from './pages/Login';
 
 /**
- * Temporary placeholders to help teammates understand 
- * how to create new pages and link them to the Router.
+ * Temporary placeholder for the Products page.
+ * To be replaced by a dedicated component once API integration starts.
  */
-const LoginPlaceholder = () => (
-  <div className="container mt-5">
-    <h1>Login Page</h1>
-    <p>Coming soon: React-Bootstrap forms and Zustand authentication.</p>
-  </div>
-);
-
 const ProductsPlaceholder = () => (
   <div className="container mt-5">
     <h1>Product Catalog</h1>
-    <p>Coming soon: API REST integration with clientLoaders and pagination.</p>
+    <p className="text-muted">
+      Status: Under development.
+      Next steps: Implement REST API calls using Axios and handle pagination.
+    </p>
   </div>
 );
 
 /**
- * Main Application Component.
- * It manages the global layout (Navbar/Footer) and defines the routing table.
+ * Main Application Shell.
+ * This component defines the global structure of the SPA, 
+ * including navigation, routing, and the shared Global Spinner.
  */
 function App() {
   return (
-    // Flexbox wrapper to ensure a sticky footer (min-vh-100)
+    // Flexbox wrapper for sticky footer and full-page layout (min-vh-100)
     <div className="d-flex flex-column min-vh-100">
-      {/* Navigation bar is visible on all routes */}
+
+      {/* 
+        Global Spinner: Automatically triggered by Axios interceptors 
+        defined in src/services/api.ts whenever an API call is made.
+      */}
+      <GlobalSpinner />
+
+      {/* Persistent Navigation Bar */}
       <Navbar />
 
-      {/* Dynamic content area that changes based on the URL */}
+      {/* Dynamic Content Area: Components switch based on the URL path */}
       <main className="flex-grow-1">
         <Routes>
+          {/* Public Landing Page */}
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<LoginPlaceholder />} />
+
+          {/* Authentication Page (React-Bootstrap + Zustand) */}
+          <Route path="/login" element={<Login />} />
+
+          {/* Catalog View (Currently under development) */}
           <Route path="/products" element={<ProductsPlaceholder />} />
-          
-          {/* Default 404 route for unknown paths */}
+
+          {/* Catch-all 404 Route for non-existent paths */}
           <Route path="*" element={
             <div className="container mt-5">
-              <h1>404 - Page Not Found</h1>
+              <h1 className="display-4 text-danger">404 - Not Found</h1>
+              <hr />
+              <p className="lead">The requested page does not exist in the Stilnovo SPA.</p>
             </div>
           } />
         </Routes>
       </main>
 
-      {/* Footer is visible on all routes */}
+      {/* Persistent Page Footer */}
       <Footer />
     </div>
   );

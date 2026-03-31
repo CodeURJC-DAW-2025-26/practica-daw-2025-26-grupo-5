@@ -1,13 +1,23 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>frontend</title>
+</head>
+
+<body>
+  <div id="root">
+    <!-- This is the 'HydrateFallback' for pure Vite apps -->
+    <div style="text-align: center; margin-top: 20%; font-family: sans-serif;">
+      <h2>Loading Stilnovo SPA...</h2>
+      <p>Please wait a moment</p>
+    </div>
+  </div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+
 </html>
