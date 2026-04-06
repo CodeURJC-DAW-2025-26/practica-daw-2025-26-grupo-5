@@ -157,7 +157,7 @@ public class WebSecurityConfig {
                                                 .requestMatchers("/login-page", "/login-error", "/signup-page")
                                                 .permitAll()
                                                 .requestMatchers("/product-images/**", "/info-product-page/**",
-                                                                "/about-page/**")
+                                                                "/about-page/**", "/new/**")
                                                 .permitAll()
                                                 .requestMatchers("/user/me/profile-photo", "/load-more-products")
                                                 .permitAll()

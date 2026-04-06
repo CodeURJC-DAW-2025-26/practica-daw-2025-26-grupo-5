@@ -1,21 +1,18 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { reactRouter } from "@react-router/dev/vite";
+import { defineConfig } from "vite";
+import tsconfigPaths from "vite-tsconfig-paths";
 
-// https://vite.dev/config/
-export default defineConfig(({ mode }) => ({
-  base: mode === "production" ? "/new/" : "/",
-  plugins: [react()],
-  build: {
-    outDir: 'build/client',
-    emptyOutDir: true,
-  },
+export default defineConfig({
+  base: process.env.NODE_ENV === 'production' ? '/new/' : '/',
+  plugins: [reactRouter(), tsconfigPaths()],
   server: {
     proxy: {
       "/api": {
-        target: "https://localhost:8443",
+        target: "https://localhost:8443/api",
         changeOrigin: true,
-        secure: false,
-      }
-    }
-  }
-}))
+        rewrite: (path) => path.replace(/^\/api/, ""),
+        secure: false
+      },
+    },
+  },
+});
