@@ -12,7 +12,7 @@
     "module": "ES2022",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "ignoreDeprecations": "5.0",
+    "ignoreDeprecations": "6.0",
     "rootDirs": [".", "./.react-router/types"],
     "baseUrl": ".",
     "paths": {
