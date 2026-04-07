@@ -5,8 +5,7 @@ import { createRoot } from 'react-dom/client';
 /**
  * React Application Entry Point
  * 
- * Uses React Router v7 with HydratedRouter
- * IMPORTANT: basename="/new" is configured in react-router.config.ts
+ * Uses React Router v7 with HydratedRouter to enable client-side routing and hydration
  * because Spring Boot serves the SPA from the /new/ context path
  */
 const root = createRoot(document.getElementById('root')!);

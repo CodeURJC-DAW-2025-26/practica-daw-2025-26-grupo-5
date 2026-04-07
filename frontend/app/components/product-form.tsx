@@ -11,7 +11,10 @@ interface ProductFormProps {
   onCancel: () => void;
 }
 
+
+
 /**
+ * GENERIC FORM COMPONENT TO CREATE OR EDIT PRODUCTS IN THE WHOLE WEBSITE
  * Product Form Component
  * Reusable form for creating and editing products
  * Used by both product-new and product-edit routes
