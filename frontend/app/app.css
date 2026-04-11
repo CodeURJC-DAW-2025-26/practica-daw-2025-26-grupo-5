@@ -2224,3 +2224,14 @@ main.overflow-auto {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+/* --- HEADER FIXES --- */
+
+/* Quitar la flecha negra por defecto de Bootstrap en el dropdown de usuario */
+.custom-nav-dropdown .dropdown-toggle::after {
+    display: none !important;
+}
+
+/* Asegurar que el logo 'Stilnovo' tenga el mismo tamaño siempre */
+.brand {
+    font-size: 1.5rem; /* Ajusta este valor al tamaño que prefieras para ambos */
+}

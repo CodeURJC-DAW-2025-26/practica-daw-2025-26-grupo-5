@@ -52,6 +52,7 @@ export default function Signup({}: Route.ComponentProps) {
     formData.append('name', data.name);
     formData.append('email', data.email);
     formData.append('password', data.password);
+    formData.append('confirmPassword', data.confirmPassword);
     if (data.profilePicture?.[0]) {
       formData.append('profilePicture', data.profilePicture[0]);
     }

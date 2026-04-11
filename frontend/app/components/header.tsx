@@ -5,10 +5,6 @@ import { Link, useLocation } from "react-router";
 import "~/app.css";
 import logo from "../assets/logo.png";
 
-/**
- * Main Header Component
- * Handles navigation, search bar visibility, and conditional auth actions
- */
 export default function Header() {
   const [isErrorLoginDialogOpen, setErrorLoginDialogOpen] = useState(false);
   const [profileImageError, setProfileImageError] = useState(false);
@@ -16,9 +12,7 @@ export default function Header() {
   const location = useLocation();
   const { user, loginError, isAuthLoading, loadLoggedUser, logoutUser } = useUserStore();
 
-  // Determine the current page type
   const isHome = location.pathname === "/";
-  // Check if we are in the product detail page
   const isProductDetail = location.pathname.startsWith("/product/");
 
   useEffect(() => {
@@ -35,12 +29,11 @@ export default function Header() {
         <div className="logo-wrapper">
           <Link to="/" className="text-decoration-none d-flex align-items-center gap-2">
             <img src={logo} alt="Stilnovo" className="logo-img" width="35" />
-            {/* REMOVED: Conditional fontSize to keep it consistent everywhere */}
             <span className="brand">Stilnovo</span>
           </Link>
         </div>
 
-        {/* CENTER: Search Box (Visible only on Home) */}
+        {/* CENTER: Search Box */}
         {isHome && (
           <form action="/#featured-treasures" method="get" className="search-box d-none d-md-flex mx-auto">
             <i className="fa-solid fa-magnifying-glass"></i>
@@ -52,14 +45,12 @@ export default function Header() {
         {/* RIGHT: Actions Container */}
         <div className={`${isHome ? "" : "ms-auto"} d-flex align-items-center gap-3`}>
 
-          {/* Conditional Back Button for non-home pages */}
           {!isHome && (
             <Link to="/" className="btn-about py-2 px-3 small text-decoration-none fw-700">
               <i className="fa-solid fa-arrow-left me-2"></i>Back to Gallery
             </Link>
           )}
 
-          {/* AUTH ACTIONS: Hidden on Product Detail Page */}
           {!isProductDetail && (
             <nav className="nav-actions">
               {isAuthLoading ? (
@@ -92,6 +83,7 @@ export default function Header() {
                   }
                   id="user-nav-dropdown"
                   align="end"
+                  className="custom-nav-dropdown" // Clase añadida para el fix de la flecha
                 >
                   <NavDropdown.Item as={Link} to="/user-page" className="fw-700 small">View Profile</NavDropdown.Item>
                   <NavDropdown.Item as={Link} to="/user-products-page" className="fw-700 small">My Inventory</NavDropdown.Item>
@@ -114,7 +106,7 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Modal de error (opcional) */}
+      {/* Login Error Modal */}
       <Modal show={isErrorLoginDialogOpen} onHide={handleCloseErrorLoginDialog} centered>
         <Modal.Header className="bg-danger text-white border-0" closeButton>
           <Modal.Title className="fw-800">Login Error</Modal.Title>
