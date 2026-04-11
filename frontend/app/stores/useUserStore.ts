@@ -9,6 +9,7 @@ import { HttpError, logIn, logOut, reqIsLogged } from "~/services/login-service"
 interface UserState {
   user: UserDTO | null;
   loginError: string | null;
+  isAuthLoading: boolean;
   loadLoggedUser: () => Promise<void>;
   loginUser: (username: string, password: string) => Promise<void>;
   logoutUser: () => Promise<void>;
@@ -22,24 +23,25 @@ interface UserState {
 export const useUserStore = create<UserState>((set, get) => ({
   user: null,
   loginError: null,
+  isAuthLoading: true,
 
   /**
    * Load current logged-in user from backend
    */
   loadLoggedUser: async () => {
-    set({ user: null, loginError: null });
+    set({ isAuthLoading: true, loginError: null });
 
     try {
       const user = await reqIsLogged();
-      set({ user });
+      set({ user, isAuthLoading: false });
     } catch (error) {
       if (error instanceof HttpError && error.status === 401) {
-        set({ user: null, loginError: null });
+        set({ user: null, loginError: null, isAuthLoading: false });
         return;
       }
 
       console.error("Failed to load logged-in user:", error);
-      set({ loginError: "Failed to load logged-in user" });
+      set({ user: null, loginError: "Failed to load logged-in user", isAuthLoading: false });
     }
   },
 
@@ -47,7 +49,7 @@ export const useUserStore = create<UserState>((set, get) => ({
    * Login user with username and password
    */
   loginUser: async (username: string, password: string) => {
-    set({ user: null, loginError: null });
+    set({ isAuthLoading: true, loginError: null });
 
     try {
       await logIn(username, password);
@@ -55,7 +57,7 @@ export const useUserStore = create<UserState>((set, get) => ({
     } catch (error) {
       console.error("Login error:", error);
       const message = "Incorrect username or password. Please try again.";
-      set({ loginError: message });
+      set({ loginError: message, isAuthLoading: false });
     }
   },
 
@@ -63,13 +65,14 @@ export const useUserStore = create<UserState>((set, get) => ({
    * Logout user
    */
   logoutUser: async () => {
-    set({ user: null, loginError: null });
+    set({ isAuthLoading: true, loginError: null });
 
     try {
       await logOut();
+      set({ user: null, isAuthLoading: false });
     } catch (error) {
       console.error("Logout error:", error);
-      set({ loginError: "Logout failed. Please try again." });
+      set({ loginError: "Logout failed. Please try again.", isAuthLoading: false });
     }
   },
 }));
