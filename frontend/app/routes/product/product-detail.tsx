@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router";
-import type { Route } from "../+types/product-detail";
 import { getProduct, removeProduct } from "~/services/products-service";
 import {
   Alert,
@@ -16,7 +15,7 @@ import { useState } from "react";
 /**
  * Client-side loader: Fetches product details before rendering
  */
-export async function clientLoader({ params }: Route.ClientLoaderArgs) {
+export async function clientLoader({ params }: { params: any }) {
   return await getProduct(params.id!);
 }
 
@@ -24,7 +23,7 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
  * Product Detail Component
  * Displays comprehensive product information with seller details
  */
-export default function ProductDetail({ loaderData }: Route.ComponentProps) {
+export default function ProductDetail({ loaderData }: { loaderData: any }) {
   const { user } = useUserStore();
   const product = loaderData;
   const navigate = useNavigate();
