@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+# React Router v7 generated files
+.react-router/
+app/+types/
