@@ -1,27 +1,30 @@
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { getProduct, removeProduct } from "~/services/products-service";
 import {
   Alert,
   Button,
-  ButtonGroup,
   Container,
-  Image,
-  ListGroup,
+  Row,
+  Col,
   Modal,
+  Accordion,
 } from "react-bootstrap";
 import { useUserStore } from "~/stores/useUserStore";
 import { useState } from "react";
+import { Link } from "react-router";
 
 /**
- * Client-side loader: Fetches product details before rendering
+ * Client-side loader: Fetches product details
  */
 export async function clientLoader({ params }: { params: any }) {
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
   return await getProduct(params.id!);
 }
 
 /**
  * Product Detail Component
- * Displays comprehensive product information with seller details
+ * Fixed syntax and logic for Stilnovo P3
  */
 export default function ProductDetail({ loaderData }: { loaderData: any }) {
   const { user } = useUserStore();
@@ -32,17 +35,18 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
   const [isPendingDelete, setPendingDelete] = useState(false);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  function handleOpenDeleteDialog() {
-    setDeleteDialogOpen(true);
-  }
+  // Logical checks for product status
+  const isActive = product.status?.toLowerCase() === "active" || product.active === true;
 
-  function handleCloseDeleteDialog() {
-    if (isPendingDelete) {
-      return;
+  const handleOpenDeleteDialog = () => setDeleteDialogOpen(true);
+
+  // FIXED: Function name consistency
+  const handleCloseDeleteDialog = () => {
+    if (!isPendingDelete) {
+      setDeleteDialogOpen(false);
+      setDeleteError(null);
     }
-    setDeleteDialogOpen(false);
-    setDeleteError(null);
-  }
+  };
 
   async function handleDelete() {
     setPendingDelete(true);
@@ -59,101 +63,158 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
 
   return (
     <>
-      <Container className="mt-4 mb-5">
-        <h2>Product "{product.name}"</h2>
+      <main className="container py-5">
+        <Row className="g-5 align-items-start">
 
-        <Image
-          src={
-            product.image
-              ? `/api/images/${product.image.id}/media`
-              : `/no_image.png`
-          }
-          className="mb-4"
-          alt={product.image ? "Product Image" : "No Image Available"}
-          fluid
-        />
+          {/* LEFT COLUMN: Image & Technical Specs */}
+          <Col lg={7}>
+            <div className="product-image-frame clay-card p-2 mb-4 bg-white d-flex align-items-center justify-content-center position-relative">
 
-        <p>
-          <b>Price: </b>${product.price.toFixed(2)}
-        </p>
+              {!isActive && (
+                <div className="position-absolute top-50 start-50 translate-middle w-100 text-center" style={{ zIndex: 10, pointerEvents: 'none' }}>
+                  <span className="badge rounded-pill bg-danger px-5 py-3 shadow-lg fw-800 border border-white border-4"
+                    style={{ fontSize: '2rem', transform: 'rotate(-15deg)', display: 'inline-block' }}>
+                    SOLD OUT
+                  </span>
+                </div>
+              )}
 
-        <p>
-          <b>Category: </b>
-          {product.category}
-        </p>
+              <img
+                src={`/api/v1/images/${product.id}/file`}
+                alt={product.name}
+                className={`main-product-image img-fluid rounded-4 ${!isActive ? 'opacity-25 grayscale' : ''}`}
+                style={{ maxHeight: '500px', objectFit: 'contain' }}
+              />
+            </div>
 
-        <p>
-          <b>Location: </b>
-          {product.location}
-        </p>
+            <div className="clay-card p-4 bg-white mt-4">
+              <h4 className="fw-800 h5 mb-4">Technical Specifications</h4>
+              <Row className="g-3">
+                <Col xs={6} md={4}>
+                  <p className="x-small fw-800 text-muted mb-1">Category</p>
+                  <p className="small fw-700 text-uppercase">{product.category}</p>
+                </Col>
+                <Col xs={6} md={4}>
+                  <p className="x-small fw-800 text-muted mb-1">Status</p>
+                  <p className={`small fw-800 text-uppercase ${isActive ? 'text-success' : 'text-danger'}`}>
+                    {product.status || (isActive ? "ACTIVE" : "SOLD")}
+                  </p>
+                </Col>
+                <Col xs={6} md={4}>
+                  <p className="x-small fw-800 text-muted mb-1">Reference</p>
+                  <p className="small fw-700">ST-{product.id}</p>
+                </Col>
+              </Row>
+            </div>
+          </Col>
 
-        <p>{product.description}</p>
+          {/* RIGHT COLUMN: Price, Actions & Seller */}
+          <Col lg={5} className="sticky-lg-top" style={{ top: '100px', zIndex: 1 }}>
+            <div className={`clay-card p-4 p-md-5 ${isActive ? 'bg-white' : 'bg-danger-subtle border border-danger'} shadow-sm`}>
 
-        <p>
-          <b>Seller:</b>
-        </p>
+              <h1 className="fw-800 h3 mb-3 lh-sm">{product.name}</h1>
 
-        <ListGroup>
-          <ListGroup.Item>
-            <strong>{product.seller.name}</strong>
-          </ListGroup.Item>
-          <ListGroup.Item>Rating: {product.seller.rating}</ListGroup.Item>
-          <ListGroup.Item>Email: {product.seller.email}</ListGroup.Item>
-        </ListGroup>
+              <div className="mb-4">
+                <h2 className={`display-5 fw-800 mb-0 ${isActive ? 'text-primary' : 'text-danger'}`}>
+                  {product.price ? product.price.toFixed(2) : "0.00"} &euro;
+                </h2>
+                <p className="small text-muted fw-700">Ref: ST-{product.id} &bull; Verified Treasure</p>
+              </div>
 
-        {user && (
-          <ButtonGroup className="mt-4">
-            {user.roles.includes("ADMIN") && (
-              <Button variant="danger" onClick={handleOpenDeleteDialog}>
-                Remove
-              </Button>
-            )}
-            {user.id === product.seller.id && (
-              <Button
-                variant="warning"
-                onClick={() => navigate(`/product/${product.id}/edit`)}
-              >
-                Edit
-              </Button>
-            )}
-          </ButtonGroup>
-        )}
+              <div className="d-flex flex-wrap gap-2 mb-5">
+                <span className="badge-attribute">
+                  <i className={`fa-solid ${isActive ? 'fa-check-circle text-success' : 'fa-circle-xmark text-danger'} me-1`}></i>
+                  {product.status || (isActive ? "Active" : "Sold")}
+                </span>
+                <span className="badge-attribute text-uppercase">
+                  <i className="fa-solid fa-tag me-1 opacity-50"></i> {product.category}
+                </span>
+              </div>
 
-        <br />
-        <Button
-          variant="secondary"
-          className="mt-3"
-          onClick={() => navigate("/")}
-        >
-          Back to all products
-        </Button>
-      </Container>
+              {isActive ? (
+                <div className="d-grid gap-3 mb-5">
+                  <Link to={`/payment-page/${product.id}`} className="btn-sell py-3 fw-800 shadow-lg rounded-pill d-flex align-items-center justify-content-center gap-2 border-0 text-decoration-none" style={{ fontSize: '1.1rem' }}>
+                    <i className="fa-solid fa-bag-shopping"></i> Buy Now
+                  </Link>
+                </div>
+              ) : (
+                <div className="alert alert-danger rounded-4 py-4 mb-5 text-center shadow-sm border-0 bg-white">
+                  <i className="fa-solid fa-handshake-slash fa-2x mb-2 text-danger"></i>
+                  <p className="fw-800 mb-0 text-dark">This item has been sold.</p>
+                </div>
+              )}
 
-      <Modal show={isDeleteDialogOpen} onHide={handleCloseDeleteDialog}>
-        <Modal.Header closeButton>
-          <Modal.Title>Delete Product</Modal.Title>
+              {/* Seller Card */}
+              {product.seller && (
+                <Link to={`/seller-profile/${product.seller.id}`} className="text-decoration-none">
+                  <div className="seller-card p-3 rounded-4 bg-light border d-flex align-items-center justify-content-between mb-4 shadow-sm">
+                    <div className="d-flex align-items-center gap-3">
+                      <img
+                        src={`/api/v1/users/${product.seller.id}/profile-photo`}
+                        className="rounded-circle border border-white shadow-sm"
+                        width="55" height="55"
+                        style={{ objectFit: 'cover' }}
+                        onError={(e) => { (e.target as HTMLImageElement).src = '/images/no-profile-picture.png' }}
+                        alt="Seller"
+                      />
+                      <div>
+                        <p className="fw-800 mb-0 text-dark">{product.seller.name}</p>
+                        <p className="small fw-700 text-muted mb-0">Verified Seller</p>
+                      </div>
+                    </div>
+                    <i className="fa-solid fa-chevron-right opacity-25 text-dark"></i>
+                  </div>
+                </Link>
+              )}
+
+              {/* Admin/Owner Actions */}
+              {user && (
+                <div className="d-flex gap-2 mb-4">
+                  {user.roles?.includes("ADMIN") && (
+                    <Button variant="danger" className="rounded-pill px-4 fw-700" onClick={handleOpenDeleteDialog}>
+                      Remove Listing
+                    </Button>
+                  )}
+                  {user.id === product.seller?.id && (
+                    <Button variant="warning" className="rounded-pill px-4 fw-700" onClick={() => navigate(`/product/${product.id}/edit`)}>
+                      Edit Details
+                    </Button>
+                  )}
+                </div>
+              )}
+
+              <Accordion flush id="accordionDetails">
+                <Accordion.Item eventKey="0" className="bg-transparent">
+                  <Accordion.Header className="bg-transparent fw-800 px-0 shadow-none">
+                    Product Description
+                  </Accordion.Header>
+                  <Accordion.Body className="px-0 text-muted fw-600 small">
+                    <p>{product.description}</p>
+                    <p className="mb-0"><i className="fa-solid fa-location-dot me-2 opacity-50"></i>{product.location}</p>
+                  </Accordion.Body>
+                </Accordion.Item>
+              </Accordion>
+            </div>
+          </Col>
+        </Row>
+      </main>
+
+      {/* DELETE MODAL - FIXED SECTION */}
+      <Modal show={isDeleteDialogOpen} onHide={handleCloseDeleteDialog} centered>
+        <Modal.Header className="bg-danger text-white border-0" closeButton>
+          <Modal.Title className="fw-800">Delete Product</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          <p>
-            Are you sure you want to delete <b>"{product.name}"</b>?
-          </p>
-          <p className="text-muted">This action cannot be undone.</p>
-          {deleteError && <Alert variant="danger">{deleteError}</Alert>}
+        <Modal.Body className="py-4 text-center">
+          <p className="mb-2 fw-600">Are you sure you want to delete <b>"{product.name}"</b>?</p>
+          <p className="small text-muted mb-0">This action cannot be undone.</p>
+          {deleteError && <Alert variant="danger" className="mt-3">{deleteError}</Alert>}
         </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={handleCloseDeleteDialog}
-            disabled={isPendingDelete}
-          >
+        <Modal.Footer className="border-0">
+          <Button variant="secondary" className="rounded-3 fw-bold" onClick={handleCloseDeleteDialog} disabled={isPendingDelete}>
             Cancel
           </Button>
-          <Button
-            variant="danger"
-            onClick={handleDelete}
-            disabled={isPendingDelete}
-          >
-            {isPendingDelete ? "Deleting..." : "Delete"}
+          <Button variant="danger" className="rounded-3 fw-bold" onClick={handleDelete} disabled={isPendingDelete}>
+            {isPendingDelete ? "Deleting..." : "Confirm Delete"}
           </Button>
         </Modal.Footer>
       </Modal>

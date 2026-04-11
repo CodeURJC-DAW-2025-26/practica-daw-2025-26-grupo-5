@@ -1,0 +1,13 @@
+
+
+
+
+
+
+
+
+
+assets/: 
+Aquí guardas los recursos estáticos que React procesará, 
+como imágenes locales (ej: el banner de Stilnovo) o 
+archivos CSS específicos de módulos.

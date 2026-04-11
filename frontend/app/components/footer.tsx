@@ -1,12 +1,28 @@
-import React from 'react';
-import '../app.css';
+import React, { useState } from 'react';
+import { Modal } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import logo from "../assets/logo.png";
+import '../app.css';
 
 /**
  * Footer Component
- * Global footer displayed at the bottom of every page
+ * Includes logic for all policy and support modals using React state.
  */
 export default function Footer() {
+  // Modal visibility states
+  const [showHelp, setShowHelp] = useState(false);
+  const [showTerms, setShowTerms] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
+  const [showSafety, setShowSafety] = useState(false);
+  const [showCookie, setShowCookie] = useState(false);
+
+  // Toggle functions
+  const toggleHelp = () => setShowHelp(!showHelp);
+  const toggleTerms = () => setShowTerms(!showTerms);
+  const togglePrivacy = () => setShowPrivacy(!showPrivacy);
+  const toggleSafety = () => setShowSafety(!showSafety);
+  const toggleCookie = () => setShowCookie(!showCookie);
+
   return (
     <>
       <footer className="footer-stilnovo mt-5">
@@ -15,14 +31,14 @@ export default function Footer() {
             {/* Branding Column */}
             <div className="col-lg-4">
               <div className="mb-3">
-                <a href="/" className="text-decoration-none d-flex align-items-center gap-2">
+                <Link to="/" className="text-decoration-none d-flex align-items-center gap-2">
                   <img 
                     src={logo} 
                     alt="Stilnovo" 
                     style={{ height: '40px', filter: 'brightness(0) invert(1)' }} 
                   />
                   <span className="text-white fw-bold fs-2">Stilnovo</span>
-                </a>
+                </Link>
               </div>
               <p>
                 Elevate your style, sustain the planet. The ultimate premium marketplace for 
@@ -52,26 +68,16 @@ export default function Footer() {
             <div className="col-lg-2 offset-lg-1">
               <h6>PLATFORM</h6>
               <ul className="list-unstyled d-flex flex-column gap-3">
-                <li><a href="/about-page" className="footer-link">About Us</a></li>
+                <li><Link to="/about-page" className="footer-link">About Us</Link></li>
                 <li>
-                  <a 
-                    className="footer-link" 
-                    style={{ cursor: 'pointer' }}
-                    data-bs-toggle="modal" 
-                    data-bs-target="#termsModal"
-                  >
+                  <span className="footer-link cursor-pointer" onClick={toggleTerms}>
                     Terms of Service
-                  </a>
+                  </span>
                 </li>
                 <li>
-                  <a 
-                    className="footer-link" 
-                    style={{ cursor: 'pointer' }}
-                    data-bs-toggle="modal" 
-                    data-bs-target="#safetyModal"
-                  >
+                  <span className="footer-link cursor-pointer" onClick={toggleSafety}>
                     Safety Rules
-                  </a>
+                  </span>
                 </li>
               </ul>
             </div>
@@ -81,34 +87,19 @@ export default function Footer() {
               <h6>SUPPORT</h6>
               <ul className="list-unstyled d-flex flex-column gap-3">
                 <li>
-                  <a 
-                    className="footer-link" 
-                    style={{ cursor: 'pointer' }}
-                    data-bs-toggle="modal" 
-                    data-bs-target="#helpModal"
-                  >
+                  <span className="footer-link cursor-pointer" onClick={toggleHelp}>
                     Help Center
-                  </a>
+                  </span>
                 </li>
                 <li>
-                  <a 
-                    className="footer-link" 
-                    style={{ cursor: 'pointer' }}
-                    data-bs-toggle="modal" 
-                    data-bs-target="#privacyModal"
-                  >
+                  <span className="footer-link cursor-pointer" onClick={togglePrivacy}>
                     Privacy Policy
-                  </a>
+                  </span>
                 </li>
                 <li>
-                  <a 
-                    className="footer-link" 
-                    style={{ cursor: 'pointer' }}
-                    data-bs-toggle="modal" 
-                    data-bs-target="#cookieModal"
-                  >
+                  <span className="footer-link cursor-pointer" onClick={toggleCookie}>
                     Cookies
-                  </a>
+                  </span>
                 </li>
               </ul>
             </div>
@@ -119,7 +110,7 @@ export default function Footer() {
               <p className="mb-4 small">
                 If you don't have an account, please join our community and start trading unique pieces today.
               </p>
-              <a href="/signup-page" className="btn-sell">CREATE ACCOUNT</a>
+              <Link to="/signup" className="btn-sell text-decoration-none">CREATE ACCOUNT</Link>
             </div>
           </div>
 
@@ -141,110 +132,87 @@ export default function Footer() {
       {/* --- MODALS --- */}
 
       {/* Help Modal */}
-      <div className="modal fade" id="helpModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content stn-modal-content p-4 text-center">
-            <div className="modal-header border-0 pb-0">
-              <h5 className="stn-modal-title w-100">Need Assistance?</h5>
-              <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div className="modal-body stn-modal-body">
-              <p>To access our official support and FAQs, please follow this path:</p>
-              <div className="stn-path-box my-3">
-                My Account <i className="fa-solid fa-chevron-right mx-2 fs-small"></i> Help Center
-              </div>
-              <p className="text-danger small fw-bold">
-                <i className="fa-solid fa-lock me-1"></i> You must be logged in to view this section.
-              </p>
-              <button className="btn-about" data-bs-dismiss="modal">UNDERSTOOD</button>
-            </div>
+      <Modal show={showHelp} onHide={toggleHelp} centered contentClassName="stn-modal-content p-4">
+        <Modal.Header closeButton className="border-0 pb-0 btn-close-white">
+          <Modal.Title className="stn-modal-title w-100 text-center">Need Assistance?</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="stn-modal-body text-center">
+          <p>To access our official support and FAQs, please follow this path:</p>
+          <div className="stn-path-box my-3">
+            My Account <i className="fa-solid fa-chevron-right mx-2 fs-small"></i> Help Center
           </div>
-        </div>
-      </div>
+          <p className="text-danger small fw-bold">
+            <i className="fa-solid fa-lock me-1"></i> You must be logged in to view this section.
+          </p>
+          <button className="btn-about" onClick={toggleHelp}>UNDERSTOOD</button>
+        </Modal.Body>
+      </Modal>
 
       {/* Terms Modal */}
-      <div className="modal fade" id="termsModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-dialog-centered modal-lg">
-          <div className="modal-content stn-modal-content p-4">
-            <div className="modal-header border-0 pb-0">
-              <h5 className="stn-modal-title">Terms of Service</h5>
-              <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div className="modal-body stn-modal-body">
-              <p>
-                By using Stilnovo, you agree to our community guidelines. We provide a platform for circular fashion. 
-                All users must maintain integrity in transactions and respect intellectual property rights. 
-                We are not liable for direct disputes between users but provide tools to facilitate safe trading.
-              </p>
-              <button className="btn-about" data-bs-dismiss="modal">I accept the terms</button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Modal show={showTerms} onHide={toggleTerms} centered size="lg" contentClassName="stn-modal-content p-4">
+        <Modal.Header closeButton className="border-0 pb-0 btn-close-white">
+          <Modal.Title className="stn-modal-title">Terms of Service</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="stn-modal-body">
+          <p>
+            By using Stilnovo, you agree to our community guidelines. We provide a platform for circular fashion. 
+            All users must maintain integrity in transactions and respect intellectual property rights. 
+            We are not liable for direct disputes between users but provide tools to facilitate safe trading.
+          </p>
+          <button className="btn-about" onClick={toggleTerms}>I accept the terms</button>
+        </Modal.Body>
+      </Modal>
 
       {/* Privacy Modal */}
-      <div className="modal fade" id="privacyModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content stn-modal-content p-4">
-            <div className="modal-header border-0 pb-0">
-              <h5 className="stn-modal-title">Privacy Policy</h5>
-              <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div className="modal-body stn-modal-body">
-              <p>
-                Your data is safe with us. We use industry-standard encryption to protect your personal information 
-                and transaction history. We never sell your data to third parties.
-              </p>
-              <button className="btn-about" data-bs-dismiss="modal">Close</button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Modal show={showPrivacy} onHide={togglePrivacy} centered contentClassName="stn-modal-content p-4">
+        <Modal.Header closeButton className="border-0 pb-0 btn-close-white">
+          <Modal.Title className="stn-modal-title">Privacy Policy</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="stn-modal-body">
+          <p>
+            Your data is safe with us. We use industry-standard encryption to protect your personal information 
+            and transaction history. We never sell your data to third parties.
+          </p>
+          <button className="btn-about" onClick={togglePrivacy}>Close</button>
+        </Modal.Body>
+      </Modal>
 
       {/* Safety Modal */}
-      <div className="modal fade" id="safetyModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content stn-modal-content p-4">
-            <div className="modal-header border-0 pb-0">
-              <h5 className="stn-modal-title">Safety Rules</h5>
-              <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div className="modal-body stn-modal-body">
-              <ul className="list-unstyled text-start">
-                <li className="mb-3">
-                  <i className="fa-solid fa-shield-check text-primary me-2"></i> Only trade through Stilnovo's platform.
-                </li>
-                <li className="mb-3">
-                  <i className="fa-solid fa-shield-check text-primary me-2"></i> Verify item authenticity before shipping.
-                </li>
-                <li>
-                  <i className="fa-solid fa-shield-check text-primary me-2"></i> Report suspicious behavior immediately.
-                </li>
-              </ul>
-              <div className="text-center mt-3">
-                <button className="btn-about" data-bs-dismiss="modal">Stay safe</button>
-              </div>
-            </div>
+      <Modal show={showSafety} onHide={toggleSafety} centered contentClassName="stn-modal-content p-4">
+        <Modal.Header closeButton className="border-0 pb-0 btn-close-white">
+          <Modal.Title className="stn-modal-title">Safety Rules</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="stn-modal-body">
+          <ul className="list-unstyled text-start">
+            <li className="mb-3">
+              <i className="fa-solid fa-shield-check text-primary me-2"></i> Only trade through Stilnovo's platform.
+            </li>
+            <li className="mb-3">
+              <i className="fa-solid fa-shield-check text-primary me-2"></i> Verify item authenticity before shipping.
+            </li>
+            <li>
+              <i className="fa-solid fa-shield-check text-primary me-2"></i> Report suspicious behavior immediately.
+            </li>
+          </ul>
+          <div className="text-center mt-3">
+            <button className="btn-about" onClick={toggleSafety}>Stay safe</button>
           </div>
-        </div>
-      </div>
+        </Modal.Body>
+      </Modal>
 
       {/* Cookie Modal */}
-      <div className="modal fade" id="cookieModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content stn-modal-content p-4 text-center">
-            <div className="modal-header border-0 pb-0">
-              <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div className="modal-body stn-modal-body">
-              <i className="fa-solid fa-cookie-bite text-primary fs-1 mb-3"></i>
-              <h5 className="stn-modal-title mb-3">Cookie Policy</h5>
-              <p>We use cookies to personalize your experience and analyze our traffic. By continuing to use our site, you accept our cookie usage.</p>
-              <button className="btn-about" data-bs-dismiss="modal">Accept all</button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Modal show={showCookie} onHide={toggleCookie} centered contentClassName="stn-modal-content p-4">
+        <Modal.Header closeButton className="border-0 pb-0 btn-close-white" />
+        <Modal.Body className="stn-modal-body text-center">
+          <i className="fa-solid fa-cookie-bite text-primary fs-1 mb-3"></i>
+          <h5 className="stn-modal-title mb-3">Cookie Policy</h5>
+          <p>
+            We use cookies to personalize your experience and analyze our traffic. 
+            By continuing to use our site, you accept our cookie usage.
+          </p>
+          <button className="btn-about" onClick={toggleCookie}>Accept all</button>
+        </Modal.Body>
+      </Modal>
     </>
   );
 }

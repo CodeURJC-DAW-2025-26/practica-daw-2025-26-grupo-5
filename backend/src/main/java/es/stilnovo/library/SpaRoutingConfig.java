@@ -14,12 +14,12 @@ import java.nio.file.Files;
 
 @Controller
 class SpaFallbackController {
-    @GetMapping(value = {"/new", "/new/**"}, produces = "text/html;charset=utf-8")
-    public ResponseEntity<String> serveSpa() throws IOException {
-        ClassPathResource resource = new ClassPathResource("static/new/index.html");
-        String content = new String(Files.readAllBytes(resource.getFile().toPath()));
-        return ResponseEntity.ok(content);
-    }
+        @GetMapping(value = { "/new", "/new/**" }, produces = "text/html;charset=utf-8")
+        public ResponseEntity<String> serveSpa() throws IOException {
+                ClassPathResource resource = new ClassPathResource("static/new/index.html");
+                String content = new String(Files.readAllBytes(resource.getFile().toPath()));
+                return ResponseEntity.ok(content);
+        }
 }
 
 @Configuration
@@ -44,7 +44,8 @@ public class SpaRoutingConfig implements WebMvcConfigurer {
                                                 }
 
                                                 // If requesting an asset file, return null (404)
-                                                if (resourcePath.matches(".*\\.(js|css|png|svg|jpg|jpeg|gif|ico|woff|woff2|ttf|eot)$")) {
+                                                if (resourcePath.matches(
+                                                                ".*\\.(js|css|png|svg|jpg|jpeg|gif|ico|woff|woff2|ttf|eot)$")) {
                                                         return null;
                                                 }
 

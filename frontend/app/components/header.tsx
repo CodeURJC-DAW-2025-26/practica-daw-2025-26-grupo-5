@@ -1,152 +1,120 @@
-import React, { useActionState, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Button, NavDropdown } from "react-bootstrap";
 import { useUserStore } from "~/stores/useUserStore";
-import { Link } from "react-router-dom";
-import "../app.css";
+import { Link, useLocation } from "react-router"; 
+import "~/app.css";
 import logo from "../assets/logo.png";
 
 /**
- * Header Component
- * Fusión del diseño Stilnovo con la lógica de UserDTO y Zustand
+ * Main Header Component
+ * Handles navigation, search bar visibility, and conditional auth actions
  */
 export default function Header() {
   const [isErrorLoginDialogOpen, setErrorLoginDialogOpen] = useState(false);
   const [profileImageError, setProfileImageError] = useState(false);
 
-  // Accedemos al store de Zustand
-  const { user, loginError, isAuthLoading, loadLoggedUser, loginUser, logoutUser } = useUserStore();
+  const location = useLocation();
+  const { user, loginError, isAuthLoading, loadLoggedUser, logoutUser } = useUserStore();
 
-  const handleShowErrorLoginDialog = () => setErrorLoginDialogOpen(true);
-  const handleCloseErrorLoginDialog = () => setErrorLoginDialogOpen(false);
+  // Determine the current page type
+  const isHome = location.pathname === "/";
+  // Check if we are in the product detail page
+  const isProductDetail = location.pathname.startsWith("/product/");
 
-  /**
-   * Login Action
-   */
-  async function loginUserAction(_prevState: void | null, formData: FormData) {
-    const username = formData.get("username") as string;
-    const password = formData.get("password") as string;
-
-    await loginUser(username, password);
-    const error = useUserStore.getState().loginError;
-
-    if (error) {
-      handleShowErrorLoginDialog();
-    }
-  }
-
-  const [, loginFormAction, isPending] = useActionState(loginUserAction, null);
-
-  /**
-   * Logout Action
-   */
-  async function logoutUserAction() {
-    await logoutUser();
-  }
-
-  const [, logoutFormAction, isLoggingOut] = useActionState(logoutUserAction, null);
-
-  /**
-   * Carga inicial del usuario
-   */
   useEffect(() => {
     loadLoggedUser();
   }, []);
 
-  // Comprobación de Admin basada en tu UserDTO (roles: string[])
-  const isAdmin = user?.roles?.includes("ROLE_ADMIN") || user?.roles?.includes("ADMIN");
+  const handleCloseErrorLoginDialog = () => setErrorLoginDialogOpen(false);
 
   return (
     <>
-      <header className="navbar container-fluid px-lg-5 py-3 sticky-top bg-white header-border-line">
+      <header className={`navbar container-fluid px-lg-5 py-3 sticky-top bg-white ${isHome ? 'header-border-line' : 'border-bottom shadow-sm'}`}>
+
+        {/* LEFT: Logo Section */}
         <div className="logo-wrapper">
           <Link to="/" className="text-decoration-none d-flex align-items-center gap-2">
             <img src={logo} alt="Stilnovo" className="logo-img" width="35" />
+            {/* REMOVED: Conditional fontSize to keep it consistent everywhere */}
             <span className="brand">Stilnovo</span>
           </Link>
         </div>
 
-        {/* BUSCADOR ORIGINAL STILNOVO */}
-        <form action="/#featured-treasures" method="get" className="search-box d-none d-md-flex">
-          <i className="fa-solid fa-magnifying-glass"></i>
-          <input type="text" name="query" placeholder="Search for treasures..." />
-          <button type="submit" className="d-none"></button>
-        </form>
+        {/* CENTER: Search Box (Visible only on Home) */}
+        {isHome && (
+          <form action="/#featured-treasures" method="get" className="search-box d-none d-md-flex mx-auto">
+            <i className="fa-solid fa-magnifying-glass"></i>
+            <input type="text" name="query" placeholder="Search for treasures..." />
+            <button type="submit" className="d-none"></button>
+          </form>
+        )}
 
-        <nav className="nav-actions">
-          {isAuthLoading ? (
-            /* --- LOADING STATE --- */
-            <div style={{ width: '42px', height: '42px' }} />
-          ) : user ? (
-            /* --- VISTA USUARIO LOGUEADO --- */
-            <NavDropdown
-              title={
-                <div className="d-flex align-items-center gap-3">
-                  <div className="text-end d-none d-lg-block">
-                    <p className="mb-0 small fw-800 lh-1 text-dark">{user.name}</p>
-                    <p className="mb-0 x-small fw-700 text-muted">
-                      My Account <i className="fa-solid fa-chevron-down ms-1" style={{ fontSize: "0.6rem" }}></i>
-                    </p>
-                  </div>
-                  <div className="position-relative">
-                    <img
-                      src={profileImageError ? `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23e2e8f0' width='100' height='100'/%3E%3Ctext x='50' y='50' text-anchor='middle' dy='.3em' fill='%231A365D' font-size='40' font-weight='bold'%3E${user.name?.charAt(0).toUpperCase()}%3C/text%3E%3C/svg%3E` : `http://localhost:8443/api/v1/users/me/photo`}
-                      className="rounded-circle border border-2 border-white shadow-sm profile-nav-img"
-                      width="42"
-                      height="42"
-                      style={{ objectFit: "cover" }}
-                      onError={() => setProfileImageError(true)}
-                      alt="Profile"
-                    />
-                    {!user.banned && (
-                      <span className="position-absolute bottom-0 end-0 p-1 bg-success border border-2 border-white rounded-circle"></span>
-                    )}
-                  </div>
-                </div>
-              }
-              id="user-nav-dropdown"
-              align="end"
-              className="user-dropdown"
-            >
-              <NavDropdown.Item as={Link} to="/user-page" className="fw-700 small">
-                <i className="fa-solid fa-user me-2" />
-                My Profile
-              </NavDropdown.Item>
-              <NavDropdown.Item as={Link} to="/sales-and-orders-page" className="fw-700 small">
-                <i className="fa-solid fa-bag-shopping me-2" />
-                My Purchases
-              </NavDropdown.Item>
-              
-              {/* Admin Panel Link - Visible for all logged-in users for testing */}
-              <NavDropdown.Item as={Link} to="/admin" className="fw-700 small text-primary">
-                <i className="fa-solid fa-shield me-2" />
-                Admin Panel
-              </NavDropdown.Item>
+        {/* RIGHT: Actions Container */}
+        <div className={`${isHome ? "" : "ms-auto"} d-flex align-items-center gap-3`}>
 
-              <NavDropdown.Divider />
-              <NavDropdown.Item as="div" className="p-0">
-                <form action={logoutFormAction} className="m-0">
-                  <button
-                    type="submit"
-                    disabled={isLoggingOut}
-                    className="dropdown-item rounded-3 py-2 fw-700 small text-danger border-0 bg-transparent w-100 text-start"
-                  >
-                    <i className="fa-solid fa-sign-out-alt me-2" />
-                    {isLoggingOut ? "Logging out..." : "Sign out"}
-                  </button>
-                </form>
-              </NavDropdown.Item>
-            </NavDropdown>
-          ) : (
-            /* --- VISTA USUARIO NO LOGUEADO --- */
-            <div className="d-flex align-items-center gap-3">
-              <Link to="/login" className="link-login">Log in</Link>
-              <Link to="/signup" className="btn-signup">Sign up</Link>
-            </div>
+          {/* Conditional Back Button for non-home pages */}
+          {!isHome && (
+            <Link to="/" className="btn-about py-2 px-3 small text-decoration-none fw-700">
+              <i className="fa-solid fa-arrow-left me-2"></i>Back to Gallery
+            </Link>
           )}
-        </nav>
+
+          {/* AUTH ACTIONS: Hidden on Product Detail Page */}
+          {!isProductDetail && (
+            <nav className="nav-actions">
+              {isAuthLoading ? (
+                <div style={{ width: '42px', height: '42px' }} />
+              ) : user ? (
+                <NavDropdown
+                  title={
+                    <div className="d-flex align-items-center gap-3">
+                      <div className="text-end d-none d-lg-block">
+                        <p className="mb-0 small fw-800 lh-1 text-dark">{user.name}</p>
+                        <p className="mb-0 x-small fw-700 text-muted">
+                          My Account <i className="fa-solid fa-chevron-down ms-1" style={{ fontSize: "0.6rem" }}></i>
+                        </p>
+                      </div>
+                      <div className="position-relative">
+                        <img
+                          src={profileImageError ? "/images/profile-photo.png" : `/api/v1/users/me/profile-photo`}
+                          className="rounded-circle border border-2 border-white shadow-sm profile-nav-img"
+                          width="42"
+                          height="42"
+                          style={{ border: "2px solid white", objectFit: "cover" }}
+                          onError={() => setProfileImageError(true)}
+                          alt="Profile"
+                        />
+                        {!user.banned && (
+                          <span className="position-absolute bottom-0 end-0 p-1 bg-success border border-2 border-white rounded-circle"></span>
+                        )}
+                      </div>
+                    </div>
+                  }
+                  id="user-nav-dropdown"
+                  align="end"
+                >
+                  <NavDropdown.Item as={Link} to="/user-page" className="fw-700 small">View Profile</NavDropdown.Item>
+                  <NavDropdown.Item as={Link} to="/user-products-page" className="fw-700 small">My Inventory</NavDropdown.Item>
+                  {user.roles?.includes("ADMIN") && (
+                    <NavDropdown.Item as={Link} to="/admin" className="fw-700 small text-primary">Administration</NavDropdown.Item>
+                  )}
+                  <NavDropdown.Divider />
+                  <button onClick={() => logoutUser()} className="dropdown-item text-danger fw-700 small border-0 bg-transparent w-100 text-start">
+                    <i className="fa-solid fa-sign-out-alt me-2" /> Log out
+                  </button>
+                </NavDropdown>
+              ) : (
+                <div className="d-flex align-items-center gap-3">
+                  <Link to="/login" className="link-login">Log in</Link>
+                  <Link to="/signup" className="btn-signup">Sign up</Link>
+                </div>
+              )}
+            </nav>
+          )}
+        </div>
       </header>
 
-      {/* MODAL DE ERROR */}
+      {/* Modal de error (opcional) */}
       <Modal show={isErrorLoginDialogOpen} onHide={handleCloseErrorLoginDialog} centered>
         <Modal.Header className="bg-danger text-white border-0" closeButton>
           <Modal.Title className="fw-800">Login Error</Modal.Title>

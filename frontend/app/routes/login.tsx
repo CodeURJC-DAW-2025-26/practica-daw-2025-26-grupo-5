@@ -1,9 +1,10 @@
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate, useLocation } from 'react-router';
-import { Container, Form, Button, Card, Alert } from 'react-bootstrap';
+import { useNavigate, useLocation, Link } from 'react-router';
+import { Container, Alert } from 'react-bootstrap';
 import { useUserStore } from '~/stores/useUserStore';
 import type { Route } from './+types/login';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import logo from "../assets/logo.png";
 
 interface LoginFormData {
   username: string;
@@ -12,10 +13,10 @@ interface LoginFormData {
 
 /**
  * Login Page Component
- * Allows users to authenticate with the backend
+ * Formatted with Stilnovo's premium design using custom CSS classes
  */
 export default function Login({}: Route.ComponentProps) {
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<LoginFormData>({
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     defaultValues: {
       username: '',
       password: '',
@@ -25,12 +26,13 @@ export default function Login({}: Route.ComponentProps) {
   const { loginUser, loginError, user } = useUserStore();
   const navigate = useNavigate();
   const location = useLocation();
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // If already logged in, redirect to admin
-  React.useEffect(() => {
+  // Redirect logic: if user is authenticated, move away from login page
+  useEffect(() => {
     if (user) {
-      const redirectTo = location.state?.from?.pathname || '/admin';
+      // Redirect to previous page or home
+      const redirectTo = location.state?.from?.pathname || '/';
       navigate(redirectTo);
     }
   }, [user, navigate, location]);
@@ -38,154 +40,97 @@ export default function Login({}: Route.ComponentProps) {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
+      // Login attempt through Zustand store
       await loginUser(data.username, data.password);
-      // loginUser will set user in store, which triggers useEffect above
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('Login process failed:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Container className="min-vh-100 d-flex align-items-center justify-content-center py-5">
-      <div style={{ width: '100%', maxWidth: '400px' }}>
-        <Card className="shadow-lg" style={{ borderRadius: '20px', border: 'none' }}>
-          <Card.Body className="p-5">
-            {/* Logo and Title */}
-            <div className="text-center mb-4">
-              <img src="/images/logo.png" alt="Stilnovo" width="50" className="mb-3" />
-              <h2 className="fw-800" style={{ color: '#1A365D', marginBottom: '0.5rem' }}>
-                Stilnovo Admin
-              </h2>
-              <p className="text-muted small">Log in to access the admin panel</p>
+    <div className="auth-page">
+      {/* --- AUTH HEADER --- */}
+      <header className="navbar container-fluid px-lg-5 py-3 header-border-line bg-white">
+        <div className="logo-wrapper">
+          <Link to="/" className="text-decoration-none d-flex align-items-center gap-2">
+            <img src={logo} alt="Stilnovo" className="logo-img" width="35" />
+            <span className="brand">Stilnovo</span>
+          </Link>
+        </div>
+        <nav className="nav-actions">
+          <span className="text-muted d-none d-sm-inline">Don't have an account?</span>
+          <Link to="/signup" className="link-login ms-2">Sign up</Link>
+        </nav>
+      </header>
+
+      {/* --- MAIN AUTH WRAPPER --- */}
+      <div className="hero-wrapper auth-background">
+        <main className="container d-flex align-items-center justify-content-center flex-grow-1">
+          
+          <div className="auth-card clay-card p-5 bg-white" style={{ maxWidth: '480px', width: '100%' }}>
+            
+            <div className="text-center mb-5">
+              <h2 className="fw-800">Welcome Back</h2>
+              <p className="hero-subtitle">Log in to your treasure chest</p>
             </div>
 
-            {/* Error Alert */}
+            {/* Error Message from Store */}
             {loginError && (
-              <Alert variant="danger" className="mb-4" style={{ borderRadius: '12px' }}>
-                <i className="fa-solid fa-exclamation-circle me-2" />
-                {loginError}
+              <Alert variant="danger" className="text-center fw-700 mb-4 border-0 rounded-3">
+                Wrong username or password
               </Alert>
             )}
 
-            {/* Login Form */}
-            <Form onSubmit={handleSubmit(onSubmit)}>
-              {/* Username Field */}
-              <Form.Group className="mb-4">
-                <Form.Label className="fw-700 mb-2">Username</Form.Label>
-                <Form.Control
-                  {...register('username', {
-                    required: 'Username is required',
-                  })}
-                  type="text"
-                  placeholder="Enter your username"
-                  isInvalid={!!errors.username}
-                  disabled={isLoading}
-                  style={{
-                    borderRadius: '12px',
-                    padding: '12px',
-                    borderColor: errors.username ? '#dc3545' : '#e2e8f0',
-                    fontSize: '0.95rem',
-                  }}
-                />
-                {errors.username && (
-                  <Form.Control.Feedback type="invalid" className="d-block mt-2 small">
-                    {errors.username.message}
-                  </Form.Control.Feedback>
-                )}
-              </Form.Group>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              
+              {/* USERNAME INPUT */}
+              <div className="mb-4">
+                <label className="form-label fw-700 small ms-2">Username</label>
+                <div className={`search-box w-100 py-2 ${errors.username ? 'border-danger' : ''}`}>
+                  <i className="fa-solid fa-user small"></i>
+                  <input 
+                    type="text" 
+                    placeholder="Enter your username" 
+                    {...register('username', { required: true })}
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
 
-              {/* Password Field */}
-              <Form.Group className="mb-4">
-                <Form.Label className="fw-700 mb-2">Password</Form.Label>
-                <Form.Control
-                  {...register('password', {
-                    required: 'Password is required',
-                  })}
-                  type="password"
-                  placeholder="Enter your password"
-                  isInvalid={!!errors.password}
-                  disabled={isLoading}
-                  style={{
-                    borderRadius: '12px',
-                    padding: '12px',
-                    borderColor: errors.password ? '#dc3545' : '#e2e8f0',
-                    fontSize: '0.95rem',
-                  }}
-                />
-                {errors.password && (
-                  <Form.Control.Feedback type="invalid" className="d-block mt-2 small">
-                    {errors.password.message}
-                  </Form.Control.Feedback>
-                )}
-              </Form.Group>
+              {/* PASSWORD INPUT */}
+              <div className="mb-5">
+                <label className="form-label fw-700 small ms-2">Password</label>
+                <div className={`search-box w-100 py-2 ${errors.password ? 'border-danger' : ''}`}>
+                  <i className="fa-solid fa-lock small"></i>
+                  <input 
+                    type="password" 
+                    placeholder="Enter your password" 
+                    {...register('password', { required: true })}
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
 
-              {/* Submit Button */}
-              <Button
-                type="submit"
+              {/* LOGIN BUTTON */}
+              <button 
+                type="submit" 
+                className="btn-sell w-100 justify-content-center mb-4 border-0" 
                 disabled={isLoading}
-                className="w-100 fw-800"
-                style={{
-                  backgroundColor: '#2f6ced',
-                  border: 'none',
-                  borderRadius: '12px',
-                  padding: '12px',
-                  fontSize: '1rem',
-                }}
               >
-                {isLoading ? (
-                  <>
-                    <span
-                      className="spinner-border spinner-border-sm me-2"
-                      role="status"
-                      aria-hidden="true"
-                    />
-                    Logging in...
-                  </>
-                ) : (
-                  <>
-                    <i className="fa-solid fa-sign-in-alt me-2" />
-                    Log In
-                  </>
-                )}
-              </Button>
-            </Form>
-
-            {/* Help Text */}
-            <div className="mt-4 p-3" style={{ backgroundColor: '#f8fafc', borderRadius: '12px' }}>
-              <p className="small text-muted mb-0">
-                <strong>Demo Credentials:</strong>
-                <br />
-                Username: <code>admin</code>
-                <br />
-                Password: <code>admin123</code>
-              </p>
-            </div>
-
-            {/* Back Link */}
-            <div className="text-center mt-4">
-              <a href="/" className="text-decoration-none" style={{ color: '#2f6ced' }}>
-                <i className="fa-solid fa-arrow-left me-2" />
-                Back to Market
-              </a>
-            </div>
-          </Card.Body>
-        </Card>
+                {isLoading ? 'Logging in...' : 'Login to My Account'}
+              </button>
+              
+              <div className="text-center">
+                <Link to="/" className="text-muted small text-decoration-none fw-700">
+                  <i className="fa-solid fa-arrow-left me-2"></i>Back to Marketplace
+                </Link>
+              </div>
+            </form>
+          </div>
+        </main>
       </div>
-    </Container>
-  );
-}
-
-import React from 'react';
-
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  return (
-    <Container className="mt-5">
-      <Alert variant="danger">
-        <h4 className="alert-heading">Error!</h4>
-        <p>{error instanceof Error ? error.message : 'An unexpected error occurred'}</p>
-      </Alert>
-    </Container>
+    </div>
   );
 }

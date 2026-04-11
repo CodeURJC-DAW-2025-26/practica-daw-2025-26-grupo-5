@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 
 /**
  * React Application Entry Point
- * 
+ * Executes the app like main()
  * Uses React Router v7 with HydratedRouter to enable client-side routing and hydration
  * because Spring Boot serves the SPA from the /new/ context path
  */

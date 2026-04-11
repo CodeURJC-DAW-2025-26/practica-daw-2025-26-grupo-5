@@ -1,9 +1,9 @@
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router';
-import { Container, Form, Button, Card, Alert } from 'react-bootstrap';
+import { useNavigate, Link } from 'react-router';
+import { Container, Form, Alert, Row, Col } from 'react-bootstrap';
 import type { Route } from './+types/signup';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import React from 'react';
+import React, { useState } from 'react';
+import logo from "../assets/logo.png";
 
 interface SignupFormData {
   name: string;
@@ -11,11 +11,12 @@ interface SignupFormData {
   username: string;
   password: string;
   confirmPassword: string;
+  profilePicture?: FileList;
 }
 
 /**
  * Signup Page Component
- * Registration form for new users
+ * Formatted to match Stilnovo's premium auth design
  */
 export default function Signup({}: Route.ComponentProps) {
   const {
@@ -23,20 +24,20 @@ export default function Signup({}: Route.ComponentProps) {
     handleSubmit,
     formState: { errors },
     watch,
-  } = useForm<SignupFormData>({
-    defaultValues: {
-      name: '',
-      email: '',
-      username: '',
-      password: '',
-      confirmPassword: '',
-    },
-  });
+  } = useForm<SignupFormData>();
 
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [signupError, setSignupError] = React.useState<string | null>(null);
-  const password = watch('password');
+  const [isLoading, setIsLoading] = useState(false);
+  const [signupError, setSignupError] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  // Watch for image changes to generate a preview
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
 
   const onSubmit = async (data: SignupFormData) => {
     if (data.password !== data.confirmPassword) {
@@ -45,253 +46,171 @@ export default function Signup({}: Route.ComponentProps) {
     }
 
     setIsLoading(true);
+    // Note: In a real P3 scenario, use FormData if uploading a profile picture
+    const formData = new FormData();
+    formData.append('username', data.username);
+    formData.append('name', data.name);
+    formData.append('email', data.email);
+    formData.append('password', data.password);
+    if (data.profilePicture?.[0]) {
+      formData.append('profilePicture', data.profilePicture[0]);
+    }
+
     try {
-      const response = await fetch(`${window.location.origin}/api/v1/auth/register`, {
+      const response = await fetch(`${window.location.origin}/api/v1/users`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: data.name,
-          email: data.email,
-          username: data.username,
-          password: data.password,
-        }),
+        body: formData, // Sending as Multipart to support the image
       });
 
       if (response.ok) {
         navigate('/login');
       } else {
-        const error = await response.json();
-        setSignupError(error.message || 'Registration failed. Please try again.');
+        setSignupError('Registration failed. Please try again.');
       }
     } catch (error) {
-      console.error('Signup failed:', error);
-      setSignupError('An error occurred. Please try again.');
+      setSignupError('An error occurred during signup.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Container className="min-vh-100 d-flex align-items-center justify-content-center py-5">
-      <div style={{ width: '100%', maxWidth: '450px' }}>
-        <Card className="shadow-lg" style={{ borderRadius: '20px', border: 'none' }}>
-          <Card.Body className="p-5">
-            {/* Logo and Title */}
-            <div className="text-center mb-4">
-              <img src="/images/logo.png" alt="Stilnovo" width="50" className="mb-3" />
-              <h2 className="fw-800" style={{ color: '#1A365D', marginBottom: '0.5rem' }}>
-                Join Stilnovo
-              </h2>
-              <p className="text-muted small">Create your account and start trading</p>
+    <div className="auth-page">
+      {/* --- AUTH HEADER --- */}
+      <header className="navbar container-fluid px-lg-5 py-3 header-border-line bg-white">
+        <div className="logo-wrapper">
+          <Link to="/" className="text-decoration-none d-flex align-items-center gap-2">
+            <img src={logo} alt="Stilnovo" className="logo-img" width="35" />
+            <span className="brand">Stilnovo</span>
+          </Link>
+        </div>
+        <nav className="nav-actions">
+          <span className="text-muted d-none d-sm-inline">Already a member?</span>
+          <Link to="/login" className="link-login ms-2">Log in</Link>
+        </nav>
+      </header>
+
+      {/* --- MAIN CONTENT --- */}
+      <div className="auth-main-wrapper no-footer-layout">
+        <Container className="d-flex align-items-center justify-content-center">
+          <div className="auth-card clay-card p-4 my-3 bg-white" style={{ maxWidth: '550px', width: '100%' }}>
+            
+            <div className="text-center mb-3">
+              <h2 className="fw-800 mb-1">Join Us</h2>
+              <p className="hero-subtitle small">Create your profile to start trading</p>
             </div>
 
-            {/* Error Alert */}
             {signupError && (
-              <Alert variant="danger" className="mb-4" style={{ borderRadius: '12px' }}>
-                <i className="fa-solid fa-exclamation-circle me-2" />
-                {signupError}
+              <Alert variant="danger" className="py-2 small fw-700 rounded-3 mb-4">
+                <i className="fa-solid fa-triangle-exclamation me-2"></i> {signupError}
               </Alert>
             )}
 
-            {/* Signup Form */}
             <Form onSubmit={handleSubmit(onSubmit)}>
-              {/* Name Field */}
-              <Form.Group className="mb-3">
-                <Form.Label className="fw-700 mb-2">Full Name</Form.Label>
-                <Form.Control
-                  {...register('name', {
-                    required: 'Full name is required',
-                  })}
-                  type="text"
-                  placeholder="Enter your full name"
-                  isInvalid={!!errors.name}
-                  disabled={isLoading}
-                  style={{
-                    borderRadius: '12px',
-                    padding: '12px',
-                    borderColor: errors.name ? '#dc3545' : '#e2e8f0',
-                    fontSize: '0.95rem',
-                  }}
-                />
-                {errors.name && (
-                  <Form.Control.Feedback type="invalid" className="d-block mt-2 small">
-                    {errors.name.message}
-                  </Form.Control.Feedback>
-                )}
-              </Form.Group>
+              
+              {/* AVATAR UPLOAD SECTION */}
+              <div className="text-center mb-3">
+                <div className="profile-upload-container mx-auto position-relative overflow-hidden d-flex align-items-center justify-content-center">
+                  {!previewUrl && <i className="fa-solid fa-user-plus text-muted"></i>}
+                  {previewUrl && (
+                    <img src={previewUrl} alt="preview" className="position-absolute w-100 h-100" style={{ objectFit: 'cover' }} />
+                  )}
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    className="file-input-hidden"
+                    {...register('profilePicture')}
+                    onChange={(e) => {
+                      register('profilePicture').onChange(e);
+                      handleImageChange(e);
+                    }}
+                  />
+                </div>
+                <label className="form-label fw-700 x-small mt-1 d-block cursor-pointer" style={{ color: 'var(--brand-blue)' }}>
+                  Upload Avatar
+                </label>
+              </div>
 
-              {/* Email Field */}
-              <Form.Group className="mb-3">
-                <Form.Label className="fw-700 mb-2">Email Address</Form.Label>
-                <Form.Control
-                  {...register('email', {
-                    required: 'Email is required',
-                    pattern: {
-                      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                      message: 'Please enter a valid email',
-                    },
-                  })}
-                  type="email"
-                  placeholder="Enter your email"
-                  isInvalid={!!errors.email}
-                  disabled={isLoading}
-                  style={{
-                    borderRadius: '12px',
-                    padding: '12px',
-                    borderColor: errors.email ? '#dc3545' : '#e2e8f0',
-                    fontSize: '0.95rem',
-                  }}
-                />
-                {errors.email && (
-                  <Form.Control.Feedback type="invalid" className="d-block mt-2 small">
-                    {errors.email.message}
-                  </Form.Control.Feedback>
-                )}
-              </Form.Group>
-
-              {/* Username Field */}
-              <Form.Group className="mb-3">
-                <Form.Label className="fw-700 mb-2">Username</Form.Label>
-                <Form.Control
-                  {...register('username', {
-                    required: 'Username is required',
-                  })}
-                  type="text"
-                  placeholder="Choose a username"
-                  isInvalid={!!errors.username}
-                  disabled={isLoading}
-                  style={{
-                    borderRadius: '12px',
-                    padding: '12px',
-                    borderColor: errors.username ? '#dc3545' : '#e2e8f0',
-                    fontSize: '0.95rem',
-                  }}
-                />
-                {errors.username && (
-                  <Form.Control.Feedback type="invalid" className="d-block mt-2 small">
-                    {errors.username.message}
-                  </Form.Control.Feedback>
-                )}
-              </Form.Group>
-
-              {/* Password Field */}
-              <Form.Group className="mb-3">
-                <Form.Label className="fw-700 mb-2">Password</Form.Label>
-                <Form.Control
-                  {...register('password', {
-                    required: 'Password is required',
-                    minLength: {
-                      value: 6,
-                      message: 'Password must be at least 6 characters',
-                    },
-                  })}
-                  type="password"
-                  placeholder="Enter a password"
-                  isInvalid={!!errors.password}
-                  disabled={isLoading}
-                  style={{
-                    borderRadius: '12px',
-                    padding: '12px',
-                    borderColor: errors.password ? '#dc3545' : '#e2e8f0',
-                    fontSize: '0.95rem',
-                  }}
-                />
-                {errors.password && (
-                  <Form.Control.Feedback type="invalid" className="d-block mt-2 small">
-                    {errors.password.message}
-                  </Form.Control.Feedback>
-                )}
-              </Form.Group>
-
-              {/* Confirm Password Field */}
-              <Form.Group className="mb-4">
-                <Form.Label className="fw-700 mb-2">Confirm Password</Form.Label>
-                <Form.Control
-                  {...register('confirmPassword', {
-                    required: 'Please confirm your password',
-                  })}
-                  type="password"
-                  placeholder="Confirm your password"
-                  isInvalid={!!errors.confirmPassword}
-                  disabled={isLoading}
-                  style={{
-                    borderRadius: '12px',
-                    padding: '12px',
-                    borderColor: errors.confirmPassword ? '#dc3545' : '#e2e8f0',
-                    fontSize: '0.95rem',
-                  }}
-                />
-                {errors.confirmPassword && (
-                  <Form.Control.Feedback type="invalid" className="d-block mt-2 small">
-                    {errors.confirmPassword.message}
-                  </Form.Control.Feedback>
-                )}
-              </Form.Group>
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-100 fw-800 mb-3"
-                style={{
-                  backgroundColor: '#2f6ced',
-                  border: 'none',
-                  borderRadius: '12px',
-                  padding: '12px',
-                  fontSize: '1rem',
-                }}
-              >
-                {isLoading ? (
-                  <>
-                    <span
-                      className="spinner-border spinner-border-sm me-2"
-                      role="status"
-                      aria-hidden="true"
+              <Row className="g-2">
+                {/* Full Name */}
+                <Col xs={12} className="mb-2">
+                  <Form.Label className="fw-700 x-small ms-2">Full Name</Form.Label>
+                  <div className={`search-box w-100 py-2 ${errors.name ? 'border-danger' : ''}`}>
+                    <i className="fa-solid fa-id-card small"></i>
+                    <input 
+                      type="text" 
+                      placeholder="Your name" 
+                      {...register('name', { required: true })} 
                     />
-                    Creating Account...
-                  </>
-                ) : (
-                  <>
-                    <i className="fa-solid fa-user-plus me-2" />
-                    Create Account
-                  </>
-                )}
-              </Button>
+                  </div>
+                </Col>
 
-              {/* Login Link */}
+                {/* Email */}
+                <Col xs={12} className="mb-2">
+                  <Form.Label className="fw-700 x-small ms-2">Email Address</Form.Label>
+                  <div className={`search-box w-100 py-2 ${errors.email ? 'border-danger' : ''}`}>
+                    <i className="fa-solid fa-envelope small"></i>
+                    <input 
+                      type="email" 
+                      placeholder="email@stilnovo.com" 
+                      {...register('email', { required: true })} 
+                    />
+                  </div>
+                </Col>
+
+                {/* Username */}
+                <Col xs={12} className="mb-2">
+                  <Form.Label className="fw-700 x-small ms-2">Username</Form.Label>
+                  <div className={`search-box w-100 py-2 ${errors.username ? 'border-danger' : ''}`}>
+                    <i className="fa-solid fa-user small"></i>
+                    <input 
+                      type="text" 
+                      placeholder="Choose a username" 
+                      {...register('username', { required: true })} 
+                    />
+                  </div>
+                </Col>
+
+                {/* Password */}
+                <Col md={6} className="mb-2">
+                  <Form.Label className="fw-700 x-small ms-2">Password</Form.Label>
+                  <div className={`search-box w-100 py-2 ${errors.password ? 'border-danger' : ''}`}>
+                    <i className="fa-solid fa-lock small"></i>
+                    <input 
+                      type="password" 
+                      placeholder="••••••" 
+                      {...register('password', { required: true, minLength: 6 })} 
+                    />
+                  </div>
+                </Col>
+
+                {/* Confirm Password */}
+                <Col md={6} className="mb-3">
+                  <Form.Label className="fw-700 x-small ms-2">Confirm</Form.Label>
+                  <div className={`search-box w-100 py-2 ${errors.confirmPassword ? 'border-danger' : ''}`}>
+                    <i className="fa-solid fa-check-double small"></i>
+                    <input 
+                      type="password" 
+                      placeholder="••••••" 
+                      {...register('confirmPassword', { required: true })} 
+                    />
+                  </div>
+                </Col>
+              </Row>
+
+              <button type="submit" className="btn-sell w-100 justify-content-center mb-3" disabled={isLoading}>
+                {isLoading ? 'Creating Account...' : 'Create Account'}
+              </button>
+              
               <div className="text-center">
-                <p className="small text-muted mb-0">
-                  Already have an account?{' '}
-                  <a href="/login" className="fw-700" style={{ color: '#2f6ced', textDecoration: 'none' }}>
-                    Log in here
-                  </a>
-                </p>
+                <Link to="/" className="text-muted small text-decoration-none fw-700">
+                  <i className="fa-solid fa-arrow-left me-2"></i>Back to Marketplace
+                </Link>
               </div>
             </Form>
-
-            {/* Back Link */}
-            <div className="text-center mt-4">
-              <a href="/" className="text-decoration-none" style={{ color: '#2f6ced' }}>
-                <i className="fa-solid fa-arrow-left me-2" />
-                Back to Market
-              </a>
-            </div>
-          </Card.Body>
-        </Card>
+          </div>
+        </Container>
       </div>
-    </Container>
-  );
-}
-
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  return (
-    <Container className="mt-5">
-      <Alert variant="danger">
-        <h4 className="alert-heading">Error!</h4>
-        <p>{error instanceof Error ? error.message : 'An unexpected error occurred'}</p>
-      </Alert>
-    </Container>
+    </div>
   );
 }
