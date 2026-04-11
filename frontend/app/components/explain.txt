@@ -1,0 +1,6 @@
+This folder is for generic implementations of components that are used across the app. 
+These components should be reusable and not specific to any particular feature or page. 
+
+Examples of components that could go in this folder 
+include buttons, form inputs, modals, and other UI elements
+that are commonly used throughout the app.
