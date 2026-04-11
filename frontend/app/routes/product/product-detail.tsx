@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import type { Route } from "./+types/product-detail";
+import type { Route } from "../+types/product-detail";
 import { getProduct, removeProduct } from "~/services/products-service";
 import {
   Alert,

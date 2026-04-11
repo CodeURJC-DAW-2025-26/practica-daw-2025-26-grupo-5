@@ -216,14 +216,14 @@ export default function AdminUsers({ loaderData }: { loaderData: any }) {
       />
 
       <div className="clay-card p-4 overflow-hidden shadow-sm bg-white" style={{ borderRadius: '20px' }}>
-        <div className="ag-theme-quartz" style={{ height: '600px', width: '100%' }}>
+        <div className="ag-theme-quartz" style={{ height: "600px", width: "100%" }}>
           <AgGridReact
+            key={rowData.length > 0 ? rowData[0].id : 'empty-grid'}
             rowData={rowData}
             columnDefs={columnDefs}
             defaultColDef={defaultColDef}
             pagination={true}
             paginationPageSize={10}
-            domLayout="autoHeight"
             suppressHorizontalScroll={false}
           />
         </div>

@@ -32,45 +32,106 @@ type Pages = {
       "*": string;
     };
   };
+  "/login": {
+    params: {};
+  };
+  "/signup": {
+    params: {};
+  };
+  "/admin": {
+    params: {};
+  };
+  "/admin/users": {
+    params: {};
+  };
+  "/admin/inventory": {
+    params: {};
+  };
+  "/admin/transactions": {
+    params: {};
+  };
+  "/admin/valorations": {
+    params: {};
+  };
 };
 
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/product/:id" | "/product/:id/edit" | "/product/new" | "/*";
+    page: "/" | "/product/:id" | "/product/:id/edit" | "/product/new" | "/*" | "/login" | "/signup" | "/admin" | "/admin/users" | "/admin/inventory" | "/admin/transactions" | "/admin/valorations";
   };
   "routes/home.tsx": {
     id: "routes/home";
     page: "/" | "/product/:id" | "/product/:id/edit" | "/product/new" | "/*";
   };
-  "routes/product-list.tsx": {
-    id: "routes/product-list";
+  "routes/product/product-list.tsx": {
+    id: "routes/product/product-list";
     page: "/";
   };
-  "routes/product-detail.tsx": {
-    id: "routes/product-detail";
+  "routes/product/product-detail.tsx": {
+    id: "routes/product/product-detail";
     page: "/product/:id";
   };
-  "routes/product-edit.tsx": {
-    id: "routes/product-edit";
+  "routes/product/product-edit.tsx": {
+    id: "routes/product/product-edit";
     page: "/product/:id/edit";
   };
-  "routes/product-new.tsx": {
-    id: "routes/product-new";
+  "routes/product/product-new.tsx": {
+    id: "routes/product/product-new";
     page: "/product/new";
   };
   "routes/not-found.tsx": {
     id: "routes/not-found";
     page: "/*";
   };
+  "routes/login.tsx": {
+    id: "routes/login";
+    page: "/login";
+  };
+  "routes/signup.tsx": {
+    id: "routes/signup";
+    page: "/signup";
+  };
+  "routes/admin.tsx": {
+    id: "routes/admin";
+    page: "/admin" | "/admin/users" | "/admin/inventory" | "/admin/transactions" | "/admin/valorations";
+  };
+  "routes/admin/dashboard.tsx": {
+    id: "routes/admin/dashboard";
+    page: "/admin";
+  };
+  "routes/admin/users.tsx": {
+    id: "routes/admin/users";
+    page: "/admin/users";
+  };
+  "routes/admin/inventory.tsx": {
+    id: "routes/admin/inventory";
+    page: "/admin/inventory";
+  };
+  "routes/admin/transactions.tsx": {
+    id: "routes/admin/transactions";
+    page: "/admin/transactions";
+  };
+  "routes/admin/valorations.tsx": {
+    id: "routes/admin/valorations";
+    page: "/admin/valorations";
+  };
 };
 
 type RouteModules = {
   "root": typeof import("./app/root.tsx");
   "routes/home": typeof import("./app/routes/home.tsx");
-  "routes/product-list": typeof import("./app/routes/product-list.tsx");
-  "routes/product-detail": typeof import("./app/routes/product-detail.tsx");
-  "routes/product-edit": typeof import("./app/routes/product-edit.tsx");
-  "routes/product-new": typeof import("./app/routes/product-new.tsx");
+  "routes/product/product-list": typeof import("./app/routes/product/product-list.tsx");
+  "routes/product/product-detail": typeof import("./app/routes/product/product-detail.tsx");
+  "routes/product/product-edit": typeof import("./app/routes/product/product-edit.tsx");
+  "routes/product/product-new": typeof import("./app/routes/product/product-new.tsx");
   "routes/not-found": typeof import("./app/routes/not-found.tsx");
+  "routes/login": typeof import("./app/routes/login.tsx");
+  "routes/signup": typeof import("./app/routes/signup.tsx");
+  "routes/admin": typeof import("./app/routes/admin.tsx");
+  "routes/admin/dashboard": typeof import("./app/routes/admin/dashboard.tsx");
+  "routes/admin/users": typeof import("./app/routes/admin/users.tsx");
+  "routes/admin/inventory": typeof import("./app/routes/admin/inventory.tsx");
+  "routes/admin/transactions": typeof import("./app/routes/admin/transactions.tsx");
+  "routes/admin/valorations": typeof import("./app/routes/admin/valorations.tsx");
 };

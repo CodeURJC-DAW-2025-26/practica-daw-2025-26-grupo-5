@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router";
-import type { Route } from "./+types/product-list";
+import type { Route } from "../+types/product-list";
 import { getProducts } from "~/services/products-service";
 import type ProductDTO from "~/dtos/ProductDTO";
 import { Card, Container, Row, Col, Button } from "react-bootstrap";

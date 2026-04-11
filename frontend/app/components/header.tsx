@@ -1,7 +1,7 @@
 import React, { useActionState, useEffect, useState } from "react";
-import { Modal, Button } from "react-bootstrap";
+import { Modal, Button, NavDropdown } from "react-bootstrap";
 import { useUserStore } from "~/stores/useUserStore";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import "../app.css";
 import logo from "../assets/logo.png";
 
@@ -11,9 +11,10 @@ import logo from "../assets/logo.png";
  */
 export default function Header() {
   const [isErrorLoginDialogOpen, setErrorLoginDialogOpen] = useState(false);
+  const [profileImageError, setProfileImageError] = useState(false);
 
   // Accedemos al store de Zustand
-  const { user, loginError, loadLoggedUser, loginUser, logoutUser } = useUserStore();
+  const { user, loginError, isAuthLoading, loadLoggedUser, loginUser, logoutUser } = useUserStore();
 
   const handleShowErrorLoginDialog = () => setErrorLoginDialogOpen(true);
   const handleCloseErrorLoginDialog = () => setErrorLoginDialogOpen(false);
@@ -49,10 +50,10 @@ export default function Header() {
    */
   useEffect(() => {
     loadLoggedUser();
-  }, [loadLoggedUser]);
+  }, []);
 
   // Comprobación de Admin basada en tu UserDTO (roles: string[])
-  const isAdmin = user?.roles.includes("ADMIN");
+  const isAdmin = user?.roles?.includes("ROLE_ADMIN") || user?.roles?.includes("ADMIN");
 
   return (
     <>
@@ -72,81 +73,74 @@ export default function Header() {
         </form>
 
         <nav className="nav-actions">
-          {user ? (
+          {isAuthLoading ? (
+            /* --- LOADING STATE --- */
+            <div style={{ width: '42px', height: '42px' }} />
+          ) : user ? (
             /* --- VISTA USUARIO LOGUEADO --- */
-            <div className="dropdown">
-              <div
-                className="d-flex align-items-center gap-3"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-                style={{ cursor: "pointer" }}
-              >
-                <div className="text-end d-none d-lg-block">
-                  <p className="mb-0 small fw-800 lh-1 text-dark">{user.name}</p>
-                  <p className="mb-0 x-small fw-700 text-muted">
-                    My Account <i className="fa-solid fa-chevron-down ms-1" style={{ fontSize: "0.6rem" }}></i>
-                  </p>
+            <NavDropdown
+              title={
+                <div className="d-flex align-items-center gap-3">
+                  <div className="text-end d-none d-lg-block">
+                    <p className="mb-0 small fw-800 lh-1 text-dark">{user.name}</p>
+                    <p className="mb-0 x-small fw-700 text-muted">
+                      My Account <i className="fa-solid fa-chevron-down ms-1" style={{ fontSize: "0.6rem" }}></i>
+                    </p>
+                  </div>
+                  <div className="position-relative">
+                    <img
+                      src={profileImageError ? `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23e2e8f0' width='100' height='100'/%3E%3Ctext x='50' y='50' text-anchor='middle' dy='.3em' fill='%231A365D' font-size='40' font-weight='bold'%3E${user.name?.charAt(0).toUpperCase()}%3C/text%3E%3C/svg%3E` : `http://localhost:8443/api/v1/users/me/photo`}
+                      className="rounded-circle border border-2 border-white shadow-sm profile-nav-img"
+                      width="42"
+                      height="42"
+                      style={{ objectFit: "cover" }}
+                      onError={() => setProfileImageError(true)}
+                      alt="Profile"
+                    />
+                    {!user.banned && (
+                      <span className="position-absolute bottom-0 end-0 p-1 bg-success border border-2 border-white rounded-circle"></span>
+                    )}
+                  </div>
                 </div>
+              }
+              id="user-nav-dropdown"
+              align="end"
+              className="user-dropdown"
+            >
+              <NavDropdown.Item as={Link} to="/user-page" className="fw-700 small">
+                <i className="fa-solid fa-user me-2" />
+                My Profile
+              </NavDropdown.Item>
+              <NavDropdown.Item as={Link} to="/sales-and-orders-page" className="fw-700 small">
+                <i className="fa-solid fa-bag-shopping me-2" />
+                My Purchases
+              </NavDropdown.Item>
+              
+              {/* Admin Panel Link - Visible for all logged-in users for testing */}
+              <NavDropdown.Item as={Link} to="/admin" className="fw-700 small text-primary">
+                <i className="fa-solid fa-shield me-2" />
+                Admin Panel
+              </NavDropdown.Item>
 
-                <div className="position-relative">
-                  <img
-                    src="/user/me/profile-photo"
-                    className="rounded-circle border border-2 border-white shadow-sm profile-nav-img"
-                    width="42"
-                    height="42"
-                    style={{ objectFit: "cover" }}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = "/images/profile-photo.png";
-                    }}
-                    alt="Profile"
-                  />
-                  {/* Punto verde de status si no está baneado */}
-                  {!user.banned && (
-                    <span className="position-absolute bottom-0 end-0 p-1 bg-success border border-2 border-white rounded-circle"></span>
-                  )}
-                </div>
-              </div>
-
-              <ul className="dropdown-menu dropdown-menu-end shadow-lg border-0 rounded-4 p-2 mt-3 animate slideIn">
-                <li>
-                  <Link className="dropdown-item rounded-3 py-2 fw-700 small" to="/user-page">
-                    View Profile
-                  </Link>
-                </li>
-                <li>
-                  <Link className="dropdown-item rounded-3 py-2 fw-700 small" to="/user-products-page">
-                    My Inventory
-                  </Link>
-                </li>
-                
-                {/* Lógica para ADMIN usando roles.includes */}
-                {isAdmin && (
-                  <li>
-                    <Link className="dropdown-item rounded-3 py-2 fw-700 small" to="/admin">
-                      Administration
-                    </Link>
-                  </li>
-                )}
-
-                <li><hr className="dropdown-divider opacity-50" /></li>
-                <li>
-                  <form action={logoutFormAction} className="m-0">
-                    <button
-                      type="submit"
-                      disabled={isLoggingOut}
-                      className="dropdown-item rounded-3 py-2 fw-700 small text-danger border-0 bg-transparent w-100 text-start"
-                    >
-                      {isLoggingOut ? "Logging out..." : "Log out"}
-                    </button>
-                  </form>
-                </li>
-              </ul>
-            </div>
+              <NavDropdown.Divider />
+              <NavDropdown.Item as="div" className="p-0">
+                <form action={logoutFormAction} className="m-0">
+                  <button
+                    type="submit"
+                    disabled={isLoggingOut}
+                    className="dropdown-item rounded-3 py-2 fw-700 small text-danger border-0 bg-transparent w-100 text-start"
+                  >
+                    <i className="fa-solid fa-sign-out-alt me-2" />
+                    {isLoggingOut ? "Logging out..." : "Sign out"}
+                  </button>
+                </form>
+              </NavDropdown.Item>
+            </NavDropdown>
           ) : (
             /* --- VISTA USUARIO NO LOGUEADO --- */
             <div className="d-flex align-items-center gap-3">
-              <Link to="/login-page" className="link-login">Log in</Link>
-              <Link to="/signup-page" className="btn-signup">Sign up</Link>
+              <Link to="/login" className="link-login">Log in</Link>
+              <Link to="/signup" className="btn-signup">Sign up</Link>
             </div>
           )}
         </nav>

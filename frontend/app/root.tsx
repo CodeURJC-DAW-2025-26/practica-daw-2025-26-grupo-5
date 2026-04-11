@@ -7,6 +7,9 @@ import {
   ScrollRestoration,
 } from "react-router";
 
+import "bootstrap/dist/css/bootstrap.min.css";
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-quartz.css';
 import type { Route } from "./+types/root";
 import "./app.css";
 
