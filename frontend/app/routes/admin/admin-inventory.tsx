@@ -3,12 +3,12 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { redirect } from 'react-router';
 import { AgGridReact } from 'ag-grid-react';
 import { Modal, Button, Form } from 'react-bootstrap';
-import { getAdminProducts, updateProduct, deleteProduct, createProduct } from '~/services/adminService';
+import { getAdminProducts, updateProduct, deleteProduct, createProduct } from '~/services/admin-service';
 import type ProductDTO from '~/dtos/ProductDTO';
 import AdminHeader from '~/components/admin/AdminHeader';
-import ConfirmModal from '~/components/ConfirmModal';
-import FormInput from '~/components/FormInput';
-import FormSelect from '~/components/FormSelect';
+import ConfirmModal from '~/components/confirm-modal';
+import FormInput from '~/components/form-input';
+import FormSelect from '~/components/form-select';
 
 // Estilos obligatorios de Ag-Grid
 import 'ag-grid-community/styles/ag-grid.css';

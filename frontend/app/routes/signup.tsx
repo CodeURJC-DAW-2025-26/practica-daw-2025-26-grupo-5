@@ -4,6 +4,8 @@ import { Container, Form, Alert, Row, Col } from 'react-bootstrap';
 import type { Route } from './+types/signup';
 import React, { useState } from 'react';
 import logo from "../assets/logo.png";
+import Footer from '~/components/footer';
+import Loader from '~/components/SignupLoader'; // Tu componente de styled-components
 
 interface SignupFormData {
   name: string;
@@ -14,16 +16,11 @@ interface SignupFormData {
   profilePicture?: FileList;
 }
 
-/**
- * Signup Page Component
- * Formatted to match Stilnovo's premium auth design
- */
 export default function Signup({}: Route.ComponentProps) {
   const {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
   } = useForm<SignupFormData>();
 
   const navigate = useNavigate();
@@ -31,7 +28,6 @@ export default function Signup({}: Route.ComponentProps) {
   const [signupError, setSignupError] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  // Watch for image changes to generate a preview
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -45,23 +41,26 @@ export default function Signup({}: Route.ComponentProps) {
       return;
     }
 
-    setIsLoading(true);
-    // Note: In a real P3 scenario, use FormData if uploading a profile picture
+    setIsLoading(true); // Se activa el loader de "Generating..."
+    
     const formData = new FormData();
-    formData.append('username', data.username);
-    formData.append('name', data.name);
-    formData.append('email', data.email);
-    formData.append('password', data.password);
-    formData.append('confirmPassword', data.confirmPassword);
     if (data.profilePicture?.[0]) {
       formData.append('profilePicture', data.profilePicture[0]);
     }
+    formData.append('username', data.username);
+    formData.append('email', data.email);
+    formData.append('password', data.password);
+    formData.append('confirmPassword', data.confirmPassword);
 
     try {
-      const response = await fetch(`${window.location.origin}/api/v1/users`, {
-        method: 'POST',
-        body: formData, // Sending as Multipart to support the image
-      });
+      // Forzamos 2.5 segundos para que la animación de las letras luzca
+      const [response] = await Promise.all([
+        fetch(`${window.location.origin}/api/v1/users`, {
+          method: 'POST',
+          body: formData,
+        }),
+        new Promise((resolve) => setTimeout(resolve, 2500))
+      ]);
 
       if (response.ok) {
         navigate('/login');
@@ -76,6 +75,10 @@ export default function Signup({}: Route.ComponentProps) {
   };
 
   return (
+    <>
+    {/* Renderizamos tu Loader solo cuando isLoading es true */}
+    {isLoading && <Loader />}
+
     <div className="auth-page">
       {/* --- AUTH HEADER --- */}
       <header className="navbar container-fluid px-lg-5 py-3 header-border-line bg-white">
@@ -109,7 +112,6 @@ export default function Signup({}: Route.ComponentProps) {
 
             <Form onSubmit={handleSubmit(onSubmit)}>
               
-              {/* AVATAR UPLOAD SECTION */}
               <div className="text-center mb-3">
                 <div className="profile-upload-container mx-auto position-relative overflow-hidden d-flex align-items-center justify-content-center">
                   {!previewUrl && <i className="fa-solid fa-user-plus text-muted"></i>}
@@ -133,20 +135,18 @@ export default function Signup({}: Route.ComponentProps) {
               </div>
 
               <Row className="g-2">
-                {/* Full Name */}
                 <Col xs={12} className="mb-2">
                   <Form.Label className="fw-700 x-small ms-2">Full Name</Form.Label>
-                  <div className={`search-box w-100 py-2 ${errors.name ? 'border-danger' : ''}`}>
+                  <div className={`search-box w-100 py-2 ${errors.username ? 'border-danger' : ''}`}>
                     <i className="fa-solid fa-id-card small"></i>
                     <input 
                       type="text" 
                       placeholder="Your name" 
-                      {...register('name', { required: true })} 
+                      {...register('username', { required: true })} 
                     />
                   </div>
                 </Col>
 
-                {/* Email */}
                 <Col xs={12} className="mb-2">
                   <Form.Label className="fw-700 x-small ms-2">Email Address</Form.Label>
                   <div className={`search-box w-100 py-2 ${errors.email ? 'border-danger' : ''}`}>
@@ -159,20 +159,6 @@ export default function Signup({}: Route.ComponentProps) {
                   </div>
                 </Col>
 
-                {/* Username */}
-                <Col xs={12} className="mb-2">
-                  <Form.Label className="fw-700 x-small ms-2">Username</Form.Label>
-                  <div className={`search-box w-100 py-2 ${errors.username ? 'border-danger' : ''}`}>
-                    <i className="fa-solid fa-user small"></i>
-                    <input 
-                      type="text" 
-                      placeholder="Choose a username" 
-                      {...register('username', { required: true })} 
-                    />
-                  </div>
-                </Col>
-
-                {/* Password */}
                 <Col md={6} className="mb-2">
                   <Form.Label className="fw-700 x-small ms-2">Password</Form.Label>
                   <div className={`search-box w-100 py-2 ${errors.password ? 'border-danger' : ''}`}>
@@ -185,7 +171,6 @@ export default function Signup({}: Route.ComponentProps) {
                   </div>
                 </Col>
 
-                {/* Confirm Password */}
                 <Col md={6} className="mb-3">
                   <Form.Label className="fw-700 x-small ms-2">Confirm</Form.Label>
                   <div className={`search-box w-100 py-2 ${errors.confirmPassword ? 'border-danger' : ''}`}>
@@ -212,6 +197,8 @@ export default function Signup({}: Route.ComponentProps) {
           </div>
         </Container>
       </div>
+      <Footer />
     </div>
+    </>
   );
 }

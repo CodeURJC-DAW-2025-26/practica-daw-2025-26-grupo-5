@@ -5,11 +5,11 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 
 // Importamos el nombre correcto de la función: getAdminTransactions
-import { getAdminTransactions } from '~/services/adminService';
+import { getAdminTransactions } from '~/services/admin-service';
 import type TransactionDTO from '~/dtos/TransactionDTO';
 import type PagedResponse from '~/dtos/PagedResponse';
 import AdminHeader from '~/components/admin/AdminHeader';
-import ConfirmModal from '~/components/ConfirmModal';
+import ConfirmModal from '~/components/confirm-modal';
 
 export async function clientLoader() {
   try {

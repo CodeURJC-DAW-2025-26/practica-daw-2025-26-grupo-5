@@ -2199,31 +2199,48 @@ main.overflow-auto {
         stroke-dashoffset: -125px;
     }
 }
+
 .page-spinner-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(255, 255, 255, 0.7); /* Background blur effect */
+    /* Fondo mucho más transparente (0.3) */
+    background: rgba(255, 255, 255, 0.3);
+    /* Desenfoque ligero para que no parezca una mancha blanca */
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    /* Soporte para Safari */
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 9999; /* Always on top */
+    z-index: 9999;
+    transition: all 0.3s ease;
+    /* Transición suave */
 }
+
 .custom-loader {
     width: 50px;
     height: 50px;
-    border: 5px solid #e5e7eb; /* Gris claro */
-    border-top: 5px solid #3b82f6; /* Azul Stilnovo */
+    border: 5px solid #e5e7eb;
+    /* Gris claro */
+    border-top: 5px solid #3b82f6;
+    /* Azul Stilnovo */
     border-radius: 50%;
     animation: spin-loader 1s linear infinite;
 }
 
 @keyframes spin-loader {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
+
 /* --- HEADER FIXES --- */
 
 /* Quitar la flecha negra por defecto de Bootstrap en el dropdown de usuario */
@@ -2233,5 +2250,79 @@ main.overflow-auto {
 
 /* Asegurar que el logo 'Stilnovo' tenga el mismo tamaño siempre */
 .brand {
-    font-size: 1.5rem; /* Ajusta este valor al tamaño que prefieras para ambos */
+    font-size: 1.5rem;
+    /* Ajusta este valor al tamaño que prefieras para ambos */
+}
+
+/* app/app.css */
+
+.error-wrapper-full {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at center, #ffffff 0%, #f1f5f9 100%);
+    padding: 2rem;
+}
+
+.error-card-wide {
+    background: white;
+    border-radius: 40px;
+    padding: 4rem;
+    width: 100%;
+    max-width: 900px;
+    /* Aquí está el secreto del look alargado */
+    box-shadow: 20px 20px 60px #d1d5db, -20px -20px 60px #ffffff;
+    /* Efecto Clay profundo */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.error-code-giant {
+    font-size: 9rem;
+    font-weight: 900;
+    background: linear-gradient(to bottom, #3b82f6, #1e3a8a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+    letter-spacing: -6px;
+}
+
+/* Fix para el botón invisible de la captura */
+.btn-primary-stilnovo {
+    background-color: #3b82f6 !important;
+    color: white !important;
+    font-weight: 700;
+    padding: 1rem 3rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.btn-primary-stilnovo:hover {
+    background-color: #2563eb !important;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+    color: white !important;
+}
+
+.btn-outline-stilnovo {
+    border: 2px solid #e2e8f0 !important;
+    color: #64748b !important;
+    font-weight: 700;
+    padding: 1rem 3rem;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+    background: transparent;
+}
+
+.btn-outline-stilnovo:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1 !important;
+    color: #1e293b !important;
 }

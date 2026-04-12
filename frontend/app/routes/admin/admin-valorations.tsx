@@ -5,11 +5,11 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 
 // Importamos el nombre correcto: deleteValoration (sin el "Admin")
-import { getAdminValorations, deleteValoration } from '~/services/adminService';
+import { getAdminValorations, deleteValoration } from '~/services/admin-service';
 import type ValorationDTO from '~/dtos/ValorationDTO';
 import type PagedResponse from '~/dtos/PagedResponse';
 import AdminHeader from '~/components/admin/AdminHeader';
-import ConfirmModal from '~/components/ConfirmModal';
+import ConfirmModal from '~/components/confirm-modal';
 
 export async function clientLoader() {
   try {

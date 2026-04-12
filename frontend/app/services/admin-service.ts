@@ -1,4 +1,4 @@
-import api from "./api"; // Importación corregida (default import)
+import api from "./api";
 import type UserDTO from "~/dtos/UserDTO";
 import type ProductDTO from "~/dtos/ProductDTO";
 import type PagedResponse from "~/dtos/PagedResponse";

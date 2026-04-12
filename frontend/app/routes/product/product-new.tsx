@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import { useActionState } from "react";
 import type { Route } from "../+types/product-new";
-import ProductForm from "~/components/product-form";
+import ProductForm from "~/components/ProductForm";
 import { addProduct, uploadProductImage } from "~/services/products-service";
 
 /**

@@ -1,5 +1,5 @@
 import { redirect } from 'react-router';
-import { getAdminSummary } from '~/services/adminService';
+import { getAdminSummary } from '~/services/admin-service';
 import type AdminSummaryDTO from '~/dtos/AdminSummaryDTO';
 import AdminHeader from '~/components/admin/AdminHeader';
 

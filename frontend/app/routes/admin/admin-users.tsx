@@ -4,11 +4,11 @@ import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 
-import { getAdminUsers, banUser, deleteUser } from '~/services/adminService';
+import { getAdminUsers, banUser, deleteUser } from '~/services/admin-service';
 import type UserDTO from '~/dtos/UserDTO';
 import type PagedResponse from '~/dtos/PagedResponse';
 import AdminHeader from '~/components/admin/AdminHeader';
-import ConfirmModal from '~/components/ConfirmModal';
+import ConfirmModal from '~/components/confirm-modal';
 
 /**
  * Client-side loader: Fetches all users for the admin panel
