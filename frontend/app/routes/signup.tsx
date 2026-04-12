@@ -5,7 +5,7 @@ import type { Route } from './+types/signup';
 import React, { useState } from 'react';
 import logo from "../assets/logo.png";
 import Footer from '~/components/footer';
-import Loader from '~/components/SignupLoader'; // Tu componente de styled-components
+import Loader from '~/components/Loader'; // Tu componente de styled-components
 
 interface SignupFormData {
   name: string;
