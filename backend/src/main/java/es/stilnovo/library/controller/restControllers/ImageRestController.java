@@ -62,8 +62,8 @@ public class ImageRestController {
 		@ApiResponse(responseCode = "200", description = "Image metadata retrieved successfully"),
 		@ApiResponse(responseCode = "404", description = "Product or image not found")
 	})
-	public ImageDTO getProductImage(@PathVariable long productId) {
-		return imageMapper.toDTO(imageService.getProductImage(productId));
+	public ResponseEntity<Resource> getProductImage(@PathVariable long productId) throws SQLException {
+		return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageService.getImageFile(productId));
 	}
 
 	/**

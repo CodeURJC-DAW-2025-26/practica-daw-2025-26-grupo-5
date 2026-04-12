@@ -20,6 +20,19 @@ export async function getProducts(): Promise<ProductDTO[]> {
 }
 
 /**
+ * Gets the products belonging to the currently authenticated user.
+ * Matches Backend: @GetMapping("/me") -> List<ProductDTO>
+ */
+export async function getMyProducts(): Promise<ProductDTO[]> {
+  const response = await api.get(`/v1/products/me`);
+  return response.data;
+}
+
+export async function deleteProduct(id: number): Promise<void> {
+  await api.delete(`/v1/products/${id}`);
+}
+
+/**
  * Get a single product by ID
  * Backend returns ProductDetailsDTO, extract product
  */
