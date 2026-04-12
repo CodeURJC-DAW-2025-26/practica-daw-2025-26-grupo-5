@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import es.stilnovo.library.dto.ImageDTO;
-import es.stilnovo.library.dto.ImageMapper;
 import es.stilnovo.library.dto.ProductDTO;
 import es.stilnovo.library.dto.ProductMapper;
 import es.stilnovo.library.service.ImageService;
@@ -45,8 +43,6 @@ public class ImageRestController {
 	@Autowired
 	private ProductService productService;
 
-	@Autowired
-	private ImageMapper imageMapper;
 
 	@Autowired
 	private ProductMapper productMapper;
