@@ -49,6 +49,7 @@ frontend/node_modules/
 frontend/dist/
 frontend/build/
 frontend/.eslintcache
+frontend/.react-router/
 
 # --- Backend SPA Integration ---
 backend/src/main/resources/ai-aplication-key.properties
