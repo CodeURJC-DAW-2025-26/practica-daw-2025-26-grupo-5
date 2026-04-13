@@ -18,7 +18,6 @@ public class AIRestController {
     private AIService aiService;
 
     @PostMapping("/generate-description")
-
     public ResponseEntity<String> generateDescription(@RequestBody AIDescriptionRequestDTO request) {
 
         // Security validation

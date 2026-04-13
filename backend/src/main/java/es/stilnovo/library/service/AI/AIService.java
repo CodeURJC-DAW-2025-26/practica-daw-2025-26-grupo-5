@@ -18,6 +18,11 @@ public class AIService {
 
     @SuppressWarnings("rawtypes")
     public String callAI(String prompt) {
+
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            return "AI Service is disabled. Please configure a valid API key (check readme documentation). You can put a normal description here as always.";
+        }
+
         RestTemplate restTemplate = new RestTemplate();
         String url = API_URL + apiKey;
 
@@ -48,9 +53,14 @@ public class AIService {
             return "No se ha podido generar la descripción.";
 
         } catch (HttpClientErrorException e) {
-            // ESTO ES LO MÁS IMPORTANTE: Te dirá en la consola por qué Google te rechaza
-            System.err.println("ERROR DE GOOGLE: " + e.getResponseBodyAsString());
-            return "Error de la API de Google (" + e.getStatusCode() + "). Revisa la consola.";
+            if (e.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
+                // Log the quota issue for the developer
+                System.err.println("AI QUOTA EXCEEDED: Limit of 20 requests reached.");
+                return "The AI assistant is tired and has reached its daily limit. Please try again tomorrow.";
+            }
+            System.err.println("GOOGLE API ERROR: " + e.getResponseBodyAsString());
+            return "The AI service is currently unavailable (" + e.getStatusCode() + ").";
+
         } catch (Exception e) {
             e.printStackTrace();
             return "Error interno al generar descripción.";
