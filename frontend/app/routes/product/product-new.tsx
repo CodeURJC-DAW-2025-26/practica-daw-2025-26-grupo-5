@@ -46,9 +46,9 @@ export default function ProductNew() {
     const price = parseFloat(formData.get("price") as string);
     const location = formData.get("location") as string;
     const description = formData.get("description") as string;
-    const imageFile = formData.get("image") as File; 
+    const file = formData.get("image") as File; 
 
-    if (!imageFile || imageFile.size === 0) {
+    if (!file || file.size === 0) {
       return { success: false, error: "La foto es obligatoria para vender en Stilnovo." };
     }
 
@@ -62,7 +62,7 @@ export default function ProductNew() {
         location,
         description,
         status: "Active",
-        file: imageFile,
+        file,
       });
 
       navigate(`/product/${newProduct.id}`);

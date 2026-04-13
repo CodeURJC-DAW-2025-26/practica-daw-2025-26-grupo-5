@@ -21,14 +21,15 @@ export default [
 
   //Private user routes
   layout("routes/user.tsx", [
-    route("user-page", "routes/user/user-page.tsx"),
-    route("user-products", "routes/user/user-products.tsx"),
-    route("user-sales-orders", "routes/user/user-sales-orders.tsx"),
-    route("user-valorations", "routes/user/user-valorations.tsx"),
-    route("user-statistics", "routes/user/user-statistics.tsx"),
-    route("user-user-settings", "routes/user/user-settings.tsx"),
+    route("user/page", "routes/user/user-page.tsx"),
+    route("user/products", "routes/user/user-products.tsx"),
+    route("user/sales-orders", "routes/user/user-sales-orders.tsx"),
+    route("user/valorations", "routes/user/user-valorations.tsx"),
+    route("user/statistics", "routes/user/user-statistics.tsx"),
+    route("user/settings", "routes/user/user-settings.tsx"),
 
-    route("product-new", "routes/product/product-new.tsx"),
+    route("product/new", "routes/product/product-new.tsx"),
+    route("product/:id/edit", "routes/product/product-edit.tsx"),
   ]),
 
   // Admin routes with separate layout

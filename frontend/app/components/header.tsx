@@ -85,8 +85,8 @@ export default function Header() {
                   align="end"
                   className="custom-nav-dropdown" // Clase añadida para el fix de la flecha
                 >
-                  <NavDropdown.Item as={Link} to="/user-page" className="fw-700 small">View Profile</NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to="/user-products" className="fw-700 small">My Inventory</NavDropdown.Item>
+                  <NavDropdown.Item as={Link} to="/user/page" className="fw-700 small">View Profile</NavDropdown.Item>
+                  <NavDropdown.Item as={Link} to="/user/products" className="fw-700 small">My Inventory</NavDropdown.Item>
                   
                   {user.roles?.includes("ROLE_ADMIN") && (
                     <NavDropdown.Item as={Link} to="/admin" className="fw-700 small text-primary">Administration</NavDropdown.Item>

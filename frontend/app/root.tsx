@@ -5,6 +5,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useNavigation,
 } from "react-router";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -13,6 +14,7 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 import type { Route } from "./+types/root";
 import "./app.css";
 import ErrorPage from "./routes/error-page";
+import Loader from '~/components/Loader';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -36,7 +38,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  const navigation = useNavigation();
+  
+  const isLoading = navigation.state === "loading";
+
+  return (
+    <>
+      {isLoading && <Loader />}
+      <Outlet />
+    </>
+  );
 }
 
 export function ErrorBoundary() {

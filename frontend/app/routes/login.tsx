@@ -1,4 +1,3 @@
-// app/routes/login.tsx
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useLocation, Link } from 'react-router';
@@ -7,7 +6,7 @@ import { useUserStore } from '~/stores/useUserStore';
 import type { Route } from './+types/login';
 import logo from "../assets/logo.png";
 import Footer from '~/components/footer';
-import Loader from '~/components/Loader'; // Importamos tu Loader
+import Loader from '~/components/Loader'; 
 
 interface LoginFormData {
   username: string;

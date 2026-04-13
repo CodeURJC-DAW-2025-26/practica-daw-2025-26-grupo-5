@@ -57,7 +57,7 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
 
       {user && (
         <div className="text-center mt-5">
-          <Button as={Link as any} to="/product-new" className="btn-sell">
+          <Button as={Link as any} to="/product/new" className="btn-sell">
             Sell New Treasure
           </Button>
         </div>

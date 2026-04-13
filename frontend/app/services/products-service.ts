@@ -3,6 +3,7 @@ import type ProductDTO from "~/dto/ProductDTO";
 import type ProductWriteRequestDTO from "~/dto/ProductWriteRequestDTO";
 import type PagedResponse from "~/dto/PagedResponse";
 import type ProductDetailsDTO from "~/dto/ProductDetailsDTO";
+import axios from "axios";
 
 /**
  * Products Service
@@ -36,7 +37,7 @@ export async function deleteProduct(id: number): Promise<void> {
  * Get a single product by ID
  * Backend returns ProductDetailsDTO, extract product
  */
-export async function getProduct(id: string): Promise<ProductDTO> {
+export async function getProductById(id: number): Promise<ProductDTO> {
   const response = await api.get(`/v1/products/${id}`);
   const detailsDTO = response.data as ProductDetailsDTO;
   return detailsDTO.product;
@@ -62,7 +63,6 @@ export async function addProduct(
   formData.append("status", product.status);
   
 
-  // Axios enviará automáticamente el header multipart/form-data
   const response = await api.post("/v1/products", formData);
   return response.data;
 }
@@ -70,12 +70,21 @@ export async function addProduct(
 /**
  * Update an existing product
  */
-export async function updateProduct(
-  id: string,
-  product: ProductWriteRequestDTO
-): Promise<ProductDTO> {
-  const response = await api.put(`/v1/products/${id}`, product);
-  return response.data;
+export async function updateProduct(id: number, productData: any) {
+  const formData = new FormData();
+  
+  formData.append('name', productData.name);
+  formData.append('category', productData.category);
+  formData.append('price', productData.price.toString());
+  formData.append('description', productData.description);
+  formData.append('location', productData.location);
+  formData.append('status', productData.status);
+  
+  
+
+  return await axios.patch(`/api/v1/products/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
 }
 
 /**
@@ -102,12 +111,14 @@ export async function uploadProductImage(
 }
 
 /**
- * Replace an existing product image
+ * Replace an existing product image.
  */
-export async function replaceImage(imageId: number, file: File): Promise<void> {
+export async function replaceImage(productId: number, file: File): Promise<void> {
   const formData = new FormData();
-  formData.append("image", file);
-  await api.put(`/v1/images/${imageId}`, formData, {
+  
+  formData.append("file", file); 
+
+  await api.post(`/v1/products/${productId}/image`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

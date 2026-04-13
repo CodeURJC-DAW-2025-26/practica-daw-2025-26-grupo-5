@@ -1,5 +1,5 @@
-import { useNavigate, useParams } from "react-router";
-import { getProduct, removeProduct } from "~/services/products-service";
+import { useNavigate, useParams, useNavigation } from "react-router";
+import { getProductById, removeProduct } from "~/services/products-service";
 import {
   Alert,
   Button,
@@ -17,9 +17,9 @@ import { Link } from "react-router";
  * Client-side loader: Fetches product details
  */
 export async function clientLoader({ params }: { params: any }) {
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 2000));
 
-  return await getProduct(params.id!);
+  return await getProductById(params.id!);
 }
 
 /**
@@ -80,7 +80,7 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
               )}
 
               <img
-                src={`/api/v1/images/${product.id}/file`}
+                src={`/api/v1/products/${product.id}/image`}
                 alt={product.name}
                 className={`main-product-image img-fluid rounded-4 ${!isActive ? 'opacity-25 grayscale' : ''}`}
                 style={{ maxHeight: '500px', objectFit: 'contain' }}

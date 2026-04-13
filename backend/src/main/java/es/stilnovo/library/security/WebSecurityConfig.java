@@ -195,7 +195,7 @@ public class WebSecurityConfig {
 
                 // Allows requests from any origin for documentation tools
                 configuration.setAllowedOriginPatterns(List.of("*"));
-                configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
                 configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Cache-Control"));
                 configuration.setAllowCredentials(true);
 
