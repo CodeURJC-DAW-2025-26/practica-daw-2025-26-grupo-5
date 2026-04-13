@@ -41,6 +41,9 @@ hs_err_pid*
 #ENV file
 *.env
 
+# --- API Keys & Secrets ---
+backend/src/main/resources/ai-aplication-key.properties
+
 # --- Frontend (React) ---
 frontend/node_modules/
 frontend/dist/
