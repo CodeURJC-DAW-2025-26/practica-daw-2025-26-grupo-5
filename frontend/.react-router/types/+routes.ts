@@ -25,26 +25,31 @@ type Pages = {
   "/signup": {
     params: {};
   };
-  "/user-page": {
+  "/user/page": {
     params: {};
   };
-  "/user-products": {
+  "/user/products": {
     params: {};
   };
-  "/user-sales-orders": {
+  "/user/sales-orders": {
     params: {};
   };
-  "/user-valorations": {
+  "/user/valorations": {
     params: {};
   };
-  "/user-statistics": {
+  "/user/statistics": {
     params: {};
   };
-  "/user-user-settings": {
+  "/user/settings": {
     params: {};
   };
-  "/product-new": {
+  "/product/new": {
     params: {};
+  };
+  "/product/:id/edit": {
+    params: {
+      "id": string;
+    };
   };
   "/admin": {
     params: {};
@@ -71,7 +76,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/product/:id" | "/login" | "/signup" | "/user-page" | "/user-products" | "/user-sales-orders" | "/user-valorations" | "/user-statistics" | "/user-user-settings" | "/product-new" | "/admin" | "/admin/users" | "/admin/inventory" | "/admin/transactions" | "/admin/valorations" | "/*";
+    page: "/" | "/product/:id" | "/login" | "/signup" | "/user/page" | "/user/products" | "/user/sales-orders" | "/user/valorations" | "/user/statistics" | "/user/settings" | "/product/new" | "/product/:id/edit" | "/admin" | "/admin/users" | "/admin/inventory" | "/admin/transactions" | "/admin/valorations" | "/*";
   };
   "routes/home.tsx": {
     id: "routes/home";
@@ -95,35 +100,39 @@ type RouteFiles = {
   };
   "routes/user.tsx": {
     id: "routes/user";
-    page: "/user-page" | "/user-products" | "/user-sales-orders" | "/user-valorations" | "/user-statistics" | "/user-user-settings" | "/product-new";
+    page: "/user/page" | "/user/products" | "/user/sales-orders" | "/user/valorations" | "/user/statistics" | "/user/settings" | "/product/new" | "/product/:id/edit";
   };
   "routes/user/user-page.tsx": {
     id: "routes/user/user-page";
-    page: "/user-page";
+    page: "/user/page";
   };
   "routes/user/user-products.tsx": {
     id: "routes/user/user-products";
-    page: "/user-products";
+    page: "/user/products";
   };
   "routes/user/user-sales-orders.tsx": {
     id: "routes/user/user-sales-orders";
-    page: "/user-sales-orders";
+    page: "/user/sales-orders";
   };
   "routes/user/user-valorations.tsx": {
     id: "routes/user/user-valorations";
-    page: "/user-valorations";
+    page: "/user/valorations";
   };
   "routes/user/user-statistics.tsx": {
     id: "routes/user/user-statistics";
-    page: "/user-statistics";
+    page: "/user/statistics";
   };
   "routes/user/user-settings.tsx": {
     id: "routes/user/user-settings";
-    page: "/user-user-settings";
+    page: "/user/settings";
   };
   "routes/product/product-new.tsx": {
     id: "routes/product/product-new";
-    page: "/product-new";
+    page: "/product/new";
+  };
+  "routes/product/product-edit.tsx": {
+    id: "routes/product/product-edit";
+    page: "/product/:id/edit";
   };
   "routes/admin.tsx": {
     id: "routes/admin";
@@ -170,6 +179,7 @@ type RouteModules = {
   "routes/user/user-statistics": typeof import("./app/routes/user/user-statistics.tsx");
   "routes/user/user-settings": typeof import("./app/routes/user/user-settings.tsx");
   "routes/product/product-new": typeof import("./app/routes/product/product-new.tsx");
+  "routes/product/product-edit": typeof import("./app/routes/product/product-edit.tsx");
   "routes/admin": typeof import("./app/routes/admin.tsx");
   "routes/admin/admin-dashboard": typeof import("./app/routes/admin/admin-dashboard.tsx");
   "routes/admin/admin-users": typeof import("./app/routes/admin/admin-users.tsx");
