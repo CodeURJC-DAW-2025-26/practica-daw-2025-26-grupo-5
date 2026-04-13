@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 public class AIService {
 
-    @Value("${google.ai.api.key}")
+    @Value("${google.ai.api.key:}")
     private String apiKey;
 
     private final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=";
