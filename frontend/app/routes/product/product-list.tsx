@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import type { Route } from "./+types/product-list";
 import { getProducts } from "~/services/products-service";
-import type ProductDTO from "~/dtos/ProductDTO";
+import type ProductDTO from "~/dto/ProductDTO";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { useUserStore } from "~/stores/useUserStore";
 

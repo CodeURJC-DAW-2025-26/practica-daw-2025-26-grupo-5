@@ -6,8 +6,8 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 
 // Importamos el nombre correcto de la función: getAdminTransactions
 import { getAdminTransactions } from '~/services/admin-service';
-import type TransactionDTO from '~/dtos/TransactionDTO';
-import type PagedResponse from '~/dtos/PagedResponse';
+import type TransactionDTO from '~/dto/TransactionDTO';
+import type PagedResponse from '~/dto/PagedResponse';
 import AdminHeader from '~/components/admin/AdminHeader';
 import ConfirmModal from '~/components/confirm-modal';
 

@@ -48,4 +48,5 @@ frontend/build/
 frontend/.eslintcache
 
 # --- Backend SPA Integration ---
+backend/src/main/resources/ai-aplication-key.properties
 backend/src/main/resources/static/new/

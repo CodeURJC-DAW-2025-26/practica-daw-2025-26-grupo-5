@@ -1,6 +1,6 @@
 import { redirect } from 'react-router';
 import { getAdminSummary } from '~/services/admin-service';
-import type AdminSummaryDTO from '~/dtos/AdminSummaryDTO';
+import type AdminSummaryDTO from '~/dto/AdminSummaryDTO';
 import AdminHeader from '~/components/admin/AdminHeader';
 
 export async function clientLoader() {

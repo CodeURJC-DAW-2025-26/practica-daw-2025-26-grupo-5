@@ -6,8 +6,8 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 
 // Importamos el nombre correcto: deleteValoration (sin el "Admin")
 import { getAdminValorations, deleteValoration } from '~/services/admin-service';
-import type ValorationDTO from '~/dtos/ValorationDTO';
-import type PagedResponse from '~/dtos/PagedResponse';
+import type ValorationDTO from '~/dto/ValorationDTO';
+import type PagedResponse from '~/dto/PagedResponse';
 import AdminHeader from '~/components/admin/AdminHeader';
 import ConfirmModal from '~/components/confirm-modal';
 

@@ -1,5 +1,5 @@
 import api from "./api";
-import type UserDTO from "~/dtos/UserDTO";
+import type UserDTO from "~/dto/UserDTO";
 
 /**
  * HttpError: Custom error class for HTTP errors

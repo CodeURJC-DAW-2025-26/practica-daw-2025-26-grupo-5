@@ -2326,3 +2326,22 @@ main.overflow-auto {
     border-color: #cbd5e1 !important;
     color: #1e293b !important;
 }
+/*AI Description generation*/
+.btn-ai-sparkle {
+    background: linear-gradient(45deg, #6366f1, #a855f7);
+    border: none;
+    color: white;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+.btn-ai-sparkle:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+    color: white;
+}
+
+.btn-ai-sparkle:disabled {
+    background: #e2e8f0;
+    color: #94a3b8;
+}

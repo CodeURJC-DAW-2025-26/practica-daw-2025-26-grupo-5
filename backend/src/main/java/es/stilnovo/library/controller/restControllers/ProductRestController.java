@@ -72,7 +72,7 @@ public class ProductRestController {
     @GetMapping
     @Operation(summary = "Get global catalog products", description = "Retrieves a paginated list of products from the global catalog, with optional search and category filters")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Products retrieved successfully")
+            @ApiResponse(responseCode = "200", description = "Products retrieved successfully")
     })
     public PagedResponse<ProductDTO> getProducts(
             @RequestParam(required = false) String query,
@@ -80,9 +80,10 @@ public class ProductRestController {
             @PageableDefault(size = 10) Pageable pageable,
             Principal principal) {
 
-        // Extract user context from Principal for personalized results (null if anonymous)
+        // Extract user context from Principal for personalized results (null if
+        // anonymous)
         User user = mainService.getUserContext(principal != null ? principal.getName() : null);
-        
+
         // Query products with filters and pagination - applies search/category logic
         CatalogPageResult page = productService.getCatalogPage(query, category, user, pageable);
 
@@ -104,18 +105,18 @@ public class ProductRestController {
      * facilitate communication.
      *
      * @param id        The unique identifier of the product the user is interested
-     * in.
+     *                  in.
      * @param principal The security context of the authenticated user (prospective
-     * buyer).
+     *                  buyer).
      * @return ContactSellerPageDTO containing the product DTO, seller DTO, and
-     * buyer's basic info.
+     *         buyer's basic info.
      */
     @GetMapping("/{id}/contact")
     @Operation(summary = "Get contact seller data", description = "Retrieves necessary data to populate the 'Contact Seller' interface for a specific product")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Contact data retrieved successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
-        @ApiResponse(responseCode = "404", description = "Product or seller not found")
+            @ApiResponse(responseCode = "200", description = "Contact data retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized user"),
+            @ApiResponse(responseCode = "404", description = "Product or seller not found")
     })
     public ContactSellerPageDTO getContactSellerData(@PathVariable long id, Principal principal) {
         // 1. Delegate business logic to fetch aggregated page data
@@ -139,8 +140,8 @@ public class ProductRestController {
     @GetMapping("/me")
     @Operation(summary = "Get my products", description = "Retrieves the authenticated user's personal inventory")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Personal inventory retrieved successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized user")
+            @ApiResponse(responseCode = "200", description = "Personal inventory retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized user")
     })
     public ResponseEntity<List<ProductDTO>> getMyProducts(Principal principal) {
         var user = productService.getAuthenticatedUserWithProducts(principal.getName());
@@ -156,7 +157,7 @@ public class ProductRestController {
     @GetMapping("/recommendations")
     @Operation(summary = "Get recommendations", description = "Retrieves a list of recommended products for the authenticated user")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Recommendations retrieved successfully")
+            @ApiResponse(responseCode = "200", description = "Recommendations retrieved successfully")
     })
     public List<ProductDTO> getRecommendations(Principal principal) {
         User user = mainService.getUserContext(principal != null ? principal.getName() : null);
@@ -170,17 +171,18 @@ public class ProductRestController {
      * items.
      *
      * InfoProductPage
-     * * @param id        Unique identifier of the product.
+     * * @param id Unique identifier of the product.
+     * 
      * @param principal The security context of the user (optional).
      * @return ProductDetailsDTO containing the main product, recommendations, and
-     * login status.
+     *         login status.
      * @throws ResponseStatusException 404 if the product is not found.
      */
     @GetMapping("/{id}")
     @Operation(summary = "Get product details", description = "Retrieves full product details including recommendations and tracks the visit")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Product details retrieved successfully"),
-        @ApiResponse(responseCode = "404", description = "Product not found")
+            @ApiResponse(responseCode = "200", description = "Product details retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "Product not found")
     })
     public ProductDetailsDTO getProductDetails(@PathVariable long id, Principal principal) {
         // 1. Get user context if logged in
@@ -219,9 +221,9 @@ public class ProductRestController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Create a product", description = "Creates a new product for the authenticated user")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Product created successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid input data or file processing error"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized user")
+            @ApiResponse(responseCode = "201", description = "Product created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data or file processing error"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized user")
     })
     public ResponseEntity<ProductDTO> createProduct(
             @ModelAttribute ProductWriteRequestDTO request,
@@ -240,8 +242,9 @@ public class ProductRestController {
 
         // 2. Recovery: Fetch the newly created product from the user's updated list
         var user = productService.getAuthenticatedUserWithProducts(principal.getName());
+
         Product newProduct = user.getProducts().stream()
-                .filter(p -> p.getName().equals(request.getName()))
+                .filter(p -> java.util.Objects.equals(p.getName(), request.getName()))
                 .findFirst()
                 .orElse(user.getProducts().get(user.getProducts().size() - 1));
 
@@ -267,11 +270,11 @@ public class ProductRestController {
     @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Update a product", description = "Performs a partial update on an existing product owned by the authenticated user")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Product updated successfully"),
-        @ApiResponse(responseCode = "400", description = "Invalid input data or file processing error"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
-        @ApiResponse(responseCode = "403", description = "Forbidden (user is not the owner)"),
-        @ApiResponse(responseCode = "404", description = "Product not found")
+            @ApiResponse(responseCode = "200", description = "Product updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input data or file processing error"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized user"),
+            @ApiResponse(responseCode = "403", description = "Forbidden (user is not the owner)"),
+            @ApiResponse(responseCode = "404", description = "Product not found")
     })
     public ResponseEntity<ProductDTO> updateProduct(
             @PathVariable long id,
@@ -312,10 +315,10 @@ public class ProductRestController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a product", description = "Deletes a specific product. The requesting user must be the owner.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "Product deleted successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized user"),
-        @ApiResponse(responseCode = "403", description = "Forbidden (user is not the owner)"),
-        @ApiResponse(responseCode = "404", description = "Product not found")
+            @ApiResponse(responseCode = "204", description = "Product deleted successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized user"),
+            @ApiResponse(responseCode = "403", description = "Forbidden (user is not the owner)"),
+            @ApiResponse(responseCode = "404", description = "Product not found")
     })
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id, Principal principal) {
         productService.deleteProduct(id, principal.getName());

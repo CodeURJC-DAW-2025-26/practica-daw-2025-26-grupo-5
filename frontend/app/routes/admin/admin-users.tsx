@@ -5,8 +5,8 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
 
 import { getAdminUsers, banUser, deleteUser } from '~/services/admin-service';
-import type UserDTO from '~/dtos/UserDTO';
-import type PagedResponse from '~/dtos/PagedResponse';
+import type UserDTO from '~/dto/UserDTO';
+import type PagedResponse from '~/dto/PagedResponse';
 import AdminHeader from '~/components/admin/AdminHeader';
 import ConfirmModal from '~/components/confirm-modal';
 

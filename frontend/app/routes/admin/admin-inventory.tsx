@@ -4,7 +4,7 @@ import { redirect } from 'react-router';
 import { AgGridReact } from 'ag-grid-react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import { getAdminProducts, updateProduct, deleteProduct, createProduct } from '~/services/admin-service';
-import type ProductDTO from '~/dtos/ProductDTO';
+import type ProductDTO from '~/dto/ProductDTO';
 import AdminHeader from '~/components/admin/AdminHeader';
 import ConfirmModal from '~/components/confirm-modal';
 import FormInput from '~/components/form-input';

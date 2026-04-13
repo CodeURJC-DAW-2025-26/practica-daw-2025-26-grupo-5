@@ -1,10 +1,10 @@
 import api from "./api";
-import type UserDTO from "~/dtos/UserDTO";
-import type ProductDTO from "~/dtos/ProductDTO";
-import type PagedResponse from "~/dtos/PagedResponse";
-import type AdminSummaryDTO from "~/dtos/AdminSummaryDTO";
-import type TransactionDTO from "~/dtos/TransactionDTO";
-import type ValorationDTO from "~/dtos/ValorationDTO";
+import type UserDTO from "~/dto/UserDTO";
+import type ProductDTO from "~/dto/ProductDTO";
+import type PagedResponse from "~/dto/PagedResponse";
+import type AdminSummaryDTO from "~/dto/AdminSummaryDTO";
+import type TransactionDTO from "~/dto/TransactionDTO";
+import type ValorationDTO from "~/dto/ValorationDTO";
 
 /**
  * --- DASHBOARD & GENERAL ---

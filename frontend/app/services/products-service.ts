@@ -1,8 +1,8 @@
 import api from "./api";
-import type ProductDTO from "~/dtos/ProductDTO";
-import type ProductWriteRequestDTO from "~/dtos/ProductWriteRequestDTO";
-import type PagedResponse from "~/dtos/PagedResponse";
-import type ProductDetailsDTO from "~/dtos/ProductDetailsDTO";
+import type ProductDTO from "~/dto/ProductDTO";
+import type ProductWriteRequestDTO from "~/dto/ProductWriteRequestDTO";
+import type PagedResponse from "~/dto/PagedResponse";
+import type ProductDetailsDTO from "~/dto/ProductDetailsDTO";
 
 /**
  * Products Service
@@ -48,7 +48,22 @@ export async function getProduct(id: string): Promise<ProductDTO> {
 export async function addProduct(
   product: ProductWriteRequestDTO
 ): Promise<ProductDTO> {
-  const response = await api.post("/v1/products", product);
+  const formData = new FormData();
+  
+  //This is the exact order that POST api/v1/products requires the info
+  if (product.file) {
+    formData.append("file", product.file); 
+  }
+  formData.append("name", product.name);
+  formData.append("category", product.category);
+  formData.append("description", product.description);
+  formData.append("price", product.price.toString());
+  formData.append("location", product.location);
+  formData.append("status", product.status);
+  
+
+  // Axios enviará automáticamente el header multipart/form-data
+  const response = await api.post("/v1/products", formData);
   return response.data;
 }
 

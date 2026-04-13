@@ -12,19 +12,7 @@ import { type RouteConfig, index, layout, route } from "@react-router/dev/routes
 export default [
   layout("routes/home.tsx", [
     index("routes/product/product-list.tsx"),
-    route("product/:id", "routes/product/product-detail.tsx"), //no va aqui, pues no queremos header ni footer, solo sidebar
-    route("product/:id/edit", "routes/product/product-edit.tsx"),//no va aqui, pues no queremos header ni footer, solo sidebar
-    route("product/new", "routes/product/product-new.tsx"),//no va aqui, pues no queremos header ni footer, solo sidebar
-    
-    // Possible future routes (commented out - not yet implemented):
-    // route("user/:id", "routes/user-profile.tsx"),
-    // route("user/settings", "routes/user-settings.tsx"),
-    // route("user/products", "routes/user-products.tsx"),
-    // route("search", "routes/search.tsx"),
-    // route("checkout", "routes/checkout.tsx"),
-    // route("orders", "routes/orders.tsx"),
-    // route("help", "routes/help-center.tsx"),
-  
+    route("product/:id", "routes/product/product-detail.tsx"), 
   ]),
 
   // Public routes
@@ -40,6 +28,7 @@ export default [
     route("user-statistics", "routes/user/user-statistics.tsx"),
     route("user-user-settings", "routes/user/user-settings.tsx"),
 
+    route("product-new", "routes/product/product-new.tsx"),
   ]),
 
   // Admin routes with separate layout

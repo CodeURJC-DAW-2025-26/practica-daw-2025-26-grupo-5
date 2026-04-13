@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { getMyProducts, deleteProduct } from "~/services/products-service";
 import Loader from "~/components/Loader";
-import type ProductDTO from "~/dtos/ProductDTO";
+import type ProductDTO from "~/dto/ProductDTO";
 
 export default function MyProducts() {
     const [products, setProducts] = useState<ProductDTO[]>([]);
@@ -50,7 +50,7 @@ export default function MyProducts() {
                     <p className="text-muted small">Manage your design inventory and track performance.</p>
                 </div>
 
-                <Link to="/add-product" className="btn-sell py-2 px-4 shadow-sm text-decoration-none d-flex align-items-center" style={{ borderRadius: '12px' }}>
+                <Link to="/product-new" className="btn-sell py-2 px-4 shadow-sm text-decoration-none d-flex align-items-center" style={{ borderRadius: '12px' }}>
                     <i className="fa-solid fa-plus me-2"></i>Add Product
                 </Link>
             </header>

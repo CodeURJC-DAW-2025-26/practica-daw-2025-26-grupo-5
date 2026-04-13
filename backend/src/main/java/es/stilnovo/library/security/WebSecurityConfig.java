@@ -130,7 +130,7 @@ public class WebSecurityConfig {
                 http.formLogin(form -> form.disable());
                 http.csrf(csrf -> csrf.disable());
                 http.httpBasic(basic -> basic.disable());
-                http.sessionManagement(mgmt -> mgmt.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                http.sessionManagement(mgmt -> mgmt.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
 
                 // Add the JWT Filter from the professor's structure
                 http.addFilterBefore(new JwtRequestFilter(userDetailsService, jwtTokenProvider),
