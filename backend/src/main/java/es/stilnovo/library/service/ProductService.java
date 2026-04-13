@@ -5,11 +5,13 @@ import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +22,7 @@ import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
 import es.stilnovo.library.model.UserInteraction;
 import es.stilnovo.library.repository.ProductRepository;
+import es.stilnovo.library.repository.TransactionRepository;
 import es.stilnovo.library.repository.UserInteractionRepository;
 import es.stilnovo.library.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -52,6 +55,9 @@ public class ProductService {
 
     @Autowired
     private ImageService imageService;
+
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     /** Checks if a product exists by ID */
     public boolean exist(long id) {
@@ -111,19 +117,47 @@ public class ProductService {
     /**
      * Retrieves personalized product recommendations for a user.
      * Uses user interaction history (views, likes, purchases) to suggest relevant products.
-     * Returns empty list for anonymous users.
      */
     public List<Product> getRecommendations(User user) {
-        // STEP 1: Handle null user (anonymous browsing) - no personalization without login
+        int limit = 4; // Number of recommendations to return
+
+        // Fallback 1: anonymous user with no interaction history -> return most recent products (no personalization)
         if (user == null) {
-            return Collections.emptyList();
+            return productRepository.findAll(PageRequest.of(0, limit, Sort.by("id").descending())).getContent();
+        }
+        // Step 1: Find the most purchased category
+        List<String> topCategories = transactionRepository.findMostPurchasedCategoriesByUserId(
+            user.getUserId(), 
+            PageRequest.of(0, 1)
+        );
+
+        // Fallback 2: user has no purchase history -> return most recent products (no personalization)
+        if (topCategories.isEmpty()) {
+            return productRepository.findAll(PageRequest.of(0, limit, Sort.by("id").descending())).getContent();
         }
 
-        // STEP 2: Query database for recommended products based on user interaction
-        // history - queries custom repository method that joins user interactions
-        List<Product> recommendations = productRepository.findRecommendedProducts(user.getUserId());
+        String favoriteCategory = topCategories.get(0);
 
-        // STEP 3: Return filtered recommendations (excludes user's own listings automatically)
+        // Step 2: Find recommended products excluding those already purchased
+        List<Product> recommendations = productRepository.findRecommendedProducts(
+            favoriteCategory, 
+            user.getUserId(), 
+            PageRequest.of(0, limit)
+        );
+
+        // Fallback 3: Fill any empty spaces if the main query returns fewer than 'limit' products
+        if (recommendations.size() < limit) {
+            int missing = limit - recommendations.size();
+            List<Product> fillers = productRepository.findAll(PageRequest.of(0, limit + missing, Sort.by("id").descending())).getContent();
+            
+            for (Product filler : fillers) {
+                if (recommendations.size() >= limit) break;
+                if (!recommendations.contains(filler)) { 
+                    recommendations.add(filler);
+                }
+            }
+        }
+
         return recommendations;
     }
 

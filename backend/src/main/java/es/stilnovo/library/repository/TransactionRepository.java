@@ -1,6 +1,8 @@
 package es.stilnovo.library.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,4 +51,8 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     // Finds all transactions where this specific product was involved
     List<Transaction> findByProduct(Product product);
+
+    // Finds the most purchased product categories by a user, ordered by frequency
+    @Query("SELECT p.category FROM TransactionTable t JOIN t.product p WHERE t.buyer.userId = :userId GROUP BY p.category ORDER BY COUNT(p.category) DESC")
+    List<String> findMostPurchasedCategoriesByUserId(@Param("userId") Long userId, Pageable pageable);
 }
