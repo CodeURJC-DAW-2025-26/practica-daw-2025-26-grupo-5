@@ -54,3 +54,20 @@ frontend/.react-router/
 # --- Backend SPA Integration ---
 backend/src/main/resources/ai-aplication-key.properties
 backend/src/main/resources/static/new/
+
+# --- IDE & Editor ---
+*.swp
+*.swo
+*~
+*.sublime-workspace
+
+# --- OS Files ---
+.DS_Store
+Thumbs.db
+*.tmp
+
+# --- Security & Credentials ---
+*.jks
+*.p12
+*.key
+/backend/src/main/resources/keystore*
