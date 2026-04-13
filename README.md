@@ -592,27 +592,41 @@ touch .env
 **Contenido mínimo del `.env` (para desarrollo local):**
 
 ```properties
+# DockerHub usuario para descargar la imagen
+DOCKER_HUB_USERNAME=tu-usuario-dockerhub
+
+# Base de datos
 MYSQL_ROOT_PASSWORD=password
 MYSQL_DATABASE=stilnovo
+
+# Servidor
 SERVER_PORT=8443
 SERVER_SSL_KEY_STORE_PASSWORD=password
 SERVER_SSL_KEY_PASSWORD=secret
-SPRING_JPA_HIBERNATE_DDL_AUTO=create
+
+# JPA/Hibernante
+SPRING_JPA_HIBERNATE_DDL_AUTO=none
+
+# Email
 SPRING_MAIL_USERNAME=stilnovo.noreply@gmail.com
 SPRING_MAIL_PASSWORD=jzax qigq qeuy jffi
+
+# URL pública de la aplicación
 APP_PUBLIC_BASE_URL=https://localhost:8443
 ```
 
-**⚠️ IMPORTANTE:** En ejecuciones posteriores, cambia `SPRING_JPA_HIBERNATE_DDL_AUTO=update` para no perder datos.
+**ℹ️ NOTA:** El valor por defecto es `none` (seguro). Para la **primera ejecución**, necesitarás pasar `-e SPRING_JPA_HIBERNATE_DDL_AUTO=create` para inicializar la base de datos (ver Paso 3).
 
 #### **Paso 3: Ejecutar docker-compose**
 
+**(Ejecutar desde la carpeta `/docker`)**
+
 ```bash
 # Primera ejecución (crea esquema de BD)
-docker-compose --env-file .env up
+docker compose --env-file ../.env -e SPRING_JPA_HIBERNATE_DDL_AUTO=create up
 
 # Ejecuciones posteriores (modo seguro, sin modificar BD)
-docker-compose --env-file .env -e SPRING_JPA_HIBERNATE_DDL_AUTO=none up
+docker compose --env-file ../.env up
 ```
 
 **Salida esperada:**
@@ -639,12 +653,14 @@ Una vez que Docker Compose está ejecutándose:
 
 #### **Paso 5: Detener la aplicación**
 
+**(Ejecutar desde la carpeta `/docker`)**
+
 ```bash
 # Detiene los contenedores (los datos persisten en la BD)
-docker-compose down
+docker compose down
 
 # Ver estado de los contenedores
-docker-compose ps
+docker compose ps
 ```
 
 #### **Solución de problemas comunes:**
@@ -679,18 +695,16 @@ Se proporcionan scripts automatizados en PowerShell (Windows) y Bash (Unix/Linux
 
 ✅ **Uso:** Construye la imagen Docker sin publicar. Ideal para probar cambios localmente.
 
-**Requisito:** Estás en el directorio raíz del proyecto.
+**(Ejecutar desde la carpeta `/docker`)**
 
 **Windows (PowerShell):**
 ```powershell
-cd practica-daw-2025-26-grupo-5
-.\docker\create_image.ps1 -ImageName "stilnovo-app:latest"
+.\create_image.ps1 -ImageName "stilnovo-app:latest"
 ```
 
 **macOS/Linux (Bash):**
 ```bash
-cd practica-daw-2025-26-grupo-5
-./docker/create_image.sh stilnovo-app:latest
+./create_image.sh stilnovo-app:latest
 ```
 
 **Qué hace el script:**
@@ -717,6 +731,8 @@ stilnovo-app              v1.0      a1b2c3d4e5f6   2 minutes ago
 
 ✅ **Uso:** Publica la imagen construida hacia DockerHub para compartirla con otros o usarla en producción.
 
+**(Ejecutar desde la carpeta `/docker`)**
+
 **Requiere:** 
 - Haber ejecutado `create_image` primero
 - Haber ejecutado `docker login` previamente
@@ -724,14 +740,14 @@ stilnovo-app              v1.0      a1b2c3d4e5f6   2 minutes ago
 
 **Windows (PowerShell):**
 ```powershell
-.\docker\publish_image.ps1 -DockerHubUsername "tu-usuario-dockerhub" `
-                           -ImageName "stilnovo-app" `
-                           -Version "v1.0"
+.\publish_image.ps1 -DockerHubUsername "tu-usuario-dockerhub" `
+                    -ImageName "stilnovo-app" `
+                    -Version "v1.0"
 ```
 
 **macOS/Linux (Bash):**
 ```bash
-./docker/publish_image.sh tu-usuario-dockerhub stilnovo-app:latest v1.0
+./publish_image.sh tu-usuario-dockerhub stilnovo-app:latest v1.0
 ```
 
 **Qué hace el script:**
@@ -752,16 +768,18 @@ https://hub.docker.com/r/tu-usuario-dockerhub/stilnovo-app
 
 ✅ **Uso:** Construye la imagen, la publica y proporciona instrucciones para desplegar el stack completo (BD + aplicación).
 
+**(Ejecutar desde la carpeta `/docker`)**
+
 **Este es el script más completo y recomendado para despliegue en producción.**
 
 **Windows (PowerShell):**
 ```powershell
-.\docker\publish_docker-compose.ps1 -DockerHubUsername "tu-usuario-dockerhub"
+.\publish_docker-compose.ps1 -DockerHubUsername "tu-usuario-dockerhub"
 ```
 
 **macOS/Linux (Bash):**
 ```bash
-./docker/publish_docker-compose.sh tu-usuario-dockerhub
+./publish_docker-compose.sh tu-usuario-dockerhub
 ```
 
 **Qué hace el script (6 pasos automáticos):**
@@ -774,35 +792,169 @@ https://hub.docker.com/r/tu-usuario-dockerhub/stilnovo-app
 
 ---
 
-#### **Flujo de trabajo recomendado: Desarrollo → Publicación → Despliegue**
+#### **Flujo de trabajo completo: Construcción, Publicación y Ejecución**
 
-**1. Desarrollo local (en tu máquina):**
+Este es el flujo **real** que debes seguir para crear la imagen, publicarla en DockerHub y ejecutarla:
+
+##### **Paso A: Configuración inicial (una sola vez)**
+
+**1. Crear el archivo `.env` en la raíz del proyecto:**
+
 ```powershell
-# Construir y probar localmente
-.\docker\create_image.ps1 -ImageName "stilnovo-app:latest"
-
-# Ejecutar localmente
-docker-compose --env-file .env up
-
-# Prueba la app en https://localhost:8443
+# Windows (desde la raíz del proyecto)
+@"
+DOCKER_HUB_USERNAME=tu-usuario-dockerhub
+MYSQL_ROOT_PASSWORD=password
+MYSQL_DATABASE=stilnovo
+SERVER_PORT=8443
+SERVER_SSL_KEY_STORE_PASSWORD=password
+SERVER_SSL_KEY_PASSWORD=secret
+SPRING_JPA_HIBERNATE_DDL_AUTO=create
+SPRING_MAIL_USERNAME=stilnovo.noreply@gmail.com
+SPRING_MAIL_PASSWORD=jzax qigq qeuy jffi
+APP_PUBLIC_BASE_URL=https://localhost:8443
+"@ | Out-File .env
 ```
 
-**2. Publicar versión estable (cuando termines de probar):**
+**⚠️ IMPORTANTE:** Reemplaza `tu-usuario-dockerhub` con tu usuario real de DockerHub.
+
+**2. Ahora estés en la raíz del proyecto y haz login en DockerHub:**
+
 ```powershell
-# Publicar en DockerHub con versión específica
-.\docker\publish_image.ps1 -DockerHubUsername "tu-usuario-dockerhub" `
-                           -ImageName "stilnovo-app" `
-                           -Version "v1.0"
-
-# O usar el script completo (recomendado):
-.\docker\publish_docker-compose.ps1 -DockerHubUsername "tu-usuario-dockerhub"
+docker login
+# Ingresa tu usuario de DockerHub y token de acceso
 ```
 
-**3. Desplegar en servidor (VM o nube):**
-```bash
-# En el servidor remoto, descargar y ejecutar:
-env $(cat .env | xargs) docker-compose -f oci://docker.io/tu-usuario-dockerhub/stilnovo-app:v1.0 up -d
+##### **Paso B: Construir la imagen (primera vez y cuando cambies código)**
+
+```powershell
+# Navega a la carpeta docker primero
+cd docker
+
+# Luego ejecuta:
+.\create_image.ps1 -ImageName "stilnovo-app:latest"
 ```
+
+**Resultado:** Tendrás una imagen Docker llamada `stilnovo-app:latest` lista en tu máquina local.
+
+##### **Paso C: Publicar la imagen en DockerHub**
+
+```powershell
+# Desde la carpeta docker (si viniste del paso B, ya estás aquí)
+cd docker  # Solo necesario si saliste de la carpeta
+
+.\publish_image.ps1 -DockerHubUsername "tu-usuario-dockerhub"
+```
+
+**Resultado:** La imagen se sube a `https://hub.docker.com/r/tu-usuario-dockerhub/stilnovo-app`
+
+##### **Paso D: Publicar el docker-compose.yml**
+
+```powershell
+# Desde la carpeta docker (si viniste del paso C, ya estás aquí)
+cd docker  # Solo necesario si saliste de la carpeta
+
+.\publish_docker-compose.ps1 -DockerHubUsername "tu-usuario-dockerhub"
+```
+
+**Resultado:** El `docker-compose.yml` está disponible en DockerHub como OCI Artifact.
+
+##### **Paso E: Ejecutar la aplicación completa localmente**
+
+```powershell
+# Desde la raíz del proyecto
+cd docker
+docker compose --env-file ..\.env up
+```
+
+O alternativamente desde la raíz:
+
+```powershell
+docker compose -f docker/docker-compose.yml --env-file .env up
+```
+
+**Resultado esperado:**
+- ✅ MySQL se inicia en el puerto 3306
+- ✅ Spring Boot se inicia en el puerto 8443
+- ✅ Accede a `https://localhost:8443`
+
+**Verifica que todo funciona correctamente** viendo estos logs en la terminal:
+
+```
+stilnovo-db    | MySQL Server is now ready for connections
+stilnovo-app   | Started StilnovoApplication in X.XXX seconds (JVM running for X.XXX)
+stilnovo-app   | Application ready to serve requests
+```
+
+---
+
+#### **Paso E: Acceder a la aplicación (después de que inicie)**
+
+Abre tu navegador y accede a:
+
+```
+https://localhost:8443
+```
+
+⚠️ **Advertencia:** Es HTTPS con certificado autofirmado, así que verás una advertencia de seguridad. **Ignórala** y continúa (haz clic en "Avanzado" → "Continuar").
+
+**Credenciales para probar:** Están en el readme un poco más arriba (user1, user2 y admin).
+
+#### **Verificación de componentes**
+
+Mientras `docker compose up` está corriendo, puedes verificar en otra terminal:
+
+```powershell
+# Ver contenedores activos
+docker ps
+
+# Ver logs de MySQL
+docker logs stilnovo-db
+
+# Ver logs de la app
+docker logs stilnovo-app
+
+# Verificar conectividad a BD (desde otra terminal)
+docker exec stilnovo-app mysql -h db -u root -ppassword stilnovo -e "SELECT COUNT(*) FROM UserTable;"
+```
+
+**Deberías ver:** Tabla `UserTable` con 3 usuarios (admin, user1, user2)
+
+---
+
+#### **Detener la aplicación**
+
+Cuando termines de probar, detén los contenedores:
+
+```powershell
+# En la terminal donde está corriendo docker compose:
+Ctrl + C
+
+# O desde otra terminal:
+docker compose down
+```
+
+---
+
+#### **Resumen de comandos (versión rápida)**
+
+| Tarea | Comando | Ubicación |
+|-------|---------|-----------|
+| **0. Navegar** | `cd docker` | Raíz del proyecto |
+| **1. Crear imagen** | `.\create_image.ps1 -ImageName "stilnovo-app:latest"` | `docker/` |
+| **2. Publicar imagen** | `.\publish_image.ps1 -DockerHubUsername "tu-usuario"` | `docker/` |
+| **3. Publicar docker-compose** | `.\publish_docker-compose.ps1 -DockerHubUsername "tu-usuario"` | `docker/` |
+| **4. Ejecutar localmente** | `docker compose --env-file ..\.env up` | `docker/` |
+| **5. Detener** | `Ctrl+C` o `docker compose down` | Terminal activa |
+
+---
+
+#### **Explicación de lo que sucede en cada paso:**
+
+1. **create_image.ps1**: Compila el código Java con Maven **dentro de un contenedor**, genera la imagen Docker multi-stage (sin necesidad de JDK en tu máquina)
+2. **publish_image.ps1**: Etiqueta la imagen y la sube a tu DockerHub personal
+3. **publish_docker-compose.ps1**: Publica el archivo `docker-compose.yml` como OCI Artifact para que pueda descargarse fácilmente
+4. **docker compose up**: Descarga ambas imágenes (MySQL + aplicación) desde DockerHub y las ejecuta con variables del `.env`
 
 ---
 
@@ -810,20 +962,30 @@ env $(cat .env | xargs) docker-compose -f oci://docker.io/tu-usuario-dockerhub/s
 
 ```powershell
 # 1. Clonar repositorio
+cd Desktop
 git clone https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5.git
 cd practica-daw-2025-26-grupo-5
 
-# 2. Crear archivo .env (ver sección anterior)
-# ...crea el .env con tus credenciales...
+# 2. Crear .env (con tu usuario de DockerHub)
+# ... copia el contenido del .env anterior con tu usuario ...
 
-# 3. Construir imagen localmente
-.\docker\create_image.ps1 -ImageName "stilnovo-app:latest"
+# 3. Navegar a la carpeta docker
+cd docker
 
-# 4. Probar localmente
-docker-compose --env-file .env up
+# 4. Construir imagen (compila Java automáticamente)
+.\create_image.ps1 -ImageName "stilnovo-app:latest"
 
-# Una vez probado, publicar a DockerHub
-.\docker\publish_docker-compose.ps1 -DockerHubUsername "tu-usuario-dockerhub"
+# 5. Publicar en DockerHub (requiere haber hecho docker login)
+.\publish_image.ps1 -DockerHubUsername "tu-usuario"
+
+# 6. Publicar docker-compose (publicar la configuración)
+.\publish_docker-compose.ps1 -DockerHubUsername "tu-usuario"
+
+# 7. Ejecutar localmente para verificar que funciona
+docker compose --env-file ..\.env up
+
+# 8. En otra terminal, accede a:
+# https://localhost:8443
 ```
 
 #### **Solución de problemas de los scripts:**
@@ -980,13 +1142,14 @@ Pulling stilnovo-app ... done
 Levantamos la aplicación en modo **inicialización**, que recrea el esquema de BD desde cero:
 
 ```bash
-sudo SPRING_APPLICATION_JSON='{"spring.jpa.hibernate.ddl-auto":"create"}' docker compose up
+sudo docker compose -e DDL_AUTO=create up
 ```
 
-**Qué hace:**
-- ✓ Crea la BD de MySQL desde cero
-- ✓ Spring Boot genera todas las tablas automáticamente
-- ✓ Carga los datos de ejemplo
+**Qué hace (`DDL_AUTO=create`):**
+- ✓ Crea la BD de MySQL desde cero (elimina esquema anterior si existe)
+- ✓ Spring Boot genera todas las tablas automáticamente desde las entidades
+- ✓ Ejecuta `DataBaseInitializer` para cargar los datos de ejemplo
+- ✓ El servicio `DataBaseInitializer` mantiene un check: solo carga datos si `userRepository.count() == 0`
 
 **Espera a ver estos mensajes en los logs:**
 ```
@@ -994,13 +1157,13 @@ stilnovo-db    | MySQL Server is now ready for connections
 stilnovo-app   | Started StilnovoApplication
 ```
 
-**⚠️ IMPORTANTE:** No cierres la terminal aún. Espera a que se estabilice.
+**⚠️ IMPORTANTE:** No cierres la terminal aún. Espera a que se estabilice (espera ~30 segundos).
 
 ---
 
-#### **Paso 2.5: Cambiar a modo normal (SEGUNDO ARRANQUE)**
+#### **Paso 2.5: Cambiar a modo normal (SEGUNDO ARRANQUE Y POSTERIORES)**
 
-Para que la BD no se borre la próxima vez, detén la ejecución y reinicia en modo seguro:
+Para que la BD **NO se borre** en los siguientes arranques, detén la ejecución y reinicia en modo **seguro untuk producción**:
 
 **1. Detén los contenedores:**
 ```
@@ -1012,22 +1175,27 @@ Espera a que salga completamente:
 vmuser@appweb05:~$
 ```
 
-**2. Reinicia en modo normal** (sin crear BD, solo ejecutar):
+**2. Reinicia en modo normal** (sin tocar esquema de BD):
 
 ```bash
 sudo docker compose up
 ```
 
-**Qué hace ahora:**
+**Qué hace ahora (`DDL_AUTO=none` - valor por defecto):**
 - ✓ Arranca los contenedores (BD + app)
-- ✓ NO modifica el esquema de BD (los datos persisten)
-- ✓ Modo seguro para producción
+- ✓ **NO modifica el esquema de BD** (contraseña: los datos **persisten**, nada se borra)
+- ✓ Hibernate solo ejecuta consultas SELECT (lectura segura)
+- ✓ Modo **seguro para producción** - cero riesgo de pérdida de datos
 
 **Deberías ver:**
 ```
 stilnovo-db    | ready for connections
 stilnovo-app   | Started StilnovoApplication
 ```
+
+**Nota sobre DDL_AUTO:**
+- `create`: Solo useuse en **PRIMER ARRANQUE** (crea todo de cero)
+- `none`: Usado en **POSTERIORES ARRANQUES** (respeta datos existentes) ← **Recomendado para producción**
 
 ---
 
@@ -1043,12 +1211,12 @@ sudo docker compose down -v
 # Paso 2.3: Descargar imagen nueva
 sudo docker compose pull
 
-# Paso 2.4: Primera ejecución (crear BD)
-sudo SPRING_APPLICATION_JSON='{"spring.jpa.hibernate.ddl-auto":"create"}' docker compose up
+# Paso 2.4: Primera ejecución (crear BD con create)
+sudo docker compose -e DDL_AUTO=create up
 
 # [Espera a que se estabilice, luego: Ctrl+C]
 
-# Paso 2.5: Segunda ejecución (modo normal)
+# Paso 2.5: Segunda ejecución (modo normal con none)
 sudo docker compose up
 ```
 
@@ -1221,7 +1389,11 @@ He extraído gran parte de la lógica de negocio de los controladores hacia los 
 
 #### **Alumno 4 - Gabriele Antonio Ricucci**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+Mi contribución se ha centrado en la implementación de endpoints REST para el dashboard de usuarios, 
+estadísticas de transacciones y gestión de productos. He trabajado en la creación de servicios para 
+el manejo de favoritos (add/remove productos), endpoints de perfil de usuario y la integración con 
+la colección de Postman. Además, he colaborado en la validación y mejora de los endpoints existentes 
+para asegurar que sigan correctamente las convenciones REST.
 
 | Nº    | Commits      | Files      |
 |:------------: |:------------:| :------------:|

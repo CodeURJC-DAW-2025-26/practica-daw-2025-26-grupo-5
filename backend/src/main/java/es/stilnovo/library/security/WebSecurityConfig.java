@@ -117,7 +117,8 @@ public class WebSecurityConfig {
                                 .requestMatchers(HttpMethod.GET,
                                                 "/api/v1/catalog/**",
                                                 "/api/v1/products/**",
-                                                "/api/v1/images/**")
+                                                "/api/v1/images/**",
+                                                "/api/v1/product-images/**") 
                                 .permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/v1/users/*/profile**").permitAll()
 
@@ -157,7 +158,7 @@ public class WebSecurityConfig {
                                                 .requestMatchers("/login-page", "/login-error", "/signup-page")
                                                 .permitAll()
                                                 .requestMatchers("/product-images/**", "/info-product-page/**",
-                                                                "/about-page/**")
+                                                                "/about-page/**", "/new/**")
                                                 .permitAll()
                                                 .requestMatchers("/user/me/profile-photo", "/load-more-products")
                                                 .permitAll()

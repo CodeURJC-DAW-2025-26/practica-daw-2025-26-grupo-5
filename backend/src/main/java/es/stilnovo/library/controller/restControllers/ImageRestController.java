@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import es.stilnovo.library.dto.ImageDTO;
-import es.stilnovo.library.dto.ImageMapper;
 import es.stilnovo.library.dto.ProductDTO;
 import es.stilnovo.library.dto.ProductMapper;
 import es.stilnovo.library.service.ImageService;
@@ -45,8 +43,6 @@ public class ImageRestController {
 	@Autowired
 	private ProductService productService;
 
-	@Autowired
-	private ImageMapper imageMapper;
 
 	@Autowired
 	private ProductMapper productMapper;
@@ -62,8 +58,8 @@ public class ImageRestController {
 		@ApiResponse(responseCode = "200", description = "Image metadata retrieved successfully"),
 		@ApiResponse(responseCode = "404", description = "Product or image not found")
 	})
-	public ImageDTO getProductImage(@PathVariable long productId) {
-		return imageMapper.toDTO(imageService.getProductImage(productId));
+	public ResponseEntity<Resource> getProductImage(@PathVariable long productId) throws SQLException {
+		return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageService.getImageFile(productId));
 	}
 
 	/**

@@ -22,7 +22,7 @@ import es.stilnovo.library.service.NotificationService;
  * Uses: ProductService, MailService, UserService, InquiryService
  */
 @Controller
-public class InquryController {
+public class InquiryController {
 
     @Autowired
     private NotificationService notificationService;

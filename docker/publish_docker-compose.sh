@@ -2,8 +2,8 @@
 
 # ============================================================
 # Script: Publish Docker Compose Configuration
-# Purpose: Push docker-compose services to DockerHub
-# Usage: ./publish_docker_compose.sh <DockerHubUsername>
+# Purpose: Push docker-compose.yml as OCI artifact to DockerHub
+# Usage: ./publish_docker-compose.sh <DockerHubUsername>
 # ============================================================
 
 # Terminal Colors
@@ -18,43 +18,42 @@ DOCKER_HUB_USER_INPUT=$1
 # Validate input
 if [ -z "$DOCKER_HUB_USER_INPUT" ]; then
     echo -e "${RED}Error: DockerHub username cannot be empty${NC}"
-    echo "Usage: ./publish_docker_compose.sh your-dockerhub-username"
+    echo "Usage: ./publish_docker-compose.sh your-dockerhub-username"
     exit 1
 fi
 
 echo -e "${CYAN}============================================================${NC}"
-echo -e "${CYAN}Docker Compose Publication to DockerHub${NC}"
+echo -e "${CYAN}Docker Compose Publication to DockerHub (OCI Artifact)${NC}"
 echo -e "${CYAN}============================================================${NC}"
 echo ""
 
-echo -e "${CYAN}Publishing docker-compose services...${NC}"
-echo -e "Username: ${YELLOW}$DOCKER_HUB_USER_INPUT${NC}"
+# Define the artifact tag (following your teammate's structure)
+IMAGE_TAG="$DOCKER_HUB_USER_INPUT/stilnovo-compose:latest"
+
+echo -e "${CYAN}Publishing to: ${YELLOW}$IMAGE_TAG${NC}"
+echo -e "  This publishes the config as an OCI artifact to DockerHub"
 echo ""
 
-# Export the environment variable so docker-compose.yml can use it
-# This replaces the $env:DOCKER_HUB_USER from PowerShell
+# Export variables for interpolation if needed
+export DOCKER_HUB_USERNAME=$DOCKER_HUB_USER_INPUT
 export DOCKER_HUB_USER=$DOCKER_HUB_USER_INPUT
 
-echo -e "${CYAN}Pushing services to DockerHub...${NC}"
-echo -e "  ${YELLOW}This publishes all services defined in docker-compose.yml${NC}"
-echo ""
+# THE FIX: Use 'publish' instead of 'push'
+docker compose publish "$IMAGE_TAG"
 
-docker compose push
-
-# Check the exit status of the last command
+# Check the exit status
 if [ $? -eq 0 ]; then
     echo ""
     echo -e "${GREEN}============================================================${NC}"
     echo -e "${GREEN}Publication Successful${NC}"
     echo -e "${GREEN}============================================================${NC}"
     echo ""
-    echo -e "${CYAN}Docker Compose services published:${NC}"
-    echo -e "  ${GREEN}User: $DOCKER_HUB_USER_INPUT${NC}"
+    echo -e "${CYAN}Docker Compose artifact published to:${NC}"
+    echo -e "  ${GREEN}$IMAGE_TAG${NC}"
     echo ""
     echo -e "${CYAN}Next steps:${NC}"
-    echo -e "  1. Deploy on VM: ${GREEN}export DOCKER_HUB_USER='$DOCKER_HUB_USER_INPUT'${NC}"
-    echo -e "  2. Pull and run: ${GREEN}docker compose up -d${NC}"
-    echo -e "  3. Monitor: ${GREEN}docker compose logs -f${NC}"
+    echo -e "  1. On VM, run: ${GREEN}docker compose pull $IMAGE_TAG${NC}"
+    echo -e "  2. Then run: ${GREEN}docker compose up -d${NC}"
     echo ""
 else
     echo ""
@@ -64,8 +63,6 @@ else
     echo ""
     echo -e "${YELLOW}Possible causes:${NC}"
     echo -e "  1. Not logged in: Run ${GREEN}docker login${NC}"
-    echo -e "  2. Old Docker Compose: Need v2.34.0 or newer"
-    echo -e "  3. Network issue: Check your internet connection"
-    echo ""
+    echo -e "  2. Old Docker version: You need Docker Compose v2.34.0+ for 'publish'${NC}"
     exit 1
 fi
