@@ -607,9 +607,9 @@ SERVER_SSL_KEY_PASSWORD=secret
 # JPA/Hibernante
 SPRING_JPA_HIBERNATE_DDL_AUTO=none
 
-# Email
+# Email (use App Password from Google Account settings)
 SPRING_MAIL_USERNAME=stilnovo.noreply@gmail.com
-SPRING_MAIL_PASSWORD=jzax qigq qeuy jffi
+SPRING_MAIL_PASSWORD=<your_generated_app_password>
 
 # URL pública de la aplicación
 APP_PUBLIC_BASE_URL=https://localhost:8443
@@ -811,7 +811,7 @@ SERVER_SSL_KEY_STORE_PASSWORD=password
 SERVER_SSL_KEY_PASSWORD=secret
 SPRING_JPA_HIBERNATE_DDL_AUTO=create
 SPRING_MAIL_USERNAME=stilnovo.noreply@gmail.com
-SPRING_MAIL_PASSWORD=jzax qigq qeuy jffi
+SPRING_MAIL_PASSWORD=<your_generated_app_password>
 APP_PUBLIC_BASE_URL=https://localhost:8443
 "@ | Out-File .env
 ```
