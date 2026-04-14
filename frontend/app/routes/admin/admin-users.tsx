@@ -105,7 +105,7 @@ export default function AdminUsers({ loaderData }: { loaderData: any }) {
       cellRenderer: (params: any) => (
         <div className="d-flex align-items-center gap-2">
           <img
-            src={`http://localhost:8443/user/${params.data.id}/profile-photo`}
+            src={`/api/v1/users/${params.data.userId}/profile-photo`}
             alt={params.data.name}
             width="36"
             height="36"

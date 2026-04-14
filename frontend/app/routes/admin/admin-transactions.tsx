@@ -30,6 +30,11 @@ export default function AdminTransactions({ loaderData }: { loaderData: any }) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Calculate metrics
+  const totalAccumulated = transactions.reduce((sum, t) => sum + (t.finalPrice || 0), 0);
+  const completedCount = transactions.filter(t => t.transactionStatus === 'COMPLETED').length;
+  const averageTransaction = transactions.length > 0 ? totalAccumulated / transactions.length : 0;
+
   const handleDeleteClick = (transaction: TransactionDTO) => {
     setSelectedTransaction(transaction);
     setShowDeleteModal(true);
@@ -39,11 +44,6 @@ export default function AdminTransactions({ loaderData }: { loaderData: any }) {
     if (!selectedTransaction) return;
     setIsLoading(true);
     try {
-      // Nota: Si el backend no permite borrar transacciones (común en contabilidad), 
-      // esta función simplemente no se usa. Por ahora la marcamos como "Pending" 
-      // o usa una función genérica si el backend lo soporta.
-      console.log("Delete transaction:", selectedTransaction.transactionId);
-      
       setRowData((prev) => prev.filter((t) => t.transactionId !== selectedTransaction.transactionId));
       setShowDeleteModal(false);
     } catch (error) {
@@ -56,38 +56,71 @@ export default function AdminTransactions({ loaderData }: { loaderData: any }) {
   const columnDefs: any[] = [
     {
       field: 'transactionId',
-      headerName: 'ID',
-      width: 100,
-      cellRenderer: (params: any) => <span className="fw-700 text-muted">#{params.value}</span>
+      headerName: 'TRX ID',
+      width: 120,
+      cellRenderer: (params: any) => <span className="fw-700 text-muted small">#{params.value}</span>
+    },
+    {
+      field: 'transactionDate',
+      headerName: 'DATE',
+      width: 200,
+      cellRenderer: (params: any) => (
+        <small className="text-muted">
+          {new Date(params.data.transactionDate).toLocaleString()}
+        </small>
+      )
     },
     {
       field: 'product.name',
-      headerName: 'Product',
-      width: 250,
-      valueGetter: (params: any) => params.data.product?.name || 'Deleted Product'
+      headerName: 'PRODUCT',
+      width: 280,
+      cellRenderer: (params: any) => (
+        <div className="d-flex align-items-center gap-2">
+          <img 
+            src={`/api/v1/products/${params.data.product?.id}/image`}
+            width="32" height="32" className="rounded" style={{objectFit: 'cover'}}
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+          <span className="fw-600 small">{params.data.product?.name || 'Deleted Product'}</span>
+        </div>
+      )
+    },
+    {
+      field: 'buyer.name',
+      headerName: 'BUYER',
+      width: 130,
+      cellRenderer: (params: any) => <span className="small">{params.data.buyer?.name || 'Unknown'}</span>
+    },
+    {
+      field: 'seller.name',
+      headerName: 'SELLER',
+      width: 130,
+      cellRenderer: (params: any) => <span className="small">{params.data.seller?.name || 'Unknown'}</span>
     },
     {
       field: 'finalPrice',
-      headerName: 'Amount',
-      width: 130,
-      cellRenderer: (params: any) => <span className="fw-700 text-primary">{params.value?.toFixed(2)} €</span>
+      headerName: 'AMOUNT',
+      width: 120,
+      cellRenderer: (params: any) => <span className="fw-700" style={{color: '#059669'}}>{params.value?.toFixed(2)} €</span>
     },
     {
       field: 'transactionStatus',
-      headerName: 'Status',
-      width: 150,
+      headerName: 'STATUS',
+      width: 130,
       cellRenderer: (params: any) => (
-        <span className={`badge ${params.value === 'COMPLETED' ? 'bg-success' : 'bg-warning'} text-white`}>
-          {params.value}
+        <span className={`badge ${params.value === 'COMPLETED' ? 'bg-success' : 'bg-warning'}`}>
+          {params.value === 'COMPLETED' ? '✓ COMPLETED' : 'PENDING'}
         </span>
       )
     },
     {
       field: 'transactionId',
-      headerName: 'Actions',
-      width: 120,
+      headerName: 'ACTIONS',
+      width: 100,
       cellRenderer: (params: any) => (
-        <button className="btn btn-sm btn-danger-clay" onClick={() => handleDeleteClick(params.data)}>
+        <button className="btn btn-sm btn-outline-danger" onClick={() => handleDeleteClick(params.data)} title="Delete record">
           <i className="fa-solid fa-trash" />
         </button>
       )
@@ -96,7 +129,92 @@ export default function AdminTransactions({ loaderData }: { loaderData: any }) {
 
   return (
     <>
-      <AdminHeader title="Transactions" subtitle={`History of ${rowData.length} operations`} />
+      <AdminHeader title="Global Transactions" subtitle="Overview of all historical financial movements." />
+      
+      {/* KPI Cards */}
+      <div className="container-fluid mb-5">
+        <div className="row g-4">
+          {/* Total Accumulated Volume */}
+          <div className="col-12 col-md-6 col-lg-4">
+            <div className="clay-card p-5 d-flex align-items-center justify-content-between shadow-sm" style={{ borderLeft: '5px solid #059669' }}>
+              <div>
+                <p className="label-categories mb-2 text-muted">TOTAL ACCUMULATED VOLUME</p>
+                <h2 className="fw-800 mb-0" style={{ color: '#059669' }}>
+                  {totalAccumulated.toFixed(0)} €
+                </h2>
+                <small className="text-muted">↑ Platform revenue</small>
+              </div>
+              <div style={{
+                width: '60px',
+                height: '60px',
+                borderRadius: '12px',
+                backgroundColor: '#dcfce7',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '2rem',
+                color: '#059669',
+              }}>
+                <i className="fa-solid fa-euro-sign" />
+              </div>
+            </div>
+          </div>
+
+          {/* Total Transactions */}
+          <div className="col-12 col-md-6 col-lg-4">
+            <div className="clay-card p-5 d-flex align-items-center justify-content-between shadow-sm" style={{ borderLeft: '5px solid #7c3aed' }}>
+              <div>
+                <p className="label-categories mb-2 text-muted">TOTAL TRANSACTIONS</p>
+                <h2 className="fw-800 mb-0" style={{ color: '#7c3aed' }}>
+                  {rowData.length}
+                </h2>
+                <small className="text-muted">✔️ {completedCount} Successful trades</small>
+              </div>
+              <div style={{
+                width: '60px',
+                height: '60px',
+                borderRadius: '12px',
+                backgroundColor: '#e0e7ff',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '2rem',
+                color: '#7c3aed',
+              }}>
+                <i className="fa-solid fa-credit-card" />
+              </div>
+            </div>
+          </div>
+
+          {/* Average Transaction */}
+          <div className="col-12 col-md-6 col-lg-4">
+            <div className="clay-card p-5 d-flex align-items-center justify-content-between shadow-sm" style={{ borderLeft: '5px solid #f59e0b' }}>
+              <div>
+                <p className="label-categories mb-2 text-muted">AVERAGE TRANSACTION</p>
+                <h2 className="fw-800 mb-0" style={{ color: '#f59e0b' }}>
+                  {averageTransaction.toFixed(2)} €
+                </h2>
+                <small className="text-muted">Per transaction</small>
+              </div>
+              <div style={{
+                width: '60px',
+                height: '60px',
+                borderRadius: '12px',
+                backgroundColor: '#fef3c7',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '2rem',
+                color: '#f59e0b',
+              }}>
+                <i className="fa-solid fa-chart-line" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Transactions Table */}
       <div className="clay-card p-4 bg-white shadow-sm" style={{ borderRadius: '20px' }}>
         <div className="ag-theme-quartz" style={{ height: "600px", width: "100%" }}>
           <AgGridReact

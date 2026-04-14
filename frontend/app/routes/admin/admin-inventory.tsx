@@ -78,8 +78,11 @@ export default function AdminInventory({ loaderData }: { loaderData: any }) {
       cellRenderer: (p: any) => (
         <div className="d-flex align-items-center gap-2">
           <img 
-            src={p.data.image?.id ? `http://localhost:8443/api/v1/images/${p.data.image.id}` : 'https://placehold.co/32x32?text=N/A'} 
+            src={`/api/v1/products/${p.data.id}/image`}
             width="32" height="32" className="rounded shadow-sm" style={{objectFit: 'cover'}}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23f0f4f8" width="100" height="100"/><text x="50" y="50" text-anchor="middle" dy=".3em" fill="%2364748b" font-size="10">No img</text></svg>';
+            }}
           />
           <div>
             <p className="fw-bold mb-0 small">{p.data.name}</p>
