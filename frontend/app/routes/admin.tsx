@@ -9,10 +9,10 @@ import { useUserStore } from '~/stores/useUserStore';
  * Wraps all admin pages with the admin sidebar and main layout
  */
 export default function AdminRoute({ }: Route.ComponentProps) {
-  const { user } = useUserStore();
+    const { user } = useUserStore();
     const location = useLocation();
 
-    // Global protection
+    // Global protection: Check if the user is logged, and if he is not redirect him to login page
     if (!user) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }

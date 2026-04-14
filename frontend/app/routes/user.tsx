@@ -8,9 +8,13 @@ import { useUserStore } from '~/stores/useUserStore';
  * Wraps all admin pages with the admin sidebar and main layout
  */
 export default function UserRoute({ }: Route.ComponentProps) {
-    if(!checkLogged()){
+    const { user } = useUserStore();
+    const location = useLocation();
+
+    // Global protection: Check if the user is logged, and if he is not redirect him to login page
+    if (!user) {
         return <Navigate to="/login" state={{ from: location }} replace />;
-    };
+    }
     
     return (
         <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh' }}>
@@ -29,11 +33,4 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
             </button>
         </div>
     );
-}
-
-// Check if the user is logged, and if he is not redirect him to login page
-export function checkLogged():Boolean{
-    const { user } = useUserStore();
-    return user ? true : false;
-
 }
