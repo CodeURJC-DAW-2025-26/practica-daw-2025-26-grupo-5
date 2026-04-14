@@ -1,5 +1,5 @@
-import { useNavigate, useLocation, useParams } from "react-router";
-import { useActionState } from "react";
+import { useNavigate, useLocation, useParams, Navigate } from "react-router";
+import { useActionState } from "react"; 
 import { sendInquiry } from "~/services/products-service";
 import { Alert, Button, Container } from "react-bootstrap";
 import { useUserStore } from "~/stores/useUserStore";
@@ -10,6 +10,11 @@ export default function ContactSellerPage() {
     const location = useLocation();
     const productName = location.state?.productName as string;
     const { user } = useUserStore(); 
+
+    // Global protection
+    if (!user) {
+        return <Navigate to="/login" state={{ from: location }} replace />;
+    }
 
     async function contactAction(
         prevState: { success: boolean; error: string | null } | null,

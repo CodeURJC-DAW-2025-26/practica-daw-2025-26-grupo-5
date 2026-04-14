@@ -8,14 +8,7 @@ import { useUserStore } from '~/stores/useUserStore';
  * Wraps all admin pages with the admin sidebar and main layout
  */
 export default function UserRoute({ }: Route.ComponentProps) {
-    const { user } = useUserStore();
-    const location = useLocation();
-
-    // Global protection
-    if (!user) {
-        return <Navigate to="/login" state={{ from: location }} replace />;
-    }
-
+    
     return (
         <div style={{ backgroundColor: '#f8fafc', minHeight: '100vh' }}>
             <UserLayout />

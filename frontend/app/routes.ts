@@ -13,6 +13,7 @@ export default [
   layout("routes/home.tsx", [
     index("routes/product/product-list.tsx"),
     route("product/:id", "routes/product/product-detail.tsx"), 
+    route("product/product-contact/:id", "routes/product/product-contact.tsx"),
   ]),
 
   // Public routes
@@ -30,7 +31,6 @@ export default [
 
     route("product/new", "routes/product/product-new.tsx"),
     route("product/:id/edit", "routes/product/product-edit.tsx"),
-    route("product/product-contact/:id", "routes/product/product-contact.tsx"),
   ]),
 
   // Admin routes with separate layout
