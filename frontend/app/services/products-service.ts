@@ -134,3 +134,19 @@ export async function deleteProductImage(
 ): Promise<void> {
   await api.delete(`/products/${productId}/image/${imageId}`);
 }
+
+export async function sendInquiry(data: {
+  productId: number;
+  phone: string;
+  type: string;
+  message: string;
+}) {
+  const response = await fetch("/api/v1/inquiries", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) throw new Error("Failed to send inquiry");
+  return response.json()
+}

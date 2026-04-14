@@ -4,7 +4,7 @@ import type ProductDTO from "./ProductDTO";
 export default interface TransactionDTO {
   transactionId: number;
   finalPrice: number;
-  createdAt: string; // LocalDateTime
+  createdAt: string; // Local time when is created
   formattedDate: string;
   transactionStatus: string;
   rated: boolean;

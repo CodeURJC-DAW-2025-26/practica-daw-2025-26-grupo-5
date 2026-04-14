@@ -136,6 +136,12 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
                   <Link to={`/payment-page/${product.id}`} className="btn-sell py-3 fw-800 shadow-lg rounded-pill d-flex align-items-center justify-content-center gap-2 border-0 text-decoration-none" style={{ fontSize: '1.1rem' }}>
                     <i className="fa-solid fa-bag-shopping"></i> Buy Now
                   </Link>
+                  <Link
+                    to={`/product/product-contact/${product.id}`}  
+                    state={{ productName: product.name, productId: product.id }}
+                    className="btn btn-outline-primary py-3 fw-800 rounded-pill border-2 d-flex align-items-center justify-content-center gap-2 text-decoration-none">
+                    <i className="fa-regular fa-comment-dots fa-lg"></i> Send Message to Seller
+                  </Link>
                 </div>
               ) : (
                 <div className="alert alert-danger rounded-4 py-4 mb-5 text-center shadow-sm border-0 bg-white">

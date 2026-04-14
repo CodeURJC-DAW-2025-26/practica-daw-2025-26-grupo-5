@@ -30,6 +30,7 @@ export default [
 
     route("product/new", "routes/product/product-new.tsx"),
     route("product/:id/edit", "routes/product/product-edit.tsx"),
+    route("product/product-contact/:id", "routes/product/product-contact.tsx"),
   ]),
 
   // Admin routes with separate layout
