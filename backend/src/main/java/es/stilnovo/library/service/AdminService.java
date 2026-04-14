@@ -22,7 +22,6 @@ import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.TransactionRepository;
 import es.stilnovo.library.repository.UserInteractionRepository;
 import es.stilnovo.library.repository.UserRepository;
-import es.stilnovo.library.repository.ValorationRepository;
 import es.stilnovo.library.model.Image;
 import es.stilnovo.library.model.Valoration;
 
