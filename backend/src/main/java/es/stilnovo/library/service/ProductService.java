@@ -489,12 +489,8 @@ public class ProductService {
         if (searching) {
             page = findActiveProducts(query, category, pageable);
         } else {
-            List<Long> recommendedIds = getRecommendations(user).stream().map(Product::getId).toList();
-            if (recommendedIds.isEmpty()) {
-                page = productRepository.findByStatusIgnoreCase("Active", pageable);
-            } else {
-                page = productRepository.findByStatusIgnoreCaseAndIdNotIn("Active", recommendedIds, pageable);
-            }
+            // When not searching, return ALL active products (not limited to recommendations)
+            page = productRepository.findByStatusIgnoreCase("Active", pageable);
         }
 
         return new CatalogPageResult(
