@@ -69,8 +69,8 @@ export default function AdminDashboard({ loaderData }: Readonly<{ loaderData: an
       <div className="container-fluid">
         {/* ROW 1: Main KPIs - 4 Columns */}
         <div className="row g-3 mb-4">
-          {mainKPIs.map((kpi) => (
-            <div key={kpi.label} className="col-12 col-sm-6 col-lg-3">
+          {mainKPIs.map((kpi, idx) => (
+            <div key={`kpi-${idx}`} className="col-12 col-sm-6 col-lg-3">
               <div className="clay-card p-4 shadow-sm" style={{ borderLeft: `5px solid ${kpi.color}` }}>
                 <div className="d-flex justify-content-between align-items-start mb-2">
                   <p className="text-muted small fw-600 mb-0">{kpi.label}</p>
@@ -198,9 +198,6 @@ export default function AdminDashboard({ loaderData }: Readonly<{ loaderData: an
                 <div className="gap-2" style={{ display: 'flex' }}>
                   <Link to="/admin/inventory" className="btn btn-sm btn-outline-primary">
                     See All
-                  </Link>
-                  <Link to="/admin/inventory?action=create" className="btn btn-sm btn-primary">
-                    <i className="fa-solid fa-plus me-1" /> Add Product
                   </Link>
                 </div>
               </div>
