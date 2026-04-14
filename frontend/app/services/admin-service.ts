@@ -64,8 +64,12 @@ export const createProduct = async (formData: FormData): Promise<ProductDTO> => 
   return response.data;
 };
 
-export const updateProduct = async (productId: number, productData: any): Promise<ProductDTO> => {
-  const response = await api.put<ProductDTO>(`/v1/admin/products/${productId}`, productData);
+export const updateProduct = async (productId: number, formData: FormData): Promise<ProductDTO> => {
+  const response = await api.patch<ProductDTO>(`/v1/admin/products/${productId}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
   return response.data;
 };
 

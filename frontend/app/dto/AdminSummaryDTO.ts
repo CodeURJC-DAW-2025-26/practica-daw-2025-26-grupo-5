@@ -10,3 +10,5 @@ interface AdminSummaryDTO {
   readonly totalProductCount: number;
   readonly totalRevenue: number;
 }
+
+export default AdminSummaryDTO;

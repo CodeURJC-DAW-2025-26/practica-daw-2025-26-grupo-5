@@ -305,6 +305,7 @@ public class AdminRestController {
 
         adminService.updateProductAsAdmin(
                 id,
+                request.sellerId(),
                 request.name(),
                 request.category(),
                 request.price(),

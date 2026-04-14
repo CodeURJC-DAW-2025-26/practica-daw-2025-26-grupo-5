@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { redirect } from 'react-router';
-import { getAdminProducts, deleteProduct, createProduct, getAdminUsers } from '~/services/admin-service';
+import { getAdminProducts, deleteProduct, createProduct, updateProduct, getAdminUsers } from '~/services/admin-service';
 import type ProductDTO from '~/dto/ProductDTO';
 import type UserDTO from '~/dto/UserDTO';
 import type PagedResponse from '~/dto/PagedResponse';
@@ -31,6 +31,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
   const [currentPage, setCurrentPage] = useState(0);
   const [formError, setFormError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
+  const [isEditingProduct, setIsEditingProduct] = useState(false); // Modo edición vs creación
   const itemsPerPage = 10;
 
   // Estado del nuevo formulario de Admin
@@ -58,7 +59,25 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
 
   const handleAddProduct = () => {
     setFormError(null);
+    setIsEditingProduct(false);
     setAdminFormData({ name: '', category: '', price: '', location: '', description: '', status: 'Active', sellerId: '' });
+    setSelectedFile(null);
+    setShowAddModal(true);
+  };
+
+  const handleEditProduct = (product: ProductDTO) => {
+    setFormError(null);
+    setIsEditingProduct(true);
+    setSelectedProduct(product);
+    setAdminFormData({
+      name: product.name,
+      category: product.category,
+      price: String(product.price),
+      location: product.location,
+      description: product.description,
+      status: product.status,
+      sellerId: String(product.seller?.id || '')
+    });
     setSelectedFile(null);
     setShowAddModal(true);
   };
@@ -81,12 +100,22 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
     }
 
     try {
-      const newProduct = await createProduct(formData);
-      setRowData((prev) => [newProduct, ...prev]);
-      setShowAddModal(false);
+      if (isEditingProduct && selectedProduct) {
+        // Editar producto existente
+        const updatedProduct = await updateProduct(selectedProduct.id, formData);
+        setRowData((prev) => prev.map((p) => (p.id === selectedProduct.id ? updatedProduct : p)));
+        setShowAddModal(false);
+        setIsEditingProduct(false);
+        setSelectedProduct(null);
+      } else {
+        // Crear nuevo producto
+        const newProduct = await createProduct(formData);
+        setRowData((prev) => [newProduct, ...prev]);
+        setShowAddModal(false);
+      }
     } catch (error: any) {
-      setFormError(error.response?.data?.message || 'Failed to create product. Please try again.');
-      console.error('Failed to create product:', error);
+      setFormError(error.response?.data?.message || (isEditingProduct ? 'Failed to update product. Please try again.' : 'Failed to create product. Please try again.'));
+      console.error(isEditingProduct ? 'Failed to update product:' : 'Failed to create product:', error);
     } finally {
       setIsPending(false);
     }
@@ -231,22 +260,40 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
                         </span>
                       </td>
                       <td>
-                        <button
-                          type="button"
-                          className="btn btn-sm fw-700"
-                          style={{
-                            backgroundColor: '#fee2e2',
-                            color: '#dc3545',
-                            border: 'none',
-                            borderRadius: '6px',
-                            padding: '5px 10px',
-                            fontSize: '0.7rem',
-                            cursor: 'pointer',
-                          }}
-                          onClick={() => handleDeleteClick(product)}
-                        >
-                          <i className="fa-solid fa-trash" />
-                        </button>
+                        <div className="d-flex align-items-center gap-2">
+                          <button
+                            type="button"
+                            className="btn btn-sm fw-700"
+                            style={{
+                              backgroundColor: '#f3f4f6',
+                              color: '#4b5563',
+                              border: 'none',
+                              borderRadius: '6px',
+                              padding: '5px 10px',
+                              fontSize: '0.7rem',
+                              cursor: 'pointer',
+                            }}
+                            onClick={() => handleEditProduct(product)}
+                          >
+                            <i className="fa-solid fa-edit" />
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-sm fw-700"
+                            style={{
+                              backgroundColor: '#fee2e2',
+                              color: '#dc3545',
+                              border: 'none',
+                              borderRadius: '6px',
+                              padding: '5px 10px',
+                              fontSize: '0.7rem',
+                              cursor: 'pointer',
+                            }}
+                            onClick={() => handleDeleteClick(product)}
+                          >
+                            <i className="fa-solid fa-trash" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -300,17 +347,23 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
         </div>
       </div>
 
-      {/* Add Product Modal (Admin Native Form) */}
+      {/* Add/Edit Product Modal (Admin Native Form) */}
       <Modal 
         show={showAddModal} 
-        onHide={() => setShowAddModal(false)}
+        onHide={() => {
+          setShowAddModal(false);
+          setIsEditingProduct(false);
+          setSelectedProduct(null);
+        }}
         size="lg"
         centered
         contentClassName="bg-white border-0 shadow-lg" 
         style={{ borderRadius: '24px' }}
       >
         <Modal.Header closeButton className="border-0 pb-0">
-          <Modal.Title className="fw-800" style={{ color: '#1e293b' }}>Create Product For Any User</Modal.Title>
+          <Modal.Title className="fw-800" style={{ color: '#1e293b' }}>
+            {isEditingProduct ? 'Edit Product' : 'Create Product For Any User'}
+          </Modal.Title>
         </Modal.Header>
         <Modal.Body className="p-4">
           {formError && <div className="alert alert-danger mb-4">{formError}</div>}
@@ -424,7 +477,11 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
             <div className="d-flex justify-content-end gap-3 mt-4">
               <Button 
                 variant="light" 
-                onClick={() => setShowAddModal(false)} 
+                onClick={() => {
+                  setShowAddModal(false);
+                  setIsEditingProduct(false);
+                  setSelectedProduct(null);
+                }} 
                 className="rounded-pill px-4 fw-700"
               >
                 Cancel
@@ -436,7 +493,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
                 disabled={isPending}
                 style={{ backgroundColor: '#1e293b' }}
               >
-                {isPending ? 'Creating...' : 'Create Product'}
+                {isPending ? (isEditingProduct ? 'Updating...' : 'Creating...') : (isEditingProduct ? 'Update Product' : 'Create Product')}
               </Button>
             </div>
           </Form>
