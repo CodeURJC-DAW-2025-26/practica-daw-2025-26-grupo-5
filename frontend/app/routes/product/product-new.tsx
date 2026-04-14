@@ -81,7 +81,7 @@ export default function ProductNew() {
   return (
     <ProductForm
       actionState={[state, formAction, isPending]}
-      onCancel={() => navigate("/")}
+      onCancel={() => navigate("/user/products")}
       onImproveWithAI={handleImproveDescription}
       aiState={{ loading: aiLoading, error: aiError }}
     />
