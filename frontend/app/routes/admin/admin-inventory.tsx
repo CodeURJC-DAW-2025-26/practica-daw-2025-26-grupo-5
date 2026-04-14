@@ -273,24 +273,21 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
             width: '100%',
             height: '100%',
             overflowY: 'auto',
+            paddingTop: '2rem',
+            paddingBottom: '2rem',
           }}
         >
           <div 
-            className="modal-dialog"
             style={{ 
-              margin: '2rem auto',
               maxWidth: '900px',
               width: '90%',
+              margin: '0 auto',
+              backgroundColor: '#ffffff',
+              borderRadius: '24px',
+              boxShadow: '0 25px 80px rgba(0, 0, 0, 0.5)',
+              overflow: 'hidden',
             }}
           >
-            <div 
-              className="modal-content border-0"
-              style={{ 
-                borderRadius: '24px',
-                boxShadow: '0 25px 80px rgba(0, 0, 0, 0.5)',
-                backgroundColor: '#ffffff',
-              }}
-            >
               <ProductForm
                 actionState={[
                   { success: false, error: formError },
@@ -303,7 +300,6 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
                 }}
               />
             </div>
-          </div>
         </div>
       )}
 
