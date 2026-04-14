@@ -28,6 +28,11 @@ export default function Login({ }: Route.ComponentProps) {
 
   useEffect(() => {
     if (user && !isLoading) {
+      // Check if user is banned
+      if (user.banned) {
+        navigate('/banned');
+        return;
+      }
       const redirectTo = location.state?.from?.pathname || '/';
       navigate(redirectTo);
     }
