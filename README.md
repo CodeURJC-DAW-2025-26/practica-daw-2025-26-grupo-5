@@ -1463,6 +1463,33 @@ Diagrama mostrando los componentes React, hooks personalizados, servicios y sus 
 
 ![Diagrama de Componentes React](images/spa-classes-diagram.png)
 
+### **Integración con Gemini AI**
+
+Como valor añadido a la plataforma Stilnovo, hemos integrado **Gemini AI** para asistir a los usuarios en la redacción de descripciones de productos. Esta funcionalidad permite generar textos profesionales y atractivos automáticamente, tanto al crear un nuevo artículo como al editar uno existente.
+
+#### **Configuración del Asistente**
+
+Por motivos de seguridad, esta funcionalidad está **deshabilitada por defecto** (no bloquea el normal funcionamiento de la aplicación), ya que requiere una clave de API privada. Sigue estos pasos para activarla:
+
+1.  **Obtener una API Key:**
+    * Accede a [Google AI Studio](https://aistudio.google.com/app/api-keys).
+    * Inicia sesión con la cuenta de Google que desees.
+    * Puedes copiar una clave existente o generar una nueva haciendo clic en **"Create API key"**.
+
+2.  **Configurar el entorno del Backend:**
+    * Dirígete a la carpeta `/backend` de tu proyecto.
+    * Crea un nuevo archivo llamado exactamente: `ai-application-key.properties` a la altura de `application.properties`.
+    * Dentro de ese archivo, añade la siguiente línea sustituyendo el valor por tu clave:
+      ```properties
+      google.ai.api.key=TU_API_KEY_AQUÍ
+      ```
+
+3.  **Finalización:**
+    * Reinicia la aplicación de Spring Boot. 
+    * El sistema detectará la clave automáticamente y habilitará el botón **"Improve with AI"** en los formularios de producto.
+
+> **Nota:** La aplicación cuenta con "degradación progresiva" (*graceful degradation*). Si decides no configurar la IA, Stilnovo arrancará con normalidad y el resto de funciones de gestión de productos seguirán operativas sin errores.
+
 ### **Participación de Miembros en la Práctica 3**
 
 #### **Alumno 1 - Victor Hugo Oliveira Petroceli**
