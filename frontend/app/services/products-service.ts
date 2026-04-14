@@ -15,7 +15,9 @@ import axios from "axios";
  * Backend returns PagedResponse, extract content array
  */
 export async function getProducts(): Promise<ProductDTO[]> {
-  const response = await api.get("/v1/products");
+  const response = await api.get("/v1/products", {
+    params: { size: 1000 } // Fetch up to 1000 products to show all on home
+  });
   const pagedResponse = response.data as PagedResponse<ProductDTO>;
   return pagedResponse.content || [];
 }

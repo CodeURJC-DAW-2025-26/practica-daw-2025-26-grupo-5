@@ -1,6 +1,5 @@
 import { redirect, Link } from 'react-router';
 import { getAdminSummary } from '~/services/admin-service';
-import type AdminSummaryDTO from '~/dto/AdminSummaryDTO';
 import AdminHeader from '~/components/admin/AdminHeader';
 
 export async function clientLoader() {
@@ -21,19 +20,19 @@ interface KPIData {
 }
 
 export default function AdminDashboard({ loaderData }: Readonly<{ loaderData: any }>) {
-  const summary = (loaderData as AdminSummaryDTO) || {};
+  const summary = loaderData || {};
   const numUsers = summary?.numUsers || 0;
   const numBanneds = summary?.numBanneds || 0;
-  const totalProducts = summary?.recentProducts?.length || 0;
+  const totalProducts = (summary?.totalProductCount || summary?.recentProducts?.length) || 0;
   const memoryUsageStr = summary?.memoryUsage || "0 MB";
   const memoryUsage = Number.parseInt(memoryUsageStr.toString()) || 0;
   const users = summary?.recentUsers || [];
   const products = summary?.recentProducts || [];
 
   // Calculate metrics
-  const totalRevenue = products.reduce<number>((sum, p: any) => sum + (p.price || 0), 0);
+  const totalRevenue = summary?.totalRevenue || 0;
   const averageRating = users.length > 0 
-    ? (users.reduce<number>((sum, u: any) => sum + (u.rating || 0), 0) / users.length).toFixed(1) 
+    ? (users.reduce((sum: number, u: any) => sum + (u.rating || 0), 0) / users.length).toFixed(1) 
     : '0';
   const activeUsers = numUsers - numBanneds;
   
@@ -69,8 +68,8 @@ export default function AdminDashboard({ loaderData }: Readonly<{ loaderData: an
       <div className="container-fluid">
         {/* ROW 1: Main KPIs - 4 Columns */}
         <div className="row g-3 mb-4">
-          {mainKPIs.map((kpi, idx) => (
-            <div key={`kpi-${idx}`} className="col-12 col-sm-6 col-lg-3">
+          {mainKPIs.map((kpi) => (
+            <div key={kpi.label} className="col-12 col-sm-6 col-lg-3">
               <div className="clay-card p-4 shadow-sm" style={{ borderLeft: `5px solid ${kpi.color}` }}>
                 <div className="d-flex justify-content-between align-items-start mb-2">
                   <p className="text-muted small fw-600 mb-0">{kpi.label}</p>

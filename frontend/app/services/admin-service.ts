@@ -26,14 +26,18 @@ export const getAdminUsers = async (page = 0, size = 10): Promise<PagedResponse<
   return response.data;
 };
 
-export const banUser = async (userId: number, ban: boolean): Promise<void> => {
-  await api.put(`/v1/admin/users/${userId}/ban`, null, {
-    params: { ban },
-  });
+export const banUser = async (userId: number, ban: boolean): Promise<UserDTO> => {
+  const response = await api.put<UserDTO>(`/v1/admin/users/${userId}/ban`, { banned: ban });
+  return response.data;
 };
 
 export const deleteUser = async (userId: number): Promise<void> => {
   await api.delete(`/v1/admin/users/${userId}`);
+};
+
+export const updateUser = async (userId: number, updateData: { name?: string; email?: string; }): Promise<UserDTO> => {
+  const response = await api.put<UserDTO>(`/v1/admin/users/${userId}`, updateData);
+  return response.data;
 };
 
 /**

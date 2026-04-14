@@ -269,4 +269,8 @@ public class AdminController {
     private String formatInt(int value) {
         return NumberFormattingUtils.formatQuantity(value);
     }
+
+    private String formatInt(double value) {
+        return NumberFormattingUtils.formatMoney(value);
+    }
 }

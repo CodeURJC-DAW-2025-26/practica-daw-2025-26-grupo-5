@@ -1,10 +1,12 @@
 import type UserDTO from './UserDTO';
 import type ProductDTO from './ProductDTO';
 
-export default interface AdminSummaryDTO {
-  numUsers: number;
-  numBanneds: number;
-  memoryUsage: string;
-  recentUsers: UserDTO[];
-  recentProducts: ProductDTO[];
+interface AdminSummaryDTO {
+  readonly numUsers: number;
+  readonly numBanneds: number;
+  readonly memoryUsage: string;
+  readonly recentUsers: readonly UserDTO[];
+  readonly recentProducts: readonly ProductDTO[];
+  readonly totalProductCount: number;
+  readonly totalRevenue: number;
 }

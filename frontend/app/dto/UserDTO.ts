@@ -5,6 +5,9 @@ export default interface UserDTO {
   rating: number;
   numRatings: number;
   description: string;
+  cardNumber?: string;
+  cardExpiringDate?: string;
+  cardCvv?: string;
   roles: string[];
   banned: boolean;
 }

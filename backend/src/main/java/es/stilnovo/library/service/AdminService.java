@@ -71,11 +71,13 @@ public class AdminService {
             int numBanneds,
             List<User> users,
             List<Product> products,
-            String memoryUsage) {
+            String memoryUsage,
+            int totalProductCount,
+            double totalRevenue) {
     }
 
     public record AdminTransactionsData(
-            int totalRevenue,
+            double totalRevenue,
             int numTransactions,
             List<Transaction> globalTransactions) {
     }
@@ -121,6 +123,10 @@ public class AdminService {
         List<User> dashboardUsers = userService.findAll().stream().limit(3).toList();
         // Fetch recent products (limited to 3) for quick inventory view
         List<Product> dashboardProducts = productRepository.findAll().stream().limit(3).toList();
+        // Count ALL products (not limited) for accurate KPI display
+        int totalProducts = (int) productRepository.count();
+        // Calculate total revenue from completed transactions
+        double totalRevenue = transactionService.getTotalRevenue();
         // Calculate JVM memory usage: (total - free) = used memory in MB
         long usedMemory = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024);
         return new AdminPanelData(
@@ -128,7 +134,9 @@ public class AdminService {
                 getNumBanneds(),
                 dashboardUsers,
                 dashboardProducts,
-                usedMemory + " MB");
+                usedMemory + " MB",
+                totalProducts,
+                totalRevenue);
     }
 
     @Transactional(readOnly = true)

@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { redirect } from 'react-router';
-import { getAdminProducts, deleteProduct, createProduct } from '~/services/admin-service';
+import { getAdminProducts, deleteProduct, createProduct, getAdminUsers } from '~/services/admin-service';
 import type ProductDTO from '~/dto/ProductDTO';
+import type UserDTO from '~/dto/UserDTO';
 import type PagedResponse from '~/dto/PagedResponse';
 import AdminHeader from '~/components/admin/AdminHeader';
 import ConfirmModal from '~/components/confirm-modal';
-import ProductForm from '~/components/ProductForm';
+import { Modal, Form, Button } from 'react-bootstrap';
 
 export async function clientLoader() {
   try {
@@ -22,6 +23,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
   const products = pagedData.content || [];
 
   const [rowData, setRowData] = useState<ProductDTO[]>(products);
+  const [users, setUsers] = useState<UserDTO[]>([]); // Lista de usuarios para el selector
   const [selectedProduct, setSelectedProduct] = useState<ProductDTO | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -31,14 +33,53 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
   const [isPending, setIsPending] = useState(false);
   const itemsPerPage = 10;
 
+  // Estado del nuevo formulario de Admin
+  const [adminFormData, setAdminFormData] = useState({
+    name: '',
+    category: '',
+    price: '',
+    location: '',
+    description: '',
+    status: 'Active',
+    sellerId: ''
+  });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  // Cargar usuarios al montar el componente
+  useEffect(() => {
+    getAdminUsers(0, 100)
+      .then(data => {
+        if (data && data.content) {
+          setUsers(data.content);
+        }
+      })
+      .catch(err => console.error('Error fetching users:', err));
+  }, []);
+
   const handleAddProduct = () => {
     setFormError(null);
+    setAdminFormData({ name: '', category: '', price: '', location: '', description: '', status: 'Active', sellerId: '' });
+    setSelectedFile(null);
     setShowAddModal(true);
   };
 
-  const handleFormSubmit = async (formData: FormData) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsPending(true);
     setFormError(null);
+
+    const formData = new FormData();
+    formData.append('name', adminFormData.name);
+    formData.append('category', adminFormData.category);
+    formData.append('price', adminFormData.price);
+    formData.append('location', adminFormData.location);
+    formData.append('description', adminFormData.description);
+    formData.append('status', adminFormData.status);
+    formData.append('sellerId', adminFormData.sellerId); // ID del dueño elegido
+    if (selectedFile) {
+      formData.append('image', selectedFile);
+    }
+
     try {
       const newProduct = await createProduct(formData);
       setRowData((prev) => [newProduct, ...prev]);
@@ -178,14 +219,14 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
                         <span
                           className={`badge fw-700`}
                           style={{
-                            backgroundColor: product.status === 'Active' ? '#dcfce7' : '#fee2e2',
-                            color: product.status === 'Active' ? '#2f855a' : '#c53030',
+                            backgroundColor: product.status === 'Active' || product.status === 'Public' ? '#dcfce7' : '#fee2e2',
+                            color: product.status === 'Active' || product.status === 'Public' ? '#2f855a' : '#c53030',
                             padding: '5px 10px',
                             borderRadius: '6px',
                             fontSize: '0.7rem',
                           }}
                         >
-                          <i className={`fa-solid fa-${product.status === 'Active' ? 'check-circle' : 'circle'}`} />
+                          <i className={`fa-solid fa-${product.status === 'Active' || product.status === 'Public' ? 'check-circle' : 'circle'}`} />
                           &nbsp;{product.status?.toUpperCase()}
                         </span>
                       </td>
@@ -259,49 +300,148 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
         </div>
       </div>
 
-      {/* Add Product Modal */}
-      {showAddModal && (
-        <div
-          className="modal-backdrop fade show"
-          style={{
-            display: 'block',
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            zIndex: 2000,
-            backgroundColor: 'rgba(0, 0, 0, 0.75)',
-            width: '100%',
-            height: '100%',
-            overflowY: 'auto',
-            paddingTop: '2rem',
-            paddingBottom: '2rem',
-          }}
-        >
-          <div 
-            style={{ 
-              maxWidth: '900px',
-              width: '90%',
-              margin: '0 auto',
-              backgroundColor: '#ffffff',
-              borderRadius: '24px',
-              boxShadow: '0 25px 80px rgba(0, 0, 0, 0.5)',
-              overflow: 'hidden',
-            }}
-          >
-              <ProductForm
-                actionState={[
-                  { success: false, error: formError },
-                  handleFormSubmit,
-                  isPending,
-                ]}
-                onCancel={() => {
-                  setShowAddModal(false);
-                  setFormError(null);
-                }}
-              />
+      {/* Add Product Modal (Admin Native Form) */}
+      <Modal 
+        show={showAddModal} 
+        onHide={() => setShowAddModal(false)}
+        size="lg"
+        centered
+        contentClassName="bg-white border-0 shadow-lg" 
+        style={{ borderRadius: '24px' }}
+      >
+        <Modal.Header closeButton className="border-0 pb-0">
+          <Modal.Title className="fw-800" style={{ color: '#1e293b' }}>Create Product For Any User</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="p-4">
+          {formError && <div className="alert alert-danger mb-4">{formError}</div>}
+          
+          <Form onSubmit={handleFormSubmit}>
+            <div className="row">
+              {/* SELLER (Usuario) */}
+              <Form.Group className="col-md-6 mb-3">
+                <Form.Label className="fw-700 small text-uppercase text-muted" style={{ letterSpacing: '1px' }}>Seller</Form.Label>
+                <Form.Select 
+                  required
+                  value={adminFormData.sellerId}
+                  onChange={(e) => setAdminFormData({...adminFormData, sellerId: e.target.value})}
+                  className="rounded-3 py-2 bg-light border-0"
+                >
+                  <option value="">Select user</option>
+                  {users.map(u => (
+                    <option key={u.id} value={u.id}>{u.name || u.email} ({u.email})</option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+
+              {/* PRODUCT NAME */}
+              <Form.Group className="col-md-6 mb-3">
+                <Form.Label className="fw-700 small text-uppercase text-muted" style={{ letterSpacing: '1px' }}>Product Name</Form.Label>
+                <Form.Control 
+                  type="text" 
+                  value={adminFormData.name}
+                  onChange={(e) => setAdminFormData({...adminFormData, name: e.target.value})}
+                  required 
+                  className="rounded-3 py-2 bg-light border-0"
+                />
+              </Form.Group>
             </div>
-        </div>
-      )}
+
+            <div className="row">
+              {/* CATEGORY */}
+              <Form.Group className="col-md-6 mb-3">
+                <Form.Label className="fw-700 small text-uppercase text-muted" style={{ letterSpacing: '1px' }}>Category</Form.Label>
+                <Form.Control 
+                  type="text" 
+                  value={adminFormData.category}
+                  onChange={(e) => setAdminFormData({...adminFormData, category: e.target.value})}
+                  className="rounded-3 py-2 bg-light border-0"
+                />
+              </Form.Group>
+
+              {/* PRICE */}
+              <Form.Group className="col-md-6 mb-3">
+                <Form.Label className="fw-700 small text-uppercase text-muted" style={{ letterSpacing: '1px' }}>Price (€)</Form.Label>
+                <Form.Control 
+                  type="number" 
+                  value={adminFormData.price}
+                  onChange={(e) => setAdminFormData({...adminFormData, price: e.target.value})}
+                  required 
+                  className="rounded-3 py-2 bg-light border-0"
+                />
+              </Form.Group>
+            </div>
+
+            <div className="row">
+              {/* LOCATION */}
+              <Form.Group className="col-md-6 mb-3">
+                <Form.Label className="fw-700 small text-uppercase text-muted" style={{ letterSpacing: '1px' }}>Location</Form.Label>
+                <Form.Control 
+                  type="text" 
+                  value={adminFormData.location}
+                  onChange={(e) => setAdminFormData({...adminFormData, location: e.target.value})}
+                  className="rounded-3 py-2 bg-light border-0"
+                />
+              </Form.Group>
+              
+              {/* STATUS */}
+              <Form.Group className="col-md-6 mb-3">
+                <Form.Label className="fw-700 small text-uppercase text-muted" style={{ letterSpacing: '1px' }}>Status</Form.Label>
+                <Form.Select 
+                  value={adminFormData.status}
+                  onChange={(e) => setAdminFormData({...adminFormData, status: e.target.value})}
+                  className="rounded-3 py-2 bg-light border-0"
+                >
+                  <option value="Active">Active</option>
+                  <option value="Hidden">Hidden</option>
+                  <option value="Banned">Banned</option>
+                </Form.Select>
+              </Form.Group>
+            </div>
+
+            {/* DESCRIPTION */}
+            <Form.Group className="mb-4">
+              <Form.Label className="fw-700 small text-uppercase text-muted" style={{ letterSpacing: '1px' }}>Description</Form.Label>
+              <Form.Control 
+                as="textarea" 
+                rows={4} 
+                value={adminFormData.description}
+                onChange={(e) => setAdminFormData({...adminFormData, description: e.target.value})}
+                className="rounded-3 py-2 bg-light border-0"
+              />
+            </Form.Group>
+
+            {/* IMAGE */}
+            <Form.Group className="mb-4">
+              <Form.Label className="fw-700 small text-uppercase text-muted" style={{ letterSpacing: '1px' }}>Image</Form.Label>
+              <Form.Control 
+                type="file" 
+                onChange={(e: any) => setSelectedFile(e.target.files[0])}
+                className="rounded-3 border"
+              />
+            </Form.Group>
+
+            {/* BUTTONS */}
+            <div className="d-flex justify-content-end gap-3 mt-4">
+              <Button 
+                variant="light" 
+                onClick={() => setShowAddModal(false)} 
+                className="rounded-pill px-4 fw-700"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                variant="dark" 
+                className="rounded-pill px-4 fw-700" 
+                disabled={isPending}
+                style={{ backgroundColor: '#1e293b' }}
+              >
+                {isPending ? 'Creating...' : 'Create Product'}
+              </Button>
+            </div>
+          </Form>
+        </Modal.Body>
+      </Modal>
 
       {/* Confirm Modal */}
       <ConfirmModal
@@ -321,6 +461,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
     </>
   );
 }
+
 export function ErrorBoundary({ error }: { readonly error: Error }) {
   return (
     <div className="alert alert-danger m-5" role="alert">
