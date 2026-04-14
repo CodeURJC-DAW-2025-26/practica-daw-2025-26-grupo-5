@@ -52,7 +52,7 @@ frontend/.eslintcache
 frontend/.react-router/
 
 # --- Backend SPA Integration ---
-backend/src/main/resources/ai-aplication-key.properties
+backend/src/main/resources/ai-application-key.properties
 backend/src/main/resources/static/new/
 
 # --- IDE & Editor ---
