@@ -3,6 +3,7 @@ import { useActionState } from "react";
 import { sendInquiry } from "~/services/products-service";
 import { Alert, Button, Container } from "react-bootstrap";
 import { useUserStore } from "~/stores/useUserStore";
+import { checkLogged } from "../user";
 
 export default function ContactSellerPage() {
     const { id } = useParams();
@@ -12,9 +13,9 @@ export default function ContactSellerPage() {
     const { user } = useUserStore(); 
 
     // Global protection
-    if (!user) {
+    if (!checkLogged()){
         return <Navigate to="/login" state={{ from: location }} replace />;
-    }
+    };
 
     async function contactAction(
         prevState: { success: boolean; error: string | null } | null,
