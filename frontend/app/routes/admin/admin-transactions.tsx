@@ -132,90 +132,41 @@ export default function AdminTransactions({ loaderData }: { loaderData: any }) {
       <AdminHeader title="Global Transactions" subtitle="Overview of all historical financial movements." />
       
       {/* KPI Cards */}
-      <div className="container-fluid mb-5">
-        <div className="row g-4">
-          {/* Total Accumulated Volume */}
-          <div className="col-12 col-md-6 col-lg-4">
-            <div className="clay-card p-5 d-flex align-items-center justify-content-between shadow-sm" style={{ borderLeft: '5px solid #059669' }}>
-              <div>
-                <p className="label-categories mb-2 text-muted">TOTAL ACCUMULATED VOLUME</p>
-                <h2 className="fw-800 mb-0" style={{ color: '#059669' }}>
-                  {totalAccumulated.toFixed(0)} €
-                </h2>
-                <small className="text-muted">↑ Platform revenue</small>
-              </div>
-              <div style={{
-                width: '60px',
-                height: '60px',
-                borderRadius: '12px',
-                backgroundColor: '#dcfce7',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '2rem',
-                color: '#059669',
-              }}>
-                <i className="fa-solid fa-euro-sign" />
-              </div>
-            </div>
+      <div className="row g-4 mb-4">
+        {/* Total Accumulated Volume */}
+        <div className="col-12 col-sm-6 col-lg-4">
+          <div className="clay-card p-4 text-center shadow-sm">
+            <i className="fa-solid fa-euro-sign" style={{ fontSize: '2rem', color: '#059669', marginBottom: '8px', display: 'block' }} />
+            <p className="text-muted small mb-1">Total Accumulated Volume</p>
+            <h3 className="fw-800 mb-0" style={{ color: '#059669' }}>{totalAccumulated.toFixed(0)} €</h3>
           </div>
+        </div>
 
-          {/* Total Transactions */}
-          <div className="col-12 col-md-6 col-lg-4">
-            <div className="clay-card p-5 d-flex align-items-center justify-content-between shadow-sm" style={{ borderLeft: '5px solid #7c3aed' }}>
-              <div>
-                <p className="label-categories mb-2 text-muted">TOTAL TRANSACTIONS</p>
-                <h2 className="fw-800 mb-0" style={{ color: '#7c3aed' }}>
-                  {rowData.length}
-                </h2>
-                <small className="text-muted">✔️ {completedCount} Successful trades</small>
-              </div>
-              <div style={{
-                width: '60px',
-                height: '60px',
-                borderRadius: '12px',
-                backgroundColor: '#e0e7ff',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '2rem',
-                color: '#7c3aed',
-              }}>
-                <i className="fa-solid fa-credit-card" />
-              </div>
-            </div>
+        {/* Total Transactions */}
+        <div className="col-12 col-sm-6 col-lg-4">
+          <div className="clay-card p-4 text-center shadow-sm">
+            <i className="fa-solid fa-credit-card" style={{ fontSize: '2rem', color: '#7c3aed', marginBottom: '8px', display: 'block' }} />
+            <p className="text-muted small mb-1">Total Transactions</p>
+            <h3 className="fw-800 mb-0" style={{ color: '#7c3aed' }}>{rowData.length}</h3>
           </div>
+        </div>
 
-          {/* Average Transaction */}
-          <div className="col-12 col-md-6 col-lg-4">
-            <div className="clay-card p-5 d-flex align-items-center justify-content-between shadow-sm" style={{ borderLeft: '5px solid #f59e0b' }}>
-              <div>
-                <p className="label-categories mb-2 text-muted">AVERAGE TRANSACTION</p>
-                <h2 className="fw-800 mb-0" style={{ color: '#f59e0b' }}>
-                  {averageTransaction.toFixed(2)} €
-                </h2>
-                <small className="text-muted">Per transaction</small>
-              </div>
-              <div style={{
-                width: '60px',
-                height: '60px',
-                borderRadius: '12px',
-                backgroundColor: '#fef3c7',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '2rem',
-                color: '#f59e0b',
-              }}>
-                <i className="fa-solid fa-chart-line" />
-              </div>
-            </div>
+        {/* Average Transaction */}
+        <div className="col-12 col-sm-6 col-lg-4">
+          <div className="clay-card p-4 text-center shadow-sm">
+            <i className="fa-solid fa-chart-line" style={{ fontSize: '2rem', color: '#f59e0b', marginBottom: '8px', display: 'block' }} />
+            <p className="text-muted small mb-1">Average Transaction</p>
+            <h3 className="fw-800 mb-0" style={{ color: '#f59e0b' }}>{averageTransaction.toFixed(2)} €</h3>
           </div>
         </div>
       </div>
 
       {/* Transactions Table */}
-      <div className="clay-card p-4 bg-white shadow-sm" style={{ borderRadius: '20px' }}>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h5 className="fw-800 mb-0">Transaction Details</h5>
+      </div>
+
+      <div className="clay-card p-3 bg-white shadow-sm" style={{ borderRadius: '15px' }}>
         <div className="ag-theme-quartz" style={{ height: "600px", width: "100%" }}>
           <AgGridReact
             rowData={rowData}

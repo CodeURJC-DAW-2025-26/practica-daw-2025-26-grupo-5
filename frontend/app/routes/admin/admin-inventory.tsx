@@ -113,10 +113,47 @@ export default function AdminInventory({ loaderData }: { loaderData: any }) {
   ];
 
   return (
-    <div className="container-fluid p-4">
+    <div className="container-fluid">
+      <AdminHeader title="Global Inventory" subtitle="Audit, edit, or remove any listing on the platform." />
+
+      {/* KPI Cards */}
+      <div className="row g-4 mb-4">
+        {/* Total Products */}
+        <div className="col-12 col-sm-6 col-lg-4">
+          <div className="clay-card p-4 text-center shadow-sm">
+            <i className="fa-solid fa-box" style={{ fontSize: '2rem', color: '#7c3aed', marginBottom: '8px', display: 'block' }} />
+            <p className="text-muted small mb-1">Total Products</p>
+            <h3 className="fw-800 mb-0" style={{ color: '#7c3aed' }}>{rowData.length}</h3>
+          </div>
+        </div>
+
+        {/* Average Price */}
+        <div className="col-12 col-sm-6 col-lg-4">
+          <div className="clay-card p-4 text-center shadow-sm">
+            <i className="fa-solid fa-euro-sign" style={{ fontSize: '2rem', color: '#059669', marginBottom: '8px', display: 'block' }} />
+            <p className="text-muted small mb-1">Average Price</p>
+            <h3 className="fw-800 mb-0" style={{ color: '#059669' }}>
+              €{rowData.length > 0 ? (rowData.reduce((sum: number, p: ProductDTO) => sum + (p.price || 0), 0) / rowData.length).toFixed(0) : 0}
+            </h3>
+          </div>
+        </div>
+
+        {/* Total Value */}
+        <div className="col-12 col-sm-6 col-lg-4">
+          <div className="clay-card p-4 text-center shadow-sm">
+            <i className="fa-solid fa-chart-line" style={{ fontSize: '2rem', color: '#0369a1', marginBottom: '8px', display: 'block' }} />
+            <p className="text-muted small mb-1">Total Inventory Value</p>
+            <h3 className="fw-800 mb-0" style={{ color: '#0369a1' }}>
+              €{rowData.reduce((sum: number, p: ProductDTO) => sum + (p.price || 0), 0).toFixed(0)}
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      {/* Table */}
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <AdminHeader title="Global Inventory" subtitle={`${rowData.length} products total`} />
-        <Button onClick={() => openForm()} className="btn-action-admin fw-bold border-0 shadow-sm">
+        <h5 className="fw-800 mb-0">Product Details</h5>
+        <Button onClick={() => openForm()} className="btn btn-primary btn-sm">
           <i className="fa-solid fa-plus me-2" />Add Product
         </Button>
       </div>

@@ -106,90 +106,41 @@ export default function AdminValorations({ loaderData }: { loaderData: any }) {
       <AdminHeader title="Global Valorations" subtitle="Monitor and manage user feedback and platform integrity." />
       
       {/* KPI Cards */}
-      <div className="container-fluid mb-5">
-        <div className="row g-4">
-          {/* Total Reviews */}
-          <div className="col-12 col-md-6 col-lg-4">
-            <div className="clay-card p-5 d-flex align-items-center justify-content-between shadow-sm" style={{ borderLeft: '5px solid #fbbf24' }}>
-              <div>
-                <p className="label-categories mb-2 text-muted">TOTAL REVIEWS</p>
-                <h2 className="fw-800 mb-0" style={{ color: '#fbbf24' }}>
-                  {totalReviews}
-                </h2>
-                <small className="text-muted">👥 User feedback count</small>
-              </div>
-              <div style={{
-                width: '60px',
-                height: '60px',
-                borderRadius: '12px',
-                backgroundColor: '#fef3c7',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '2rem',
-                color: '#fbbf24',
-              }}>
-                <i className="fa-solid fa-star" />
-              </div>
-            </div>
+      <div className="row g-4 mb-4">
+        {/* Total Reviews */}
+        <div className="col-12 col-sm-6 col-lg-4">
+          <div className="clay-card p-4 text-center shadow-sm">
+            <i className="fa-solid fa-star" style={{ fontSize: '2rem', color: '#fbbf24', marginBottom: '8px', display: 'block' }} />
+            <p className="text-muted small mb-1">Total Reviews</p>
+            <h3 className="fw-800 mb-0" style={{ color: '#fbbf24' }}>{totalReviews}</h3>
           </div>
+        </div>
 
-          {/* Average Rating */}
-          <div className="col-12 col-md-6 col-lg-4">
-            <div className="clay-card p-5 d-flex align-items-center justify-content-between shadow-sm" style={{ borderLeft: '5px solid #06b6d4' }}>
-              <div>
-                <p className="label-categories mb-2 text-muted">AVERAGE RATING</p>
-                <h2 className="fw-800 mb-0" style={{ color: '#06b6d4' }}>
-                  {averageRating} / 5
-                </h2>
-                <small className="text-muted">📊 Platform satisfaction</small>
-              </div>
-              <div style={{
-                width: '60px',
-                height: '60px',
-                borderRadius: '12px',
-                backgroundColor: '#cffafe',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '2rem',
-                color: '#06b6d4',
-              }}>
-                <i className="fa-solid fa-chart-bar" />
-              </div>
-            </div>
+        {/* Average Rating */}
+        <div className="col-12 col-sm-6 col-lg-4">
+          <div className="clay-card p-4 text-center shadow-sm">
+            <i className="fa-solid fa-chart-bar" style={{ fontSize: '2rem', color: '#06b6d4', marginBottom: '8px', display: 'block' }} />
+            <p className="text-muted small mb-1">Average Rating</p>
+            <h3 className="fw-800 mb-0" style={{ color: '#06b6d4' }}>{averageRating} / 5</h3>
           </div>
+        </div>
 
-          {/* 5-Star Reviews */}
-          <div className="col-12 col-md-6 col-lg-4">
-            <div className="clay-card p-5 d-flex align-items-center justify-content-between shadow-sm" style={{ borderLeft: '5px solid #10b981' }}>
-              <div>
-                <p className="label-categories mb-2 text-muted">5-STAR REVIEWS</p>
-                <h2 className="fw-800 mb-0" style={{ color: '#10b981' }}>
-                  {fiveStarCount}
-                </h2>
-                <small className="text-muted">⭐ Excellent feedback</small>
-              </div>
-              <div style={{
-                width: '60px',
-                height: '60px',
-                borderRadius: '12px',
-                backgroundColor: '#dcfce7',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '2rem',
-                color: '#10b981',
-              }}>
-                <i className="fa-solid fa-trophy" />
-              </div>
-            </div>
+        {/* 5-Star Reviews */}
+        <div className="col-12 col-sm-6 col-lg-4">
+          <div className="clay-card p-4 text-center shadow-sm">
+            <i className="fa-solid fa-trophy" style={{ fontSize: '2rem', color: '#10b981', marginBottom: '8px', display: 'block' }} />
+            <p className="text-muted small mb-1">5-Star Reviews</p>
+            <h3 className="fw-800 mb-0" style={{ color: '#10b981' }}>{fiveStarCount}</h3>
           </div>
         </div>
       </div>
 
       {/* Valorations Table */}
-      <div className="clay-card p-4 bg-white shadow-sm" style={{ borderRadius: '20px' }}>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h5 className="fw-800 mb-0">Review Details</h5>
+      </div>
+
+      <div className="clay-card p-3 bg-white shadow-sm" style={{ borderRadius: '15px' }}>
         <div className="ag-theme-quartz" style={{ height: "600px", width: "100%" }}>
           <AgGridReact
             rowData={rowData}

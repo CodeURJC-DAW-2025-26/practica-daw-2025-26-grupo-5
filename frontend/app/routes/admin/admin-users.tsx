@@ -208,24 +208,64 @@ export default function AdminUsers({ loaderData }: { loaderData: any }) {
     resizable: true,
   };
 
+  const totalUsers = rowData.length;
+  const bannedUsers = rowData.filter(u => u.banned).length;
+  const activeUsers = totalUsers - bannedUsers;
+  const activeRate = totalUsers > 0 ? ((activeUsers / totalUsers) * 100).toFixed(0) : 0;
+
   return (
     <>
       <AdminHeader
         title="User Management"
-        subtitle={`Total users: ${rowData.length}`}
+        subtitle="Moderate access and user permissions."
       />
 
-      <div className="clay-card p-4 overflow-hidden shadow-sm bg-white" style={{ borderRadius: '20px' }}>
-        <div className="ag-theme-quartz" style={{ height: "600px", width: "100%" }}>
-          <AgGridReact
-            key={rowData.length > 0 ? rowData[0].id : 'empty-grid'}
-            rowData={rowData}
-            columnDefs={columnDefs}
-            defaultColDef={defaultColDef}
-            pagination={true}
-            paginationPageSize={10}
-            suppressHorizontalScroll={false}
-          />
+      <div className="container-fluid">
+        {/* KPI Row */}
+        <div className="row g-3 mb-4">
+          <div className="col-12 col-sm-6 col-lg-3">
+            <div className="clay-card p-4 text-center shadow-sm">
+              <i className="fa-solid fa-users" style={{ fontSize: '2rem', color: '#0369a1', marginBottom: '8px', display: 'block' }} />
+              <p className="text-muted small mb-1">Total Users</p>
+              <h3 className="fw-800 mb-0" style={{ color: '#0369a1' }}>{totalUsers}</h3>
+            </div>
+          </div>
+          <div className="col-12 col-sm-6 col-lg-3">
+            <div className="clay-card p-4 text-center shadow-sm">
+              <i className="fa-solid fa-check-circle" style={{ fontSize: '2rem', color: '#059669', marginBottom: '8px', display: 'block' }} />
+              <p className="text-muted small mb-1">Active Users</p>
+              <h3 className="fw-800 mb-0" style={{ color: '#059669' }}>{activeUsers}</h3>
+            </div>
+          </div>
+          <div className="col-12 col-sm-6 col-lg-3">
+            <div className="clay-card p-4 text-center shadow-sm">
+              <i className="fa-solid fa-ban" style={{ fontSize: '2rem', color: '#dc2626', marginBottom: '8px', display: 'block' }} />
+              <p className="text-muted small mb-1">Banned Users</p>
+              <h3 className="fw-800 mb-0" style={{ color: '#dc2626' }}>{bannedUsers}</h3>
+            </div>
+          </div>
+          <div className="col-12 col-sm-6 col-lg-3">
+            <div className="clay-card p-4 text-center shadow-sm">
+              <i className="fa-solid fa-chart-pie" style={{ fontSize: '2rem', color: '#7c3aed', marginBottom: '8px', display: 'block' }} />
+              <p className="text-muted small mb-1">Active Rate</p>
+              <h3 className="fw-800 mb-0" style={{ color: '#7c3aed' }}>{activeRate}%</h3>
+            </div>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="clay-card p-4 overflow-hidden shadow-sm bg-white" style={{ borderRadius: '20px' }}>
+          <div className="ag-theme-quartz" style={{ height: "600px", width: "100%" }}>
+            <AgGridReact
+              key={rowData.length > 0 ? rowData[0].id : 'empty-grid'}
+              rowData={rowData}
+              columnDefs={columnDefs}
+              defaultColDef={defaultColDef}
+              pagination={true}
+              paginationPageSize={10}
+              suppressHorizontalScroll={false}
+            />
+          </div>
         </div>
       </div>
 
