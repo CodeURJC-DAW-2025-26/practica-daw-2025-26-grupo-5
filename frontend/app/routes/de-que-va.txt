@@ -1,7 +1,0 @@
-
-
-
-routes/: 
-Aquí están tus páginas completas (vistas). 
-Cada archivo aquí suele corresponder a una URL: 
-el home, el perfil, el panel de admin, etc.
