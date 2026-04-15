@@ -3,6 +3,7 @@ import type ProductDTO from "~/dto/ProductDTO";
 import type ProductWriteRequestDTO from "~/dto/ProductWriteRequestDTO";
 import type PagedResponse from "~/dto/PagedResponse";
 import type ProductDetailsDTO from "~/dto/ProductDetailsDTO";
+import type HomePageDTO from "~/dto/HomePageDTO";
 import axios from "axios";
 
 /**
@@ -133,4 +134,17 @@ export async function deleteProductImage(
   imageId: number
 ): Promise<void> {
   await api.delete(`/products/${productId}/image/${imageId}`);
+}
+
+/**
+ * Get the catalog of products for the homepage, with optional search query and category filter
+ */
+export async function getCatalog(query?: string, category?: string, page: number = 0): Promise<HomePageDTO> {
+  const params = new URLSearchParams();
+  if (query) params.append("query", query);
+  if (category) params.append("category", category);
+  params.append("page", page.toString());
+
+  const response = await api.get("/v1/catalog", { params });
+  return response.data;
 }
