@@ -14,6 +14,7 @@ export default [
     index("routes/product/product-list.tsx"),
     route("product/:id", "routes/product/product-detail.tsx"), 
     route("product/product-contact/:id", "routes/product/product-contact.tsx"),
+    route("transactions/payment-page/:id", "routes/transactions/payment-page.$id.tsx")
   ]),
 
   // Public routes

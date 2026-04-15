@@ -12,6 +12,7 @@ import {
 import { useUserStore } from "~/stores/useUserStore";
 import { useState } from "react";
 import { Link } from "react-router";
+import { isSelfPurchase } from "~/services/transaction-service";
 
 /**
  * Client-side loader: Fetches product details
@@ -60,6 +61,8 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
       setPendingDelete(false);
     }
   }
+
+  const isSelfProduct = isSelfPurchase(product, user)
 
   return (
     <>
@@ -133,9 +136,15 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
 
               {isActive ? (
                 <div className="d-grid gap-3 mb-5">
-                  <Link to={`/payment-page/${product.id}`} className="btn-sell py-3 fw-800 shadow-lg rounded-pill d-flex align-items-center justify-content-center gap-2 border-0 text-decoration-none" style={{ fontSize: '1.1rem' }}>
-                    <i className="fa-solid fa-bag-shopping"></i> Buy Now
-                  </Link>
+                  {!isSelfProduct ? (
+                    <Link to={`/transactions/payment-page/${product.id}`} className="btn-sell py-3 fw-800 shadow-lg rounded-pill d-flex align-items-center justify-content-center gap-2 border-0 text-decoration-none" style={{ fontSize: '1.1rem' }}>
+                      <i className="fa-solid fa-bag-shopping"></i> Buy Now
+                    </Link>
+                  ) : (
+                    <div className="btn-sell py-3 fw-800 shadow-lg rounded-pill d-flex align-items-center justify-content-center gap-2 border-0 text-decoration-none" style={{ fontSize: '1.1rem', backgroundColor: 'red' }}>
+                      This is your product
+                    </div>
+                  )}
                   <Link
                     to={`/product/product-contact/${product.id}`}  
                     state={{ productName: product.name, productId: product.id }}

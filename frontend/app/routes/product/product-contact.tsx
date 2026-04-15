@@ -1,22 +1,23 @@
 import { useNavigate, useLocation, useParams, Navigate } from "react-router";
 import { useActionState } from "react"; 
 import { sendInquiry } from "~/services/products-service";
-import { Alert, Button, Container } from "react-bootstrap";
 import { useUserStore } from "~/stores/useUserStore";
-import { checkLogged } from "../user";
+import { Alert, Button, Container, Row, Col } from "react-bootstrap";
 
 export default function ContactSellerPage() {
     const { id } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
-    const productName = location.state?.productName as string;
     const { user } = useUserStore(); 
 
-    // Global protection
-    if (!checkLogged()){
-        return <Navigate to="/login" state={{ from: location }} replace />;
-    };
+    const productName = location.state?.productName || "Producto";
+    const productPrice = location.state?.price || "0.00 €";
+    const sellerName = location.state?.sellerName || "Vendedor";
 
+    // Global protection: Check if the user is logged, and if he is not redirect him to login page
+    if (!user) {
+        return <Navigate to="/login" state={{ from: location }} replace />;
+    }
     async function contactAction(
         prevState: { success: boolean; error: string | null } | null,
         formData: FormData
@@ -54,84 +55,119 @@ export default function ContactSellerPage() {
                     className="rounded-pill px-5 fw-700"
                     onClick={() => navigate(`/product/${id}`)}
                 >
-                    Back to Product
+                    Back to product
                 </Button>
             </Container>
         );
     }
 
     return (
-        <Container className="py-5" style={{ maxWidth: "600px" }}>
-            {/* Header */}
-            <div className="mb-4">
-                <button
-                    className="btn btn-link text-muted text-decoration-none fw-700 px-0 mb-3"
-                    onClick={() => navigate(-1)}
-                >
-                    <i className="fa-solid fa-arrow-left me-2"></i>Back
-                </button>
-                <h1 className="fw-800 h3">Contact Seller</h1>
-                <p className="text-muted fw-600">
-                    About: <span className="text-dark fw-700">{productName}</span>
-                </p>
-            </div>
-
-            <div className="clay-card p-4 bg-white">
-                <form action={formAction}>
-                    {/* Tipo de consulta */}
-                    <div className="mb-3">
-                        <label className="form-label fw-700 small">Inquiry Type</label>
-                        <select name="type" className="form-select fw-600" required>
-                            <option value="">Select a reason...</option>
-                            <option value="INFO">Request more information</option>
-                            <option value="PRICE">Negotiate price</option>
-                            <option value="VISIT">Arrange a visit</option>
-                            <option value="OTHER">Other</option>
-                        </select>
+        <div className="min-vh-100 bg-light py-5">
+            <Container>
+                {/* Navbar / Back Button */}
+                <div className="d-flex align-items-center mb-4">
+                    <button className="btn btn-link text-decoration-none text-dark p-0" onClick={() => navigate(-1)}>
+                        <i className="fa-solid fa-chevron-left me-2"></i> Back
+                    </button>
+                    <div className="mx-auto">
+                        <img src="/logo-owl.png" alt="Logo" style={{ height: "40px" }} />
                     </div>
+                </div>
 
-                    {/* Teléfono */}
-                    <div className="mb-3">
-                        <label className="form-label fw-700 small">Your Phone Number</label>
-                        <input
-                            type="tel"
-                            name="phone"
-                            className="form-control fw-600"
-                            placeholder="+34 600 000 000"
-                            required
-                        />
-                    </div>
+                {/* Main Card */}
+                <div className="bg-white rounded-5 shadow-sm overflow-hidden mx-auto" style={{ maxWidth: "1000px" }}>
+                    <Row className="g-0">
+                        {/* Left Column: Product Info */}
+                        <Col md={5} className="p-5 border-end bg-white">
+                            <span className="badge bg-primary-subtle text-primary rounded-pill px-3 mb-3">New Inquiry</span>
+                            <div className="mb-4">
+                                <img 
+                                    src="/car-placeholder.png" 
+                                    alt="Product" 
+                                    className="img-fluid rounded-4 mb-3 w-100"
+                                    style={{ objectFit: "cover", height: "200px" }}
+                                />
+                                <h2 className="fw-bold h4 mb-1">{productName}</h2>
+                                <p className="text-primary fw-bold h5">{productPrice}</p>
+                            </div>
 
-                    {/* Mensaje */}
-                    <div className="mb-4">
-                        <label className="form-label fw-700 small">Message</label>
-                        <textarea
-                            name="message"
-                            className="form-control fw-600"
-                            rows={5}
-                            placeholder="Write your message to the seller..."
-                            required
-                        />
-                    </div>
+                            <div className="d-flex align-items-center p-3 bg-light rounded-4 mb-4">
+                                <div className="bg-white rounded-circle p-2 me-3 shadow-sm">
+                                    <i className="fa-solid fa-user-ninja text-muted"></i>
+                                </div>
+                                <div>
+                                    <small className="text-muted d-block small">Seller</small>
+                                    <span className="fw-bold">{sellerName}</span>
+                                </div>
+                            </div>
 
-                    {state?.error && (
-                        <Alert variant="danger" className="mb-3">{state.error}</Alert>
-                    )}
+                            <div className="small text-muted">
+                                <p className="mb-1"><i className="fa-solid fa-circle-check text-success me-2"></i> Your message will be sent via email</p>
+                                <p className="mb-0"><i className="fa-solid fa-circle-check text-success me-2"></i> Response time: ~24 hours</p>
+                            </div>
+                        </Col>
 
-                    <div className="d-grid">
-                        <button
-                            type="submit"
-                            className="btn-sell py-3 fw-800 rounded-pill border-0"
-                            disabled={isPending}
-                        >
-                            {isPending
-                                ? <><i className="fa-solid fa-spinner fa-spin me-2"></i>Sending...</>
-                                : <><i className="fa-regular fa-comment-dots me-2"></i>Send Message</>
-                            }
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </Container>
+                        {/* Right Column: Form */}
+                        <Col md={7} className="p-5">
+                            <div className="d-flex justify-content-between align-items-center mb-4">
+                                <h3 className="fw-bold h4 m-0">Complete your Inquiry</h3>
+                                <small className="text-muted"><i className="fa-solid fa-lock me-1"></i> Secure Form</small>
+                            </div>
+
+                            <form action={formAction}>
+                                <Row className="mb-3">
+                                    <Col md={6}>
+                                        <label className="form-label small fw-bold text-muted text-uppercase">Phone</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text bg-light border-0"><i className="fa-solid fa-phone text-muted"></i></span>
+                                            <input type="tel" name="phone" className="form-control bg-light border-0 py-2" placeholder="+34 600 000 000" required />
+                                        </div>
+                                    </Col>
+                                    <Col md={6}>
+                                        <label className="form-label small fw-bold text-muted text-uppercase">Inquiry Type</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text bg-light border-0"><i className="fa-solid fa-tag text-muted"></i></span>
+                                            <select name="type" className="form-select bg-light border-0 py-2" required>
+                                                <option value="GENERAL">General Question</option>
+                                                <option value="INFO">Request Info</option>
+                                                <option value="PRICE">Negotiate</option>
+                                            </select>
+                                        </div>
+                                    </Col>
+                                </Row>
+
+                                <div className="mb-4">
+                                    <label className="form-label small fw-bold text-muted text-uppercase">Message</label>
+                                    <div className="position-relative">
+                                        <i className="fa-solid fa-comment position-absolute text-muted" style={{ left: '12px', top: '15px' }}></i>
+                                        <textarea 
+                                            name="message" 
+                                            className="form-control bg-light border-0 ps-5 py-3" 
+                                            rows={4} 
+                                            placeholder={`Hi Mario, is this still available?`}
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                {state?.error && <Alert variant="danger">{state.error}</Alert>}
+
+                                <button 
+                                    type="submit" 
+                                    className="btn btn-primary w-100 py-3 rounded-3 fw-bold shadow-sm d-flex align-items-center justify-content-center"
+                                    disabled={isPending}
+                                >
+                                    {isPending ? (
+                                        <><i className="fa-solid fa-spinner fa-spin me-2"></i> Sending...</>
+                                    ) : (
+                                        <><i className="fa-solid fa-paper-plane me-2"></i> Send Email Inquiry</>
+                                    )}
+                                </button>
+                            </form>
+                        </Col>
+                    </Row>
+                </div>
+            </Container>
+        </div>
     );
 }
