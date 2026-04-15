@@ -1444,16 +1444,48 @@ Mi contribución se ha centrado en la mejora y consolidación de la capa REST de
 
 2. **Clonar el repositorio** (si no lo has hecho ya)
    ```bash
-   git clone https://github.com/[usuario]/[nombre-repositorio].git
-   cd [nombre-repositorio]
+   git clone https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5.git
+   cd practica-daw-2025-26-grupo-5
    ```
+3. **Ejecución del Backend (para la base de datos)**
+   
 
-3. **Navegar a la carpeta del proyecto React**
+   El backend debe estar activo para que Hibernate cree las tablas y cargue los datos iniciales.
+    Abre el proyecto en tu IDE (IntelliJ IDEA recomendado).
+
+   Localiza la clase StilnovoApplication.java en src/main/java/....
+
+   Ejecuta la aplicación (Run).
+
+    El servidor arrancará en:
+    ```bash
+      https://localhost:8443/new/
+    ```
+4. **Navegar a la carpeta del proyecto React**
+    
+   Muevete a:
+   
    ```bash
    cd frontend
    ```
+   Instala las dependencias
+   
+   ```bash
+   npm install
+   ```
 
-4. **AQUÍ LOS SIGUIENTES PASOS**
+5. **Ejecuta el Frontend**
+
+    Inicia el servidor de desarrollo de Vite:
+   
+    ```bash
+     npm run dev
+     ```
+   El terminal mostrará que la aplicación está lista en (navega a esa URL):
+   
+   ```bash
+    http://localhost:5173/new/
+   ```
 
 ### **Diagrama de Clases y Templates de la SPA**
 
