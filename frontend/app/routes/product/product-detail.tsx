@@ -137,7 +137,7 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
               {isActive ? (
                 <div className="d-grid gap-3 mb-5">
                   {!isSelfProduct ? (
-                    <Link to={`/transactions/payment-page/${product.id}`} className="btn-sell py-3 fw-800 shadow-lg rounded-pill d-flex align-items-center justify-content-center gap-2 border-0 text-decoration-none" style={{ fontSize: '1.1rem' }}>
+                    <Link to={`/transactions/payment/${product.id}`} className="btn-sell py-3 fw-800 shadow-lg rounded-pill d-flex align-items-center justify-content-center gap-2 border-0 text-decoration-none" style={{ fontSize: '1.1rem' }}>
                       <i className="fa-solid fa-bag-shopping"></i> Buy Now
                     </Link>
                   ) : (
@@ -146,7 +146,7 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
                     </div>
                   )}
                   <Link
-                    to={`/product/product-contact/${product.id}`}  
+                    to={`/product/contact/${product.id}`}  
                     state={{ productName: product.name, productId: product.id }}
                     className="btn btn-outline-primary py-3 fw-800 rounded-pill border-2 d-flex align-items-center justify-content-center gap-2 text-decoration-none">
                     <i className="fa-regular fa-comment-dots fa-lg"></i> Send Message to Seller
@@ -161,7 +161,7 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
 
               {/* Seller Card */}
               {product.seller && (
-                <Link to={`/seller-profile/${product.seller.id}`} className="text-decoration-none">
+                <Link to={`/seller/${product.seller.id}`} className="text-decoration-none">
                   <div className="seller-card p-3 rounded-4 bg-light border d-flex align-items-center justify-content-between mb-4 shadow-sm">
                     <div className="d-flex align-items-center gap-3">
                       <img

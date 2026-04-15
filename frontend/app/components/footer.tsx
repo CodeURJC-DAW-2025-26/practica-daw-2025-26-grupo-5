@@ -1,27 +1,24 @@
 import React, { useState } from 'react';
 import { Modal } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router'; // Corrected import for v7
 import logo from "../assets/logo.png";
 import '../app.css';
+import { useUserStore } from "~/stores/useUserStore";
 
-/**
- * Footer Component
- * Includes logic for all policy and support modals using React state.
- */
 export default function Footer() {
-  // Modal visibility states
   const [showHelp, setShowHelp] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showSafety, setShowSafety] = useState(false);
   const [showCookie, setShowCookie] = useState(false);
 
-  // Toggle functions
   const toggleHelp = () => setShowHelp(!showHelp);
   const toggleTerms = () => setShowTerms(!showTerms);
   const togglePrivacy = () => setShowPrivacy(!showPrivacy);
   const toggleSafety = () => setShowSafety(!showSafety);
   const toggleCookie = () => setShowCookie(!showCookie);
+
+  const { user, isAuthLoading } = useUserStore();
 
   return (
     <>
@@ -32,33 +29,23 @@ export default function Footer() {
             <div className="col-lg-4">
               <div className="mb-3">
                 <Link to="/" className="text-decoration-none d-flex align-items-center gap-2">
-                  <img 
-                    src={logo} 
-                    alt="Stilnovo" 
-                    style={{ height: '40px', filter: 'brightness(0) invert(1)' }} 
+                  <img
+                    src={logo}
+                    alt="Stilnovo"
+                    style={{ height: '40px', filter: 'brightness(0) invert(1)' }}
                   />
                   <span className="text-white fw-bold fs-2">Stilnovo</span>
                 </Link>
               </div>
               <p>
-                Elevate your style, sustain the planet. The ultimate premium marketplace for 
+                Elevate your style, sustain the planet. The ultimate premium marketplace for
                 circular fashion and unique designer treasures.
               </p>
               <div className="d-flex gap-3 mt-4">
-                <a 
-                  href="https://www.instagram.com/stilnovo_marketplace/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="social-link btn-sell"
-                >
+                <a href="https://www.instagram.com/stilnovo_marketplace/" target="_blank" rel="noopener noreferrer" className="social-link btn-sell">
                   <i className="fa-brands fa-instagram fs-5"></i>
                 </a>
-                <a 
-                  href="https://www.youtube.com/@StilnovoWebsite" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="social-link btn-sell"
-                >
+                <a href="https://www.youtube.com/@StilnovoWebsite" target="_blank" rel="noopener noreferrer" className="social-link btn-sell">
                   <i className="fa-brands fa-youtube fs-5"></i>
                 </a>
               </div>
@@ -69,16 +56,8 @@ export default function Footer() {
               <h6>PLATFORM</h6>
               <ul className="list-unstyled d-flex flex-column gap-3">
                 <li><Link to="/about-page" className="footer-link">About Us</Link></li>
-                <li>
-                  <span className="footer-link cursor-pointer" onClick={toggleTerms}>
-                    Terms of Service
-                  </span>
-                </li>
-                <li>
-                  <span className="footer-link cursor-pointer" onClick={toggleSafety}>
-                    Safety Rules
-                  </span>
-                </li>
+                <li><span className="footer-link cursor-pointer" onClick={toggleTerms}>Terms of Service</span></li>
+                <li><span className="footer-link cursor-pointer" onClick={toggleSafety}>Safety Rules</span></li>
               </ul>
             </div>
 
@@ -86,48 +65,93 @@ export default function Footer() {
             <div className="col-lg-2">
               <h6>SUPPORT</h6>
               <ul className="list-unstyled d-flex flex-column gap-3">
-                <li>
-                  <span className="footer-link cursor-pointer" onClick={toggleHelp}>
-                    Help Center
-                  </span>
-                </li>
-                <li>
-                  <span className="footer-link cursor-pointer" onClick={togglePrivacy}>
-                    Privacy Policy
-                  </span>
-                </li>
-                <li>
-                  <span className="footer-link cursor-pointer" onClick={toggleCookie}>
-                    Cookies
-                  </span>
-                </li>
+                <li><span className="footer-link cursor-pointer" onClick={toggleHelp}>Help Center</span></li>
+                <li><span className="footer-link cursor-pointer" onClick={togglePrivacy}>Privacy Policy</span></li>
+                <li><span className="footer-link cursor-pointer" onClick={toggleCookie}>Cookies</span></li>
               </ul>
             </div>
 
             {/* Call to Action Column */}
             <div className="col-lg-3">
-              <h6>READY TO START?</h6>
-              <p className="mb-4 small">
-                If you don't have an account, please join our community and start trading unique pieces today.
+              {isAuthLoading ? (
+                <div style={{ width: '42px', height: '42px' }} className="spinner-border spinner-border-sm text-muted" />
+              ) : user ? (
+                <>
+                  <h6 className="text-uppercase fw-800 text-primary">A PLEASURE TO SEE YOU, {user.name}!</h6>
+                  <p className="mb-4 small italic">
+                    You've reached the very heart of our gallery. We're thrilled to have a true collector like you with us today.
+                  </p>
+                  {/* Discovery text and Sell Button group */}
+                  <div className="d-flex flex-column gap-3">
+                    <div className="d-flex align-items-center gap-2 text-muted">
+                      <i className="fa-solid fa-gem small"></i>
+                      <span className="x-small fw-700">Ready for your next discovery?</span>
+                    </div>
+
+                    {/* New Sell Treasure Button for logged users */}
+                    <Link to="/product/new" className="btn-sell">
+                      <i className="fa-solid"></i>
+                      SELL NEW TREASURE
+                    </Link>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h6 className="fw-800">READY TO START?</h6>
+                  <p className="mb-4 small">
+                    If you don't have an account, please join our community and start trading unique pieces today.
+                  </p>
+                  <Link to="/signup" className="btn-sell text-decoration-none shadow-sm">CREATE ACCOUNT</Link>
+                </>
+              )}
+            </div>
+
+            <hr style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} className="my-5" />
+
+            <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 pb-4">
+              <p style={{ fontSize: '0.85rem', color: '#94a3b8' }} className="mb-0">
+                &copy; 2026 Stilnovo Marketplace. All rights reserved.
               </p>
-              <Link to="/signup" className="btn-sell text-decoration-none">CREATE ACCOUNT</Link>
+              <div className="d-flex gap-3 text-white fs-4 opacity-75">
+                <i className="fa-brands fa-cc-visa"></i>
+                <i className="fa-brands fa-cc-mastercard"></i>
+                <i className="fa-brands fa-cc-apple-pay"></i>
+              </div>
             </div>
-          </div>
-
-          <hr style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} className="my-5" />
-
-          <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-            <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
-              &copy; 2026 Stilnovo Marketplace. All rights reserved.
-            </p>
-            <div className="d-flex gap-3 text-white fs-4 opacity-75">
-              <i className="fa-brands fa-cc-visa"></i>
-              <i className="fa-brands fa-cc-mastercard"></i>
-              <i className="fa-brands fa-cc-apple-pay"></i>
-            </div>
-          </div>
-        </div>
+          </div> {/* Row closure */}
+        </div> {/* Container closure */}
       </footer>
+
+      {/* --- MODALS --- */}
+      {/* Help Modal */}
+      <Modal show={showHelp} onHide={toggleHelp} centered contentClassName="stn-modal-content p-4">
+        <Modal.Header closeButton className="border-0 pb-0 btn-close-white">
+          <Modal.Title className="stn-modal-title w-100 text-center text-white">Need Assistance?</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="stn-modal-body text-center">
+          <p>To access our official support and FAQs, please follow this path:</p>
+          <div className="stn-path-box my-3 p-2 bg-dark rounded text-white">
+            My Account <i className="fa-solid fa-chevron-right mx-2 fs-small"></i> Help Center
+          </div>
+          <p className="text-danger small fw-bold">
+            <i className="fa-solid fa-lock me-1"></i> You must be logged in to view this section.
+          </p>
+          <button className="btn-about" onClick={toggleHelp}>UNDERSTOOD</button>
+        </Modal.Body>
+      </Modal>
+
+      {/* Terms Modal */}
+      <Modal show={showTerms} onHide={toggleTerms} centered size="lg" contentClassName="stn-modal-content p-4">
+        <Modal.Header closeButton className="border-0 pb-0 btn-close-white">
+          <Modal.Title className="stn-modal-title text-white">Terms of Service</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="stn-modal-body text-white">
+          <p>By using Stilnovo, you agree to our community guidelines. We provide a platform for circular fashion.</p>
+          <button className="btn-about" onClick={toggleTerms}>I accept the terms</button>
+        </Modal.Body>
+      </Modal>
+
+      {/* Privacy, Safety and Cookie modals follow same logic... */}
 
       {/* --- MODALS --- */}
 
@@ -155,8 +179,8 @@ export default function Footer() {
         </Modal.Header>
         <Modal.Body className="stn-modal-body">
           <p>
-            By using Stilnovo, you agree to our community guidelines. We provide a platform for circular fashion. 
-            All users must maintain integrity in transactions and respect intellectual property rights. 
+            By using Stilnovo, you agree to our community guidelines. We provide a platform for circular fashion.
+            All users must maintain integrity in transactions and respect intellectual property rights.
             We are not liable for direct disputes between users but provide tools to facilitate safe trading.
           </p>
           <button className="btn-about" onClick={toggleTerms}>I accept the terms</button>
@@ -170,7 +194,7 @@ export default function Footer() {
         </Modal.Header>
         <Modal.Body className="stn-modal-body">
           <p>
-            Your data is safe with us. We use industry-standard encryption to protect your personal information 
+            Your data is safe with us. We use industry-standard encryption to protect your personal information
             and transaction history. We never sell your data to third parties.
           </p>
           <button className="btn-about" onClick={togglePrivacy}>Close</button>
@@ -207,7 +231,7 @@ export default function Footer() {
           <i className="fa-solid fa-cookie-bite text-primary fs-1 mb-3"></i>
           <h5 className="stn-modal-title mb-3">Cookie Policy</h5>
           <p>
-            We use cookies to personalize your experience and analyze our traffic. 
+            We use cookies to personalize your experience and analyze our traffic.
             By continuing to use our site, you accept our cookie usage.
           </p>
           <button className="btn-about" onClick={toggleCookie}>Accept all</button>

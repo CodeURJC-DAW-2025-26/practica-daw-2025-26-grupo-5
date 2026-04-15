@@ -11,10 +11,16 @@ import { type RouteConfig, index, layout, route } from "@react-router/dev/routes
  */
 export default [
   layout("routes/home.tsx", [
+    //products
     index("routes/product/product-list.tsx"),
     route("product/:id", "routes/product/product-detail.tsx"), 
-    route("product/product-contact/:id", "routes/product/product-contact.tsx"),
-    route("transactions/payment-page/:id", "routes/transactions/payment-page.$id.tsx")
+    route("product/contact/:id", "routes/product/product-contact.tsx"),
+
+    //transactions
+    route("transactions/payment/:id", "routes/transactions/payment-page.$id.tsx"),
+
+    //seller
+    route("seller/:id", "routes/user/seller-profile.tsx"),
   ]),
 
   // Public routes

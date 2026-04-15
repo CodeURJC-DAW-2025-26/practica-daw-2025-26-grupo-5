@@ -2326,6 +2326,7 @@ main.overflow-auto {
     border-color: #cbd5e1 !important;
     color: #1e293b !important;
 }
+
 /*AI Description generation*/
 .btn-ai-sparkle {
     background: linear-gradient(45deg, #6366f1, #a855f7);
@@ -2344,4 +2345,16 @@ main.overflow-auto {
 .btn-ai-sparkle:disabled {
     background: #e2e8f0;
     color: #94a3b8;
+}
+
+.back-link {
+    color: #6c757d;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.back-link:hover {
+    color: #212529;
 }

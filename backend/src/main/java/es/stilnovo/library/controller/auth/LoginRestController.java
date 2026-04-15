@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import es.stilnovo.library.security.jwt.AuthResponse;
 import es.stilnovo.library.security.jwt.LoginRequest;
 import es.stilnovo.library.security.jwt.UserLoginService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -85,8 +86,8 @@ public class LoginRestController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Logged out successfully")
 	})
-	public ResponseEntity<AuthResponse> logout(HttpServletResponse response) {
-		userLoginService.logout(response);
+	public ResponseEntity<AuthResponse> logout(HttpServletRequest request, HttpServletResponse response) {
+		userLoginService.logout(request, response);
 		return ResponseEntity.ok(new AuthResponse(AuthResponse.Status.SUCCESS, "logout successfully"));
 	}
 }

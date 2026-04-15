@@ -26,9 +26,15 @@ export async function getUserDashboardStats() {
 }
 
 /**
- * Fetch public profile of any user
+ * Fetch public profile of any user: for example, the seller
  */
 export async function getUserProfile(userId: string | number) {
-    const response = await axios.get(`/api/v1/users/${userId}`);
+    const response = await axios.get(`/api/v1/users/${userId}/profile`);
+    return response.data;
+}
+
+export async function getUserPhoto(userId: string | number){
+
+    const response = await axios.get(`/api/v1/users/${userId}/profile-photo`);
     return response.data;
 }

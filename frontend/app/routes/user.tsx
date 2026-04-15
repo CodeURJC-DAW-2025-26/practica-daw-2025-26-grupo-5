@@ -2,6 +2,8 @@ import { Navigate, Outlet, useLocation } from 'react-router';
 import UserLayout from '~/components/user/UserLayout';
 import type { Route } from './+types/admin';
 import { useUserStore } from '~/stores/useUserStore';
+import Loader from "~/components/Loader";
+
 
 /**
  * User Layout Route

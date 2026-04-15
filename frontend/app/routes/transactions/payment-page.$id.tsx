@@ -142,13 +142,6 @@ const PaymentPage = () => {
 
     return (
         <div className="bg-light min-vh-100">
-            {/* Header section */}
-            <header className="navbar container-fluid px-4 py-3 border-bottom bg-white sticky-top position-relative justify-content-center">
-                <Link to={`/info-product-page/${id}`} className="text-decoration-none text-muted small fw-800 position-absolute start-0 ms-4">
-                    <i className="fa-solid fa-chevron-left me-1"></i> Back to Product
-                </Link>
-                <img src="/images/logo.png" alt="Stilnovo" className="logo-img" />
-            </header>
 
             <main className="container-fluid main-wrapper d-flex align-items-center py-5">
                 <div className="container">
