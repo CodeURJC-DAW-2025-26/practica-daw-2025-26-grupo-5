@@ -35,6 +35,7 @@ import es.stilnovo.library.service.ContactSellerService;
 import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.UserService;
 import es.stilnovo.library.service.ValorationService;
+import es.stilnovo.library.dto.TransactionMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -80,6 +81,9 @@ public class UserWebRestController {
 
     @Autowired
     private ValorationMapper valorationMapper;
+
+    @Autowired
+    private TransactionMapper transactionMapper;
 
     /**
      * This section refers to the current (principal) user.
@@ -194,15 +198,32 @@ public class UserWebRestController {
     @GetMapping("/me/transactions")
     @Operation(summary = "Get my transactions summary", description = "Retrieves sales and orders transaction dashboard data for the authenticated user")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Transactions data retrieved successfully"),
-        @ApiResponse(responseCode = "401", description = "Unauthorized user")
+            @ApiResponse(responseCode = "200", description = "Transactions data retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized user")
     })
     public ResponseEntity<Map<String, Object>> getMyTransactions(Principal principal,
             @RequestParam(required = false) Long transactionId) {
-        Map<String, Object> data = userService.getSalesAndOrdersDashboard(principal.getName(), transactionId);
-        return ResponseEntity.ok(data);
-    }
 
+        // 1. Retrieve the raw data from the service (Entities)
+        Map<String, Object> data = userService.getSalesAndOrdersDashboard(principal.getName(), transactionId);
+
+        // 2. Extract the entity lists, avoiding NullPointerExceptions
+        @SuppressWarnings("unchecked")
+        java.util.List<es.stilnovo.library.model.Transaction> rawSales = (java.util.List<es.stilnovo.library.model.Transaction>) data
+                .getOrDefault("sales", new java.util.ArrayList<>());
+
+        @SuppressWarnings("unchecked")
+        java.util.List<es.stilnovo.library.model.Transaction> rawOrders = (java.util.List<es.stilnovo.library.model.Transaction>) data
+                .getOrDefault("orders", new java.util.ArrayList<>());
+
+        // 3. Map the entities to DTOs to prevent infinite recursion in JSON
+        Map<String, Object> safeData = java.util.Map.of(
+                "sales", transactionMapper.toDTOs(rawSales),
+                "orders", transactionMapper.toDTOs(rawOrders));
+
+        // 4. Return the clean and safe JSON
+        return ResponseEntity.ok(safeData);
+    }
     /**
      * GET /api/v1/users/me/valorations
      * Retrieves a paginated list of ratings for the authenticated user.

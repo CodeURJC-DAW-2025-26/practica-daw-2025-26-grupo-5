@@ -1,5 +1,7 @@
 package es.stilnovo.library.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -16,6 +18,7 @@ import jakarta.mail.internet.MimeMessage;
  */
 @Service
 public class MailService {
+    private static final Logger logger = LoggerFactory.getLogger(MailService.class);
 
     @Autowired
     private JavaMailSender mailSender;
@@ -51,7 +54,8 @@ public class MailService {
      */
     public void sendHtmlWithInline(String to, String subject, String htmlBody,
             String contentId, Resource inlineResource) throws MessagingException {
-
+        logger.info("📧 [EMAIL SENDING] From: {}, To: {}, Subject: {}", fromAddress, to, subject);
+        
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
@@ -61,7 +65,9 @@ public class MailService {
         helper.setText(htmlBody, true);
 
         helper.addInline(contentId, inlineResource);
-
+        
+        logger.info("✅ [EMAIL] Sending email via mailSender.send()...");
         mailSender.send(message);
+        logger.info("✅ [EMAIL SENT] Successfully sent to: {}", to);
     }
 }

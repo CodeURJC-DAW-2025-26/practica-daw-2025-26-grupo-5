@@ -241,18 +241,25 @@ public class AdminController {
      * photos.
      */
     @PostMapping("/products/edit/{id}")
-    public String updateProductAsAdmin(@PathVariable long id,
-            Product updatedProduct,
-            @RequestParam MultipartFile imageField) throws IOException {
+    public String updateProductAsAdmin(
+            @PathVariable long id,
+            @RequestParam String name,
+            @RequestParam String category,
+            @RequestParam double price,
+            @RequestParam String description,
+            @RequestParam String location,
+            @RequestParam String status,
+            @RequestParam(required = false) MultipartFile imageField) throws IOException {
 
         adminService.updateProductAsAdmin(
                 id, 
-                updatedProduct.getName(), 
-                updatedProduct.getCategory(), 
-                updatedProduct.getPrice(), 
-                updatedProduct.getDescription(), 
-                updatedProduct.getLocation(), 
-                updatedProduct.getStatus(), 
+                null, // No cambiar seller desde template
+                name, 
+                category, 
+                price, 
+                description, 
+                location, 
+                status, 
                 imageField);
 
         return "redirect:/admin/global-inventory";
@@ -268,5 +275,9 @@ public class AdminController {
 
     private String formatInt(int value) {
         return NumberFormattingUtils.formatQuantity(value);
+    }
+
+    private String formatInt(double value) {
+        return NumberFormattingUtils.formatMoney(value);
     }
 }

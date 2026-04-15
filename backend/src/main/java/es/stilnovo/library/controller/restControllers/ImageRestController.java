@@ -48,18 +48,19 @@ public class ImageRestController {
 	private ProductMapper productMapper;
 
 	/**
-	 * Retrieves image metadata for a specific product
+	 * Retrieves the product image file
 	 * @param productId The ID of the product
-	 * @return ImageDTO containing the image ID
+	 * @return JPEG image content
 	 */
 	@GetMapping("/products/{productId}/image")
-	@Operation(summary = "Get product image metadata", description = "Retrieves image metadata for a specific product")
+	@Operation(summary = "Get product image", description = "Retrieves the image file for a specific product")
 	@ApiResponses(value = {
-		@ApiResponse(responseCode = "200", description = "Image metadata retrieved successfully"),
+		@ApiResponse(responseCode = "200", description = "Image retrieved successfully"),
 		@ApiResponse(responseCode = "404", description = "Product or image not found")
 	})
 	public ResponseEntity<Resource> getProductImage(@PathVariable long productId) throws SQLException {
-		return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageService.getImageFile(productId));
+		// Get the image associated with this product (not by image ID, but by product ID)
+		return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageService.getProductImageFile(productId));
 	}
 
 	/**

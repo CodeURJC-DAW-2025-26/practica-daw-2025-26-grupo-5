@@ -1,36 +1,21 @@
 package es.stilnovo.library;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.servlet.resource.PathResourceResolver;
-import org.springframework.http.ResponseEntity;
 import java.io.IOException;
-import java.nio.file.Files;
-
-@Controller
-class SpaFallbackController {
-        @GetMapping(value = { "/new", "/new/**" }, produces = "text/html;charset=utf-8")
-        public ResponseEntity<String> serveSpa() throws IOException {
-                ClassPathResource resource = new ClassPathResource("static/new/index.html");
-                String content = new String(Files.readAllBytes(resource.getFile().toPath()));
-                return ResponseEntity.ok(content);
-        }
-}
 
 @Configuration
 public class SpaRoutingConfig implements WebMvcConfigurer {
 
-        private static final String SPA_ROUTE = "/new";
-
         @Override
         public void addResourceHandlers(ResourceHandlerRegistry registry) {
-                registry.addResourceHandler(SPA_ROUTE + "/**")
-                                .addResourceLocations("classpath:/static" + SPA_ROUTE + "/")
+                // Maps the URL /new/** to the physical folder static/new/
+                registry.addResourceHandler("/new/**", "/new", "/new/")
+                                .addResourceLocations("classpath:/static/new/")
                                 .resourceChain(true)
                                 .addResolver(new PathResourceResolver() {
                                         @Override
@@ -38,19 +23,20 @@ public class SpaRoutingConfig implements WebMvcConfigurer {
                                                         throws IOException {
                                                 Resource requestedResource = location.createRelative(resourcePath);
 
-                                                // If it's a real file, return it
+                                                // 1. If it's a real file (JS, CSS, PNG), return it
                                                 if (requestedResource.exists() && requestedResource.isReadable()) {
                                                         return requestedResource;
                                                 }
 
-                                                // If requesting an asset file, return null (404)
-                                                if (resourcePath.matches(
-                                                                ".*\\.(js|css|png|svg|jpg|jpeg|gif|ico|woff|woff2|ttf|eot)$")) {
+                                                // 2. If the resource is not found but is an asset request (contains a
+                                                // dot),
+                                                // return null to trigger a 404 instead of a 500.
+                                                if (resourcePath.contains(".")) {
                                                         return null;
                                                 }
 
-                                                // Fallback to index.html for SPA routes
-                                                return new ClassPathResource("/static" + SPA_ROUTE + "/index.html");
+                                                // 3. Fallback: Return index.html for any React navigation route
+                                                return new ClassPathResource("/static/new/index.html");
                                         }
                                 });
         }

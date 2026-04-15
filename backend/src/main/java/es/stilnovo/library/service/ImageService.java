@@ -39,6 +39,19 @@ public class ImageService {
         return imageRepository.findByProductId(productId).orElseThrow();
     }
 
+    public Resource getProductImageFile(long productId) throws SQLException {
+        // STEP 1: Get the image associated with this product
+        Image image = getProductImage(productId);
+
+        // STEP 2: Check if image blob exists
+        if (image.getImageFile() != null) {
+            // STEP 3: Convert blob to stream resource for HTTP response
+            return new InputStreamResource(image.getImageFile().getBinaryStream());
+        } else {
+            throw new RuntimeException("Image file not found for product " + productId);
+        }
+    }
+
     public Image createImage(InputStream inputStream) throws IOException {
         // STEP 1: Create new Image entity
         Image image = new Image();

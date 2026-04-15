@@ -16,7 +16,9 @@ import axios from "axios";
  * Backend returns PagedResponse, extract content array
  */
 export async function getProducts(): Promise<ProductDTO[]> {
-  const response = await api.get("/v1/products");
+  const response = await api.get("/v1/products", {
+    params: { size: 1000 } // Fetch up to 1000 products to show all on home
+  });
   const pagedResponse = response.data as PagedResponse<ProductDTO>;
   return pagedResponse.content || [];
 }
@@ -147,4 +149,20 @@ export async function getCatalog(query?: string, category?: string, page: number
 
   const response = await api.get("/v1/catalog", { params });
   return response.data;
+}
+
+export async function sendInquiry(data: {
+  productId: number;
+  phone: string;
+  type: string;
+  message: string;
+}) {
+  const response = await fetch("/api/v1/inquiries", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) throw new Error("Failed to send inquiry");
+  return response.json();
 }

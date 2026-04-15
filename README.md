@@ -604,18 +604,16 @@ SERVER_PORT=8443
 SERVER_SSL_KEY_STORE_PASSWORD=password
 SERVER_SSL_KEY_PASSWORD=secret
 
-# JPA/Hibernante
-SPRING_JPA_HIBERNATE_DDL_AUTO=none
-
-# Email (use App Password from Google Account settings)
-SPRING_MAIL_USERNAME=stilnovo.noreply@gmail.com
-SPRING_MAIL_PASSWORD=<your_generated_app_password>
+# JPA/Hibernante (update para desarrollo, validate para producción)
+SPRING_JPA_HIBERNATE_DDL_AUTO=update
 
 # URL pública de la aplicación
 APP_PUBLIC_BASE_URL=https://localhost:8443
 ```
 
-**ℹ️ NOTA:** El valor por defecto es `none` (seguro). Para la **primera ejecución**, necesitarás pasar `-e SPRING_JPA_HIBERNATE_DDL_AUTO=create` para inicializar la base de datos (ver Paso 3).
+**ℹ️ NOTA:** 
+- **Desarrollo**: `update` sincroniza el esquema automáticamente
+- **Producción**: Cambia a `validate` y utiliza migraciones manuales con Flyway/Liquibase
 
 #### **Paso 3: Ejecutar docker-compose**
 

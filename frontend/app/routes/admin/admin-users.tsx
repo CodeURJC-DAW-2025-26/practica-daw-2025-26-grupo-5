@@ -1,18 +1,13 @@
 import { useState } from 'react';
-import { redirect, useNavigate } from 'react-router';
-import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-quartz.css';
-
-import { getAdminUsers, banUser, deleteUser } from '~/services/admin-service';
+import { redirect } from 'react-router';
+import { getAdminUsers, banUser, deleteUser, updateUser } from '~/services/admin-service';
+import { useUserStore } from '~/stores/useUserStore';
 import type UserDTO from '~/dto/UserDTO';
 import type PagedResponse from '~/dto/PagedResponse';
 import AdminHeader from '~/components/admin/AdminHeader';
 import ConfirmModal from '~/components/confirm-modal';
+import { Modal, Form, Button } from 'react-bootstrap';
 
-/**
- * Client-side loader: Fetches all users for the admin panel
- */
 export async function clientLoader() {
   try {
     const data = await getAdminUsers(0, 100);
@@ -23,23 +18,86 @@ export async function clientLoader() {
   }
 }
 
-/**
- * Admin Users Component
- * Displays a table of all users with actions (ban, delete)
- */
-export default function AdminUsers({ loaderData }: { loaderData: any }) {
+export default function AdminUsers({ loaderData }: { readonly loaderData: any }) {
   const pagedData = loaderData as PagedResponse<UserDTO>;
   const users = pagedData.content || [];
+  const loggedInUser = useUserStore((state) => state.user);
 
   const [rowData, setRowData] = useState<UserDTO[]>(users);
   const [selectedUser, setSelectedUser] = useState<UserDTO | null>(null);
-  const [modalType, setModalType] = useState<'ban' | 'delete' | null>(null);
+  const [modalType, setModalType] = useState<'ban' | 'delete' | 'edit' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 10;
 
-  /**
-   * Handle ban/unban action
-   */
+  // Estado del formulario de edición expandido
+  const [editFormData, setEditFormData] = useState({
+    name: '',
+    email: '',
+    description: '',
+    cardNumber: '',
+    cardExpiringDate: '',
+    cardCvv: '',
+  });
+  const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
+
+  // Check if a user is admin
+  const isUserAnAdmin = (user: UserDTO) => user.roles?.includes('ADMIN') || user.roles?.includes('ROLE_ADMIN');
+
+  // Check if user can perform action
+  const canEditUser = (user: UserDTO) => user.id !== loggedInUser?.id;
+  const canBanOrDeleteUser = (user: UserDTO) => !isUserAnAdmin(user) && user.id !== loggedInUser?.id;
+
+  const handleEditClick = (user: UserDTO) => {
+    setSelectedUser(user);
+    setEditFormData({
+      name: user.name || '',
+      email: user.email || '',
+      description: user.description || '',
+      cardNumber: user.cardNumber || '',
+      cardExpiringDate: user.cardExpiringDate || '',
+      cardCvv: user.cardCvv || '',
+    });
+    setSelectedPhoto(null);
+    setModalType('edit');
+  };
+
+  const confirmEdit = async () => {
+    if (!selectedUser) return;
+    setIsLoading(true);
+    try {
+      // Si el backend espera un DTO normal, enviamos el objeto.
+      // Si espera FormData por la foto, habría que ajustarlo (asumo que updateUser maneja el objeto o formData según tu service)
+      // Por simplicidad, asumo que `updateUser` acepta el objeto con los datos y que la subida de foto es un endpoint aparte o va en FormData.
+      // Aquí armamos un FormData para incluir la foto si existe.
+      const formData = new FormData();
+      formData.append('name', editFormData.name);
+      formData.append('email', editFormData.email);
+      formData.append('description', editFormData.description);
+      formData.append('cardNumber', editFormData.cardNumber);
+      formData.append('cardExpiringDate', editFormData.cardExpiringDate);
+      formData.append('cardCvv', editFormData.cardCvv);
+      
+      if (selectedPhoto) {
+        formData.append('profileImage', selectedPhoto);
+      }
+
+      // IMPORTANTE: Asegúrate de que `updateUser` en admin-service.ts esté preparado para recibir FormData si vas a enviar archivos.
+      const updatedUser = await updateUser(selectedUser.id, formData as any); // Type assertion temporal, revisa tu servicio
+      
+      setRowData((prev) =>
+        prev.map((u) => (u.id === selectedUser.id ? updatedUser : u))
+      );
+      setModalType(null);
+      setSelectedUser(null);
+    } catch (error) {
+      console.error('Failed to update user:', error);
+      alert('Failed to update user. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleBanClick = (user: UserDTO) => {
     setSelectedUser(user);
     setModalType('ban');
@@ -50,13 +108,10 @@ export default function AdminUsers({ loaderData }: { loaderData: any }) {
     setIsLoading(true);
     try {
       const isBanned = selectedUser.banned;
-      await banUser(selectedUser.id, !isBanned);
-
-      // Update row data
+      const updatedUser = await banUser(selectedUser.id, !isBanned);
       setRowData((prev) =>
-        prev.map((u) => (u.id === selectedUser.id ? { ...u, banned: !isBanned } : u))
+        prev.map((u) => (u.id === selectedUser.id ? updatedUser : u))
       );
-
       setModalType(null);
       setSelectedUser(null);
     } catch (error) {
@@ -67,9 +122,6 @@ export default function AdminUsers({ loaderData }: { loaderData: any }) {
     }
   };
 
-  /**
-   * Handle delete action
-   */
   const handleDeleteClick = (user: UserDTO) => {
     setSelectedUser(user);
     setModalType('delete');
@@ -80,10 +132,7 @@ export default function AdminUsers({ loaderData }: { loaderData: any }) {
     setIsLoading(true);
     try {
       await deleteUser(selectedUser.id);
-
-      // Remove user from table
       setRowData((prev) => prev.filter((u) => u.id !== selectedUser.id));
-
       setModalType(null);
       setSelectedUser(null);
     } catch (error) {
@@ -94,161 +143,410 @@ export default function AdminUsers({ loaderData }: { loaderData: any }) {
     }
   };
 
-  /**
-   * Column Definitions for ag-grid
-   */
-  const columnDefs: any[] = [
-    {
-      field: 'name',
-      headerName: 'User',
-      width: 200,
-      cellRenderer: (params: any) => (
-        <div className="d-flex align-items-center gap-2">
-          <img
-            src={`http://localhost:8443/user/${params.data.id}/profile-photo`}
-            alt={params.data.name}
-            width="36"
-            height="36"
-            style={{ borderRadius: '50%', objectFit: 'cover' }}
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23e2e8f0" width="100" height="100"/><text x="50" y="50" text-anchor="middle" dy=".3em" fill="%2364748b" font-size="12">No img</text></svg>';
-            }}
-          />
-          <div>
-            <p className="fw-700 mb-0 text-dark">{params.data.name}</p>
-            <p className="x-small text-muted mb-0">{params.data.email}</p>
-          </div>
-        </div>
-      ),
-    },
-    {
-      field: 'roles',
-      headerName: 'Role',
-      width: 120,
-      cellRenderer: (params: any) => {
-        const roles = params.data.roles || [];
-        return (
-          <span className="badge bg-light text-dark fw-700" style={{ fontSize: '0.75rem' }}>
-            {roles.join(', ') || 'USER'}
-          </span>
-        );
-      },
-    },
-    {
-      field: 'banned',
-      headerName: 'Status',
-      width: 140,
-      cellRenderer: (params: any) => (
-        <span
-          className={`status-pill badge ${params.data.banned ? 'bg-danger' : 'bg-success'}`}
-          style={{
-            backgroundColor: params.data.banned ? '#fee2e2' : '#dcfce7',
-            color: params.data.banned ? '#c53030' : '#2f855a',
-            padding: '5px 12px',
-            borderRadius: '10px',
-            fontWeight: 700,
-            fontSize: '0.75rem',
-          }}
-        >
-          <i className={`fa-solid fa-${params.data.banned ? 'ban' : 'check-circle'}`} /> &nbsp;
-          {params.data.banned ? 'BANNED' : 'ACTIVE'}
-        </span>
-      ),
-    },
-    {
-      field: 'id',
-      headerName: 'Actions',
-      width: 200,
-      cellRenderer: (params: any) => (
-        <div className="d-flex gap-2">
-          <button
-            type="button"
-            className="btn btn-sm fw-700"
-            style={{
-              backgroundColor: params.data.banned ? '#dcfce7' : '#fee2e2',
-              color: params.data.banned ? '#2f855a' : '#c53030',
-              border: 'none',
-              borderRadius: '8px',
-              padding: '6px 12px',
-              fontSize: '0.75rem',
-              cursor: 'pointer',
-            }}
-            onClick={() => handleBanClick(params.data)}
-          >
-            <i className={`fa-solid fa-${params.data.banned ? 'unlock' : 'lock'}`} />
-            &nbsp;{params.data.banned ? 'UNBAN' : 'BAN'}
-          </button>
-          <button
-            type="button"
-            className="btn btn-sm fw-700"
-            style={{
-              backgroundColor: '#fee2e2',
-              color: '#dc3545',
-              border: 'none',
-              borderRadius: '8px',
-              padding: '6px 12px',
-              fontSize: '0.75rem',
-              cursor: 'pointer',
-            }}
-            onClick={() => handleDeleteClick(params.data)}
-          >
-            <i className="fa-solid fa-trash" /> DELETE
-          </button>
-        </div>
-      ),
-    },
-  ];
+  const totalUsers = rowData.length;
+  const bannedUsers = rowData.filter(u => u.banned).length;
+  const activeUsers = totalUsers - bannedUsers;
+  const activeRate = totalUsers > 0 ? ((activeUsers / totalUsers) * 100).toFixed(0) : 0;
 
-  /**
-   * Default column settings
-   */
-  const defaultColDef = {
-    sortable: true,
-    filter: true,
-    resizable: true,
-  };
+  const paginatedData = rowData.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage
+  );
+  const totalPages = Math.ceil(rowData.length / itemsPerPage);
+
+  // Compute modal titles and messages
+  const isBanning = modalType === 'ban' && selectedUser?.banned === false;
+  const isUnbanning = modalType === 'ban' && selectedUser?.banned === true;
+
+  let modalTitle = 'Delete User?';
+  if (isUnbanning) {
+    modalTitle = 'Unban User?';
+  } else if (isBanning) {
+    modalTitle = 'Ban User?';
+  }
+
+  let modalMessage = `Are you sure you want to permanently delete "${selectedUser?.name}"? This action cannot be undone.`;
+  if (isUnbanning) {
+    modalMessage = `Are you sure you want to unban "${selectedUser?.name}"? They will regain access.`;
+  } else if (isBanning) {
+    modalMessage = `Are you sure you want to ban "${selectedUser?.name}"? They will be unable to access the platform.`;
+  }
+
+  let confirmText = 'Delete';
+  if (isUnbanning) {
+    confirmText = 'Unban';
+  } else if (isBanning) {
+    confirmText = 'Ban';
+  }
+
+  const modalVariant = modalType === 'delete' ? 'danger' : 'warning';
 
   return (
     <>
       <AdminHeader
         title="User Management"
-        subtitle={`Total users: ${rowData.length}`}
+        subtitle="Moderate access and user permissions."
       />
 
-      <div className="clay-card p-4 overflow-hidden shadow-sm bg-white" style={{ borderRadius: '20px' }}>
-        <div className="ag-theme-quartz" style={{ height: "600px", width: "100%" }}>
-          <AgGridReact
-            key={rowData.length > 0 ? rowData[0].id : 'empty-grid'}
-            rowData={rowData}
-            columnDefs={columnDefs}
-            defaultColDef={defaultColDef}
-            pagination={true}
-            paginationPageSize={10}
-            suppressHorizontalScroll={false}
-          />
+      <div className="container-fluid">
+        {/* KPI Row */}
+        <div className="row g-3 mb-4">
+          <div className="col-12 col-sm-6 col-lg-3">
+            <div className="clay-card p-4 text-center shadow-sm">
+              <i className="fa-solid fa-users" style={{ fontSize: '2rem', color: '#0369a1', marginBottom: '8px', display: 'block' }} />
+              <p className="text-muted small mb-1">Total Users</p>
+              <h3 className="fw-800 mb-0" style={{ color: '#0369a1' }}>{totalUsers}</h3>
+            </div>
+          </div>
+          <div className="col-12 col-sm-6 col-lg-3">
+            <div className="clay-card p-4 text-center shadow-sm">
+              <i className="fa-solid fa-check-circle" style={{ fontSize: '2rem', color: '#059669', marginBottom: '8px', display: 'block' }} />
+              <p className="text-muted small mb-1">Active Users</p>
+              <h3 className="fw-800 mb-0" style={{ color: '#059669' }}>{activeUsers}</h3>
+            </div>
+          </div>
+          <div className="col-12 col-sm-6 col-lg-3">
+            <div className="clay-card p-4 text-center shadow-sm">
+              <i className="fa-solid fa-ban" style={{ fontSize: '2rem', color: '#dc2626', marginBottom: '8px', display: 'block' }} />
+              <p className="text-muted small mb-1">Banned Users</p>
+              <h3 className="fw-800 mb-0" style={{ color: '#dc2626' }}>{bannedUsers}</h3>
+            </div>
+          </div>
+          <div className="col-12 col-sm-6 col-lg-3">
+            <div className="clay-card p-4 text-center shadow-sm">
+              <i className="fa-solid fa-chart-pie" style={{ fontSize: '2rem', color: '#7c3aed', marginBottom: '8px', display: 'block' }} />
+              <p className="text-muted small mb-1">Active Rate</p>
+              <h3 className="fw-800 mb-0" style={{ color: '#7c3aed' }}>{activeRate}%</h3>
+            </div>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="clay-card p-4 shadow-sm bg-white" style={{ borderRadius: '20px' }}>
+          <div style={{ overflowX: 'auto' }}>
+            <table className="table table-hover align-middle mb-0">
+              <thead style={{ backgroundColor: '#f5f7fa', borderBottom: '2px solid #e5e7eb' }}>
+                <tr>
+                  <th className="text-muted fw-700 small">USER</th>
+                  <th className="text-muted fw-700 small">EMAIL</th>
+                  <th className="text-muted fw-700 small">ROLE</th>
+                  <th className="text-muted fw-700 small">STATUS</th>
+                  <th className="text-muted fw-700 small">ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedData.length > 0 ? (
+                  paginatedData.map((user) => (
+                    <tr key={user.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
+                      <td>
+                        <div className="d-flex align-items-center gap-2">
+                          <img
+                            src={`/api/v1/users/${user.id}/profile-photo`}
+                            alt={user.name}
+                            width="36"
+                            height="36"
+                            style={{ borderRadius: '50%', objectFit: 'cover', backgroundColor: '#e5e7eb' }}
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                          />
+                          <div>
+                            <p className="fw-700 mb-0 small">{user.name}</p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="text-muted small">{user.email}</td>
+                      <td>
+                        <span className="badge bg-light text-dark fw-700" style={{ fontSize: '0.7rem' }}>
+                          {user.roles?.join(', ') || 'USER'}
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          className={`badge fw-700`}
+                          style={{
+                            backgroundColor: user.banned ? '#fee2e2' : '#dcfce7',
+                            color: user.banned ? '#c53030' : '#2f855a',
+                            padding: '5px 10px',
+                            borderRadius: '6px',
+                            fontSize: '0.7rem',
+                          }}
+                        >
+                          <i className={`fa-solid fa-${user.banned ? 'ban' : 'check-circle'}`} />
+                          &nbsp;{user.banned ? 'BANNED' : 'ACTIVE'}
+                        </span>
+                      </td>
+                      <td>
+                        <div className="d-flex gap-2">
+                          {/* EDIT Button */}
+                          {canEditUser(user) && (
+                            <button
+                              type="button"
+                              className="btn btn-sm fw-700"
+                              style={{
+                                backgroundColor: '#e0f2fe',
+                                color: '#0369a1',
+                                border: 'none',
+                                borderRadius: '6px',
+                                padding: '5px 10px',
+                                fontSize: '0.7rem',
+                                cursor: 'pointer',
+                              }}
+                              onClick={() => handleEditClick(user)}
+                            >
+                              <i className="fa-solid fa-pencil" />
+                            </button>
+                          )}
+                          
+                          {/* BAN/UNBAN Button */}
+                          {canBanOrDeleteUser(user) && (
+                            <button
+                              type="button"
+                              className="btn btn-sm fw-700"
+                              style={{
+                                backgroundColor: user.banned ? '#dcfce7' : '#fee2e2',
+                                color: user.banned ? '#2f855a' : '#c53030',
+                                border: 'none',
+                                borderRadius: '6px',
+                                padding: '5px 10px',
+                                fontSize: '0.7rem',
+                                cursor: 'pointer',
+                              }}
+                              onClick={() => handleBanClick(user)}
+                            >
+                              <i className={`fa-solid fa-${user.banned ? 'unlock' : 'lock'}`} />
+                            </button>
+                          )}
+
+                          {/* DELETE Button */}
+                          {canBanOrDeleteUser(user) && (
+                            <button
+                              type="button"
+                              className="btn btn-sm fw-700"
+                              style={{
+                                backgroundColor: '#fee2e2',
+                                color: '#dc3545',
+                                border: 'none',
+                                borderRadius: '6px',
+                                padding: '5px 10px',
+                                fontSize: '0.7rem',
+                                cursor: 'pointer',
+                              }}
+                              onClick={() => handleDeleteClick(user)}
+                            >
+                              <i className="fa-solid fa-trash" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="text-center py-4 text-muted">
+                      No users found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+              <small className="text-muted">
+                Showing {currentPage * itemsPerPage + 1} to {Math.min((currentPage + 1) * itemsPerPage, rowData.length)} of {rowData.length}
+              </small>
+              <div className="btn-group" style={{ display: 'flex', gap: '4px' }}>
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline-secondary"
+                  onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+                  disabled={currentPage === 0}
+                >
+                  <i className="fa-solid fa-chevron-left" />
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    className={`btn btn-sm ${currentPage === i ? 'btn-primary' : 'btn-outline-secondary'}`}
+                    onClick={() => setCurrentPage(i)}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline-secondary"
+                  onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
+                  disabled={currentPage === totalPages - 1}
+                >
+                  <i className="fa-solid fa-chevron-right" />
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Confirm Modal */}
+      {/* Full Edit Modal */}
+      <Modal 
+        show={modalType === 'edit'} 
+        onHide={() => { setModalType(null); setSelectedUser(null); }} 
+        size="lg"
+        centered
+        contentClassName="bg-white border-0 shadow-lg"
+        style={{ borderRadius: '24px' }}
+      >
+        <Modal.Header closeButton className="border-0 pb-0">
+          <Modal.Title className="fw-800" style={{ color: '#1e293b' }}>
+            Edit User: {selectedUser?.name || selectedUser?.email}
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="p-4">
+          <Form>
+            <div className="row">
+              {/* Columna Izquierda: Perfil y Bio */}
+              <div className="col-md-5 d-flex flex-column align-items-center border-end pe-4">
+                
+                <div className="mb-3 position-relative text-center">
+                  <img
+                    src={selectedPhoto ? URL.createObjectURL(selectedPhoto) : `/api/v1/users/${selectedUser?.id}/profile-photo`}
+                    alt="Profile"
+                    className="rounded-circle shadow-sm mb-3"
+                    style={{ width: '120px', height: '120px', objectFit: 'cover', backgroundColor: '#f1f5f9' }}
+                    onError={(e) => { (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=User&background=random'; }}
+                  />
+                  <div>
+                    <label htmlFor="photo-upload" className="btn btn-outline-primary btn-sm rounded-pill fw-700">
+                      <i className="fa-solid fa-camera me-2"></i>Change Photo
+                    </label>
+                    <input 
+                      id="photo-upload" 
+                      type="file" 
+                      accept="image/*" 
+                      className="d-none" 
+                      onChange={(e: any) => setSelectedPhoto(e.target.files[0])}
+                    />
+                  </div>
+                </div>
+
+                <div className="w-100">
+                  <Form.Group className="mb-3">
+                    <Form.Label className="fw-700 small text-uppercase text-muted" style={{ letterSpacing: '1px' }}>Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      className="rounded-3 py-2 bg-light border-0"
+                      value={editFormData.name}
+                      onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                      disabled={isLoading}
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="mb-3">
+                    <Form.Label className="fw-700 small text-uppercase text-muted" style={{ letterSpacing: '1px' }}>Bio / Description</Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={5}
+                      className="rounded-3 py-2 bg-light border-0"
+                      value={editFormData.description}
+                      onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                      disabled={isLoading}
+                    />
+                  </Form.Group>
+                </div>
+              </div>
+
+              {/* Columna Derecha: Account & Billing */}
+              <div className="col-md-7 ps-4">
+                <h6 className="fw-700 text-uppercase text-muted mb-4" style={{ letterSpacing: '1px' }}>Account & Billing</h6>
+
+                <Form.Group className="mb-4">
+                  <Form.Label className="fw-700 small text-muted">EMAIL ADDRESS</Form.Label>
+                  <Form.Control
+                    type="email"
+                    className="rounded-3 py-2 bg-light border-0"
+                    value={editFormData.email}
+                    onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+                    disabled={isLoading}
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-4">
+                  <Form.Label className="fw-700 small text-muted">CARD NUMBER</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="xxxx xxxx xxxx xxxx"
+                    className="rounded-3 py-2 bg-light border-0"
+                    value={editFormData.cardNumber}
+                    onChange={(e) => setEditFormData({ ...editFormData, cardNumber: e.target.value })}
+                    disabled={isLoading}
+                  />
+                </Form.Group>
+
+                <div className="row">
+                  <Form.Group className="col-sm-6 mb-4">
+                    <Form.Label className="fw-700 small text-muted">EXPIRING DATE</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="MM/YY"
+                      className="rounded-3 py-2 bg-light border-0"
+                      value={editFormData.cardExpiringDate}
+                      onChange={(e) => setEditFormData({ ...editFormData, cardExpiringDate: e.target.value })}
+                      disabled={isLoading}
+                    />
+                  </Form.Group>
+
+                  <Form.Group className="col-sm-6 mb-4">
+                    <Form.Label className="fw-700 small text-muted">CVV</Form.Label>
+                    <Form.Control
+                      type="text"
+                      placeholder="123"
+                      className="rounded-3 py-2 bg-light border-0"
+                      value={editFormData.cardCvv}
+                      onChange={(e) => setEditFormData({ ...editFormData, cardCvv: e.target.value })}
+                      disabled={isLoading}
+                    />
+                  </Form.Group>
+                </div>
+
+                {/* Botones de acción alineados a la derecha */}
+                <div className="d-flex gap-3 justify-content-end mt-3">
+                  <Button
+                    variant="light"
+                    className="rounded-pill px-4 fw-700"
+                    onClick={() => {
+                      setModalType(null);
+                      setSelectedUser(null);
+                    }}
+                    disabled={isLoading}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="dark"
+                    className="rounded-pill px-4 fw-700"
+                    style={{ backgroundColor: '#1e293b' }}
+                    onClick={confirmEdit}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Saving...' : 'Save Changes'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </Form>
+        </Modal.Body>
+      </Modal>
+
+      {/* Confirm Modal for Ban/Delete */}
       <ConfirmModal
-        show={modalType !== null}
-        title={
-          modalType === 'ban'
-            ? selectedUser?.banned
-              ? 'Unban User?'
-              : 'Ban User?'
-            : 'Delete User?'
-        }
-        message={
-          modalType === 'ban'
-            ? selectedUser?.banned
-              ? `Are you sure you want to unban "${selectedUser?.name}"? They will regain access.`
-              : `Are you sure you want to ban "${selectedUser?.name}"? They will be unable to access the platform.`
-            : `Are you sure you want to permanently delete "${selectedUser?.name}"? This action cannot be undone.`
-        }
-        confirmText={modalType === 'ban' ? (selectedUser?.banned ? 'Unban' : 'Ban') : 'Delete'}
+        show={modalType === 'ban' || modalType === 'delete'}
+        title={modalTitle}
+        message={modalMessage}
+        confirmText={confirmText}
         cancelText="Cancel"
-        variant={modalType === 'delete' ? 'danger' : 'warning'}
+        variant={modalVariant}
         isLoading={isLoading}
         onConfirm={modalType === 'ban' ? confirmBan : confirmDelete}
         onCancel={() => {
@@ -260,12 +558,12 @@ export default function AdminUsers({ loaderData }: { loaderData: any }) {
   );
 }
 
-export function ErrorBoundary({ error }: { error: Error }) {
+export function ErrorBoundary({ error }: { readonly error: Error }) {
   return (
     <div className="alert alert-danger m-5" role="alert">
       <h4 className="alert-heading">Error Loading Users!</h4>
       <p>{error instanceof Error ? error.message : 'An unexpected error occurred'}</p>
-      <button className="btn btn-outline-danger" onClick={() => (window.location.href = '/')}>
+      <button className="btn btn-outline-danger" onClick={() => (globalThis.location.href = '/')}>
         Back to home
       </button>
     </div>

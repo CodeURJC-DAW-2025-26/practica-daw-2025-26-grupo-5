@@ -3,6 +3,8 @@ package es.stilnovo.library.service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -28,6 +30,7 @@ import jakarta.mail.MessagingException;
  */
 @Service
 public class NotificationService {
+    private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
 
     /**
      * Result of an inquiry submission attempt
@@ -124,6 +127,7 @@ public class NotificationService {
                 buyer.getName(), buyer.getEmail(), phoneValue, logoCid);
         String buyerHtml = MailTemplates.buyerConfirmation(publicBaseUrl, product.getName(), type, message, logoCid);
 
+        logger.info("🔧 [INQUIRY EMAIL PROCESS] Starting email sending for product: {}, seller: {}", product.getId(), sellerEmail);
         try {
             // Send seller notification and buyer confirmation (with embedded logo)
             mailService.sendHtmlWithInline(sellerEmail, "New Inquiry: " + product.getName(), sellerHtml, logoCid, logoResource);
@@ -144,6 +148,7 @@ public class NotificationService {
                     "SENT");
             return new InquirySubmissionResult(inquiry, true, null, null);
         } catch (MailException | MessagingException exception) {
+            logger.error("❌ [EMAIL SEND FAILED] Error sending inquiry emails: {}", exception.getMessage(), exception);
             // If email fails, still create inquiry record with FAILED_MAIL status for audit trail
             Inquiry inquiry = inquiryService.createInquiry(
                     product.getId(),

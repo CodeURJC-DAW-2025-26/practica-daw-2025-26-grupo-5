@@ -71,11 +71,13 @@ public class AdminService {
             int numBanneds,
             List<User> users,
             List<Product> products,
-            String memoryUsage) {
+            String memoryUsage,
+            int totalProductCount,
+            double totalRevenue) {
     }
 
     public record AdminTransactionsData(
-            int totalRevenue,
+            double totalRevenue,
             int numTransactions,
             List<Transaction> globalTransactions) {
     }
@@ -119,8 +121,12 @@ public class AdminService {
     public AdminPanelData getAdminPanelData() {
         // Fetch recent users (limited to 3) for dashboard widget
         List<User> dashboardUsers = userService.findAll().stream().limit(3).toList();
-        // Fetch recent products (limited to 3) for quick inventory view
-        List<Product> dashboardProducts = productRepository.findAll().stream().limit(3).toList();
+        // Fetch ALL products for accurate category calculation and preview
+        List<Product> dashboardProducts = productRepository.findAll().stream().toList();
+        // Count ALL products (not limited) for accurate KPI display
+        int totalProducts = (int) productRepository.count();
+        // Calculate total revenue from completed transactions
+        double totalRevenue = transactionService.getTotalRevenue();
         // Calculate JVM memory usage: (total - free) = used memory in MB
         long usedMemory = (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / (1024 * 1024);
         return new AdminPanelData(
@@ -128,7 +134,9 @@ public class AdminService {
                 getNumBanneds(),
                 dashboardUsers,
                 dashboardProducts,
-                usedMemory + " MB");
+                usedMemory + " MB",
+                totalProducts,
+                totalRevenue);
     }
 
     @Transactional(readOnly = true)
@@ -238,6 +246,7 @@ public class AdminService {
 
     @Transactional
     public void updateProductAsAdmin(long id,
+                                     Long sellerId,
                                      String name,
                                      String category,
                                      Double price,
@@ -250,7 +259,14 @@ public class AdminService {
         Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found"));
 
-        // 2. Update fields only if new data is provided and not blank (prevents
+        // 2. Update seller if provided
+        if (sellerId != null) {
+            User newSeller = userRepository.findById(sellerId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Seller not found"));
+            existingProduct.setSeller(newSeller);
+        }
+
+        // 3. Update fields only if new data is provided and not blank (prevents
         // accidental deletion)
         if (name != null && !name.isBlank()) {
             existingProduct.setName(name);
@@ -280,14 +296,14 @@ public class AdminService {
             existingProduct.setStatus(status);
         }
 
-        // 3. Handle image update only if a new file was actually uploaded
+        // 4. Handle image update only if a new file was actually uploaded
         if (imageFile != null && !imageFile.isEmpty()) {
             // Create new image blob and link it to the existing product
             Image newImage = imageService.createImage(imageFile.getInputStream());
             existingProduct.setImage(newImage);
         }
 
-        // 4. Save the updated product back to the repository
+        // 5. Save the updated product back to the repository
         productRepository.save(existingProduct);
     }
     

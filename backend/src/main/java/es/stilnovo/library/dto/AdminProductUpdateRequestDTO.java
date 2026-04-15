@@ -14,6 +14,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @Schema(description = "Request body for administrators to update product details")
 public record AdminProductUpdateRequestDTO(
         
+        @Schema(description = "ID of the seller who owns the product", example = "1")
+        Long sellerId,
+        
         @Schema(description = "Updated product name", example = "Vintage Camera - Updated")
         String name,
         

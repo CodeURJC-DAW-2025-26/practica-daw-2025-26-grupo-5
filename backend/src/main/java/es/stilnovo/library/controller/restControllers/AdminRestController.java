@@ -106,7 +106,9 @@ public class AdminRestController {
                 panelData.numBanneds(),
                 panelData.memoryUsage(),
                 userMapper.toDTOs(panelData.users()),
-                productMapper.toDTOs(panelData.products()));
+                productMapper.toDTOs(panelData.products()),
+                panelData.totalProductCount(),
+                panelData.totalRevenue());
     }
 
     // --- USER MANAGEMENT ---
@@ -303,6 +305,7 @@ public class AdminRestController {
 
         adminService.updateProductAsAdmin(
                 id,
+                request.sellerId(),
                 request.name(),
                 request.category(),
                 request.price(),

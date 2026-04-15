@@ -23,7 +23,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Stilnovo</title>
-        <link rel="icon" type="image/png" href="/logo.png"/>
+        <link rel="icon" type="image/svg+xml" href="/logo.svg"/>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
         <Meta />
         <Links />

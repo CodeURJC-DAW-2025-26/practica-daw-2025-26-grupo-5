@@ -225,11 +225,11 @@ public class TransactionService {
      * 
      * @return the totalRevenue of earnings
      */
-    public int getTotalRevenue() {
+    public double getTotalRevenue() {
         List<Transaction> transactions = getAllTransactions();
-        int totalRevenue = 0;
+        double totalRevenue = 0.0;
         for (Transaction transaction : transactions) {
-            totalRevenue += transaction.getProduct().getPrice();
+            totalRevenue += transaction.getFinalPrice();
         }
         return totalRevenue;
     }
