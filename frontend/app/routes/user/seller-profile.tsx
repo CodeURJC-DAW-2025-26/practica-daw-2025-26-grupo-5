@@ -29,7 +29,7 @@ export default function SellerProfile({ loaderData }: Route.ComponentProps) {
                                 className="rounded-circle border border-4 border-white shadow-sm"
                                 width="125" height="125"
                                 style={{ objectFit: "cover" }}
-                                onError={(e) => { (e.target as HTMLImageElement).src = '/images/profile-photo.png' }}
+                                onError={(e) => { (e.target as HTMLImageElement).src = '/assets/no-profile-picture.png' }}
                             />
                         </div>
                         <div className="col-md text-center text-md-start">
@@ -49,7 +49,7 @@ export default function SellerProfile({ loaderData }: Route.ComponentProps) {
 
                         {/* If im the profile user */}
                         {owner && (
-    
+
                             <div className="col-md-auto ms-auto text-center text-md-end">
                                 <Link
                                     to="/user-page"
@@ -91,6 +91,7 @@ export default function SellerProfile({ loaderData }: Route.ComponentProps) {
             </div>
 
             <div className="tab-content container py-4">
+
                 {/* Seller products */}
                 <div className={`tab-pane fade ${activeTab === 'items' ? 'show active' : ''}`}>
                     <div className="row g-4">
@@ -123,12 +124,13 @@ export default function SellerProfile({ loaderData }: Route.ComponentProps) {
                             <div key={val.id} className="clay-card p-4 mb-3 bg-white border-0 shadow-sm animate slideIn">
                                 <div className="d-flex justify-content-between align-items-center mb-3">
                                     <div className="d-flex align-items-center gap-3">
-                                        <img src={`/api/v1/users/${val.buyerId || 'default'}/profile-photo`}
+                                        <img
+                                            src={`/api/v1/users/search/profile-photo?name=${encodeURIComponent(val.buyerName)}`}
                                             alt={val.buyerName}
                                             className="rounded-circle border shadow-sm"
                                             width="45" height="45"
-                                            style={{ objectFit: "cover" }}
-                                            onError={(e) => { (e.target as HTMLImageElement).src = '/images/profile-photo.png' }} />
+                                            onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')}
+                                        />
                                         <div>
                                             <h4 className="fw-800 h6 mb-0">{val.buyerName}</h4>
                                             <div className="d-flex align-items-center gap-1 mt-1" style={{ color: "var(--brand-blue)" }}>

@@ -20,7 +20,7 @@ export async function getPendingValorations(): Promise<any[]> {
 /**
  * Submits a new valoration for a specific transaction.
  */
-export async function submitValoration(data: { transactionId: number, stars: number, comment: string }): Promise<ValorationDTO> {
+export async function createValoration(data: { stars: number, comment: string, buyerName: string, transactionId: number }): Promise<ValorationDTO> {
     const response = await api.post("/v1/valorations", data);
     return response.data;
 }
