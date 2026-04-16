@@ -1451,7 +1451,7 @@ Mi contribución se ha centrado en la mejora y consolidación de la capa REST de
    
 
    El backend debe estar activo para que Hibernate cree las tablas y cargue los datos iniciales.
-    Abre el proyecto en tu IDE (IntelliJ IDEA recomendado).
+    Abre el proyecto en tu IDE.
 
    Localiza la clase StilnovoApplication.java en src/main/java/....
 
