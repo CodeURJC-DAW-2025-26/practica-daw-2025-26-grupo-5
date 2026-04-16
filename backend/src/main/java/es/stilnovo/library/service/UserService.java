@@ -43,6 +43,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import es.stilnovo.library.dto.UserDashboardDataDTO;
 import es.stilnovo.library.dto.SellerProfilePageDataDTO;
+import es.stilnovo.library.dto.TransactionDTO;
+import es.stilnovo.library.dto.TransactionDashboardDTO;
+import es.stilnovo.library.dto.TransactionMapper;
 import es.stilnovo.library.dto.UserStatisticsDataDTO;
 import es.stilnovo.library.util.NumberFormattingUtils;
 
@@ -75,6 +78,9 @@ public class UserService {
 
     @Autowired
     private InquiryService inquiryService;
+
+    @Autowired
+    private TransactionMapper transactionMapper; 
 
     /** Saves or updates a user in the database */
     public void save(User user) {
@@ -340,6 +346,29 @@ public class UserService {
     public User getPublicProfileById(long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Seller not found"));
+    }
+
+    @Transactional(readOnly = true)
+    public TransactionDashboardDTO getSalesAndOrdersDashboardDTO(String username, Long transactionId) {
+        // 1. Fetch the user
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // 2. Retrieve entities from the database
+        List<Transaction> rawSales = transactionRepository.findBySellerUserId(user.getUserId());
+        List<Transaction> rawOrders = transactionRepository.findByBuyerUserId(user.getUserId());
+
+        // 3. Check if they are rated (business logic)
+        for (Transaction t : rawOrders) {
+            t.setRated(valorationRepository.existsByTransaction(t));
+        }
+
+        // 4. Convert to DTOs within the service
+        List<TransactionDTO> salesDTOs = transactionMapper.toDTOs(rawSales);
+        List<TransactionDTO> ordersDTOs = transactionMapper.toDTOs(rawOrders);
+
+        // 5. Return the clean Record DTO
+        return new TransactionDashboardDTO(salesDTOs, ordersDTOs);
     }
 
     public SellerProfilePageDataDTO getSellerProfilePageData(long id, String viewerUsername) {

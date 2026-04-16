@@ -36,7 +36,7 @@ import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.UserService;
 import es.stilnovo.library.service.ValorationService;
 import es.stilnovo.library.dto.TransactionMapper;
-
+import es.stilnovo.library.dto.TransactionDashboardDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -201,28 +201,13 @@ public class UserWebRestController {
             @ApiResponse(responseCode = "200", description = "Transactions data retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized user")
     })
-    public ResponseEntity<Map<String, Object>> getMyTransactions(Principal principal,
+    public ResponseEntity<TransactionDashboardDTO> getMyTransactions(Principal principal,
             @RequestParam(required = false) Long transactionId) {
 
-        // 1. Retrieve the raw data from the service (Entities)
-        Map<String, Object> data = userService.getSalesAndOrdersDashboard(principal.getName(), transactionId);
+        TransactionDashboardDTO dashboardData = 
+            userService.getSalesAndOrdersDashboardDTO(principal.getName(), transactionId);
 
-        // 2. Extract the entity lists, avoiding NullPointerExceptions
-        @SuppressWarnings("unchecked")
-        java.util.List<es.stilnovo.library.model.Transaction> rawSales = (java.util.List<es.stilnovo.library.model.Transaction>) data
-                .getOrDefault("sales", new java.util.ArrayList<>());
-
-        @SuppressWarnings("unchecked")
-        java.util.List<es.stilnovo.library.model.Transaction> rawOrders = (java.util.List<es.stilnovo.library.model.Transaction>) data
-                .getOrDefault("orders", new java.util.ArrayList<>());
-
-        // 3. Map the entities to DTOs to prevent infinite recursion in JSON
-        Map<String, Object> safeData = java.util.Map.of(
-                "sales", transactionMapper.toDTOs(rawSales),
-                "orders", transactionMapper.toDTOs(rawOrders));
-
-        // 4. Return the clean and safe JSON
-        return ResponseEntity.ok(safeData);
+        return ResponseEntity.ok(dashboardData);
     }
     /**
      * GET /api/v1/users/me/valorations
