@@ -50,7 +50,7 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
                   <div className="clay-card">
                     <div className="img-container">
                       <img 
-                        src={`/api/v1/images/${product.id}/file`} 
+                        src={`/api/v1/products/${product.id}/image`} 
                         alt={product.name} 
                       />
                     </div>
@@ -80,7 +80,7 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
                 <div className="clay-card">
                   <div className="img-container">
                     <img 
-                      src={`/api/v1/images/${product.id}/file`} 
+                      src={`/api/v1/products/${product.id}/image`} 
                       alt={product.name} 
                     />
                   </div>
