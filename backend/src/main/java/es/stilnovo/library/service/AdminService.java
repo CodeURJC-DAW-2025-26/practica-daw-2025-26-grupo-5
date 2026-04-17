@@ -116,15 +116,19 @@ public class AdminService {
     /**
      * Prepares admin dashboard data: system statistics and preview samples.
      * Shows overview of users, products, and system resources.
+     * Filters out "Sold" products to match Global Inventory view.
      */
     @Transactional(readOnly = true)
     public AdminPanelData getAdminPanelData() {
         // Fetch recent users (limited to 3) for dashboard widget
         List<User> dashboardUsers = userService.findAll().stream().limit(3).toList();
-        // Fetch ALL products for accurate category calculation and preview
-        List<Product> dashboardProducts = productRepository.findAll().stream().toList();
-        // Count ALL products (not limited) for accurate KPI display
-        int totalProducts = (int) productRepository.count();
+        // Fetch only ACTIVE/INACTIVE products (exclude "Sold") for dashboard display
+        // This ensures consistency with Global Inventory page
+        List<Product> dashboardProducts = getAllProducts().stream()
+                .filter(p -> !"Sold".equalsIgnoreCase(p.getStatus()))
+                .toList();
+        // Count only ACTIVE/INACTIVE products (exclude "Sold") for accurate KPI display
+        int totalProducts = (int) dashboardProducts.size();
         // Calculate total revenue from completed transactions
         double totalRevenue = transactionService.getTotalRevenue();
         // Calculate JVM memory usage: (total - free) = used memory in MB
