@@ -163,17 +163,23 @@ public class AdminRestController {
     })
     public ResponseEntity<UserDTO> updateUser(
         @PathVariable Long id,
-        @ModelAttribute AdminUserUpdateRequestDTO request,
+        @RequestParam(required = false) String name,
+        @RequestParam(required = false) String email,
+        @RequestParam(required = false) String cardNumber,
+        @RequestParam(required = false) String cardCvv,
+        @RequestParam(required = false) String cardExpiringDate,
+        @RequestParam(required = false) String description,
         @RequestParam(value = "newProfilePhoto", required = false) MultipartFile newProfilePhoto) throws IOException {
 
         adminService.updateUserAsAdmin(
                 id,
                 newProfilePhoto,
-                request.email(),
-                request.cardNumber(),
-                request.cardCvv(),
-                request.cardExpiringDate(),
-                request.description());
+                name,
+                email,
+                cardNumber,
+                cardCvv,
+                cardExpiringDate,
+                description);
 
         User updatedUser = userService.findById(id).orElseThrow();
         return ResponseEntity.ok(userMapper.toDTO(updatedUser));

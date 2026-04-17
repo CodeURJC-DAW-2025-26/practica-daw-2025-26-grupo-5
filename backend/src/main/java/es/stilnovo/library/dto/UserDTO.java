@@ -33,6 +33,15 @@ public record UserDTO(
         @Schema(description = "User's profile description or biography", example = "Seller of vintage photography items.")
         String description,
         
+        @Schema(description = "Payment card number", example = "1234567890123456")
+        String cardNumber,
+        
+        @Schema(description = "Card expiration date", example = "12/25")
+        String cardExpiringDate,
+        
+        @Schema(description = "Card CVV security code", example = "123")
+        String cardCvv,
+        
         @Schema(description = "List of assigned security roles (e.g., ROLE_USER, ROLE_ADMIN)")
         List<String> roles,
         

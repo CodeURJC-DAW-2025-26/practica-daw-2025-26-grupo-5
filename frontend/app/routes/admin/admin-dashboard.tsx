@@ -95,11 +95,39 @@ export default function AdminDashboard({ loaderData }: Readonly<{ loaderData: an
               <div className="d-flex justify-content-between align-items-center mb-4">
                 <div>
                   <h5 className="fw-800 mb-0">User Management</h5>
-                  <p className="text-muted small mb-0">Total: {numUsers} • Banned: {numBanneds}</p>
+                  <p className="text-muted small mb-0">Moderate access and user permissions.</p>
                 </div>
                 <Link to="/admin/users" className="btn btn-sm btn-outline-primary">
                   View All
                 </Link>
+              </div>
+
+              {/* User Stats Grid */}
+              <div className="row g-3 mb-4">
+                <div className="col-6 col-md-3">
+                  <div style={{ textAlign: 'center', padding: '12px', backgroundColor: '#f5f7fa', borderRadius: '8px' }}>
+                    <p className="text-muted small mb-1">Total Users</p>
+                    <h5 className="fw-800 mb-0" style={{ fontSize: '24px' }}>{numUsers}</h5>
+                  </div>
+                </div>
+                <div className="col-6 col-md-3">
+                  <div style={{ textAlign: 'center', padding: '12px', backgroundColor: '#f5f7fa', borderRadius: '8px' }}>
+                    <p className="text-muted small mb-1">Active Users</p>
+                    <h5 className="fw-800 mb-0" style={{ fontSize: '24px', color: '#059669' }}>{activeUsers}</h5>
+                  </div>
+                </div>
+                <div className="col-6 col-md-3">
+                  <div style={{ textAlign: 'center', padding: '12px', backgroundColor: '#f5f7fa', borderRadius: '8px' }}>
+                    <p className="text-muted small mb-1">Banned Users</p>
+                    <h5 className="fw-800 mb-0" style={{ fontSize: '24px', color: '#dc2626' }}>{numBanneds}</h5>
+                  </div>
+                </div>
+                <div className="col-6 col-md-3">
+                  <div style={{ textAlign: 'center', padding: '12px', backgroundColor: '#f5f7fa', borderRadius: '8px' }}>
+                    <p className="text-muted small mb-1">Active Rate</p>
+                    <h5 className="fw-800 mb-0" style={{ fontSize: '24px', color: '#0369a1' }}>{numUsers > 0 ? ((activeUsers / numUsers) * 100).toFixed(0) : 0}%</h5>
+                  </div>
+                </div>
               </div>
               
               {users.length > 0 ? (

@@ -66,10 +66,6 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
     if (!selectedUser) return;
     setIsLoading(true);
     try {
-      // Si el backend espera un DTO normal, enviamos el objeto.
-      // Si espera FormData por la foto, habría que ajustarlo (asumo que updateUser maneja el objeto o formData según tu service)
-      // Por simplicidad, asumo que `updateUser` acepta el objeto con los datos y que la subida de foto es un endpoint aparte o va en FormData.
-      // Aquí armamos un FormData para incluir la foto si existe.
       const formData = new FormData();
       formData.append('name', editFormData.name);
       formData.append('email', editFormData.email);
@@ -79,11 +75,20 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
       formData.append('cardCvv', editFormData.cardCvv);
       
       if (selectedPhoto) {
-        formData.append('profileImage', selectedPhoto);
+        formData.append('newProfilePhoto', selectedPhoto);
       }
 
-      // IMPORTANTE: Asegúrate de que `updateUser` en admin-service.ts esté preparado para recibir FormData si vas a enviar archivos.
-      const updatedUser = await updateUser(selectedUser.id, formData as any); // Type assertion temporal, revisa tu servicio
+      // Debug logging
+      console.log('Sending FormData:', {
+        email: editFormData.email,
+        description: editFormData.description,
+        cardNumber: editFormData.cardNumber,
+        cardExpiringDate: editFormData.cardExpiringDate,
+        cardCvv: editFormData.cardCvv,
+        hasPhoto: !!selectedPhoto
+      });
+
+      const updatedUser = await updateUser(selectedUser.id, formData as any);
       
       setRowData((prev) =>
         prev.map((u) => (u.id === selectedUser.id ? updatedUser : u))

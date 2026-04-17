@@ -216,6 +216,7 @@ public class AdminService {
     @Transactional
     public void updateUserAsAdmin(Long id,
             MultipartFile newProfilePhoto,
+            String name,
             String email,
             String cardNumber,
             String cardCvv,
@@ -233,6 +234,8 @@ public class AdminService {
         }
 
         // STEP 3: Conditionally update billing and profile fields (only if not blank)
+        if (name != null && !name.trim().isEmpty())
+            user.setName(name);
         if (email != null && !email.trim().isEmpty())
             user.setEmail(email);
         if (cardNumber != null && !cardNumber.trim().isEmpty())
@@ -242,7 +245,7 @@ public class AdminService {
         if (cardExpiringDate != null && !cardExpiringDate.trim().isEmpty())
             user.setCardExpiringDate(cardExpiringDate);
         if (description != null && !description.trim().isEmpty())
-            user.setUserDescription(description);
+            user.setDescription(description);
 
         // STEP 4: Persist updated user to database
         userRepository.save(user);

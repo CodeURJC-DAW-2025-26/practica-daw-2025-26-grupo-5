@@ -20,11 +20,14 @@ public interface UserMapper {
 
     /**
      * Convert User entity to UserDTO for API responses.
-     * Excludes all sensitive fields (password, card, etc.).
+     * Excludes password and profile image, but includes card data for admin use.
      * @param user the User entity to convert
      * @return UserDTO with id, name, email, and public profile data
      */
     @Mapping(source = "userId", target = "id")
+    @Mapping(source = "cardNumber", target = "cardNumber")
+    @Mapping(source = "cardCvv", target = "cardCvv")
+    @Mapping(source = "cardExpiringDate", target = "cardExpiringDate")
     UserDTO toDTO(User user);
     
     /**

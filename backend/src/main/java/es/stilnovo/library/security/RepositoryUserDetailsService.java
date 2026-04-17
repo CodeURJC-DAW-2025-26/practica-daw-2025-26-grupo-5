@@ -26,10 +26,10 @@ public class RepositoryUserDetailsService implements UserDetailsService {
 
     /**
      * Load user details from database for authentication
-     * Blocks banned users from gaining access
+     * NOTE: Banned users ARE allowed to login (ban check happens in frontend)
      * @param username the username to look up
      * @return UserDetails with credentials and authorities
-     * @throws UsernameNotFoundException if user not found or is banned
+     * @throws UsernameNotFoundException if user not found
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -38,18 +38,14 @@ public class RepositoryUserDetailsService implements UserDetailsService {
         User user = userRepository.findByName(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        // STEP 2: Security gate - block banned users
-        if (user.isBanned()) {
-            throw new UsernameNotFoundException("User is banned");
-        }
-
-        // STEP 3: Convert user roles to Spring Security authorities
+        // STEP 2: Convert user roles to Spring Security authorities
         List<GrantedAuthority> roles = new ArrayList<>();
         for (String role : user.getRoles()) {
             roles.add(new SimpleGrantedAuthority(role));
         }
 
-        // STEP 4: Return UserDetails object for authentication
+        // STEP 3: Return UserDetails object for authentication
+        // NOTE: Frontend will check user.banned field and redirect to /banned if needed
         return new org.springframework.security.core.userdetails.User(
                 user.getName(),
                 user.getEncodedPassword(),
