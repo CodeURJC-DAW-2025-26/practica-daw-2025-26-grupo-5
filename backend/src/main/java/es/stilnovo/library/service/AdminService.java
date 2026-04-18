@@ -116,19 +116,29 @@ public class AdminService {
     /**
      * Prepares admin dashboard data: system statistics and preview samples.
      * Shows overview of users, products, and system resources.
-     * Filters out "Sold" products to match Global Inventory view.
+     * 
+     * Active Listings: Products that can be purchased (status="Active", seller not banned)
+     * Products: Total products in DB including all statuses (Active, Inactive, Banned, Hidden, Sold)
      */
     @Transactional(readOnly = true)
     public AdminPanelData getAdminPanelData() {
         // Fetch recent users (limited to 3) for dashboard widget
         List<User> dashboardUsers = userService.findAll().stream().limit(3).toList();
-        // Fetch only ACTIVE/INACTIVE products (exclude "Sold") for dashboard display
-        // This ensures consistency with Global Inventory page
-        List<Product> dashboardProducts = getAllProducts().stream()
-                .filter(p -> !"Sold".equalsIgnoreCase(p.getStatus()))
+        
+        // ACTIVE LISTINGS = products ready for sale (Active status, seller not banned)
+        List<Product> activeListings = getAllProducts().stream()
+                .filter(p -> "Active".equalsIgnoreCase(p.getStatus()))
+                .filter(p -> !p.getSeller().isBanned())
                 .toList();
-        // Count only ACTIVE/INACTIVE products (exclude "Sold") for accurate KPI display
-        int totalProducts = (int) dashboardProducts.size();
+        
+        // PRODUCTS = ALL products in database (Active, Inactive, Banned, Hidden, Sold)
+        // This is the total historical count of products ever created
+        List<Product> allProducts = getAllProducts();
+        
+        // Display active listings as preview on dashboard
+        int totalProducts = (int) allProducts.size();
+        int activeListingsCount = (int) activeListings.size();
+        
         // Calculate total revenue from completed transactions
         double totalRevenue = transactionService.getTotalRevenue();
         // Calculate JVM memory usage: (total - free) = used memory in MB
@@ -137,7 +147,7 @@ public class AdminService {
                 getNumTotalUsers(),
                 getNumBanneds(),
                 dashboardUsers,
-                dashboardProducts,
+                activeListings,
                 usedMemory + " MB",
                 totalProducts,
                 totalRevenue);
@@ -149,17 +159,16 @@ public class AdminService {
     }
 
     /**
-     * Retrieves paginated inventory view of unsold products only.
-     * Filters out "Sold" products from the inventory display.
+     * Retrieves paginated inventory view of ALL products.
+     * Includes products with any status: Active, Inactive, Banned, Hidden, Sold.
+     * This is the complete product catalog for admin audit and management.
      */
     @Transactional(readOnly = true)
     public Page<Product> getInventoryPage(Pageable pageable) {
-        // Stream all products and filter: keep only Active/Inactive statuses, exclude Sold
-        List<Product> productsToDisplay = getAllProducts().stream()
-                .filter(p -> !"Sold".equalsIgnoreCase(p.getStatus()))
-                .toList();
-        // Convert filtered list to Page object with pagination info (size, number, etc)
-        return toPage(productsToDisplay, pageable);
+        // Return ALL products including Sold status for complete inventory management
+        List<Product> allProducts = getAllProducts();
+        // Convert list to Page object with pagination info (size, number, etc)
+        return toPage(allProducts, pageable);
     }
 
     @Transactional(readOnly = true)

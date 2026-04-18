@@ -19,11 +19,14 @@ public interface ValorationMapper {
 
     /**
      * Convert Valoration (review/rating) entity to ValorationDTO.
-     * Flattens nested buyer name and transaction ID for API simplicity.
+     * Flattens nested buyer name, seller name, and transaction ID for API simplicity.
+     * Maps stars field from entity to rating in DTO.
      * @param valoration the source Valoration entity
-     * @return ValorationDTO with flattened buyer/transaction references
+     * @return ValorationDTO with flattened buyer/seller/transaction references
      */
+    @Mapping(source = "stars", target = "rating")
     @Mapping(source = "buyer.name", target = "buyerName")
+    @Mapping(source = "seller.name", target = "sellerName")
     @Mapping(source = "transaction.transactionId", target = "transactionId")
     ValorationDTO toDTO(Valoration valoration);
     

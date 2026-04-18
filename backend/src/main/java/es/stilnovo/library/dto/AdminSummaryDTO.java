@@ -30,8 +30,11 @@ public record AdminSummaryDTO(
         @Schema(description = "List of recently added products")
         List<ProductDTO> recentProducts,
         
-        @Schema(description = "Total count of all products in the system", example = "7")
+        @Schema(description = "Total count of all products in the system (including Sold)", example = "8")
         int totalProductCount,
+        
+        @Schema(description = "Count of active listings ready for purchase (status=Active, seller not banned)", example = "6")
+        int activeListingCount,
 
         @Schema(description = "Total revenue from completed transactions", example = "45798.00")
         double totalRevenue,

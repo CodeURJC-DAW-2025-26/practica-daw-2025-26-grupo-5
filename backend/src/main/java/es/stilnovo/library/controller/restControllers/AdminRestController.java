@@ -107,6 +107,9 @@ public class AdminRestController {
         int totalTransactions = transactionService.getTotalNumOfTransactions();
         double averageTransactionValue = totalTransactions > 0 ? panelData.totalRevenue() / totalTransactions : 0.0;
         
+        // Count active listings (panelData.products contains only Active status items)
+        int activeListingCount = panelData.products().size();
+        
         return new AdminSummaryDTO(
                 panelData.numUsers(),
                 panelData.numBanneds(),
@@ -114,6 +117,7 @@ public class AdminRestController {
                 userMapper.toDTOs(panelData.users()),
                 productMapper.toDTOs(panelData.products()),
                 panelData.totalProductCount(),
+                activeListingCount,
                 panelData.totalRevenue(),
                 globalAvgRating,
                 totalTransactions,

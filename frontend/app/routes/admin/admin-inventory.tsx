@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { redirect } from 'react-router';
+import { redirect, useRevalidator } from 'react-router';
 import { getAdminProducts, deleteProduct, createProduct, updateProduct, getAdminUsers } from '~/services/admin-service';
 import type ProductDTO from '~/dto/ProductDTO';
 import type UserDTO from '~/dto/UserDTO';
@@ -10,7 +10,7 @@ import { Modal, Form, Button } from 'react-bootstrap';
 
 export async function clientLoader() {
   try {
-    const data = await getAdminProducts(0, 100);
+    const data = await getAdminProducts(0, 1000); // Load ALL products for accurate KPI calculation
     return data || {};
   } catch (error) {
     console.error('Failed to fetch admin products:', error);
@@ -19,6 +19,7 @@ export async function clientLoader() {
 }
 
 export default function AdminInventory({ loaderData }: { readonly loaderData: any }) {
+  const revalidator = useRevalidator();
   const pagedData = loaderData as PagedResponse<ProductDTO>;
   const products = pagedData.content || [];
 
@@ -56,6 +57,13 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
       })
       .catch(err => console.error('Error fetching users:', err));
   }, []);
+
+  // Sync rowData with loaderData when it changes (e.g., after revalidator.revalidate())
+  useEffect(() => {
+    const newProducts = pagedData.content || [];
+    setRowData(newProducts);
+    setCurrentPage(0); // Reset to first page
+  }, [pagedData.content]);
 
   const handleAddProduct = () => {
     setFormError(null);
@@ -107,11 +115,13 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
         setShowAddModal(false);
         setIsEditingProduct(false);
         setSelectedProduct(null);
+        revalidator.revalidate(); // Refresh loader data
       } else {
         // Crear nuevo producto
         const newProduct = await createProduct(formData);
         setRowData((prev) => [newProduct, ...prev]);
         setShowAddModal(false);
+        revalidator.revalidate(); // Refresh loader data
       }
     } catch (error: any) {
       setFormError(error.response?.data?.message || (isEditingProduct ? 'Failed to update product. Please try again.' : 'Failed to create product. Please try again.'));
@@ -134,6 +144,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
       setRowData((prev) => prev.filter((p) => p.id !== selectedProduct.id));
       setShowDeleteModal(false);
       setSelectedProduct(null);
+      revalidator.revalidate(); // Refresh loader data
     } catch (error) {
       console.error('Failed to delete product:', error);
       alert('Failed to delete product. Please try again.');
@@ -156,6 +167,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
       
       const updatedProduct = await updateProduct(product.id, formData);
       setRowData((prev) => prev.map((p) => (p.id === product.id ? updatedProduct : p)));
+      revalidator.revalidate(); // Refresh loader data
     } catch (error) {
       console.error('Failed to ban product:', error);
       alert('Failed to ban product. Please try again.');
@@ -164,8 +176,10 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
     }
   };
 
-  const totalProducts = rowData.length;
-  const averagePrice = totalProducts > 0 ? rowData.reduce((sum, p) => sum + (p.price || 0), 0) / totalProducts : 0;
+  const totalProducts = pagedData.totalElements || 0;
+  // Count active listings from ALL loaded products (rowData contains all products loaded in the page)
+  const activeListings = rowData.filter(p => p.status?.toLowerCase() === "active").length;
+  const averagePrice = rowData.length > 0 ? rowData.reduce((sum, p) => sum + (p.price || 0), 0) / rowData.length : 0;
   const totalValue = rowData.reduce((sum, p) => sum + (p.price || 0), 0);
 
   const paginatedData = rowData.slice(
@@ -184,21 +198,28 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
       <div className="container-fluid">
         {/* KPI Row */}
         <div className="row g-4 mb-4">
-          <div className="col-12 col-sm-6 col-lg-4">
+          <div className="col-12 col-sm-6 col-lg-3">
             <div className="clay-card p-4 text-center shadow-sm">
               <i className="fa-solid fa-box" style={{ fontSize: '2rem', color: '#7c3aed', marginBottom: '8px', display: 'block' }} />
               <p className="text-muted small mb-1">Total Products</p>
               <h3 className="fw-800 mb-0" style={{ color: '#7c3aed' }}>{totalProducts}</h3>
             </div>
           </div>
-          <div className="col-12 col-sm-6 col-lg-4">
+          <div className="col-12 col-sm-6 col-lg-3">
+            <div className="clay-card p-4 text-center shadow-sm">
+              <i className="fa-solid fa-check-circle" style={{ fontSize: '2rem', color: '#ea580c', marginBottom: '8px', display: 'block' }} />
+              <p className="text-muted small mb-1">Active Listings</p>
+              <h3 className="fw-800 mb-0" style={{ color: '#ea580c' }}>{activeListings}</h3>
+            </div>
+          </div>
+          <div className="col-12 col-sm-6 col-lg-3">
             <div className="clay-card p-4 text-center shadow-sm">
               <i className="fa-solid fa-euro-sign" style={{ fontSize: '2rem', color: '#059669', marginBottom: '8px', display: 'block' }} />
               <p className="text-muted small mb-1">Average Price</p>
               <h3 className="fw-800 mb-0" style={{ color: '#059669' }}>€{averagePrice.toFixed(0)}</h3>
             </div>
           </div>
-          <div className="col-12 col-sm-6 col-lg-4">
+          <div className="col-12 col-sm-6 col-lg-3">
             <div className="clay-card p-4 text-center shadow-sm">
               <i className="fa-solid fa-chart-line" style={{ fontSize: '2rem', color: '#0369a1', marginBottom: '8px', display: 'block' }} />
               <p className="text-muted small mb-1">Total Value</p>

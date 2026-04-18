@@ -19,6 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import es.stilnovo.library.dto.PagedResponse;
 import es.stilnovo.library.dto.ValorationDTO;
+import es.stilnovo.library.dto.ValorationCreateRequestDTO;
 import es.stilnovo.library.dto.ValorationMapper;
 import es.stilnovo.library.service.UserService;
 import es.stilnovo.library.service.ValorationService;
@@ -81,7 +82,7 @@ public class ValorationRestController {
      * Submits a new valoration for a completed transaction.
      * The buyer identity is automatically resolved from the security context.
      *
-     * @param dto       The valoration data including stars, comment, and
+     * @param dto       The valoration data including rating, comment, and
      * transactionId.
      * @param principal The security context of the authenticated buyer.
      * @return ResponseEntity with 201 Created status, the URI of the new resource,
@@ -95,7 +96,7 @@ public class ValorationRestController {
         @ApiResponse(responseCode = "401", description = "Unauthorized user"),
         @ApiResponse(responseCode = "404", description = "Transaction not found")
     })
-    public ResponseEntity<ValorationDTO> createValoration(@RequestBody ValorationDTO dto, Principal principal) {
+    public ResponseEntity<ValorationDTO> createValoration(@RequestBody ValorationCreateRequestDTO dto, Principal principal) {
         // 1. Resolve buyer from current session
         var buyer = userService.findByName(principal.getName())
                 .orElseThrow(() -> new RuntimeException("User not found: " + principal.getName()));
@@ -121,7 +122,7 @@ public class ValorationRestController {
      * @return ResponseEntity containing the updated ValorationDTO.
      */
     @PatchMapping("/{id}")
-    @Operation(summary = "Update a valoration", description = "Updates an existing valoration (stars and comment)")
+    @Operation(summary = "Update a valoration", description = "Updates an existing valoration (rating and comment)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Valoration updated successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid input data"),
@@ -131,7 +132,7 @@ public class ValorationRestController {
     })
     public ResponseEntity<ValorationDTO> updateValoration(
             @PathVariable Long id,
-            @RequestBody ValorationDTO dto,
+            @RequestBody ValorationCreateRequestDTO dto,
             Principal principal) {
 
         

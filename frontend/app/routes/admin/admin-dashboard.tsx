@@ -23,7 +23,8 @@ export default function AdminDashboard({ loaderData }: Readonly<{ loaderData: an
   const summary = loaderData || {};
   const numUsers = summary?.numUsers || 0;
   const numBanneds = summary?.numBanneds || 0;
-  const totalProducts = (summary?.totalProductCount || summary?.recentProducts?.length) || 0;
+  const totalProducts = (summary?.totalProductCount || 0);
+  const activeListings = (summary?.activeListingCount || 0);
   const memoryUsageStr = summary?.memoryUsage || "0 MB";
   const memoryUsage = Number.parseInt(memoryUsageStr.toString()) || 0;
   const users = summary?.recentUsers || [];
@@ -346,7 +347,7 @@ export default function AdminDashboard({ loaderData }: Readonly<{ loaderData: an
             <div className="clay-card p-4 text-center shadow-sm">
               <i className="fa-solid fa-chart-line" style={{ fontSize: '2rem', color: '#059669', marginBottom: '8px', display: 'block' }} />
               <p className="text-muted small mb-1">Active Listings</p>
-              <h3 className="fw-800 mb-0" style={{ color: '#059669' }}>{totalProducts}</h3>
+              <h3 className="fw-800 mb-0" style={{ color: '#059669' }}>{activeListings}</h3>
             </div>
           </div>
           <div className="col-12 col-sm-6 col-lg-3">
