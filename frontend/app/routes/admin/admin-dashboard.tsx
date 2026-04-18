@@ -44,6 +44,10 @@ export default function AdminDashboard({ loaderData }: Readonly<{ loaderData: an
     categoryMap[cat] = (categoryMap[cat] || 0) + 1;
   });
 
+  // Active products only (for dashboard display)
+  const activeProducts = products.filter((p: any) => p.status?.toLowerCase() === "active");
+  const activeProductsCount = activeProducts.length;
+
   // Main KPIs (4 columns - simple and clean)
   const mainKPIs: readonly KPIData[] = [
     { label: 'TOTAL REVENUE', value: `${totalRevenue.toFixed(2)} €`, color: '#059669', icon: 'fa-euro-sign' },
@@ -213,15 +217,15 @@ export default function AdminDashboard({ loaderData }: Readonly<{ loaderData: an
           </div>
         </div>
 
-        {/* ROW 3: Global Inventory + System Status */}
+        {/* ROW 3: Active Listings + System Status */}
         <div className="row g-4 mb-4">
-          {/* Global Inventory */}
+          {/* Active Listings Products */}
           <div className="col-12 col-lg-8">
             <div className="clay-card p-4 shadow-sm">
               <div className="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                  <h5 className="fw-800 mb-0">Global Inventory</h5>
-                  <p className="text-muted small mb-0">{totalProducts} products total</p>
+                  <h5 className="fw-800 mb-0">Active Listings Products</h5>
+                  <p className="text-muted small mb-0">{activeProductsCount} products</p>
                 </div>
                 <div className="gap-2" style={{ display: 'flex' }}>
                   <Link to="/admin/inventory" className="btn btn-sm btn-outline-primary">
@@ -230,7 +234,7 @@ export default function AdminDashboard({ loaderData }: Readonly<{ loaderData: an
                 </div>
               </div>
               
-              {products.length > 0 ? (
+              {activeProducts.length > 0 ? (
                 <div style={{ overflowX: 'auto' }}>
                   <table className="table table-sm table-hover mb-0">
                     <thead style={{ backgroundColor: '#f5f7fa' }}>
@@ -242,7 +246,7 @@ export default function AdminDashboard({ loaderData }: Readonly<{ loaderData: an
                       </tr>
                     </thead>
                     <tbody>
-                      {products.slice(0, 8).map((product: any) => (
+                      {activeProducts.slice(0, 8).map((product: any) => (
                         <tr key={product.id}>
                           <td>
                             <div className="d-flex align-items-center gap-2">
@@ -267,7 +271,7 @@ export default function AdminDashboard({ loaderData }: Readonly<{ loaderData: an
                   </table>
                 </div>
               ) : (
-                <p className="text-muted text-center py-4">No products available</p>
+                <p className="text-muted text-center py-4">No active products available</p>
               )}
             </div>
           </div>
