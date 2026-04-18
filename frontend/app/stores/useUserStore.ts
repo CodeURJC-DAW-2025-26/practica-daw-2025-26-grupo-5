@@ -13,6 +13,7 @@ interface UserState {
   loadLoggedUser: () => Promise<void>;
   loginUser: (username: string, password: string) => Promise<void>;
   logoutUser: () => Promise<void>;
+  setUser: (user: UserDTO | null) => void;
 }
 
 /**
@@ -74,5 +75,12 @@ export const useUserStore = create<UserState>((set, get) => ({
       console.error("Logout error:", error);
       set({ loginError: "Logout failed. Please try again.", isAuthLoading: false });
     }
+  },
+
+  /**
+   * Directly set user data (for profile updates)
+   */
+  setUser: (user: UserDTO | null) => {
+    set({ user });
   },
 }));

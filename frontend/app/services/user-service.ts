@@ -1,4 +1,5 @@
 import axios from "axios";
+import type UserDTO from "~/dto/UserDTO";
 
 /**
  * Fetch dashboard statistics for the logged-in user
@@ -36,5 +37,19 @@ export async function getUserProfile(userId: string | number) {
 export async function getUserPhoto(userId: string | number){
 
     const response = await axios.get(`/api/v1/users/${userId}/profile-photo`);
+    return response.data;
+}
+
+/**
+ * Update user settings (profile, email, card info, etc.)
+ */
+export async function updateUserSettings(formData: FormData): Promise<UserDTO> {
+    const token = localStorage.getItem('token');
+    const response = await axios.patch<UserDTO>("/api/v1/users/me/profile", formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`,
+        },
+    });
     return response.data;
 }

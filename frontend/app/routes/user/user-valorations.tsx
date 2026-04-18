@@ -133,8 +133,8 @@ export default function UserValorations() {
 
       {/* Pending Valorations Section */}
       {pendingCount > 0 ? (
-        <div className="clay-card p-4 mb-5 shadow-sm">
-          <div className="d-flex align-items-center gap-3 mb-4">
+        <div className="clay-card p-3 mb-4 shadow-sm">
+          <div className="d-flex align-items-center gap-3 mb-3">
             <div style={{ fontSize: '1.5rem', color: '#f59e0b' }}>
               <i className="fa-solid fa-hourglass-end"></i>
             </div>
@@ -143,24 +143,24 @@ export default function UserValorations() {
               <p className="text-muted small mb-0">You have {pendingCount} purchase{pendingCount !== 1 ? 's' : ''} waiting for your feedback.</p>
             </div>
           </div>
-          <div className="d-flex flex-column gap-3">
+          <div className="d-flex flex-column gap-2">
             {transactions.map((transaction: any) => (
-              <div key={transaction.transactionId} className="border rounded-3 p-3 d-flex justify-content-between align-items-center bg-light">
+              <div key={transaction.transactionId} className="border rounded-2 p-2 d-flex justify-content-between align-items-center bg-light">
                 <div>
-                  <h6 className="fw-700 mb-1">{transaction.product?.name}</h6>
-                  <p className="text-muted small mb-0">
+                  <h6 className="fw-700 mb-0 small">{transaction.product?.name}</h6>
+                  <p className="text-muted x-small mb-0">
                     Seller: <span className="fw-600">{transaction.seller?.name}</span>
                   </p>
                 </div>
-                <Link to="/user/sales-orders" className="btn-about py-2 px-3 small d-flex align-items-center gap-2">
-                  <i className="fa-solid fa-star"></i> Rate Now
+                <Link to="/user/sales-orders" className="btn-about py-1 px-3 x-small d-flex align-items-center gap-2" style={{ fontSize: '0.85rem' }}>
+                  <i className="fa-solid fa-star"></i> Rate
                 </Link>
               </div>
             ))}
           </div>
         </div>
       ) : (
-        <Alert variant="success" className="rounded-4 d-flex align-items-center gap-3 mb-5">
+        <Alert variant="success" className="rounded-4 d-flex align-items-center gap-3 mb-4">
           <div style={{ fontSize: '1.5rem' }}>
             <i className="fa-solid fa-check-circle"></i>
           </div>
@@ -172,47 +172,47 @@ export default function UserValorations() {
       )}
 
       {/* Completed Valorations Section */}
-      <div className="clay-card p-4 shadow-sm">
-        <h5 className="fw-800 h5 mb-4">Feedback for Sellers</h5>
+      <div className="clay-card p-3 shadow-sm">
+        <h5 className="fw-800 h5 mb-3">Feedback for Sellers</h5>
         
         {completedCount > 0 ? (
-          <div className="d-flex flex-column gap-4">
+          <div className="d-flex flex-column gap-3">
             {valorations.map((valoration: any) => (
-              <div key={valoration.id} className="border rounded-3 p-4 bg-light">
-                <div className="d-flex justify-content-between align-items-start mb-3">
+              <div key={valoration.id} className="border rounded-2 p-3 bg-light">
+                <div className="d-flex justify-content-between align-items-start mb-2">
                   <div>
-                    <h6 className="fw-800 mb-1">
+                    <h6 className="fw-800 mb-1 small">
                       Purchased: Product
                     </h6>
-                    <p className="text-muted small mb-2">
+                    <p className="text-muted x-small mb-0">
                       Seller: <span className="fw-600">{valoration.sellerName}</span>
                     </p>
                   </div>
                   <div className="text-end">
-                    <div className="mb-2">
+                    <div className="mb-1">
                       {[...Array(5)].map((_, i) => (
                         <i
                           key={i}
                           className={`fa-solid fa-star ${
                             i < (valoration.rating || 0) ? 'text-warning' : 'text-muted'
                           }`}
-                          style={{ fontSize: '1.1rem', marginRight: '4px' }}
+                          style={{ fontSize: '0.9rem', marginRight: '3px' }}
                         ></i>
                       ))}
                     </div>
-                    <span className="badge bg-light text-dark fw-700">{valoration.rating}/5</span>
+                    <span className="badge bg-light text-dark fw-700 small">{valoration.rating}/5</span>
                   </div>
                 </div>
-                <div className="bg-white p-3 rounded-2 border-start border-4" style={{ borderColor: '#2f6ced' }}>
-                  <p className="mb-0 small">"{valoration.comment}"</p>
+                <div className="bg-white p-2 rounded-2 border-start border-4" style={{ borderColor: '#2f6ced' }}>
+                  <p className="mb-0 x-small">"{valoration.comment}"</p>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-5 opacity-50">
-            <i className="fa-solid fa-comment-dots fa-3x mb-3 text-muted"></i>
-            <p className="small fw-600">No valorations yet. Complete a purchase and share your feedback!</p>
+          <div className="text-center py-3 opacity-50">
+            <i className="fa-solid fa-comment-dots fa-2x mb-2 text-muted"></i>
+            <p className="small fw-600 mb-0">No valorations yet. Complete a purchase and share your feedback!</p>
           </div>
         )}
       </div>
