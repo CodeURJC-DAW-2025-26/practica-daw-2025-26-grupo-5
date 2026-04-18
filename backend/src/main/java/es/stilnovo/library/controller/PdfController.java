@@ -370,7 +370,7 @@ public class PdfController {
     }
 
     private String formatCurrency(double a) {
-        return "$" + CURRENCY.format(a);
+        return "€" + CURRENCY.format(a);
     }
 
     private ResponseEntity<byte[]> pdfResponse(ByteArrayOutputStream os, String n) {

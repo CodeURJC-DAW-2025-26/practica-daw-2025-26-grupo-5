@@ -196,7 +196,7 @@ export default function UserStatistics({ loaderData }: { loaderData: any }) {
         <Col md={6} lg={3}>
           <div className="clay-card p-4 h-100">
             <p className="label-categories mb-1 text-uppercase small opacity-50">Total Sales</p>
-            <h2 className="fw-800 text-success">${loaderData.formattedTotalRevenue}</h2>
+            <h2 className="fw-800 text-success">€{loaderData.formattedTotalRevenue}</h2>
             <span className="text-muted fw-600 small">Cumulative earnings</span>
           </div>
         </Col>
@@ -210,7 +210,7 @@ export default function UserStatistics({ loaderData }: { loaderData: any }) {
         <Col md={6} lg={3}>
           <div className="clay-card p-4 h-100">
             <p className="label-categories mb-1 text-uppercase small opacity-50">Inventory Value</p>
-            <h2 className="fw-800 text-warning">${loaderData.formattedBalance}</h2>
+            <h2 className="fw-800 text-warning">€{loaderData.formattedBalance}</h2>
             <span className="text-muted fw-600 small">Active products worth</span>
           </div>
         </Col>
@@ -286,7 +286,7 @@ export default function UserStatistics({ loaderData }: { loaderData: any }) {
                   <tr key={sale.id}>
                     <td className="py-3">{sale.product?.name}</td>
                     <td className="opacity-50">{sale.product?.category}</td>
-                    <td className="text-success">${sale.product?.formattedPrice}</td>
+                    <td className="text-success">€{sale.product?.formattedPrice}</td>
                     <td>
                       <Badge pill bg="success-subtle" className="text-success px-3 py-2">
                         {sale.product?.status}
