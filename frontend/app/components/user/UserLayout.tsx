@@ -10,7 +10,7 @@ export default function UserLayout() {
         { to: "/user/valorations", label: "My Valorations", icon: "fa-star" },
         { to: "/user/statistics", label: "Statistics", icon: "fa-magnifying-glass-chart" },
         { to: "/user/settings", label: "Settings", icon: "fa-user-gear" },
-        //{ to: "/user-help-center", label: "Help Center", icon: "text-muted fa-solid fa-circle-question" },
+        { to: "/user/help-center", label: "Help Center", icon: "fa-circle-question" },
     ];
 
     return (

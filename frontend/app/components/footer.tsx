@@ -1,16 +1,25 @@
 import React, { useState } from 'react';
 import { Modal } from 'react-bootstrap';
-import { Link } from 'react-router'; // Corrected import for v7
+import { Link, useNavigate } from 'react-router'; // Corrected import for v7
 import logo from "../assets/logo.png";
 import '../app.css';
 import { useUserStore } from "~/stores/useUserStore";
 
 export default function Footer() {
+  const navigate = useNavigate();
   const [showHelp, setShowHelp] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showSafety, setShowSafety] = useState(false);
   const [showCookie, setShowCookie] = useState(false);
+
+  const handleHelpCenter = () => {
+    if (user) {
+      navigate('/user/help-center');
+    } else {
+      setShowHelp(true);
+    }
+  };
 
   const toggleHelp = () => setShowHelp(!showHelp);
   const toggleTerms = () => setShowTerms(!showTerms);
@@ -65,7 +74,7 @@ export default function Footer() {
             <div className="col-lg-2">
               <h6>SUPPORT</h6>
               <ul className="list-unstyled d-flex flex-column gap-3">
-                <li><span className="footer-link cursor-pointer" onClick={toggleHelp}>Help Center</span></li>
+                <li><span className="footer-link cursor-pointer" onClick={handleHelpCenter}>Help Center</span></li>
                 <li><span className="footer-link cursor-pointer" onClick={togglePrivacy}>Privacy Policy</span></li>
                 <li><span className="footer-link cursor-pointer" onClick={toggleCookie}>Cookies</span></li>
               </ul>

@@ -34,6 +34,7 @@ export default [
       route("user/valorations", "routes/user/user-valorations.tsx"),
       route("user/statistics", "routes/user/user-statistics.tsx"),
       route("user/settings", "routes/user/user-settings.tsx"),
+      route("user/help-center", "routes/user/user-help-center.tsx"),
 
       route("product/new", "routes/product/product-new.tsx"),
       route("product/:id/edit", "routes/product/product-edit.tsx"),

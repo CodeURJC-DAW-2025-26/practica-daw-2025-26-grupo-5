@@ -141,7 +141,7 @@ export default function SellerProfile({ loaderData }: Route.ComponentProps) {
                                     </div>
                                     <div className="text-warning small d-flex align-items-center gap-1 bg-light px-2 py-1 rounded-pill border">
                                         <i className="fa-solid fa-star"></i>
-                                        <span className="fw-800 text-dark">{val.stars}</span>
+                                        <span className="fw-800 text-dark">{val.rating}</span>
                                     </div>
                                 </div>
                                 <p className="small text-muted mb-0 lh-base" style={{ fontStyle: "italic" }}>
