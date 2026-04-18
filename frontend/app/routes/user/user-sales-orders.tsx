@@ -184,10 +184,10 @@ const UserSalesOrders = () => {
                                     <p className="small fw-700 mb-0">{selectedTransaction.product.location}</p>
                                 </div>
                                 <div className="d-grid gap-3">
-                                    <a className="btn-sell py-3 text-center text-decoration-none" href={`/api/v1/pdf/shipping-label/${selectedTransaction.transactionId}`} target="_blank">
+                                    <a className="btn-sell py-3 text-center text-decoration-none" href={`/api/v1/transactions/${selectedTransaction.transactionId}/shipping-label`} target="_blank">
                                         <i className="fa-solid fa-print me-2"></i> Shipping Label
                                     </a>
-                                    <a className="btn-about py-3 text-center text-decoration-none" href={`/api/v1/pdf/invoice/${selectedTransaction.transactionId}`} target="_blank">
+                                    <a className="btn-about py-3 text-center text-decoration-none" href={`/api/v1/transactions/${selectedTransaction.transactionId}/invoice`} target="_blank">
                                         <i className="fa-solid fa-file-invoice me-2"></i> Invoice
                                     </a>
                                 </div>

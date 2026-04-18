@@ -1,245 +1,221 @@
-import { useState } from "react";
-import { Link } from "react-router";
-import { Offcanvas, Modal, Button, Form, Badge } from "react-bootstrap";
-import type { Route } from "./+types/user-valorations";
-import {
-    getUserValorations,
-    getPendingValorations,
-    updateValoration,
-    deleteValoration,
-    submitValoration
-} from "~/services/valorations-service";
-import ConfirmModal from "~/components/confirm-modal";
-import type ValorationDTO from "~/dto/ValorationDTO";
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router';
+import { useUserStore } from '~/stores/useUserStore';
+import type ValorationDTO from '~/dto/ValorationDTO';
+import type TransactionDTO from '~/dto/TransactionDTO';
+import { Row, Col, Alert } from 'react-bootstrap';
 
-/**
- * Client-side loader: Pre-fetches the reviews and pending tasks.
- */
-export async function clientLoader() {
-    try {
-        const [completed, pending] = await Promise.all([
-            getUserValorations(),
-            getPendingValorations()
-        ]);
-        return { completed, pending };
-    } catch (error) {
-        console.error("Error loading user valorations:", error);
-        return { completed: [], pending: [] };
-    }
-}
+export default function UserValorations() {
+  const [valorations, setValorations] = useState<ValorationDTO[]>([]);
+  const [transactions, setTransactions] = useState<TransactionDTO[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export default function UserValorations({ loaderData }: Route.ComponentProps) {
-    // Local state for interactive UI updates
-    const [completedReviews, setCompletedReviews] = useState<ValorationDTO[]>(loaderData.completed);
-    const [pendingReviews, setPendingReviews] = useState(loaderData.pending);
-    
-    // UI control states
-    const [showMobileMenu, setShowMobileMenu] = useState(false);
-    const [isProcessing, setIsProcessing] = useState(false);
+  const { user } = useUserStore();
+  const navigate = useNavigate();
 
-    // Modal data management
-    const [editModal, setEditModal] = useState<{ show: boolean; data: ValorationDTO | null }>({ show: false, data: null });
-    const [rateModal, setRateModal] = useState<{ show: boolean; data: any }>({ show: false, data: null });
-    const [deleteModal, setDeleteModal] = useState<{ show: boolean; id: number | null }>({ show: false, id: null });
+  useEffect(() => {
+    if (!user) navigate('/login');
+  }, [user, navigate]);
 
-    /**
-     * Action: Updates an existing feedback record.
-     */
-    const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (!editModal.data) return;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch completed valorations
+        const valoResponse = await fetch('/api/v1/users/me/valorations?page=0&size=100', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
 
-        const formData = new FormData(e.currentTarget);
-        const id = editModal.data.id;
+        // Fetch transactions (to find pending ones)
+        const transResponse = await fetch('/api/v1/users/me/transactions', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
 
-        setIsProcessing(true);
-        try {
-            const updated = await updateValoration(id, {
-                stars: Number(formData.get("stars")),
-                comment: formData.get("comment") as string
-            });
-            // Update state: replace old record with the updated one
-            setCompletedReviews(prev => prev.map(v => v.id === id ? updated : v));
-            setEditModal({ show: false, data: null });
-        } finally {
-            setIsProcessing(false);
+        if (!valoResponse.ok || !transResponse.ok) {
+          if (valoResponse.status === 401 || transResponse.status === 401) {
+            throw new Error("Session expired.");
+          }
+          throw new Error("Could not load data.");
         }
+
+        const valoData = await valoResponse.json();
+        const transData = await transResponse.json();
+
+        setValorations(valoData.content || []);
+        
+        // Find pending purchases (orders that haven't been rated)
+        const purchasesWithValorations = new Set(
+          (valoData.content || []).map((v: any) => v.transactionId)
+        );
+        const pendingPurchases = (transData.orders || []).filter(
+          (order: any) => !purchasesWithValorations.has(order.transactionId)
+        );
+        
+        setTransactions(pendingPurchases);
+        setLoading(false);
+      } catch (err: any) {
+        setError(err.message);
+        setLoading(false);
+      }
     };
 
-    /**
-     * Action: Deletes a review via the ConfirmModal.
-     */
-    const handleConfirmDelete = async () => {
-        if (!deleteModal.id) return;
-        setIsProcessing(true);
-        try {
-            await deleteValoration(deleteModal.id);
-            // Remove from list instantly for better UX
-            setCompletedReviews(prev => prev.filter(v => v.id !== deleteModal.id));
-            setDeleteModal({ show: false, id: null });
-        } finally {
-            setIsProcessing(false);
-        }
-    };
+    if (user) fetchData();
+  }, [user]);
 
-    /**
-     * Action: Creates a new review for a pending transaction.
-     */
-    const handleRateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        const transactionId = rateModal.data.transactionId;
+  if (loading) return (
+    <div className="d-flex justify-content-center align-items-center vh-100 w-100">
+      <svg className="stn-loader" viewBox="25 25 50 50"><circle cx="50" cy="50" r="20"></circle></svg>
+    </div>
+  );
 
-        setIsProcessing(true);
-        try {
-            const newValoration = await submitValoration({
-                transactionId,
-                stars: Number(formData.get("stars")),
-                comment: formData.get("comment") as string
-            });
-            // Move item from 'Pending' to 'Completed'
-            setPendingReviews(prev => prev.filter((t: any) => t.transactionId !== transactionId));
-            setCompletedReviews(prev => [newValoration, ...prev]);
-            setRateModal({ show: false, data: null });
-        } finally {
-            setIsProcessing(false);
-        }
-    };
+  const completedCount = valorations.length;
+  const pendingCount = transactions.length;
+  const averageRating = valorations.length > 0
+    ? (valorations.reduce((sum: number, v: any) => sum + (v.rating || 0), 0) / valorations.length).toFixed(1)
+    : '0.0';
 
-    return (
-        <div className="d-flex min-vh-100 bg-light animate-fade-in">
-            {/* Sidebar is in user.tsx */}
-            {/* Main Content Area */}
-            <main className="flex-grow-1 p-4 p-md-5 overflow-auto">
-                <header className="d-flex justify-content-between align-items-center mb-5">
-                    <div>
-                        <h1 className="fw-800 h2">My Valorations</h1>
-                        <p className="text-muted small">Manage your feedback and rate your recent purchases.</p>
-                    </div>
-                </header>
-
-                {/* Section: Submitted Feedback */}
-                <section className="mb-5">
-                    <div className="d-flex align-items-center justify-content-between mb-4">
-                        <h3 className="fw-800 h5 mb-0"><i className="fa-solid fa-check-double me-2"></i>Completed Reviews</h3>
-                        <Badge pill bg="dark" className="px-3 py-2 fw-700">Total: {completedReviews.length}</Badge>
-                    </div>
-
-                    <div className="d-flex flex-column gap-3">
-                        {completedReviews.length > 0 ? (
-                            completedReviews.map((val) => (
-                                <div key={val.id} className="clay-card p-4 shadow-sm bg-white border-0">
-                                    <div className="d-flex justify-content-between mb-3">
-                                        <div>
-                                            <h6 className="fw-800 mb-0">Review for Order #{val.transactionId}</h6>
-                                            <span className="x-small text-muted">Submitted for: <span className="fw-700">{val.buyerName}</span></span>
-                                        </div>
-                                        <div className="d-flex gap-2">
-                                            <button className="btn-about p-2 rounded-3 text-dark border-0" onClick={() => setEditModal({ show: true, data: val })}>
-                                                <i className="fa-solid fa-pen-to-square"></i>
-                                            </button>
-                                            <button className="btn-about p-2 rounded-3 text-danger border-0 bg-white" onClick={() => setDeleteModal({ show: true, id: val.id })}>
-                                                <i className="fa-solid fa-trash-can"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div className="bg-light p-3 rounded-4">
-                                        <div className="text-warning mb-2 small">
-                                            <i className="fa-solid fa-star"></i> 
-                                            <span className="text-dark fw-800 ms-1">{val.stars}/5</span>
-                                        </div>
-                                        <p className="small text-muted mb-0 italic">"{val.comment}"</p>
-                                    </div>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="p-5 text-center opacity-50 border border-dashed rounded-4">
-                                <p className="small fw-700 mb-0">No reviews found in your history.</p>
-                            </div>
-                        )}
-                    </div>
-                </section>
-
-                <hr className="my-5 opacity-10" />
-
-                {/* Section: Pending Tasks */}
-                <section>
-                    <div className="d-flex align-items-center justify-content-between mb-4">
-                        <h3 className="fw-800 h5 mb-0 text-primary"><i className="fa-solid fa-clock-rotate-left me-2"></i>Pending for Rating</h3>
-                        <Badge pill bg="primary-subtle" className="text-primary px-3 py-2 fw-800 border">Waiting: {pendingReviews.length}</Badge>
-                    </div>
-                    <div className="d-flex flex-column gap-3 mb-5">
-                        {pendingReviews.length > 0 ? (
-                            pendingReviews.map((t: any) => (
-                                <div key={t.transactionId} className="clay-card p-3 d-flex align-items-center justify-content-between bg-white shadow-sm border-start border-primary border-4">
-                                    <div>
-                                        <h4 className="fw-800 h6 mb-1">Transaction #{t.transactionId}</h4>
-                                        <p className="x-small text-muted mb-0">Order status: <span className="text-success fw-700">Delivered</span></p>
-                                    </div>
-                                    <button className="btn-sell py-2 px-4 small shadow-sm border-0 d-flex align-items-center gap-2" onClick={() => setRateModal({ show: true, data: t })}>
-                                        <i className="fa-solid fa-star"></i> Rate
-                                    </button>
-                                </div>
-                            ))
-                        ) : (
-                            <div className="p-4 text-center opacity-50 border border-dashed rounded-4">
-                                <p className="small fw-700 mb-0">You're all caught up! No pending reviews.</p>
-                            </div>
-                        )}
-                    </div>
-                </section>
-            </main>
-
-            {/* --- Modals for Editing and Submitting Ratings --- */}
-            
-            <Modal show={editModal.show} onHide={() => setEditModal({ show: false, data: null })} centered>
-                <div className="clay-card modal-content p-4 border-0">
-                    <h3 className="fw-800 h5 mb-4 text-primary text-center">Edit Feedback</h3>
-                    <Form onSubmit={handleEditSubmit}>
-                        <Form.Group className="mb-3">
-                            <Form.Label className="fw-700 small">RATING</Form.Label>
-                            <Form.Control type="number" name="stars" min="1" max="5" defaultValue={editModal.data?.stars} className="rounded-pill bg-light border-0 text-center fw-800" required />
-                        </Form.Group>
-                        <Form.Group className="mb-4">
-                            <Form.Label className="fw-700 small">YOUR EXPERIENCE</Form.Label>
-                            <Form.Control as="textarea" name="comment" rows={3} defaultValue={editModal.data?.comment} className="rounded-4 bg-light border-0 p-3" required />
-                        </Form.Group>
-                        <Button type="submit" className="btn-sell w-100 py-3 border-0" disabled={isProcessing}>
-                            {isProcessing ? "Saving..." : "Update Review"}
-                        </Button>
-                    </Form>
-                </div>
-            </Modal>
-
-            <Modal show={rateModal.show} onHide={() => setRateModal({ show: false, data: null })} centered>
-                <div className="clay-card modal-content p-4 border-0">
-                    <h3 className="fw-800 h5 mb-4 text-primary text-center">Rate Purchase</h3>
-                    <Form onSubmit={handleRateSubmit}>
-                        <Form.Group className="mb-3">
-                            <Form.Label className="fw-700 small text-center d-block">STARS</Form.Label>
-                            <Form.Control type="number" name="stars" min="1" max="5" defaultValue="5" className="rounded-pill bg-light border-0 text-center fw-800" required />
-                        </Form.Group>
-                        <Form.Group className="mb-4">
-                            <Form.Label className="fw-700 small">COMMENT</Form.Label>
-                            <Form.Control as="textarea" name="comment" rows={3} placeholder="How was the product and delivery?" className="rounded-4 bg-light border-0 p-3" required />
-                        </Form.Group>
-                        <Button type="submit" className="btn-sell w-100 py-3 border-0" disabled={isProcessing}>
-                            {isProcessing ? "Submitting..." : "Submit Feedback"}
-                        </Button>
-                    </Form>
-                </div>
-            </Modal>
-
-            {/* Generic confirmation modal for destructive deletion */}
-            <ConfirmModal
-                show={deleteModal.show}
-                title="Delete Feedback?"
-                message="Are you sure? This review will be permanently removed from the seller's profile."
-                confirmText="Delete"
-                isLoading={isProcessing}
-                onConfirm={handleConfirmDelete}
-                onCancel={() => setDeleteModal({ show: false, id: null })}
-            />
+  return (
+    <main className="flex-grow-1 p-4 p-md-5 overflow-auto bg-light min-vh-100">
+      {/* Header */}
+      <header className="d-flex justify-content-between align-items-center mb-5">
+        <div>
+          <h1 className="fw-800 h2">My Valorations</h1>
+          <p className="text-muted small">Overview of your submitted feedback and pending actions.</p>
         </div>
-    );
+        {user && (
+          <Link to="/user/settings">
+            <img
+              src={`/api/v1/users/me/profile-photo?t=${Date.now()}`}
+              className="rounded-circle border border-2 shadow-sm"
+              width="48"
+              height="48"
+              alt="Profile"
+              onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')}
+            />
+          </Link>
+        )}
+      </header>
+
+      {error && <div className="alert alert-danger rounded-4">{error}</div>}
+
+      {/* KPI Cards */}
+      <Row className="g-4 mb-5">
+        <Col md={6} lg={4}>
+          <div className="clay-card p-4 h-100">
+            <p className="label-categories mb-1 text-uppercase small opacity-50">Completed Reviews</p>
+            <h2 className="fw-800 text-success">Total: {completedCount}</h2>
+            <span className="text-muted fw-600 small">Feedback submitted</span>
+          </div>
+        </Col>
+        <Col md={6} lg={4}>
+          <div className="clay-card p-4 h-100">
+            <p className="label-categories mb-1 text-uppercase small opacity-50">Pending for Rating</p>
+            <h2 className="fw-800 text-warning">Waiting: {pendingCount}</h2>
+            <span className="text-muted fw-600 small">Purchases to review</span>
+          </div>
+        </Col>
+        <Col md={6} lg={4}>
+          <div className="clay-card p-4 h-100">
+            <p className="label-categories mb-1 text-uppercase small opacity-50">Average Rating Given</p>
+            <h2 className="fw-800 text-info">{averageRating}⭐</h2>
+            <span className="text-muted fw-600 small">Your feedback score</span>
+          </div>
+        </Col>
+      </Row>
+
+      {/* Pending Valorations Section */}
+      {pendingCount > 0 ? (
+        <div className="clay-card p-4 mb-5 shadow-sm">
+          <div className="d-flex align-items-center gap-3 mb-4">
+            <div style={{ fontSize: '1.5rem', color: '#f59e0b' }}>
+              <i className="fa-solid fa-hourglass-end"></i>
+            </div>
+            <div>
+              <h5 className="fw-800 mb-1">Pending for Rating</h5>
+              <p className="text-muted small mb-0">You have {pendingCount} purchase{pendingCount !== 1 ? 's' : ''} waiting for your feedback.</p>
+            </div>
+          </div>
+          <div className="d-flex flex-column gap-3">
+            {transactions.map((transaction: any) => (
+              <div key={transaction.transactionId} className="border rounded-3 p-3 d-flex justify-content-between align-items-center bg-light">
+                <div>
+                  <h6 className="fw-700 mb-1">{transaction.product?.name}</h6>
+                  <p className="text-muted small mb-0">
+                    Seller: <span className="fw-600">{transaction.seller?.name}</span>
+                  </p>
+                </div>
+                <Link to="/user/sales-orders" className="btn-about py-2 px-3 small d-flex align-items-center gap-2">
+                  <i className="fa-solid fa-star"></i> Rate Now
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <Alert variant="success" className="rounded-4 d-flex align-items-center gap-3 mb-5">
+          <div style={{ fontSize: '1.5rem' }}>
+            <i className="fa-solid fa-check-circle"></i>
+          </div>
+          <div>
+            <h6 className="fw-800 mb-1">All Caught Up!</h6>
+            <p className="mb-0 small">All your purchases have been rated. Great!</p>
+          </div>
+        </Alert>
+      )}
+
+      {/* Completed Valorations Section */}
+      <div className="clay-card p-4 shadow-sm">
+        <h5 className="fw-800 h5 mb-4">Feedback for Sellers</h5>
+        
+        {completedCount > 0 ? (
+          <div className="d-flex flex-column gap-4">
+            {valorations.map((valoration: any) => (
+              <div key={valoration.id} className="border rounded-3 p-4 bg-light">
+                <div className="d-flex justify-content-between align-items-start mb-3">
+                  <div>
+                    <h6 className="fw-800 mb-1">
+                      Purchased: Product
+                    </h6>
+                    <p className="text-muted small mb-2">
+                      Seller: <span className="fw-600">{valoration.sellerName}</span>
+                    </p>
+                  </div>
+                  <div className="text-end">
+                    <div className="mb-2">
+                      {[...Array(5)].map((_, i) => (
+                        <i
+                          key={i}
+                          className={`fa-solid fa-star ${
+                            i < (valoration.rating || 0) ? 'text-warning' : 'text-muted'
+                          }`}
+                          style={{ fontSize: '1.1rem', marginRight: '4px' }}
+                        ></i>
+                      ))}
+                    </div>
+                    <span className="badge bg-light text-dark fw-700">{valoration.rating}/5</span>
+                  </div>
+                </div>
+                <div className="bg-white p-3 rounded-2 border-start border-4" style={{ borderColor: '#2f6ced' }}>
+                  <p className="mb-0 small">"{valoration.comment}"</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-5 opacity-50">
+            <i className="fa-solid fa-comment-dots fa-3x mb-3 text-muted"></i>
+            <p className="small fw-600">No valorations yet. Complete a purchase and share your feedback!</p>
+          </div>
+        )}
+      </div>
+    </main>
+  );
 }
