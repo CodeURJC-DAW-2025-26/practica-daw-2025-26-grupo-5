@@ -28,7 +28,6 @@ import es.stilnovo.library.dto.AdminProductCreateRequestDTO;
 import es.stilnovo.library.dto.AdminProductUpdateRequestDTO;
 import es.stilnovo.library.dto.AdminSummaryDTO;
 import es.stilnovo.library.dto.AdminUserBanRequestDTO;
-import es.stilnovo.library.dto.AdminUserUpdateRequestDTO;
 import es.stilnovo.library.dto.PagedResponse;
 import es.stilnovo.library.dto.ProductDTO;
 import es.stilnovo.library.dto.ProductMapper;
