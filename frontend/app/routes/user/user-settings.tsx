@@ -17,7 +17,7 @@ export default function UserSettings() {
   const { user, setUser } = useUserStore();
   const revalidator = useRevalidator();
   
-  const { register, handleSubmit, reset, watch, formState: { errors } } = useForm<SettingsFormData>({
+  const { register, handleSubmit, reset, watch } = useForm<SettingsFormData>({
     defaultValues: {
       email: user?.email || '',
       description: user?.description || '',
@@ -211,9 +211,9 @@ export default function UserSettings() {
                 <div className="search-box d-flex align-items-center bg-white">
                   <span className="fw-700">{user.rating ? user.rating.toFixed(1) : '0.0'} / 5</span>
                   <div className="ms-2">
-                    {[...Array(5)].map((_, i) => (
+                    {new Array(5).fill(0).map((_, i) => (
                       <i
-                        key={i}
+                        key={`star-${i}`}
                         className={`fa-solid fa-star ${i < Math.floor(user.rating || 0) ? 'text-warning' : 'text-muted'}`}
                         style={{ marginRight: '4px', fontSize: '0.9rem' }}
                       ></i>

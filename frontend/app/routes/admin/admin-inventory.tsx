@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import { redirect, useRevalidator } from 'react-router';
 import { getAdminProducts, deleteProduct, createProduct, updateProduct, getAdminUsers } from '~/services/admin-service';
 import type ProductDTO from '~/dto/ProductDTO';
@@ -7,6 +8,16 @@ import type PagedResponse from '~/dto/PagedResponse';
 import AdminHeader from '~/components/admin/AdminHeader';
 import ConfirmModal from '~/components/confirm-modal';
 import { Modal, Form, Button } from 'react-bootstrap';
+
+interface ProductFormData {
+  name: string;
+  category: string;
+  price: string;
+  location: string;
+  description: string;
+  status: string;
+  sellerId: string;
+}
 
 export async function clientLoader() {
   try {
@@ -23,8 +34,20 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
   const pagedData = loaderData as PagedResponse<ProductDTO>;
   const products = pagedData.content || [];
 
+  const { register, handleSubmit, reset } = useForm<ProductFormData>({
+    defaultValues: {
+      name: '',
+      category: '',
+      price: '',
+      location: '',
+      description: '',
+      status: 'Active',
+      sellerId: ''
+    },
+  });
+
   const [rowData, setRowData] = useState<ProductDTO[]>(products);
-  const [users, setUsers] = useState<UserDTO[]>([]); // Lista de usuarios para el selector
+  const [users, setUsers] = useState<UserDTO[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<ProductDTO | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -32,26 +55,22 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
   const [currentPage, setCurrentPage] = useState(0);
   const [formError, setFormError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
-  const [isEditingProduct, setIsEditingProduct] = useState(false); // Modo edición vs creación
+  const [isEditingProduct, setIsEditingProduct] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const itemsPerPage = 10;
 
-  // Estado del nuevo formulario de Admin
-  const [adminFormData, setAdminFormData] = useState({
-    name: '',
-    category: '',
-    price: '',
-    location: '',
-    description: '',
-    status: 'Active',
-    sellerId: ''
-  });
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const getFormButtonText = (): string => {
+    if (isPending) {
+      return isEditingProduct ? 'Updating...' : 'Creating...';
+    }
+    return isEditingProduct ? 'Update Product' : 'Create Product';
+  };
 
   // Cargar usuarios al montar el componente
   useEffect(() => {
     getAdminUsers(0, 100)
       .then(data => {
-        if (data && data.content) {
+        if (data?.content) {
           setUsers(data.content);
         }
       })
@@ -68,7 +87,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
   const handleAddProduct = () => {
     setFormError(null);
     setIsEditingProduct(false);
-    setAdminFormData({ name: '', category: '', price: '', location: '', description: '', status: 'Active', sellerId: '' });
+    reset({ name: '', category: '', price: '', location: '', description: '', status: 'Active', sellerId: '' });
     setSelectedFile(null);
     setShowAddModal(true);
   };
@@ -77,7 +96,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
     setFormError(null);
     setIsEditingProduct(true);
     setSelectedProduct(product);
-    setAdminFormData({
+    reset({
       name: product.name,
       category: product.category,
       price: String(product.price),
@@ -90,38 +109,35 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
     setShowAddModal(true);
   };
 
-  const handleFormSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onFormSubmit = async (formData: ProductFormData) => {
     setIsPending(true);
     setFormError(null);
 
-    const formData = new FormData();
-    formData.append('name', adminFormData.name);
-    formData.append('category', adminFormData.category);
-    formData.append('price', adminFormData.price);
-    formData.append('location', adminFormData.location);
-    formData.append('description', adminFormData.description);
-    formData.append('status', adminFormData.status);
-    formData.append('sellerId', adminFormData.sellerId); // ID del dueño elegido
+    const formDataObj = new FormData();
+    formDataObj.append('name', formData.name);
+    formDataObj.append('category', formData.category);
+    formDataObj.append('price', formData.price);
+    formDataObj.append('location', formData.location);
+    formDataObj.append('description', formData.description);
+    formDataObj.append('status', formData.status);
+    formDataObj.append('sellerId', formData.sellerId);
     if (selectedFile) {
-      formData.append('image', selectedFile);
+      formDataObj.append('image', selectedFile);
     }
 
     try {
       if (isEditingProduct && selectedProduct) {
-        // Editar producto existente
-        const updatedProduct = await updateProduct(selectedProduct.id, formData);
+        const updatedProduct = await updateProduct(selectedProduct.id, formDataObj);
         setRowData((prev) => prev.map((p) => (p.id === selectedProduct.id ? updatedProduct : p)));
         setShowAddModal(false);
         setIsEditingProduct(false);
         setSelectedProduct(null);
-        revalidator.revalidate(); // Refresh loader data
+        revalidator.revalidate();
       } else {
-        // Crear nuevo producto
-        const newProduct = await createProduct(formData);
+        const newProduct = await createProduct(formDataObj);
         setRowData((prev) => [newProduct, ...prev]);
         setShowAddModal(false);
-        revalidator.revalidate(); // Refresh loader data
+        revalidator.revalidate();
       }
     } catch (error: any) {
       setFormError(error.response?.data?.message || (isEditingProduct ? 'Failed to update product. Please try again.' : 'Failed to create product. Please try again.'));
@@ -429,15 +445,14 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
         <Modal.Body className="p-4">
           {formError && <div className="alert alert-danger mb-4">{formError}</div>}
           
-          <Form onSubmit={handleFormSubmit}>
+          <Form onSubmit={handleSubmit(onFormSubmit)}>
             <div className="row">
               {/* SELLER (Usuario) */}
               <Form.Group className="col-md-6 mb-3">
                 <Form.Label className="fw-700 small text-uppercase text-muted" style={{ letterSpacing: '1px' }}>Seller</Form.Label>
                 <Form.Select 
                   required
-                  value={adminFormData.sellerId}
-                  onChange={(e) => setAdminFormData({...adminFormData, sellerId: e.target.value})}
+                  {...register('sellerId')}
                   className="rounded-3 py-2 bg-light border-0"
                 >
                   <option value="">Select user</option>
@@ -452,8 +467,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
                 <Form.Label className="fw-700 small text-uppercase text-muted" style={{ letterSpacing: '1px' }}>Product Name</Form.Label>
                 <Form.Control 
                   type="text" 
-                  value={adminFormData.name}
-                  onChange={(e) => setAdminFormData({...adminFormData, name: e.target.value})}
+                  {...register('name')}
                   required 
                   className="rounded-3 py-2 bg-light border-0"
                 />
@@ -466,8 +480,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
                 <Form.Label className="fw-700 small text-uppercase text-muted" style={{ letterSpacing: '1px' }}>Category</Form.Label>
                 <Form.Control 
                   type="text" 
-                  value={adminFormData.category}
-                  onChange={(e) => setAdminFormData({...adminFormData, category: e.target.value})}
+                  {...register('category')}
                   className="rounded-3 py-2 bg-light border-0"
                 />
               </Form.Group>
@@ -477,8 +490,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
                 <Form.Label className="fw-700 small text-uppercase text-muted" style={{ letterSpacing: '1px' }}>Price (€)</Form.Label>
                 <Form.Control 
                   type="number" 
-                  value={adminFormData.price}
-                  onChange={(e) => setAdminFormData({...adminFormData, price: e.target.value})}
+                  {...register('price')}
                   required 
                   className="rounded-3 py-2 bg-light border-0"
                 />
@@ -491,8 +503,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
                 <Form.Label className="fw-700 small text-uppercase text-muted" style={{ letterSpacing: '1px' }}>Location</Form.Label>
                 <Form.Control 
                   type="text" 
-                  value={adminFormData.location}
-                  onChange={(e) => setAdminFormData({...adminFormData, location: e.target.value})}
+                  {...register('location')}
                   className="rounded-3 py-2 bg-light border-0"
                 />
               </Form.Group>
@@ -501,8 +512,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
               <Form.Group className="col-md-6 mb-3">
                 <Form.Label className="fw-700 small text-uppercase text-muted" style={{ letterSpacing: '1px' }}>Status</Form.Label>
                 <Form.Select 
-                  value={adminFormData.status}
-                  onChange={(e) => setAdminFormData({...adminFormData, status: e.target.value})}
+                  {...register('status')}
                   className="rounded-3 py-2 bg-light border-0"
                 >
                   <option value="Active">Active</option>
@@ -518,8 +528,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
               <Form.Control 
                 as="textarea" 
                 rows={4} 
-                value={adminFormData.description}
-                onChange={(e) => setAdminFormData({...adminFormData, description: e.target.value})}
+                {...register('description')}
                 className="rounded-3 py-2 bg-light border-0"
               />
             </Form.Group>
@@ -554,7 +563,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
                 disabled={isPending}
                 style={{ backgroundColor: '#1e293b' }}
               >
-                {isPending ? (isEditingProduct ? 'Updating...' : 'Creating...') : (isEditingProduct ? 'Update Product' : 'Create Product')}
+                {getFormButtonText()}
               </Button>
             </div>
           </Form>

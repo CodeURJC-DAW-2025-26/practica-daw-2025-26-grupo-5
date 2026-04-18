@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { redirect, useRevalidator } from 'react-router';
 import { getAdminUsers, banUser, deleteUser, updateUser } from '~/services/admin-service';
 import { useUserStore } from '~/stores/useUserStore';
@@ -7,6 +8,15 @@ import type PagedResponse from '~/dto/PagedResponse';
 import AdminHeader from '~/components/admin/AdminHeader';
 import ConfirmModal from '~/components/confirm-modal';
 import { Modal, Form, Button } from 'react-bootstrap';
+
+interface UserEditFormData {
+  name: string;
+  email: string;
+  description: string;
+  cardNumber: string;
+  cardExpiringDate: string;
+  cardCvv: string;
+}
 
 export async function clientLoader() {
   try {
@@ -24,23 +34,24 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
   const users = pagedData.content || [];
   const loggedInUser = useUserStore((state) => state.user);
 
+  const { register, handleSubmit, reset } = useForm<UserEditFormData>({
+    defaultValues: {
+      name: '',
+      email: '',
+      description: '',
+      cardNumber: '',
+      cardExpiringDate: '',
+      cardCvv: '',
+    },
+  });
+
   const [rowData, setRowData] = useState<UserDTO[]>(users);
   const [selectedUser, setSelectedUser] = useState<UserDTO | null>(null);
   const [modalType, setModalType] = useState<'ban' | 'delete' | 'edit' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const itemsPerPage = 10;
-
-  // Estado del formulario de edición expandido
-  const [editFormData, setEditFormData] = useState({
-    name: '',
-    email: '',
-    description: '',
-    cardNumber: '',
-    cardExpiringDate: '',
-    cardCvv: '',
-  });
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
+  const itemsPerPage = 10;
 
   // Check if a user is admin
   const isUserAnAdmin = (user: UserDTO) => user.roles?.includes('ADMIN') || user.roles?.includes('ROLE_ADMIN');
@@ -51,7 +62,7 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
 
   const handleEditClick = (user: UserDTO) => {
     setSelectedUser(user);
-    setEditFormData({
+    reset({
       name: user.name || '',
       email: user.email || '',
       description: user.description || '',
@@ -63,33 +74,23 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
     setModalType('edit');
   };
 
-  const confirmEdit = async () => {
+  const onEditSubmit = async (formData: UserEditFormData) => {
     if (!selectedUser) return;
     setIsLoading(true);
     try {
-      const formData = new FormData();
-      formData.append('name', editFormData.name);
-      formData.append('email', editFormData.email);
-      formData.append('description', editFormData.description);
-      formData.append('cardNumber', editFormData.cardNumber);
-      formData.append('cardExpiringDate', editFormData.cardExpiringDate);
-      formData.append('cardCvv', editFormData.cardCvv);
+      const formDataObj = new FormData();
+      formDataObj.append('name', formData.name);
+      formDataObj.append('email', formData.email);
+      formDataObj.append('description', formData.description);
+      formDataObj.append('cardNumber', formData.cardNumber);
+      formDataObj.append('cardExpiringDate', formData.cardExpiringDate);
+      formDataObj.append('cardCvv', formData.cardCvv);
       
       if (selectedPhoto) {
-        formData.append('newProfilePhoto', selectedPhoto);
+        formDataObj.append('newProfilePhoto', selectedPhoto);
       }
 
-      // Debug logging
-      console.log('Sending FormData:', {
-        email: editFormData.email,
-        description: editFormData.description,
-        cardNumber: editFormData.cardNumber,
-        cardExpiringDate: editFormData.cardExpiringDate,
-        cardCvv: editFormData.cardCvv,
-        hasPhoto: !!selectedPhoto
-      });
-
-      const updatedUser = await updateUser(selectedUser.id, formData as any);
+      const updatedUser = await updateUser(selectedUser.id, formDataObj as any);
       
       setRowData((prev) =>
         prev.map((u) => (u.id === selectedUser.id ? updatedUser : u))
@@ -413,7 +414,7 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
           </Modal.Title>
         </Modal.Header>
         <Modal.Body className="p-4">
-          <Form>
+          <Form onSubmit={handleSubmit(onEditSubmit)}>
             <div className="row">
               {/* Columna Izquierda: Perfil y Bio */}
               <div className="col-md-5 d-flex flex-column align-items-center border-end pe-4">
@@ -446,8 +447,7 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
                     <Form.Control
                       type="text"
                       className="rounded-3 py-2 bg-light border-0"
-                      value={editFormData.name}
-                      onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                      {...register('name')}
                       disabled={isLoading}
                     />
                   </Form.Group>
@@ -458,8 +458,7 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
                       as="textarea"
                       rows={5}
                       className="rounded-3 py-2 bg-light border-0"
-                      value={editFormData.description}
-                      onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                      {...register('description')}
                       disabled={isLoading}
                     />
                   </Form.Group>
@@ -475,8 +474,7 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
                   <Form.Control
                     type="email"
                     className="rounded-3 py-2 bg-light border-0"
-                    value={editFormData.email}
-                    onChange={(e) => setEditFormData({ ...editFormData, email: e.target.value })}
+                    {...register('email')}
                     disabled={isLoading}
                   />
                 </Form.Group>
@@ -487,8 +485,7 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
                     type="text"
                     placeholder="xxxx xxxx xxxx xxxx"
                     className="rounded-3 py-2 bg-light border-0"
-                    value={editFormData.cardNumber}
-                    onChange={(e) => setEditFormData({ ...editFormData, cardNumber: e.target.value })}
+                    {...register('cardNumber')}
                     disabled={isLoading}
                   />
                 </Form.Group>
@@ -500,8 +497,7 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
                       type="text"
                       placeholder="MM/YY"
                       className="rounded-3 py-2 bg-light border-0"
-                      value={editFormData.cardExpiringDate}
-                      onChange={(e) => setEditFormData({ ...editFormData, cardExpiringDate: e.target.value })}
+                      {...register('cardExpiringDate')}
                       disabled={isLoading}
                     />
                   </Form.Group>
@@ -512,8 +508,7 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
                       type="text"
                       placeholder="123"
                       className="rounded-3 py-2 bg-light border-0"
-                      value={editFormData.cardCvv}
-                      onChange={(e) => setEditFormData({ ...editFormData, cardCvv: e.target.value })}
+                      {...register('cardCvv')}
                       disabled={isLoading}
                     />
                   </Form.Group>
@@ -523,6 +518,7 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
                 <div className="d-flex gap-3 justify-content-end mt-3">
                   <Button
                     variant="light"
+                    type="button"
                     className="rounded-pill px-4 fw-700"
                     onClick={() => {
                       setModalType(null);
@@ -533,10 +529,10 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
                     Cancel
                   </Button>
                   <Button
+                    type="submit"
                     variant="dark"
                     className="rounded-pill px-4 fw-700"
                     style={{ backgroundColor: '#1e293b' }}
-                    onClick={confirmEdit}
                     disabled={isLoading}
                   >
                     {isLoading ? 'Saving...' : 'Save Changes'}
