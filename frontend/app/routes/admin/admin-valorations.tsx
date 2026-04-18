@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { redirect } from 'react-router';
+import { redirect, useRevalidator } from 'react-router';
 import { getAdminValorations, deleteValoration } from '~/services/admin-service';
 import type ValorationDTO from '~/dto/ValorationDTO';
 import type PagedResponse from '~/dto/PagedResponse';
@@ -17,6 +17,7 @@ export async function clientLoader() {
 }
 
 export default function AdminValorations({ loaderData }: { readonly loaderData: any }) {
+  const revalidator = useRevalidator();
   const pagedData = loaderData as PagedResponse<ValorationDTO>;
   const valorations = pagedData.content || [];
 
@@ -40,6 +41,7 @@ export default function AdminValorations({ loaderData }: { readonly loaderData: 
       setRowData((prev) => prev.filter((v) => v.id !== selectedVal.id));
       setShowDeleteModal(false);
       setSelectedVal(null);
+      revalidator.revalidate();
     } catch (error) {
       console.error('Failed to delete valoration:', error);
       alert('Failed to delete review. Please try again.');

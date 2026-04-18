@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { redirect } from 'react-router';
+import { redirect, useRevalidator } from 'react-router';
 import { getAdminUsers, banUser, deleteUser, updateUser } from '~/services/admin-service';
 import { useUserStore } from '~/stores/useUserStore';
 import type UserDTO from '~/dto/UserDTO';
@@ -19,6 +19,7 @@ export async function clientLoader() {
 }
 
 export default function AdminUsers({ loaderData }: { readonly loaderData: any }) {
+  const revalidator = useRevalidator();
   const pagedData = loaderData as PagedResponse<UserDTO>;
   const users = pagedData.content || [];
   const loggedInUser = useUserStore((state) => state.user);
@@ -95,6 +96,7 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
       );
       setModalType(null);
       setSelectedUser(null);
+      revalidator.revalidate();
     } catch (error) {
       console.error('Failed to update user:', error);
       alert('Failed to update user. Please try again.');
@@ -119,6 +121,7 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
       );
       setModalType(null);
       setSelectedUser(null);
+      revalidator.revalidate();
     } catch (error) {
       console.error('Failed to ban user:', error);
       alert('Failed to ban user. Please try again.');
@@ -140,6 +143,7 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
       setRowData((prev) => prev.filter((u) => u.id !== selectedUser.id));
       setModalType(null);
       setSelectedUser(null);
+      revalidator.revalidate();
     } catch (error) {
       console.error('Failed to delete user:', error);
       alert('Failed to delete user. Please try again.');
