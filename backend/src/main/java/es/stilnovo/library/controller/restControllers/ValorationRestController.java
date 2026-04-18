@@ -101,7 +101,7 @@ public class ValorationRestController {
                 .orElseThrow(() -> new RuntimeException("User not found: " + principal.getName()));
 
         // 2. Create the valoration via service layer
-        var created = valorationService.createValoration(dto.transactionId(), dto.stars(), dto.comment(), buyer);
+        var created = valorationService.createValoration(dto.transactionId(), dto.rating(), dto.comment(), buyer);
 
         // 3. Construct the URI for the newly created valoration
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -139,7 +139,7 @@ public class ValorationRestController {
                 .orElseThrow(() -> new RuntimeException("User not found: " + principal.getName()));
 
         
-        valorationService.updateValoration(id, dto.stars(), dto.comment(), currentUser);
+        valorationService.updateValoration(id, dto.rating(), dto.comment(), currentUser);
 
         
         var updated = valorationService.findById(id);

@@ -83,7 +83,7 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
               )}
 
               <img
-                src={`/api/v1/products/${product.id}/image`}
+                src={`/api/v1/products/${product.id}/image?t=${Date.now()}`}
                 alt={product.name}
                 className={`main-product-image img-fluid rounded-4 ${!isActive ? 'opacity-25 grayscale' : ''}`}
                 style={{ maxHeight: '500px', objectFit: 'contain' }}
@@ -165,7 +165,7 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
                   <div className="seller-card p-3 rounded-4 bg-light border d-flex align-items-center justify-content-between mb-4 shadow-sm">
                     <div className="d-flex align-items-center gap-3">
                       <img
-                        src={`/api/v1/users/${product.seller.id}/profile-photo`}
+                        src={`/api/v1/users/${product.seller.id}/profile-photo?t=${Date.now()}`}
                         className="rounded-circle border border-white shadow-sm"
                         width="55" height="55"
                         style={{ objectFit: 'cover' }}

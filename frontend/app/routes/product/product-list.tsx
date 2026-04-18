@@ -9,9 +9,16 @@ import { useUserStore } from "~/stores/useUserStore";
 /**
  * Optimization: Prevent the list from reloading when coming back from a product.
  * This makes the "Back to Gallery" button instant.
+ * EXCEPTION: Revalidate if a purchase just occurred to refresh the product list.
  */
 export function shouldRevalidate() {
-  return false; 
+  // Check if a purchase was just completed
+  const justPurchased = localStorage.getItem('justPurchased');
+  if (justPurchased === 'true') {
+    localStorage.removeItem('justPurchased');
+    return true; // Revalidate to fetch updated products
+  }
+  return false; // Don't revalidate for normal navigation
 }
 
 /**
@@ -50,7 +57,7 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
                   <div className="clay-card">
                     <div className="img-container">
                       <img 
-                        src={`/api/v1/products/${product.id}/image`} 
+                        src={`/api/v1/products/${product.id}/image?t=${Date.now()}`} 
                         alt={product.name} 
                       />
                     </div>
@@ -80,7 +87,7 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
                 <div className="clay-card">
                   <div className="img-container">
                     <img 
-                      src={`/api/v1/products/${product.id}/image`} 
+                      src={`/api/v1/products/${product.id}/image?t=${Date.now()}`} 
                       alt={product.name} 
                     />
                   </div>

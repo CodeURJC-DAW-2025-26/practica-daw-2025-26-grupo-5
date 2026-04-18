@@ -68,7 +68,7 @@ export default function Header() {
                     </div>
                     <div className="position-relative">
                       <img
-                        src={profileImageError ? "/images/profile-photo.png" : `/api/v1/users/me/profile-photo`}
+                        src={profileImageError ? "/images/profile-photo.png" : `/api/v1/users/me/profile-photo?t=${Date.now()}`}
                         className="rounded-circle border border-2 border-white shadow-sm profile-nav-img"
                         width="42"
                         height="42"

@@ -246,7 +246,7 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
                       <td>
                         <div className="d-flex align-items-center gap-2">
                           <img
-                            src={`/api/v1/users/${user.id}/profile-photo`}
+                            src={`/api/v1/users/${user.id}/profile-photo?t=${Date.now()}`}
                             alt={user.name}
                             width="36"
                             height="36"
@@ -416,7 +416,7 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
                 
                 <div className="mb-3 position-relative text-center">
                   <img
-                    src={selectedPhoto ? URL.createObjectURL(selectedPhoto) : `/api/v1/users/${selectedUser?.id}/profile-photo`}
+                    src={selectedPhoto ? URL.createObjectURL(selectedPhoto) : `/api/v1/users/${selectedUser?.id}/profile-photo?t=${Date.now()}`}
                     alt="Profile"
                     className="rounded-circle shadow-sm mb-3"
                     style={{ width: '120px', height: '120px', objectFit: 'cover', backgroundColor: '#f1f5f9' }}

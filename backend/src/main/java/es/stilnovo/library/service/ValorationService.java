@@ -230,6 +230,23 @@ public class ValorationService {
     }
 
     /**
+     * Calculates the global average rating across all valorations in the system.
+     * This is used for admin dashboard statistics.
+     * @return Average rating from 0 to 5 (or 0.0 if no valorations exist)
+     */
+    @Transactional(readOnly = true)
+    public double getGlobalAverageRating() {
+        List<Valoration> allValorations = valorationRepository.findAll();
+        if (allValorations.isEmpty()) {
+            return 0.0;
+        }
+        return allValorations.stream()
+                .mapToDouble(Valoration::getStars)
+                .average()
+                .orElse(0.0);
+    }
+
+    /**
      * Deletes a valoration by its ID (Admin version).
      * This method disconnects the review from users and triggers an 
      * atomic update of the seller's statistics (average rating and count).

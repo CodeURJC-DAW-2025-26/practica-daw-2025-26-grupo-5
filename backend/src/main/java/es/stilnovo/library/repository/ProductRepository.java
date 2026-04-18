@@ -90,7 +90,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findRecommendedProducts(@Param("userId") Long userId);
 
     // Look for products in a category that the user hasn't interacted with yet 
-    @Query("SELECT p FROM ProductTable p WHERE p.category = :category AND p.id NOT IN (SELECT t.product.id FROM TransactionTable t WHERE t.buyer.userId = :userId)")
+    @Query("SELECT p FROM ProductTable p WHERE p.category = :category AND p.status != 'Sold' AND p.id NOT IN (SELECT t.product.id FROM TransactionTable t WHERE t.buyer.userId = :userId)")
     List<Product> findRecommendedProducts(@Param("category") String category, @Param("userId") Long userId, Pageable pageable);
     
     /**

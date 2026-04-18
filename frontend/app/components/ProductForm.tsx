@@ -30,7 +30,7 @@ export default function ProductForm({
     if (product?.name) setName(product.name);
     if (product?.description) setDescription(product.description);
     if (product?.id && !previewUrl) {
-      setPreviewUrl(`/api/v1/products/${product.id}/image`);
+      setPreviewUrl(`/api/v1/products/${product.id}/image?t=${Date.now()}`);
     }
   }, [product]);
 

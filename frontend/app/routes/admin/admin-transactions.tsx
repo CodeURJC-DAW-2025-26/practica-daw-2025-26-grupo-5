@@ -91,7 +91,7 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
                       <td>
                         <div className="d-flex align-items-center gap-2">
                           <img
-                            src={`/api/v1/products/${transaction.product?.id}/image`}
+                            src={`/api/v1/products/${transaction.product?.id}/image?t=${Date.now()}`}
                             alt={transaction.product?.name}
                             width="32"
                             height="32"

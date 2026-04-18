@@ -58,12 +58,12 @@ const UserSalesOrders = () => {
         setShowModal(true);
     };
 
-    const handleValorationSubmit = async (stars: number, comment: string) => {
+    const handleValorationSubmit = async (rating: number, comment: string) => {
         if (!activeTransaction) return;
         setIsProcessing(true);
         try {
             await createValoration({
-                stars,
+                rating,
                 comment,
                 buyerName: user?.name || "Buyer",
                 transactionId: activeTransaction.transactionId
@@ -98,7 +98,7 @@ const UserSalesOrders = () => {
                 </div>
                 {user && (
                     <Link to="/user/settings">
-                        <img src={`/api/v1/users/me/profile-photo`} className="rounded-circle border border-2 shadow-sm" width="48" height="48" alt="Profile" onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')} />
+                        <img src={`/api/v1/users/me/profile-photo?t=${Date.now()}`} className="rounded-circle border border-2 shadow-sm" width="48" height="48" alt="Profile" onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')} />
                     </Link>
                 )}
             </header>
@@ -136,7 +136,7 @@ const UserSalesOrders = () => {
                                     {/* Seller Info Group */}
                                     <div className="d-flex align-items-center gap-2">
                                         <img
-                                            src={`/api/v1/users/${purchase.seller.id}/profile-photo`}
+                                            src={`/api/v1/users/${purchase.seller.id}/profile-photo?t=${Date.now()}`}
                                             alt={purchase.seller.name}
                                             className="rounded-circle border shadow-sm"
                                             width="32"

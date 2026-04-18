@@ -104,6 +104,9 @@ const PaymentPage = () => {
 
             const result = await response.json();
             
+            // Mark that a purchase occurred so product list revalidates
+            localStorage.setItem('justPurchased', 'true');
+            
             // Redirect to a success page using the returned transaction ID
             navigate(`/user/sales-orders`);
             
@@ -157,7 +160,7 @@ const PaymentPage = () => {
                                             <div className="position-relative mb-4">
                                                 {/* Utilizing your API endpoint for images as seen in ProductDetail */}
                                                 <img 
-                                                    src={`/api/v1/products/${product.id}/image`} 
+                                                    src={`/api/v1/products/${product.id}/image?t=${Date.now()}`} 
                                                     alt={product.name} 
                                                     className="img-fluid rounded-4 shadow-sm" 
                                                     style={{ maxHeight: '220px', width: '100%', objectFit: 'contain' }} 

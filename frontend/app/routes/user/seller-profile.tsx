@@ -24,7 +24,7 @@ export default function SellerProfile({ loaderData }: Route.ComponentProps) {
                     <div className="row align-items-center g-4">
                         <div className="col-md-auto text-center text-md-start">
                             <img
-                                src={`/api/v1/users/${seller.id}/profile-photo`}
+                                src={`/api/v1/users/${seller.id}/profile-photo?t=${Date.now()}`}
                                 alt={seller.name}
                                 className="rounded-circle border border-4 border-white shadow-sm"
                                 width="125" height="125"
@@ -100,7 +100,7 @@ export default function SellerProfile({ loaderData }: Route.ComponentProps) {
                                 <Link to={`/product/${product.id}`} className="text-decoration-none">
                                     <div className="clay-card p-2 h-100 shadow-sm border-0 bg-white hover-up">
                                         <div className="rounded-4 overflow-hidden mb-3" style={{ height: "180px", background: "#f8fafc" }}>
-                                            <img src={`/api/v1/products/${product.image.id}/image`} className="img-fluid w-100 h-100" style={{ objectFit: "cover" }} />
+                                            <img src={`/api/v1/products/${product.image.id}/image?t=${Date.now()}`} className="img-fluid w-100 h-100" style={{ objectFit: "cover" }} />
                                         </div>
                                         <div className="px-2 pb-2 text-center">
                                             <p className="fw-800 h5 mb-1 text-dark">{product.price}€</p>
@@ -125,7 +125,7 @@ export default function SellerProfile({ loaderData }: Route.ComponentProps) {
                                 <div className="d-flex justify-content-between align-items-center mb-3">
                                     <div className="d-flex align-items-center gap-3">
                                         <img
-                                            src={`/api/v1/users/search/profile-photo?name=${encodeURIComponent(val.buyerName)}`}
+                                            src={`/api/v1/users/search/profile-photo?name=${encodeURIComponent(val.buyerName)}&t=${Date.now()}`}
                                             alt={val.buyerName}
                                             className="rounded-circle border shadow-sm"
                                             width="45" height="45"

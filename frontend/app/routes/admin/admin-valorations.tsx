@@ -112,8 +112,8 @@ export default function AdminValorations({ loaderData }: { readonly loaderData: 
                   paginatedData.map((val) => (
                     <tr key={val.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
                       <td className="text-muted small fw-700">#{val.id}</td>
-                      <td className="text-muted small">{val.valuator?.name || 'Unknown'}</td>
-                      <td className="text-muted small">{val.valued?.name || 'Unknown'}</td>
+                      <td className="text-muted small">{val.buyerName || 'Unknown'}</td>
+                      <td className="text-muted small">{val.sellerName || 'Unknown'}</td>
                       <td>
                         <span className="fw-700 small" style={{ color: '#fbbf24' }}>
                           {val.rating} {val.rating > 0 && '★'}

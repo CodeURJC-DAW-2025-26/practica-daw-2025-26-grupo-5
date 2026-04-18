@@ -20,15 +20,15 @@ export async function getPendingValorations(): Promise<any[]> {
 /**
  * Submits a new valoration for a specific transaction.
  */
-export async function createValoration(data: { stars: number, comment: string, buyerName: string, transactionId: number }): Promise<ValorationDTO> {
+export async function createValoration(data: { rating: number, comment: string, buyerName: string, transactionId: number }): Promise<ValorationDTO> {
     const response = await api.post("/v1/valorations", data);
     return response.data;
 }
 
 /**
- * Updates an existing valoration's stars and comment.
+ * Updates an existing valoration's rating and comment.
  */
-export async function updateValoration(id: number, data: { stars: number, comment: string }): Promise<ValorationDTO> {
+export async function updateValoration(id: number, data: { rating: number, comment: string }): Promise<ValorationDTO> {
     const response = await api.patch(`/v1/valorations/${id}`, data);
     return response.data;
 }

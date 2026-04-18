@@ -1,7 +1,8 @@
 export default interface ValorationDTO {
   id: number;
-  stars: number;
+  rating: number;
   comment: string;
   buyerName: string;
+  sellerName: string;
   transactionId: number;
 }

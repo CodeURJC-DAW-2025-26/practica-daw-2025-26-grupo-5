@@ -105,7 +105,7 @@ export default function MyProducts() {
                             <div className="product-img-preview rounded-4 bg-white d-flex align-items-center justify-content-center overflow-hidden shadow-inner"
                                 style={{ width: '80px', height: '80px', border: '1px solid #f1f4f8', flexShrink: 0 }}>
                                 <img
-                                    src={`/api/v1/products/${product.id}/image`}
+                                    src={`/api/v1/products/${product.id}/image?t=${Date.now()}`}
                                     alt={product.name}
                                     className="img-fluid"
                                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}

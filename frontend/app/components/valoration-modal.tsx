@@ -6,21 +6,21 @@ interface ValorationModalProps {
     show: boolean;
     onHide: () => void;
     transaction: TransactionDTO | null;
-    onSubmit: (stars: number, comment: string) => Promise<void>;
+    onSubmit: (rating: number, comment: string) => Promise<void>;
     isProcessing: boolean;
 }
 
 export default function ValorationModal({ show, onHide, transaction, onSubmit, isProcessing }: ValorationModalProps) {
-    const [stars, setStars] = useState(5);
+    const [rating, setRating] = useState(5);
     const [comment, setComment] = useState("");
 
     if (!transaction) return null;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        await onSubmit(stars, comment);
+        await onSubmit(rating, comment);
         // Reset local state after submission
-        setStars(5);
+        setRating(5);
         setComment("");
     };
 
@@ -38,7 +38,7 @@ export default function ValorationModal({ show, onHide, transaction, onSubmit, i
                 {/* Seller Info Branding */}
                 <div className="d-flex align-items-center gap-3 p-3 bg-light rounded-4 mb-4">
                     <img 
-                        src={`/api/v1/users/${transaction.seller.id}/profile-photo`} 
+                        src={`/api/v1/users/${transaction.seller.id}/profile-photo?t=${Date.now()}`} 
                         className="rounded-circle border border-2 border-white shadow-sm" 
                         width="55" height="55" 
                         style={{ objectFit: 'cover' }} 
@@ -60,8 +60,8 @@ export default function ValorationModal({ show, onHide, transaction, onSubmit, i
                         <Form.Control 
                             type="number" 
                             min="1" max="5" 
-                            value={stars}
-                            onChange={(e) => setStars(Number(e.target.value))}
+                            value={rating}
+                            onChange={(e) => setRating(Number(e.target.value))}
                             className="rounded-pill bg-light border-0 text-center fw-800"
                             required 
                         />

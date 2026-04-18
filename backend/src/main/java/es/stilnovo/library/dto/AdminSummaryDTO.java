@@ -34,6 +34,15 @@ public record AdminSummaryDTO(
         int totalProductCount,
 
         @Schema(description = "Total revenue from completed transactions", example = "45798.00")
-        double totalRevenue
+        double totalRevenue,
+
+        @Schema(description = "Global average rating across all platform valorations", example = "4.5")
+        double globalAverageRating,
+
+        @Schema(description = "Total number of completed transactions", example = "42")
+        int totalTransactions,
+
+        @Schema(description = "Average value per transaction", example = "1090.43")
+        double averageTransactionValue
 ) {
 }

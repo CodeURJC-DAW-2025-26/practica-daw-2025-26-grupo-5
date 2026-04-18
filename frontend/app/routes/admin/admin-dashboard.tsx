@@ -31,9 +31,9 @@ export default function AdminDashboard({ loaderData }: Readonly<{ loaderData: an
 
   // Calculate metrics
   const totalRevenue = summary?.totalRevenue || 0;
-  const averageRating = users.length > 0 
-    ? (users.reduce((sum: number, u: any) => sum + (u.rating || 0), 0) / users.length).toFixed(1) 
-    : '0';
+  const totalTransactions = summary?.totalTransactions || 0;
+  const averageTransactionValue = summary?.averageTransactionValue || 0;
+  const averageRating = (summary?.globalAverageRating || 0).toFixed(1);
   const activeUsers = numUsers - numBanneds;
   
   // Products by category
@@ -46,8 +46,8 @@ export default function AdminDashboard({ loaderData }: Readonly<{ loaderData: an
   // Main KPIs (4 columns - simple and clean)
   const mainKPIs: readonly KPIData[] = [
     { label: 'TOTAL REVENUE', value: `${totalRevenue.toFixed(2)} €`, color: '#059669', icon: 'fa-euro-sign' },
-    { label: 'ACTIVE USERS', value: activeUsers, color: '#0369a1', icon: 'fa-users' },
-    { label: 'AVG RATING', value: `${averageRating}★`, color: '#d97706', icon: 'fa-star' },
+    { label: 'TOTAL TRANSACTIONS', value: totalTransactions, color: '#0369a1', icon: 'fa-receipt' },
+    { label: 'AVG TRANSACTION', value: `${averageTransactionValue.toFixed(2)} €`, color: '#d97706', icon: 'fa-chart-line' },
     { label: 'PRODUCTS', value: totalProducts, color: '#7c3aed', icon: 'fa-box' },
   ];
 
@@ -146,7 +146,7 @@ export default function AdminDashboard({ loaderData }: Readonly<{ loaderData: an
                           <td>
                             <div className="d-flex align-items-center gap-2">
                               <img
-                                src={`/api/v1/users/${user.userId}/profile-photo`}
+                                src={`/api/v1/users/${user.userId}/profile-photo?t=${Date.now()}`}
                                 alt={user.name}
                                 width="32"
                                 height="32"
@@ -246,7 +246,7 @@ export default function AdminDashboard({ loaderData }: Readonly<{ loaderData: an
                           <td>
                             <div className="d-flex align-items-center gap-2">
                               <img
-                                src={`/api/v1/products/${product.id}/image`}
+                                src={`/api/v1/products/${product.id}/image?t=${Date.now()}`}
                                 alt={product.name}
                                 width="36"
                                 height="36"

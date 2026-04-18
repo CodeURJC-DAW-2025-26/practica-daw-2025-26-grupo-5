@@ -9,6 +9,9 @@ interface AdminSummaryDTO {
   readonly recentProducts: readonly ProductDTO[];
   readonly totalProductCount: number;
   readonly totalRevenue: number;
+  readonly globalAverageRating: number;
+  readonly totalTransactions: number;
+  readonly averageTransactionValue: number;
 }
 
 export default AdminSummaryDTO;

@@ -101,6 +101,12 @@ public class AdminRestController {
     })
     public AdminSummaryDTO getAdminPanel() {
         var panelData = adminService.getAdminPanelData();
+        double globalAvgRating = valorationService.getGlobalAverageRating();
+        
+        // Calculate transaction statistics
+        int totalTransactions = transactionService.getTotalNumOfTransactions();
+        double averageTransactionValue = totalTransactions > 0 ? panelData.totalRevenue() / totalTransactions : 0.0;
+        
         return new AdminSummaryDTO(
                 panelData.numUsers(),
                 panelData.numBanneds(),
@@ -108,7 +114,10 @@ public class AdminRestController {
                 userMapper.toDTOs(panelData.users()),
                 productMapper.toDTOs(panelData.products()),
                 panelData.totalProductCount(),
-                panelData.totalRevenue());
+                panelData.totalRevenue(),
+                globalAvgRating,
+                totalTransactions,
+                averageTransactionValue);
     }
 
     // --- USER MANAGEMENT ---

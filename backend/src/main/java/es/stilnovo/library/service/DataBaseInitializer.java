@@ -79,7 +79,6 @@ public class DataBaseInitializer implements CommandLineRunner {
                 User user2 = new User("user2", passwordEncoder.encode("user123"), "user2@stilnovo.es", photoUserBlob,
                                 0.0,
                                 "9876 5432 1098 7654", "789", "11/28", 0, 0, 0, "I am user2 in Stilnovo", "ROLE_USER");
-                user2.setBanned(true); // user2 is banned by default for testing
                 User admin = new User("admin", passwordEncoder.encode("admin123"), "admin@stilnovo.es", photoAdminBlob,
                                 0.0,
                                 "3456 7890 1234 5678", "456", "07/26", 0, 0, 0,

@@ -142,6 +142,28 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
     }
   };
 
+  const handleBanProduct = async (product: ProductDTO) => {
+    setIsLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append('name', product.name);
+      formData.append('category', product.category);
+      formData.append('price', String(product.price));
+      formData.append('location', product.location);
+      formData.append('description', product.description);
+      formData.append('status', 'Banned');
+      formData.append('sellerId', String(product.seller?.id || ''));
+      
+      const updatedProduct = await updateProduct(product.id, formData);
+      setRowData((prev) => prev.map((p) => (p.id === product.id ? updatedProduct : p)));
+    } catch (error) {
+      console.error('Failed to ban product:', error);
+      alert('Failed to ban product. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const totalProducts = rowData.length;
   const averagePrice = totalProducts > 0 ? rowData.reduce((sum, p) => sum + (p.price || 0), 0) / totalProducts : 0;
   const totalValue = rowData.reduce((sum, p) => sum + (p.price || 0), 0);
@@ -229,7 +251,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
                       <td>
                         <div className="d-flex align-items-center gap-2">
                           <img
-                            src={`/api/v1/products/${product.id}/image`}
+                            src={`/api/v1/products/${product.id}/image?t=${Date.now()}`}
                             alt={product.name}
                             width="36"
                             height="36"
@@ -276,6 +298,24 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
                             onClick={() => handleEditProduct(product)}
                           >
                             <i className="fa-solid fa-edit" />
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-sm fw-700"
+                            style={{
+                              backgroundColor: '#fef3c7',
+                              color: '#92400e',
+                              border: 'none',
+                              borderRadius: '6px',
+                              padding: '5px 10px',
+                              fontSize: '0.7rem',
+                              cursor: 'pointer',
+                            }}
+                            onClick={() => handleBanProduct(product)}
+                            disabled={product.status === 'Banned'}
+                            title={product.status === 'Banned' ? 'Product already banned' : 'Ban this product'}
+                          >
+                            <i className="fa-solid fa-lock" />
                           </button>
                           <button
                             type="button"
