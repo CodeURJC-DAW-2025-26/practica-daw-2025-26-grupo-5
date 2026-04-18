@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "react-router dev",
-    "build": "react-router build && rm -rf ../backend/src/main/resources/static/new && mkdir -p ../backend/src/main/resources/static/new && cp -r build/client/* ../backend/src/main/resources/static/new/",
+    "build": "react-router build && rimraf ../backend/src/main/resources/static/new && node scripts/copy-build.js",
     "preview": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc"
   },
@@ -37,6 +37,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "rimraf": "^6.1.3",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.57.0",
     "vite": "^7.1.7",
