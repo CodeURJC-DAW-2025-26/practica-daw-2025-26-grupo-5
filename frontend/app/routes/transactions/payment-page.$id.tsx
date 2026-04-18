@@ -1,21 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Container, Row, Col, Card, Form, Button, Alert, Image, Spinner, Stack } from 'react-bootstrap';
 import type CheckoutDTO from '../../dto/CheckoutDTO';
 import { useUserStore } from '~/stores/useUserStore';
 import { Navigate, useLocation } from 'react-router';
 
 const PaymentPage = () => {
-    // URL parameters and navigation hooks
-    const { id } = useParams<{ id: string }>(); 
+    const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
 
-    // Component state typed with your official CheckoutDTO
     const [checkoutData, setCheckoutData] = useState<CheckoutDTO | null>(null);
     const [loading, setLoading] = useState(true);
     const [processing, setProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Form state for payment details
     const [paymentForm, setPaymentForm] = useState({
         cardHolder: '',
         cardNumber: '',
@@ -25,15 +23,13 @@ const PaymentPage = () => {
     const { user } = useUserStore();
     const location = useLocation();
 
-    // Global protection: Check if the user is logged, and if he is not redirect him to login page
     if (!user) {
         return <Navigate to="/login" state={{ from: location }} replace />;
-    };
-    // Fetch checkout data on component mount
+    }
+
     useEffect(() => {
         const fetchCheckoutData = async () => {
             try {
-                // Call to GET /api/v1/transactions/{id}/checkout
                 const response = await fetch(`/api/v1/transactions/${id}/checkout`, {
                     method: 'GET',
                     headers: {
@@ -46,11 +42,9 @@ const PaymentPage = () => {
                     throw new Error('Failed to fetch checkout details');
                 }
 
-                // Type assertion using your official DTO
                 const data: CheckoutDTO = await response.json();
-                setCheckoutData(data); 
+                setCheckoutData(data);
             } catch (err) {
-                // Safely handle unknown error type
                 if (err instanceof Error) {
                     setError(err.message);
                 } else {
@@ -66,19 +60,16 @@ const PaymentPage = () => {
         }
     }, [id]);
 
-    // Handle form input changes
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setPaymentForm(prev => ({ ...prev, [name]: value }));
     };
 
-    // Handle transaction submission
     const handlePaymentSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setProcessing(true);
         setError(null);
 
-        // Ensure the ID exists before sending the request
         if (!id) {
             setError("Product ID is missing.");
             setProcessing(false);
@@ -86,15 +77,14 @@ const PaymentPage = () => {
         }
 
         try {
-            // Call to POST /api/v1/transactions
             const response = await fetch('/api/v1/transactions', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}` // Ensure token is sent on POST too
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
                 body: JSON.stringify({
-                    productId: parseInt(id, 10), 
+                    productId: parseInt(id, 10),
                 })
             });
 
@@ -102,14 +92,9 @@ const PaymentPage = () => {
                 throw new Error('Transaction failed. Please try again.');
             }
 
-            const result = await response.json();
-            
-            // Mark that a purchase occurred so product list revalidates
             localStorage.setItem('justPurchased', 'true');
-            
-            // Redirect to a success page using the returned transaction ID
             navigate(`/user/sales-orders`);
-            
+
         } catch (err) {
             if (err instanceof Error) {
                 setError(err.message);
@@ -123,207 +108,210 @@ const PaymentPage = () => {
     if (loading) {
         return (
             <div className="d-flex justify-content-center align-items-center vh-100">
-                {/* Utilizing the custom Stilnovo loader from your app.css */}
-                <svg className="stn-loader" viewBox="25 25 50 50">
-                    <circle cx="50" cy="50" r="20"></circle>
-                </svg>
+                <Spinner animation="border" role="status" />
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="container mt-5 text-center">
-                <div className="alert alert-danger rounded-4 shadow-sm">{error}</div>
-                <button className="btn btn-outline-stilnovo mt-3" onClick={() => navigate('/')}>Return to home</button>
-            </div>
+            <Container className="mt-5 text-center">
+                <Alert variant="danger" className="rounded-4 shadow-sm">{error}</Alert>
+                <Button variant="outline-primary" className="mt-3" onClick={() => navigate('/')}>
+                    Return to home
+                </Button>
+            </Container>
         );
     }
 
-    // Safely destructure relying on the CheckoutDTO structure
     const { product, buyer } = checkoutData || {};
 
     return (
-        <div className="bg-light min-vh-100">
-
-            <main className="container-fluid main-wrapper d-flex align-items-center py-5">
-                <div className="container">
-                    <div className="row justify-content-center">
-                        <div className="col-xl-11">
-                            {/* Uses global glass-card from app.css */}
-                            <div className="glass-card p-4 p-md-5 shadow-lg">
-                                <div className="row align-items-center">
-                                    
-                                    {/* Left Column: Product Info */}
-                                    {product && (
-                                        <div className="col-lg-5 text-center border-end pe-lg-5">
-                                            <div className="position-relative mb-4">
-                                                {/* Utilizing your API endpoint for images as seen in ProductDetail */}
-                                                <img 
-                                                    src={`/api/v1/products/${product.id}/image?t=${Date.now()}`} 
-                                                    alt={product.name} 
-                                                    className="img-fluid rounded-4 shadow-sm" 
-                                                    style={{ maxHeight: '220px', width: '100%', objectFit: 'contain' }} 
-                                                />
-                                            </div>
-                                            <h2 className="fw-800 h3 mb-1">{product.name}</h2>
-                                            <p className="text-muted small fw-700 mb-4">{product.location} &bull; Verified Seller</p>
-
-                                            <div className="alert-oversized p-3 rounded-4 border d-flex align-items-center gap-3 mb-4 mx-auto text-start" style={{ maxWidth: '350px' }}>
-                                                <i className="fa-solid fa-truck-fast text-primary fs-3"></i>
-                                                <div>
-                                                    <p className="small fw-800 mb-0">SECURE SHIPPING</p>
-                                                    <p className="small text-muted mb-0">Door-to-door delivery active.</p>
+        <div className="bg-light min-vh-100" style={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #fef3f2 100%)' }}>
+            <Container fluid className="main-wrapper d-flex align-items-center py-5">
+                <Container>
+                    <Row className="justify-content-center">
+                        <Col xl={11}>
+                            <Card className="border-0" style={{ boxShadow: '0 20px 50px rgba(0,0,0,0.15)', borderRadius: '20px' }}>
+                                <Card.Body className="p-5 p-md-6">
+                                    <Row className="align-items-center">
+                                        {/* Left Column: Product Info */}
+                                        {product && (
+                                            <Col lg={5} className="text-center border-end pe-lg-5">
+                                                <div className="position-relative mb-4">
+                                                    <Image
+                                                        src={`/api/v1/products/${product.id}/image?t=${Date.now()}`}
+                                                        alt={product.name}
+                                                        fluid
+                                                        rounded
+                                                        className="shadow-sm"
+                                                        style={{ maxHeight: '220px', objectFit: 'contain' }}
+                                                    />
                                                 </div>
-                                            </div>
+                                                <h2 className="fw-800 h3 mb-1">{product.name}</h2>
+                                                <p className="text-muted small fw-700 mb-4">
+                                                    {product.location} &bull; Verified Seller
+                                                </p>
 
-                                            <div className="d-flex justify-content-center gap-4 align-items-center">
-                                                <div className="text-center">
-                                                    <p className="small fw-800 text-muted mb-0">PRICE</p>
-                                                    {/* Formatted price to 2 decimal places */}
-                                                    <p className="fw-800 h4 mb-0">{product.price.toFixed(2)} &euro;</p> 
-                                                </div>
-                                                <div className="vr opacity-25" style={{ height: '30px' }}></div>
-                                                <div className="text-center">
-                                                    <p className="small fw-800 text-muted mb-0">PROTECTION</p>
-                                                    <p className="fw-800 h4 mb-0 text-success">Active</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
+                                                <Alert variant="info" className="d-flex align-items-center gap-3 mb-4 mx-auto text-start" style={{ maxWidth: '350px' }}>
+                                                    <i className="fa-solid fa-truck-fast fs-3" />
+                                                    <div>
+                                                        <p className="small fw-800 mb-0">SECURE SHIPPING</p>
+                                                        <p className="small text-muted mb-0">Door-to-door delivery active.</p>
+                                                    </div>
+                                                </Alert>
 
-                                    {/* Right Column: Checkout Form & User Info */}
-                                    <div className="col-lg-7 ps-lg-5 mt-5 mt-lg-0">
-                                        
-                                        {/* Visual Card Representation using .visual-card from app.css */}
-                                        {buyer && (
-                                            <>
-                                                <div className="visual-card d-none d-md-block mb-4">
-                                                    <div className="chip"></div>
-                                                    <p className="mb-0 fw-800 opacity-75 small">CARD NUMBER</p>
-                                                    <p className="h5 fw-800 mb-3" style={{ letterSpacing: '2px' }}>
-                                                        {buyer.cardNumber || '0000 0000 0000 0000'}
-                                                    </p>
-                                                    <div className="d-flex justify-content-between">
-                                                        <div>
-                                                            <p className="mb-0 opacity-50 small">HOLDER</p>
-                                                            <p className="small fw-800 mb-0 text-uppercase text-truncate" style={{ maxWidth: '150px' }}>
-                                                                {buyer.name}
-                                                            </p>
-                                                        </div>
-                                                        <div>
-                                                            <p className="mb-0 opacity-50 small">EXPIRES</p>
-                                                            <p className="small fw-800 mb-0">
-                                                                {buyer.cardExpiringDate || '00/00'}
-                                                            </p>
-                                                        </div>
-                                                        <div>
-                                                            <p className="mb-0 opacity-50 small">CVV</p>
-                                                            <p className="small fw-800 mb-0">
-                                                                {buyer.cardCvv || '000'}
-                                                            </p>
-                                                        </div>
+                                                <div className="d-flex justify-content-center gap-4 align-items-center">
+                                                    <div className="text-center">
+                                                        <p className="small fw-800 text-muted mb-0">PRICE</p>
+                                                        <p className="fw-800 h4 mb-0">{product.price.toFixed(2)} €</p>
+                                                    </div>
+                                                    <div style={{ width: '1px', height: '30px', backgroundColor: '#ccc', opacity: 0.25 }} />
+                                                    <div className="text-center">
+                                                        <p className="small fw-800 text-muted mb-0">PROTECTION</p>
+                                                        <p className="fw-800 h4 mb-0 text-success">Active</p>
                                                     </div>
                                                 </div>
-
-                                                {/* Tooltip if user has no saved card using .tip-card-blue from app.css */}
-                                                {!buyer.cardExpiringDate && (
-                                                    <div className="tip-card-blue mb-4 d-flex align-items-center gap-3">
-                                                        <i className="fa-solid fa-wand-magic-sparkles text-primary fs-4"></i>
-                                                        <div>
-                                                            <p className="small fw-800 mb-0 text-dark">Want to buy faster?</p>
-                                                            <p className="small mb-0 text-muted">Save your payment info in <strong>Settings</strong> to go faster in this form next time.</p>
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </>
+                                            </Col>
                                         )}
 
-                                        {/* Payment Form utilizing .search-box inputs from app.css */}
-                                        <form onSubmit={handlePaymentSubmit} className="row g-3">
-                                            <div className="col-12">
-                                                <div className="search-box w-100">
-                                                    <input 
-                                                        type="text" 
-                                                        name="cardHolder" 
+                                        {/* Right Column: Checkout Form & User Info */}
+                                        <Col lg={7} className="ps-lg-5 mt-5 mt-lg-0">
+                                            {/* Card Display */}
+                                            {buyer && (
+                                                <>
+                                                    <Card className="d-none d-md-block mb-4 border-0" style={{ backgroundColor: '#f3f4f6', minHeight: '220px', boxShadow: '0 8px 20px rgba(0,0,0,0.08)', borderRadius: '16px' }}>
+                                                        <Card.Body className="d-flex flex-column justify-content-between p-4">
+                                                            <div>
+                                                                <div style={{ width: '40px', height: '24px', backgroundColor: '#fbbf24', borderRadius: '4px', marginBottom: '16px' }} />
+                                                                <p className="mb-0 fw-800 opacity-75 small">CARD NUMBER</p>
+                                                                <p className="h5 fw-800 mb-3" style={{ letterSpacing: '2px' }}>
+                                                                    {buyer.cardNumber || '0000 0000 0000 0000'}
+                                                                </p>
+                                                            </div>
+                                                            <Row>
+                                                                <Col>
+                                                                    <p className="mb-0 opacity-50 small">HOLDER</p>
+                                                                    <p className="small fw-800 mb-0 text-uppercase text-truncate" style={{ maxWidth: '150px' }}>
+                                                                        {buyer.name}
+                                                                    </p>
+                                                                </Col>
+                                                                <Col>
+                                                                    <p className="mb-0 opacity-50 small">EXPIRES</p>
+                                                                    <p className="small fw-800 mb-0">
+                                                                        {buyer.cardExpiringDate || '00/00'}
+                                                                    </p>
+                                                                </Col>
+                                                                <Col>
+                                                                    <p className="mb-0 opacity-50 small">CVV</p>
+                                                                    <p className="small fw-800 mb-0">
+                                                                        {buyer.cardCvv || '000'}
+                                                                    </p>
+                                                                </Col>
+                                                            </Row>
+                                                        </Card.Body>
+                                                    </Card>
+
+                                                    {/* Tip Card */}
+                                                    {!buyer.cardExpiringDate && (
+                                                        <Alert variant="light" className="d-flex align-items-center gap-3 mb-4 border-0" style={{ backgroundColor: '#eff6ff', boxShadow: '0 4px 12px rgba(3, 105, 161, 0.1)', borderRadius: '12px' }}>
+                                                            <i className="fa-solid fa-wand-magic-sparkles text-primary fs-4" />
+                                                            <div>
+                                                                <p className="small fw-800 mb-0 text-dark">Want to buy faster?</p>
+                                                                <p className="small mb-0 text-muted">Save your payment info in <strong>Settings</strong> to go faster in this form next time.</p>
+                                                            </div>
+                                                        </Alert>
+                                                    )}
+                                                </>
+                                            )}
+
+                                            {/* Payment Form */}
+                                            <Form onSubmit={handlePaymentSubmit}>
+                                                <Form.Group className="mb-3">
+                                                    <Form.Control
+                                                        type="text"
+                                                        name="cardHolder"
                                                         value={paymentForm.cardHolder}
                                                         onChange={handleInputChange}
-                                                        placeholder="Cardholder Name" 
-                                                        required 
+                                                        placeholder="Cardholder Name"
+                                                        required
                                                     />
-                                                </div>
-                                            </div>
-                                            <div className="col-12">
-                                                <div className="search-box w-100">
-                                                    <input 
-                                                        type="text" 
-                                                        name="cardNumber" 
-                                                        value={paymentForm.cardNumber}
-                                                        onChange={handleInputChange}
-                                                        placeholder="Card Number" 
-                                                        required 
-                                                    />
-                                                    <i className="fa-brands fa-cc-visa fa-lg ms-auto"></i>
-                                                </div>
-                                            </div>
-                                            <div className="col-6">
-                                                <div className="search-box w-100 text-center">
-                                                    <input 
-                                                        type="text" 
-                                                        name="expiry" 
-                                                        value={paymentForm.expiry}
-                                                        onChange={handleInputChange}
-                                                        className="text-center"
-                                                        placeholder="MM/YY" 
-                                                        required 
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className="col-6">
-                                                <div className="search-box w-100 text-center">
-                                                    <input 
-                                                        type="password" 
-                                                        name="cvv" 
-                                                        value={paymentForm.cvv}
-                                                        onChange={handleInputChange}
-                                                        className="text-center"
-                                                        placeholder="CVV" 
-                                                        required 
-                                                    />
-                                                </div>
-                                            </div>
+                                                </Form.Group>
 
-                                            <div className="col-12 mt-4">
-                                                {/* Replaced standard bootstrap btn with your custom .btn-sell class */}
-                                                <button 
-                                                    type="submit" 
+                                                <Form.Group className="mb-3">
+                                                    <div style={{ position: 'relative' }}>
+                                                        <Form.Control
+                                                            type="text"
+                                                            name="cardNumber"
+                                                            value={paymentForm.cardNumber}
+                                                            onChange={handleInputChange}
+                                                            placeholder="Card Number"
+                                                            required
+                                                        />
+                                                        <i className="fa-brands fa-cc-visa ms-auto" style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', fontSize: '1.5rem', color: '#1f2937' }} />
+                                                    </div>
+                                                </Form.Group>
+
+                                                <Row className="g-3 mb-3">
+                                                    <Col xs={6}>
+                                                        <Form.Control
+                                                            type="text"
+                                                            name="expiry"
+                                                            value={paymentForm.expiry}
+                                                            onChange={handleInputChange}
+                                                            placeholder="MM/YY"
+                                                            className="text-center"
+                                                            required
+                                                        />
+                                                    </Col>
+                                                    <Col xs={6}>
+                                                        <Form.Control
+                                                            type="password"
+                                                            name="cvv"
+                                                            value={paymentForm.cvv}
+                                                            onChange={handleInputChange}
+                                                            placeholder="CVV"
+                                                            className="text-center"
+                                                            required
+                                                        />
+                                                    </Col>
+                                                </Row>
+
+                                                <Button
+                                                    variant="success"
+                                                    type="submit"
                                                     disabled={processing}
-                                                    className="btn-sell w-100 justify-content-center"
+                                                    className="w-100 mt-4 py-3 fw-800"
+                                                    style={{ fontSize: '1.05rem', borderRadius: '10px', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)', transition: 'all 0.3s ease' }}
                                                 >
                                                     {processing ? (
-                                                        <><i className="fas fa-spinner fa-spin me-2"></i> Processing Transaction...</>
+                                                        <>
+                                                            <Spinner animation="border" size="sm" className="me-2" />
+                                                            Processing Transaction...
+                                                        </>
                                                     ) : (
-                                                        <><i className="fa-solid fa-lock me-2"></i> Confirm Secure Payment</>
+                                                        <>
+                                                            <i className="fa-solid fa-lock me-2" />
+                                                            Confirm Secure Payment
+                                                        </>
                                                     )}
-                                                </button>
-                                            </div>
+                                                </Button>
 
-                                            <div className="col-12 text-center mt-3">
-                                                <span className="small fw-800 text-muted text-uppercase">
-                                                    <span className="status-pulse me-2"></span> Secure Bank Connection Established
-                                                </span>
-                                            </div>
-                                        </form>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
+                                                <div className="text-center mt-3">
+                                                    <span className="small fw-800 text-muted text-uppercase">
+                                                        <i className="fa-solid fa-circle text-success me-2" style={{ fontSize: '0.5rem' }} />
+                                                        Secure Bank Connection Established
+                                                    </span>
+                                                </div>
+                                            </Form>
+                                        </Col>
+                                    </Row>
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    </Row>
+                </Container>
+            </Container>
         </div>
     );
 };
-
-export default PaymentPage;

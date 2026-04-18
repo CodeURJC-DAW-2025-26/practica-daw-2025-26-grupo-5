@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router'; // Corrected to react-router
+import { Link, useNavigate } from 'react-router';
+import { Container, Row, Col, Card, Badge, Button, Image, Spinner, Stack, Alert } from 'react-bootstrap';
 import { useUserStore } from '~/stores/useUserStore';
 import ValorationModal from "~/components/valoration-modal";
 
@@ -14,7 +15,7 @@ const UserSalesOrders = () => {
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [isProcessing, setIsProcessing] = useState(false); // Added missing state
+    const [isProcessing, setIsProcessing] = useState(false);
 
     // Modal Control
     const [showModal, setShowModal] = useState(false);
@@ -85,131 +86,182 @@ const UserSalesOrders = () => {
 
     if (loading) return (
         <div className="d-flex justify-content-center align-items-center vh-100 w-100">
-            <svg className="stn-loader" viewBox="25 25 50 50"><circle cx="50" cy="50" r="20"></circle></svg>
+            <Spinner animation="border" role="status" />
         </div>
     );
 
     return (
-        <main className="flex-grow-1 p-4 p-md-5 overflow-auto bg-light min-vh-100">
-            <header className="d-flex justify-content-between align-items-center mb-5">
-                <div>
-                    <h1 className="fw-800 h2">Sales & Orders</h1>
-                    <p className="text-muted small">Manage your transactions and community reputation.</p>
-                </div>
-                {user && (
-                    <Link to="/user/settings">
-                        <img src={`/api/v1/users/me/profile-photo?t=${Date.now()}`} className="rounded-circle border border-2 shadow-sm" width="48" height="48" alt="Profile" onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')} />
-                    </Link>
-                )}
-            </header>
-
-            {error && <div className="alert alert-danger rounded-4">{error}</div>}
-
-            <div className="row g-4">
-                {/* LEFT COLUMN: Lists */}
-                <div className="col-lg-7">
-                    <h3 className="fw-800 h5 mb-3"><i className="fa-solid fa-tag me-2"></i>My Sales</h3>
-                    <div className="d-flex flex-column gap-3 mb-5">
-                        {sales.map((sale) => (
-                            <div key={sale.transactionId} className="clay-card p-4 shadow-sm" onClick={() => setSelectedTransactionId(sale.transactionId)} style={{ cursor: 'pointer' }}>
-                                <div className="d-flex justify-content-between">
-                                    <h5 className="fw-800 mb-0">{sale.product.name}</h5>
-                                    <span className="badge rounded-pill bg-success-subtle text-success small">{sale.transactionStatus}</span>
-                                </div>
-                                <div className="mt-4 d-flex justify-content-between align-items-center">
-                                    <span className="small fw-700 text-muted">Buyer: {sale.buyer.name}</span>
-                                    <p className="fw-800 mb-0 text-primary">{sale.finalPrice.toFixed(2)}€</p>
-                                </div>
-                            </div>
-                        ))}
+        <main className="flex-grow-1 overflow-auto min-vh-100" style={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #fef3f2 100%)' }}>
+            <Container fluid className="py-4 py-md-5">
+                <Stack direction="horizontal" gap={3} className="justify-content-between align-items-start mb-5">
+                    <div>
+                        <h1 className="fw-800 h2">Sales & Orders</h1>
+                        <p className="text-muted small">Manage your transactions and community reputation.</p>
                     </div>
+                    {user && (
+                        <Link to="/user/settings">
+                            <Image
+                                src={`/api/v1/users/me/profile-photo?t=${Date.now()}`}
+                                className="rounded-circle border border-2 shadow-sm"
+                                width={48}
+                                height={48}
+                                alt="Profile"
+                                onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')}
+                            />
+                        </Link>
+                    )}
+                </Stack>
 
-                    <h3 className="fw-800 h5 mb-3"><i className="fa-solid fa-cart-shopping me-2"></i>My Purchases</h3>
-                    <div className="d-flex flex-column gap-3">
-                        {purchases.map((purchase) => (
-                            <div key={purchase.transactionId} className="clay-card p-4 shadow-sm" onClick={() => setSelectedTransactionId(purchase.transactionId)} style={{ cursor: 'pointer' }}>
-                                <div className="d-flex justify-content-between">
-                                    <h5 className="fw-800 mb-0">{purchase.product.name}</h5>
-                                    <span className="badge rounded-pill bg-info-subtle text-info small">Bought</span>
-                                </div>
-                                <div className="mt-4 d-flex justify-content-between align-items-center">
-                                    {/* Seller Info Group */}
-                                    <div className="d-flex align-items-center gap-2">
-                                        <img
-                                            src={`/api/v1/users/${purchase.seller.id}/profile-photo?t=${Date.now()}`}
-                                            alt={purchase.seller.name}
-                                            className="rounded-circle border shadow-sm"
-                                            width="32"
-                                            height="32"
-                                            style={{ objectFit: 'cover' }}
-                                            onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')}
-                                        />
-                                        <span className="small fw-700 text-muted">Seller: {purchase.seller.name}</span>
-                                    </div>
+                {error && <Alert variant="danger" className="rounded-4">{error}</Alert>}
 
-                                    {/* Price and Action Group */}
-                                    <div className="d-flex align-items-center gap-3">
-                                        <p className="fw-800 mb-0">{purchase.finalPrice.toFixed(2)}€</p>
+                <Row className="g-4">
+                    {/* LEFT COLUMN: Lists */}
+                    <Col lg={7}>
+                        <h3 className="fw-800 h5 mb-3">
+                            <i className="fa-solid fa-tag me-2" />
+                            My Sales
+                        </h3>
+                        <Stack gap={3} className="mb-5">
+                            {sales.map((sale) => (
+                                <Card
+                                    key={sale.transactionId}
+                                    className="border-0"
+                                    onClick={() => setSelectedTransactionId(sale.transactionId)}
+                                    style={{ cursor: 'pointer', boxShadow: '0 8px 20px rgba(0,0,0,0.1)', borderRadius: '12px', transition: 'all 0.3s ease' }}
+                                    onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 12px 30px rgba(0,0,0,0.15)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                                    onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.1)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                                >
+                                    <Card.Body>
+                                        <Stack direction="horizontal" gap={3} className="justify-content-between">
+                                            <h5 className="fw-800 mb-0">{sale.product.name}</h5>
+                                            <Badge bg="success">{sale.transactionStatus}</Badge>
+                                        </Stack>
+                                        <Stack direction="horizontal" gap={3} className="justify-content-between align-items-center mt-4">
+                                            <span className="small fw-700 text-muted">Buyer: {sale.buyer.name}</span>
+                                            <p className="fw-800 mb-0 text-primary">{sale.finalPrice.toFixed(2)}€</p>
+                                        </Stack>
+                                    </Card.Body>
+                                </Card>
+                            ))}
+                        </Stack>
 
-                                        {purchase.rated ? (
-                                            <span className="badge rounded-pill bg-light text-muted border px-3 py-2">
-                                                <i className="fa-solid fa-check-circle me-1 text-success"></i> Rated
-                                            </span>
-                                        ) : (
-                                            <button
-                                                className="btn-about py-2 px-3 small d-flex align-items-center gap-2"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleShowModal(purchase);
-                                                }}
+                        <h3 className="fw-800 h5 mb-3">
+                            <i className="fa-solid fa-cart-shopping me-2" />
+                            My Purchases
+                        </h3>
+                        <Stack gap={3}>
+                            {purchases.map((purchase) => (
+                                <Card
+                                    key={purchase.transactionId}
+                                    className="border-0"
+                                    onClick={() => setSelectedTransactionId(purchase.transactionId)}
+                                    style={{ cursor: 'pointer', boxShadow: '0 8px 20px rgba(0,0,0,0.1)', borderRadius: '12px', transition: 'all 0.3s ease' }}
+                                    onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 12px 30px rgba(0,0,0,0.15)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                                    onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.1)'; e.currentTarget.style.transform = 'translateY(0)'; }}
+                                >
+                                    <Card.Body>
+                                        <Stack direction="horizontal" gap={3} className="justify-content-between">
+                                            <h5 className="fw-800 mb-0">{purchase.product.name}</h5>
+                                            <Badge bg="info">Bought</Badge>
+                                        </Stack>
+                                        <Stack direction="horizontal" gap={3} className="justify-content-between align-items-center mt-4">
+                                            {/* Seller Info Group */}
+                                            <Stack direction="horizontal" gap={2} className="align-items-center">
+                                                <Image
+                                                    src={`/api/v1/users/${purchase.seller.id}/profile-photo?t=${Date.now()}`}
+                                                    alt={purchase.seller.name}
+                                                    className="rounded-circle border shadow-sm"
+                                                    width={32}
+                                                    height={32}
+                                                    style={{ objectFit: 'cover' }}
+                                                    onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')}
+                                                />
+                                                <span className="small fw-700 text-muted">Seller: {purchase.seller.name}</span>
+                                            </Stack>
+
+                                            {/* Price and Action Group */}
+                                            <Stack direction="horizontal" gap={3} className="align-items-center">
+                                                <p className="fw-800 mb-0">{purchase.finalPrice.toFixed(2)}€</p>
+
+                                                {purchase.rated ? (
+                                                    <Badge bg="light" text="muted" className="border px-3 py-2">
+                                                        <i className="fa-solid fa-check-circle me-1 text-success" /> Rated
+                                                    </Badge>
+                                                ) : (
+                                                    <Button
+                                                        variant="warning"
+                                                        size="sm"
+                                                        className="d-flex align-items-center gap-2"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleShowModal(purchase);
+                                                        }}
+                                                    >
+                                                        <i className="fa-solid fa-star" /> Rate Seller
+                                                    </Button>
+                                                )}
+                                            </Stack>
+                                        </Stack>
+                                    </Card.Body>
+                                </Card>
+                            ))}
+                        </Stack>
+                    </Col>
+
+                    {/* RIGHT COLUMN: Order Details */}
+                    <Col lg={5}>
+                        <Card className="border-0 position-sticky" style={{ top: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.12)', borderRadius: '16px' }}>
+                            <Card.Body>
+                                <h3 className="fw-800 h5 mb-4">Order Details</h3>
+                                {selectedTransaction ? (
+                                    <>
+                                        <Card className="border-0 mb-4" style={{ backgroundColor: '#f0f9ff', borderLeft: '4px solid #06b6d4', boxShadow: '0 4px 12px rgba(6, 182, 212, 0.1)', borderRadius: '10px' }}>
+                                            <Card.Body>
+                                                <span className="x-small fw-800 text-muted text-uppercase">Shipping Address</span>
+                                                <p className="small fw-700 mb-0">{selectedTransaction.product.location}</p>
+                                            </Card.Body>
+                                        </Card>
+                                        <Stack gap={3}>
+                                            <Button
+                                                variant="success"
+                                                className="py-3"
+                                                as="a"
+                                                href={`/api/v1/transactions/${selectedTransaction.transactionId}/shipping-label`}
+                                                target="_blank"
                                             >
-                                                <i className="fa-solid fa-star text-warning"></i> Rate Seller
-                                            </button>
-                                        )}
+                                                <i className="fa-solid fa-print me-2" /> Shipping Label
+                                            </Button>
+                                            <Button
+                                                variant="info"
+                                                className="py-3"
+                                                as="a"
+                                                href={`/api/v1/transactions/${selectedTransaction.transactionId}/invoice`}
+                                                target="_blank"
+                                            >
+                                                <i className="fa-solid fa-file-invoice me-2" /> Invoice
+                                            </Button>
+                                        </Stack>
+                                    </>
+                                ) : (
+                                    <div className="text-center py-5 opacity-50">
+                                        <i className="fa-solid fa-hand-pointer fa-3x mb-3 text-primary" />
+                                        <p className="small fw-700">Select a transaction to see details</p>
                                     </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                                )}
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
 
-                {/* RIGHT COLUMN: Order Details */}
-                <div className="col-lg-5">
-                    <div className="clay-card p-4 h-100 position-sticky" style={{ top: '20px' }}>
-                        <h3 className="fw-800 h5 mb-4">Order Details</h3>
-                        {selectedTransaction ? (
-                            <>
-                                <div className="p-3 bg-light rounded-4 mb-4">
-                                    <span className="x-small fw-800 text-muted text-uppercase">Shipping Address</span>
-                                    <p className="small fw-700 mb-0">{selectedTransaction.product.location}</p>
-                                </div>
-                                <div className="d-grid gap-3">
-                                    <a className="btn-sell py-3 text-center text-decoration-none" href={`/api/v1/transactions/${selectedTransaction.transactionId}/shipping-label`} target="_blank">
-                                        <i className="fa-solid fa-print me-2"></i> Shipping Label
-                                    </a>
-                                    <a className="btn-about py-3 text-center text-decoration-none" href={`/api/v1/transactions/${selectedTransaction.transactionId}/invoice`} target="_blank">
-                                        <i className="fa-solid fa-file-invoice me-2"></i> Invoice
-                                    </a>
-                                </div>
-                            </>
-                        ) : (
-                            <div className="text-center py-5 opacity-50">
-                                <i className="fa-solid fa-hand-pointer fa-3x mb-3 text-primary"></i>
-                                <p className="small fw-700">Select a transaction to see details</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </div>
-
-            {/* VALORATION MODAL */}
-            <ValorationModal
-                show={showModal}
-                onHide={() => setShowModal(false)}
-                transaction={activeTransaction}
-                onSubmit={handleValorationSubmit}
-                isProcessing={isProcessing}
-            />
+                {/* VALORATION MODAL */}
+                <ValorationModal
+                    show={showModal}
+                    onHide={() => setShowModal(false)}
+                    transaction={activeTransaction}
+                    onSubmit={handleValorationSubmit}
+                    isProcessing={isProcessing}
+                />
+            </Container>
         </main>
     );
 };

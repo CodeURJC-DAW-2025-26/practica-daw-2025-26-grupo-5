@@ -1,8 +1,8 @@
 import AdminLayout from '~/components/admin/AdminLayout';
 import { Navigate, useLocation } from 'react-router';
+import { Alert, Button, Container } from 'react-bootstrap';
 import type { Route } from './+types/admin';
 import { useUserStore } from '~/stores/useUserStore';
-
 
 /**
  * Admin Layout Route
@@ -26,12 +26,17 @@ export default function AdminRoute({ }: Route.ComponentProps) {
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   return (
-    <div className="alert alert-danger m-5" role="alert">
-      <h4 className="alert-heading">Error in Admin Panel!</h4>
-      <p>{error instanceof Error ? error.message : 'An unexpected error occurred'}</p>
-      <button className="btn btn-outline-danger" onClick={() => (window.location.href = '/')}>
-        Back to home
-      </button>
-    </div>
+    <Container className="mt-5">
+      <Alert variant="danger">
+        <Alert.Heading>Error in Admin Panel!</Alert.Heading>
+        <p>{error instanceof Error ? error.message : 'An unexpected error occurred'}</p>
+        <Button
+          variant="outline-danger"
+          onClick={() => (window.location.href = '/')}
+        >
+          Back to home
+        </Button>
+      </Alert>
+    </Container>
   );
 }
