@@ -137,16 +137,23 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
               {isActive ? (
                 <div className="d-grid gap-3 mb-5">
                   {!isSelfProduct ? (
-                    <Link to={`/transactions/payment/${product.id}`} className="btn-sell py-3 fw-800 shadow-lg rounded-pill d-flex align-items-center justify-content-center gap-2 border-0 text-decoration-none" style={{ fontSize: '1.1rem' }}>
+                    <Link to={`../transactions/payment/${product.id}`} className="btn-sell py-3 fw-800 shadow-lg rounded-pill d-flex align-items-center justify-content-center gap-2 border-0 text-decoration-none" style={{ fontSize: '1.1rem' }}>
                       <i className="fa-solid fa-bag-shopping"></i> Buy Now
                     </Link>
                   ) : (
-                    <div className="btn-sell py-3 fw-800 shadow-lg rounded-pill d-flex align-items-center justify-content-center gap-2 border-0 text-decoration-none" style={{ fontSize: '1.1rem', backgroundColor: 'red' }}>
-                      This is your product
+                    <div 
+                      className="py-3 fw-800 shadow-lg rounded-3 d-flex align-items-center justify-content-center gap-2 border-0 text-decoration-none"
+                      style={{
+                        fontSize: '1rem',
+                        background: 'linear-gradient(135deg, #f50519 0%, #dc2626 100%)',
+                        color: 'white'
+                      }}
+                    >
+                      <i className="fa-solid fa-lock"></i> This is your product
                     </div>
                   )}
                   <Link
-                    to={`/product/contact/${product.id}`}  
+                    to={`../product/contact/${product.id}`}  
                     state={{ productName: product.name, productId: product.id }}
                     className="btn btn-outline-primary py-3 fw-800 rounded-pill border-2 d-flex align-items-center justify-content-center gap-2 text-decoration-none">
                     <i className="fa-regular fa-comment-dots fa-lg"></i> Send Message to Seller
@@ -183,18 +190,46 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
               )}
 
               {/* Admin/Owner Actions */}
-              {user && (
+              {user && (user.roles?.includes("ROLE_ADMIN") || user.id === product.seller?.id) && (
                 <div className="d-flex gap-2 mb-4">
-                  {user.roles?.includes("ADMIN") && (
-                    <Button variant="danger" className="rounded-pill px-4 fw-700" onClick={handleOpenDeleteDialog}>
-                      Remove Listing
-                    </Button>
-                  )}
-                  {user.id === product.seller?.id && (
-                    <Button variant="warning" className="rounded-pill px-4 fw-700" onClick={() => navigate(`/product/${product.id}/edit`)}>
-                      Edit Details
-                    </Button>
-                  )}
+                  <Button 
+                    className="rounded-3 px-4 fw-800 border-0"
+                    style={{
+                      background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                      color: 'white',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onClick={handleOpenDeleteDialog}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(239, 68, 68, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
+                    <i className="fa-solid fa-trash-can me-2"></i> Remove Listing
+                  </Button>
+                  <Button 
+                    className="rounded-3 px-4 fw-800 border-0"
+                    style={{
+                      background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                      color: 'white',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onClick={() => navigate(`/product/${product.id}/edit`)}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-2px)';
+                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(245, 158, 11, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
+                    <i className="fa-solid fa-pen-to-square me-2"></i> Edit Details
+                  </Button>
                 </div>
               )}
 

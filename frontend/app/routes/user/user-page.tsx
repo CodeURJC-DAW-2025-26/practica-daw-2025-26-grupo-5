@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import { Row, Col, Table, Badge } from "react-bootstrap";
+import { Row, Col, Table, Badge, Card, Stack, Image } from "react-bootstrap";
+import { Link } from "react-router";
 import { useUserStore } from "~/stores/useUserStore";
 import type { Route } from "./+types/user-page";
 import { getUserDashboardStats } from "~/services/user-service";
@@ -34,16 +35,29 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
             type: 'line',
             data: {
                 labels: loaderData.revenueLabels,
-                datasets: [{ label: 'Revenue', data: loaderData.revenueValues, borderColor: '#3b82f6', tension: 0.4 }]
-            }
+                datasets: [{
+                    label: 'Revenue',
+                    data: loaderData.revenueValues,
+                    borderColor: '#2f6ced',
+                    backgroundColor: 'rgba(47, 108, 237, 0.05)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: { plugins: { legend: { display: false } } }
         });
 
         const chart2 = new Chart(catCtx!, {
             type: 'doughnut',
             data: {
                 labels: loaderData.revenueLabels,
-                datasets: [{ data: loaderData.revenueValues, backgroundColor: ['#1e3a8a', '#3b82f6', '#93c5fd', '#60a5fa'] }]
-            }
+                datasets: [{
+                    data: loaderData.revenueValues,
+                    backgroundColor: ['#1e3a8a', '#2f6ced', '#93c5fd', '#60a5fa'],
+                    borderWidth: 0
+                }]
+            },
+            options: { plugins: { legend: { position: 'bottom' } } }
         });
 
         return () => { chart1.destroy(); chart2.destroy(); };
@@ -53,84 +67,109 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
         <>
             <header className="d-flex justify-content-between align-items-center mb-5">
                 <div>
-                    <h1 className="fw-800 h2">Hello, {user?.name || 'User'}!</h1>
-                    <p className="text-muted small">Tracking your design treasures performance.</p>
+                    <h1 className="fw-800 h2 text-dark">Hello, {user?.name || 'User'}!</h1>
+                    <p className="text-muted small fw-600 mb-0">Tracking your design treasures performance.</p>
                 </div>
-                <div className="d-none d-md-flex">
-                    <span className="btn-about py-2 px-3 small"><i className="fa-solid fa-calendar-day me-2"></i> {loaderData.date}</span>
-                </div>
+                <Stack direction="horizontal" gap={3}>
+                    <div className="d-none d-md-flex">
+                        <span className="badge bg-white text-dark border border-2 px-3 py-2 fw-700 shadow-sm rounded-pill">
+                            <i className="fa-solid fa-calendar-day me-2 text-primary"></i> {loaderData.date}
+                        </span>
+                    </div>
+                    {user && (
+                        <Link to="/user/settings">
+                            <Image
+                                src={`/api/v1/users/me/profile-photo?t=${Date.now()}`}
+                                className="rounded-circle border border-2 shadow-sm"
+                                width="48" height="48"
+                                style={{ objectFit: 'cover' }}
+                                onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')}
+                            />
+                        </Link>
+                    )}
+                </Stack>
             </header>
 
             {/* --- STAT CARDS --- */}
             <Row className="g-4 mb-4">
                 <Col md={6}>
-                    <div className="clay-card p-4">
-                        <p className="label-categories mb-1 text-uppercase small opacity-50">Total Revenue</p>
-                        <h2 className="fw-800 text-primary">{loaderData.formattedTotalRevenue} €</h2>
-                        <span className="text-success fw-700 small">Keep going!</span>
-                    </div>
+                    <Card className="clay-card border-0 p-3 h-100">
+                        <Card.Body>
+                            <p className="text-muted small fw-700 mb-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Total Revenue</p>
+                            <h2 className="fw-800 text-primary mb-1">{loaderData.formattedTotalRevenue} €</h2>
+                            <span className="text-success fw-700 small">Keep going!</span>
+                        </Card.Body>
+                    </Card>
                 </Col>
                 <Col md={6}>
-                    <div className="clay-card p-4">
-                        <p className="label-categories mb-1 text-uppercase small opacity-50">Current Balance</p>
-                        <h2 className="fw-800 text-dark">{loaderData.formattedBalance} €</h2>
-                        <span className="text-primary fw-700 small">Wow!</span>
-                    </div>
+                    <Card className="clay-card border-0 p-3 h-100">
+                        <Card.Body>
+                            <p className="text-muted small fw-700 mb-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Current Balance</p>
+                            <h2 className="fw-800 text-dark mb-1">{loaderData.formattedBalance} €</h2>
+                            <span className="text-primary fw-700 small">Wow!</span>
+                        </Card.Body>
+                    </Card>
                 </Col>
             </Row>
 
             {/* --- CHARTS --- */}
             <Row className="g-4 mb-4">
                 <Col lg={7}>
-                    <div className="clay-card p-4 h-100">
-                        <h3 className="fw-800 h5 mb-4">Monthly Revenue Trend</h3>
-                        <canvas ref={revenueChartRef}></canvas>
-                    </div>
+                    <Card className="clay-card border-0 p-3 h-100">
+                        <Card.Body>
+                            <h5 className="fw-800 text-dark mb-4">Monthly Revenue Trend</h5>
+                            <canvas ref={revenueChartRef}></canvas>
+                        </Card.Body>
+                    </Card>
                 </Col>
                 <Col lg={5}>
-                    <div className="clay-card p-4 h-100">
-                        <h3 className="fw-800 h5 mb-4">Sales by Category</h3>
-                        <canvas ref={categoryChartRef}></canvas>
-                    </div>
+                    <Card className="clay-card border-0 p-3 h-100">
+                        <Card.Body>
+                            <h5 className="fw-800 text-dark mb-4">Sales by Category</h5>
+                            <canvas ref={categoryChartRef}></canvas>
+                        </Card.Body>
+                    </Card>
                 </Col>
             </Row>
 
             {/* --- RECENT SALES TABLE --- */}
-            <div className="clay-card p-4 mb-5">
-                <h3 className="fw-800 h5 mb-4">Recent Sales</h3>
-                <div className="table-responsive">
-                    <Table hover className="align-middle border-light">
-                        <thead className="x-small text-muted fw-800 text-uppercase">
-                            <tr>
-                                <th className="pb-3">Item Name</th>
-                                <th className="pb-3">Category</th>
-                                <th className="pb-3">Amount</th>
-                                <th className="pb-3">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody className="fw-700 small">
-                            {loaderData.userSales?.length > 0 ? (
-                                loaderData.userSales.map((sale: any) => (
-                                    <tr key={sale.id}>
-                                        <td className="py-3">{sale.product?.name}</td>
-                                        <td className="opacity-50">{sale.product?.category}</td>
-                                        <td className="text-primary">{sale.product?.formattedPrice} €</td>
-                                        <td>
-                                            <Badge pill bg="success-subtle" className="text-success px-3 py-2">
-                                                {sale.product?.status}
-                                            </Badge>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : (
+            <Card className="clay-card border-0 p-3 mb-5">
+                <Card.Body>
+                    <h5 className="fw-800 text-dark mb-4">Recent Sales</h5>
+                    <div className="table-responsive">
+                        <Table hover className="table-admin mb-0 align-middle">
+                            <thead>
                                 <tr>
-                                    <td colSpan={4} className="text-center py-4 text-muted">No sales yet.</td>
+                                    <th>ITEM NAME</th>
+                                    <th>CATEGORY</th>
+                                    <th>AMOUNT</th>
+                                    <th>STATUS</th>
                                 </tr>
-                            )}
-                        </tbody>
-                    </Table>
-                </div>
-            </div>
+                            </thead>
+                            <tbody>
+                                {loaderData.userSales?.length > 0 ? (
+                                    loaderData.userSales.map((sale: any) => (
+                                        <tr key={sale.id}>
+                                            <td className="fw-700 text-dark">{sale.product?.name}</td>
+                                            <td className="text-muted fw-600 small">{sale.product?.category}</td>
+                                            <td className="text-primary fw-800">{sale.product?.formattedPrice} €</td>
+                                            <td>
+                                                <Badge pill bg="success-subtle" className="text-success px-3 py-2 fw-700">
+                                                    {sale.product?.status}
+                                                </Badge>
+                                            </td>
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={4} className="text-center py-4 text-muted fw-600">No sales yet.</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </Table>
+                    </div>
+                </Card.Body>
+            </Card>
         </>
     );
 }

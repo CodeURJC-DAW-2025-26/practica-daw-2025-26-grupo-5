@@ -1,15 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { Container, Button, Badge, Image, Stack, ListGroup } from "react-bootstrap";
+import { Button, Badge, Image, Stack, Card, Row, Col, Spinner } from "react-bootstrap";
 import { getMyProducts, deleteProduct } from "~/services/products-service";
-import Loader from "~/components/Loader";
 import ConfirmModal from "~/components/confirm-modal";
 import type ProductDTO from "~/dto/ProductDTO";
 
-/**
- * MyProducts Component
- * Manages the user's personal inventory with specialized deletion feedback.
- */
 export default function MyProducts() {
     const [products, setProducts] = useState<ProductDTO[]>([]);
     const [loading, setLoading] = useState(true);
@@ -44,9 +39,7 @@ export default function MyProducts() {
 
     const handleConfirmDelete = async () => {
         if (idToDelete === null) return;
-
         setIsDeleting(true);
-
         try {
             await new Promise(resolve => setTimeout(resolve, 1000));
             await deleteProduct(idToDelete);
@@ -61,120 +54,88 @@ export default function MyProducts() {
         }
     };
 
-    if (loading) return <Loader />;
+    if (loading) return (
+        <div className="d-flex justify-content-center align-items-center py-5 w-100">
+            <Spinner animation="border" variant="primary" />
+        </div>
+    );
 
     return (
-        <Container className="py-4 animate-fade-in">
+        <>
             {/* Header */}
-            <div className="d-flex justify-content-between align-items-center mb-5">
+            <header className="d-flex justify-content-between align-items-center mb-5">
                 <div>
-                    <h1 className="fw-800 mb-1">My Products</h1>
-                    <p className="text-muted small mb-0">Manage your design inventory and track performance.</p>
+                    <h1 className="fw-800 h2 text-dark">My Products</h1>
+                    <p className="text-muted small fw-600 mb-0">Manage your design inventory and track performance.</p>
                 </div>
+
+                {/* AQUÍ ESTÁ LA CORRECCIÓN: Link envolviendo al Button */}
                 <Link to="/product/new" className="text-decoration-none">
-                    <Button variant="primary" className="fw-600 d-flex align-items-center gap-2">
-                        <i className="fa-solid fa-plus"></i>
-                        Add Product
+                    <Button variant="primary" className="fw-700 rounded-pill px-4" style={{ backgroundColor: '#2f6ced', border: 'none' }}>
+                        <i className="fa-solid fa-plus me-2"></i>Add Product
                     </Button>
                 </Link>
-            </div>
+
+            </header>
 
             {/* Product List */}
             {products.length > 0 ? (
-                <div className="d-flex flex-column gap-3">
+                <Stack gap={3}>
                     {products.map((product) => (
-                        <div
-                            key={product.id}
-                            className="d-flex align-items-center justify-content-between flex-wrap gap-3 p-3"
-                            style={{
-                                backgroundColor: '#fff',
-                                border: '1px solid #e5e7eb',
-                                borderRadius: '8px',
-                                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
-                            }}
-                        >
-                            {/* Product Info */}
-                            <Link
-                                to={`/product/${product.id}`}
-                                className="d-flex align-items-center gap-4 text-decoration-none text-dark flex-grow-1"
-                                style={{ minWidth: '0' }}
-                            >
-                                {/* Product Image */}
-                                <Image
-                                    src={`/api/v1/products/${product.id}/image?t=${Date.now()}`}
-                                    alt={product.name}
-                                    rounded
-                                    style={{
-                                        width: '80px',
-                                        height: '80px',
-                                        objectFit: 'cover',
-                                        flexShrink: 0,
-                                        backgroundColor: '#f3f4f6',
-                                        border: '1px solid #e5e7eb'
-                                    }}
-                                    onError={(e) => (e.currentTarget.src = "/images/placeholder.png")}
-                                />
+                        <Card key={product.id} className="clay-card border-0 overflow-hidden">
+                            <Card.Body className="p-3">
+                                <Row className="align-items-center g-3">
+                                    <Col xs={12} md={8}>
+                                        <Link to={`/product/${product.id}`} className="text-decoration-none text-dark d-flex align-items-center gap-3">
+                                            <Image
+                                                src={`/api/v1/products/${product.id}/image?t=${Date.now()}`}
+                                                alt={product.name}
+                                                rounded
+                                                style={{ width: '80px', height: '80px', objectFit: 'cover', backgroundColor: '#f3f4f6', border: '1px solid #e5e7eb' }}
+                                                onError={(e) => (e.currentTarget.src = "/images/placeholder.png")}
+                                            />
+                                            <div>
+                                                <h6 className="fw-800 mb-2 text-dark">{product.name}</h6>
+                                                <Stack direction="horizontal" gap={3}>
+                                                    <span className="text-muted small fw-700 text-uppercase" style={{ letterSpacing: '0.5px' }}>Ref: #ST-0{product.id}</span>
+                                                    <Badge bg={product.status === 'Active' ? 'success' : 'danger'} className="fw-700 px-3 py-2 rounded-pill">
+                                                        {product.status}
+                                                    </Badge>
+                                                </Stack>
+                                            </div>
+                                        </Link>
+                                    </Col>
 
-                                {/* Product Details */}
-                                <div style={{ minWidth: '0' }}>
-                                    <h6 className="fw-800 mb-2">{product.name}</h6>
-                                    <Stack direction="horizontal" gap={3} className="flex-wrap">
-                                        <small className="text-muted fw-600">
-                                            Ref: #ST-0{product.id}
-                                        </small>
-                                        <Badge
-                                            bg={product.status === 'Active' ? 'success' : 'danger'}
-                                            className="px-3 py-2"
-                                        >
-                                            {product.status}
-                                        </Badge>
-                                    </Stack>
-                                </div>
-                            </Link>
-
-                            {/* Price & Actions */}
-                            <div className="d-flex align-items-center gap-4">
-                                {/* Price - Hidden on small screens */}
-                                <div className="d-none d-md-block text-end">
-                                    <p className="fw-800 mb-0" style={{ color: '#3b82f6', fontSize: '18px' }}>
-                                        {priceFormatter.format(product.price)}€
-                                    </p>
-                                </div>
-
-                                {/* Action Buttons */}
-                                <Stack direction="horizontal" gap={2}>
-                                    <Link to={`/product/${product.id}/edit`} className="text-decoration-none">
-                                        <Button
-                                            variant="outline-secondary"
-                                            size="sm"
-                                            className="d-flex align-items-center justify-content-center"
-                                            style={{ width: '40px', height: '40px', padding: '0' }}
-                                            title="Edit product"
-                                        >
-                                            <i className="fa-solid fa-pen-to-square"></i>
-                                        </Button>
-                                    </Link>
-
-                                    <Button
-                                        variant="outline-danger"
-                                        size="sm"
-                                        className="d-flex align-items-center justify-content-center"
-                                        style={{ width: '40px', height: '40px', padding: '0' }}
-                                        onClick={() => handleDeleteClick(product.id)}
-                                        title="Delete product"
-                                    >
-                                        <i className="fa-solid fa-trash-can"></i>
-                                    </Button>
-                                </Stack>
-                            </div>
-                        </div>
+                                    <Col xs={12} md={4} className="d-flex justify-content-md-end align-items-center gap-4">
+                                        <div className="d-none d-md-block text-end">
+                                            <h4 className="fw-800 mb-0 text-primary">
+                                                {priceFormatter.format(product.price)}€
+                                            </h4>
+                                        </div>
+                                        <Stack direction="horizontal" gap={2}>
+                                            <Link to={`/product/${product.id}/edit`} className="text-decoration-none">
+                                                <Button variant="outline-secondary" size="sm" className="d-flex align-items-center justify-content-center border-0 bg-light" style={{ width: '40px', height: '40px', padding: '0', borderRadius: '8px' }} title="Edit product">
+                                                    <i className="fa-solid fa-pen-to-square text-secondary"></i>
+                                                </Button>
+                                            </Link>
+                                            <Button variant="outline-danger" size="sm" className="d-flex align-items-center justify-content-center border-0" style={{ width: '40px', height: '40px', padding: '0', borderRadius: '8px', backgroundColor: '#fef2f2' }} onClick={() => handleDeleteClick(product.id)} title="Delete product">
+                                                <i className="fa-solid fa-trash-can text-danger"></i>
+                                            </Button>
+                                        </Stack>
+                                    </Col>
+                                </Row>
+                            </Card.Body>
+                        </Card>
                     ))}
-                </div>
+                </Stack>
             ) : (
-                <div className="text-center py-5" style={{ opacity: '0.5' }}>
-                    <i className="fa-solid fa-box-open fa-3x mb-3"></i>
-                    <p className="fw-700">Empty inventory.</p>
-                </div>
+                <Card className="clay-card border-0">
+                    <Card.Body className="text-center py-5 opacity-50">
+                        <i className="fa-solid fa-box-open fa-3x mb-3 text-muted"></i>
+                        <h5 className="fw-800 text-dark">Empty inventory</h5>
+                        <p className="text-muted fw-600 mb-0">You haven't uploaded any products yet.</p>
+                    </Card.Body>
+                </Card>
             )}
 
             {/* Confirmation Modal */}
@@ -189,6 +150,6 @@ export default function MyProducts() {
                 onConfirm={handleConfirmDelete}
                 onCancel={() => !isDeleting && setShowDeleteModal(false)}
             />
-        </Container>
+        </>
     );
 }

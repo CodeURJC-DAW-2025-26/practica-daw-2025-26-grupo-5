@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useLocation, Link } from 'react-router';
-import { Container, Alert } from 'react-bootstrap';
+import { Container, Alert, Card, Form, Button, Image, Stack } from 'react-bootstrap';
 import { useUserStore } from '~/stores/useUserStore';
 import type { Route } from './+types/login';
 import logo from "../assets/logo.png";
 import Footer from '~/components/footer';
-import Loader from '~/components/Loader'; 
+import Loader from '~/components/Loader';
 
 interface LoginFormData {
   username: string;
@@ -14,13 +14,7 @@ interface LoginFormData {
 }
 
 export default function Login({ }: Route.ComponentProps) {
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
-    defaultValues: {
-      username: '',
-      password: '',
-    },
-  });
-
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({ defaultValues: { username: '', password: '' } });
   const { loginUser, loginError, user } = useUserStore();
   const navigate = useNavigate();
   const location = useLocation();
@@ -28,11 +22,7 @@ export default function Login({ }: Route.ComponentProps) {
 
   useEffect(() => {
     if (user && !isLoading) {
-      // Check if user is banned
-      if (user.banned) {
-        navigate('/banned');
-        return;
-      }
+      if (user.banned) { navigate('/banned'); return; }
       const redirectTo = location.state?.from?.pathname || '/';
       navigate(redirectTo);
     }
@@ -41,96 +31,62 @@ export default function Login({ }: Route.ComponentProps) {
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      await Promise.all([
-        loginUser(data.username, data.password),
-        new Promise((resolve) => setTimeout(resolve, 2000))
-      ]);
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setIsLoading(false);
-    }
+      await Promise.all([loginUser(data.username, data.password), new Promise((resolve) => setTimeout(resolve, 2000))]);
+    } catch (error) { console.error('Error:', error); }
+    finally { setIsLoading(false); }
   };
 
   return (
     <>
       {isLoading && <Loader />}
-
-      <div className="auth-page">
-        <header className="navbar container-fluid px-lg-5 py-3 header-border-line bg-white">
-          <div className="logo-wrapper">
-            <Link to="/" className="text-decoration-none d-flex align-items-center gap-2">
-              <img src={logo} alt="Stilnovo" className="logo-img" width="35" />
-              <span className="brand">Stilnovo</span>
-            </Link>
-          </div>
-          <nav className="nav-actions">
+      <div className="auth-page min-vh-100 d-flex flex-column bg-light">
+        <header className="navbar container-fluid px-lg-5 py-3 bg-white border-bottom shadow-sm">
+          <Link to="/" className="text-decoration-none d-flex align-items-center gap-2">
+            <Image src={logo} alt="Stilnovo" width="35" />
+            <span className="brand fw-800 text-primary mb-0 fs-4">Stilnovo</span>
+          </Link>
+          <nav className="ms-auto fw-600">
             <span className="text-muted d-none d-sm-inline">Don't have an account?</span>
             <Link to="/signup" className="link-login ms-2">Sign up</Link>
           </nav>
         </header>
 
-        <div className="hero-wrapper auth-background">
-          <main className="container d-flex align-items-center justify-content-center flex-grow-1">
+        <main className="flex-grow-1 d-flex align-items-center justify-content-center py-5">
+          <Container className="d-flex justify-content-center">
+            <Card className="clay-card border-0 p-3" style={{ maxWidth: '480px', width: '100%' }}>
+              <Card.Body className="p-4 p-md-5">
+                <div className="text-center mb-5">
+                  <h2 className="fw-800 text-dark">Welcome Back</h2>
+                  <p className="text-muted small fw-600">Log in to your treasure chest</p>
+                </div>
 
-            <div className="auth-card clay-card p-5 bg-white" style={{ maxWidth: '480px', width: '100%' }}>
+                {loginError && <Alert variant="danger" className="text-center fw-700 mb-4 border-0 rounded-3">Wrong username or password</Alert>}
 
-              <div className="text-center mb-5">
-                <h2 className="fw-800">Welcome Back</h2>
-                <p className="hero-subtitle">Log in to your treasure chest</p>
-              </div>
+                <Form onSubmit={handleSubmit(onSubmit)}>
+                  <Form.Group className="mb-4">
+                    <Form.Label className="fw-800 small text-muted ms-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Username</Form.Label>
+                    <Form.Control className="py-3 bg-light border-0 rounded-3 fw-600" placeholder="Enter your username" {...register('username', { required: true })} disabled={isLoading} isInvalid={!!errors.username} />
+                  </Form.Group>
 
-              {loginError && (
-                <Alert variant="danger" className="text-center fw-700 mb-4 border-0 rounded-3">
-                  Wrong username or password
-                </Alert>
-              )}
+                  <Form.Group className="mb-5">
+                    <Form.Label className="fw-800 small text-muted ms-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Password</Form.Label>
+                    <Form.Control type="password" className="py-3 bg-light border-0 rounded-3 fw-600" placeholder="Enter your password" {...register('password', { required: true })} disabled={isLoading} isInvalid={!!errors.password} />
+                  </Form.Group>
 
-              <form onSubmit={handleSubmit(onSubmit)}>
+                  <Button type="submit" className="btn-sell w-100 py-3 fw-800 border-0 mb-4 rounded-pill shadow-lg" disabled={isLoading}>
+                    {isLoading ? 'Logging in...' : 'Login to My Account'}
+                  </Button>
 
-                <div className="mb-4">
-                  <label className="form-label fw-700 small ms-2">Username</label>
-                  <div className={`search-box w-100 py-2 ${errors.username ? 'border-danger' : ''}`}>
-                    <i className="fa-solid fa-user small"></i>
-                    <input
-                      type="text"
-                      placeholder="Enter your username"
-                      {...register('username', { required: true })}
-                      disabled={isLoading}
-                    />
+                  <div className="text-center">
+                    <Link to="/" className="text-muted small text-decoration-none fw-700">
+                      <i className="fa-solid fa-arrow-left me-2"></i>Back to Marketplace
+                    </Link>
                   </div>
-                </div>
-
-                <div className="mb-5">
-                  <label className="form-label fw-700 small ms-2">Password</label>
-                  <div className={`search-box w-100 py-2 ${errors.password ? 'border-danger' : ''}`}>
-                    <i className="fa-solid fa-lock small"></i>
-                    <input
-                      type="password"
-                      placeholder="Enter your password"
-                      {...register('password', { required: true })}
-                      disabled={isLoading}
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className="btn-sell w-100 justify-content-center mb-4"
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Logging in...' : 'Login to My Account'}
-                </button>
-
-                <div className="text-center">
-                  <Link to="/" className="text-muted small text-decoration-none fw-700">
-                    <i className="fa-solid fa-arrow-left me-2"></i>Back to Marketplace
-                  </Link>
-                </div>
-              </form>
-            </div>
-          </main>
-        </div>
+                </Form>
+              </Card.Body>
+            </Card>
+          </Container>
+        </main>
         <Footer />
       </div>
     </>

@@ -43,15 +43,26 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
   const homeData = loaderData as HomePageDTO;
   const { user } = useUserStore();
 
+  // Fill recommended products to always show 4 (or available)
+  const recommendedCount = homeData.recommendedProducts?.length || 0;
+  const filledRecommendations = [...(homeData.recommendedProducts || [])];
+  
+  if (recommendedCount < 4 && homeData.products) {
+    const recommendedIds = new Set(filledRecommendations.map(p => p.id));
+    const fillers = homeData.products.filter(p => !recommendedIds.has(p.id));
+    const needed = 4 - recommendedCount;
+    filledRecommendations.push(...fillers.slice(0, needed));
+  }
+
   return (
     <Container className="pt-5">
       
       {/* NEW SECTION: Recommended Products */}
-      {homeData.recommendedProducts && homeData.recommendedProducts.length > 0 && (
+      {filledRecommendations.length > 0 && (
         <div className="mb-5 pb-4 border-bottom">
           <h2 className="fw-800 mb-5 text-center text-primary">Recommended for You</h2>
           <Row xs={1} md={2} lg={4} className="g-4">
-            {homeData.recommendedProducts.map((product: ProductDTO) => (
+            {filledRecommendations.map((product: ProductDTO) => (
               <Col key={`rec-${product.id}`}> {/* Prefisso rec- per evitare conflitti di chiavi */}
                 <Link to={`/product/${product.id}`} className="text-decoration-none text-dark">
                   <div className="clay-card">
