@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { redirect, useRevalidator } from 'react-router';
-import { getAdminUsers, banUser, deleteUser, updateUser } from '~/services/admin-service';
+import { getAdminUsers, banUser, deleteUser, updateUser, getAdminProducts, updateProduct } from '~/services/admin-service';
 import { useUserStore } from '~/stores/useUserStore';
 import type UserDTO from '~/dto/UserDTO';
 import type PagedResponse from '~/dto/PagedResponse';
@@ -47,15 +46,6 @@ const getKPIBg = (color: string): string => {
   return map[color] || '#f8fafc';
 };
 
-interface UserEditFormData {
-  name: string;
-  email: string;
-  description: string;
-  cardNumber: string;
-  cardExpiringDate: string;
-  cardCvv: string;
-}
-
 export async function clientLoader() {
   try {
     const data = await getAdminUsers(0, 100);
@@ -72,9 +62,13 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
   const users = pagedData.content || [];
   const loggedInUser = useUserStore((state) => state.user);
 
-  const { register, handleSubmit, reset } = useForm<UserEditFormData>({
-    defaultValues: { name: '', email: '', description: '', cardNumber: '', cardExpiringDate: '', cardCvv: '' },
-  });
+  // Individual form field states for edit modal
+  const [editName, setEditName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editCardNumber, setEditCardNumber] = useState('');
+  const [editCardExpiry, setEditCardExpiry] = useState('');
+  const [editCardCvv, setEditCardCvv] = useState('');
 
   const [rowData, setRowData] = useState<UserDTO[]>(users);
   const [selectedUser, setSelectedUser] = useState<UserDTO | null>(null);
@@ -82,6 +76,7 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
+  const [editError, setEditError] = useState<string | null>(null);
   const itemsPerPage = 10;
 
   const isUserAnAdmin = (user: UserDTO) => user.roles?.includes('ADMIN') || user.roles?.includes('ROLE_ADMIN');
@@ -90,30 +85,40 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
 
   const handleEditClick = (user: UserDTO) => {
     setSelectedUser(user);
-    reset({
-      name: user.name || '', email: user.email || '', description: user.description || '',
-      cardNumber: user.cardNumber || '', cardExpiringDate: user.cardExpiringDate || '', cardCvv: user.cardCvv || ''
-    });
+    setEditName(user.name || '');
+    setEditEmail(user.email || '');
+    setEditDescription(user.description || '');
+    setEditCardNumber(user.cardNumber || '');
+    setEditCardExpiry(user.cardExpiringDate || '');
+    setEditCardCvv(user.cardCvv || '');
     setSelectedPhoto(null);
+    setEditError(null);
     setModalType('edit');
   };
 
-  const onEditSubmit = async (formData: UserEditFormData) => {
+  const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     if (!selectedUser) return;
+    e.preventDefault();
+    setEditError(null);
     setIsLoading(true);
     try {
       const formDataObj = new FormData();
-      Object.entries(formData).forEach(([key, value]) => formDataObj.append(key, value));
+      formDataObj.append('name', editName);
+      formDataObj.append('email', editEmail);
+      formDataObj.append('description', editDescription);
+      formDataObj.append('cardNumber', editCardNumber);
+      formDataObj.append('cardExpiringDate', editCardExpiry);
+      formDataObj.append('cardCvv', editCardCvv);
       if (selectedPhoto) formDataObj.append('newProfilePhoto', selectedPhoto);
 
-      const updatedUser = await updateUser(selectedUser.id, formDataObj as any);
+      const updatedUser = await updateUser(selectedUser.id, formDataObj);
       setRowData((prev) => prev.map((u) => (u.id === selectedUser.id ? updatedUser : u)));
       setModalType(null);
       setSelectedUser(null);
       revalidator.revalidate();
-    } catch (error) {
-      console.error('Failed to update user:', error);
-      alert('Failed to update user. Please try again.');
+    } catch (error: any) {
+      const errorMsg = error.message || 'Failed to update user. Please try again.';
+      setEditError(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -127,6 +132,32 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
     try {
       const updatedUser = await banUser(selectedUser.id, !selectedUser.banned);
       setRowData((prev) => prev.map((u) => (u.id === selectedUser.id ? updatedUser : u)));
+      
+      // Handle product banning/unbanning based on user's ban status
+      try {
+        const productsPage = await getAdminProducts(0, 1000);
+        const userProducts = productsPage.content?.filter(p => p.seller?.id === selectedUser.id) || [];
+        
+        // If banning (user.banned is false -> true), ban all products
+        // If unbanning (user.banned is true -> false), unban all products to Active
+        const newProductStatus = !selectedUser.banned ? 'Banned' : 'Active';
+        
+        for (const product of userProducts) {
+          const formData = new FormData();
+          formData.append('name', product.name);
+          formData.append('category', product.category);
+          formData.append('price', String(product.price));
+          formData.append('location', product.location);
+          formData.append('description', product.description);
+          formData.append('status', newProductStatus);
+          formData.append('sellerId', String(product.seller?.id || ''));
+          await updateProduct(product.id, formData);
+        }
+      } catch (productError) {
+        console.error('Failed to update user products:', productError);
+        // Don't fail the entire operation if product update fails
+      }
+      
       setModalType(null); setSelectedUser(null); revalidator.revalidate();
     } catch (error) {
       console.error('Failed to ban user:', error); alert('Failed to ban user. Please try again.');
@@ -270,7 +301,8 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
           <Modal.Title className="fw-800 text-dark">Edit User: {selectedUser?.name || selectedUser?.email}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="p-4">
-          <Form onSubmit={handleSubmit(onEditSubmit)}>
+          {editError && <Alert variant="danger" className="mb-3">{editError}</Alert>}
+          <Form onSubmit={handleEditSubmit}>
             <Row>
               <Col md={5} className="d-flex flex-column align-items-center border-end pe-4">
                 <div className="mb-3 position-relative text-center">
@@ -285,11 +317,11 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
                 <div className="w-100">
                   <Form.Group className="mb-3">
                     <Form.Label className="fw-700 small text-uppercase text-muted">Name</Form.Label>
-                    <Form.Control type="text" className="rounded-3 py-2 bg-light border-0" {...register('name')} disabled={isLoading} />
+                    <Form.Control type="text" name="name" className="rounded-3 py-2 bg-light border-0" value={editName} onChange={(e) => setEditName(e.target.value)} disabled={isLoading} />
                   </Form.Group>
                   <Form.Group className="mb-3">
                     <Form.Label className="fw-700 small text-uppercase text-muted">Bio / Description</Form.Label>
-                    <Form.Control as="textarea" rows={5} className="rounded-3 py-2 bg-light border-0" {...register('description')} disabled={isLoading} />
+                    <Form.Control as="textarea" name="description" rows={5} className="rounded-3 py-2 bg-light border-0" value={editDescription} onChange={(e) => setEditDescription(e.target.value)} disabled={isLoading} />
                   </Form.Group>
                 </div>
               </Col>
@@ -297,23 +329,23 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
                 <h6 className="fw-700 text-uppercase text-muted mb-4">Account & Billing</h6>
                 <Form.Group className="mb-4">
                   <Form.Label className="fw-700 small text-muted">EMAIL ADDRESS</Form.Label>
-                  <Form.Control type="email" className="rounded-3 py-2 bg-light border-0" {...register('email')} disabled={isLoading} />
+                  <Form.Control type="email" name="email" className="rounded-3 py-2 bg-light border-0" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} disabled={isLoading} />
                 </Form.Group>
                 <Form.Group className="mb-4">
                   <Form.Label className="fw-700 small text-muted">CARD NUMBER</Form.Label>
-                  <Form.Control type="text" className="rounded-3 py-2 bg-light border-0" {...register('cardNumber')} disabled={isLoading} />
+                  <Form.Control type="text" name="cardNumber" className="rounded-3 py-2 bg-light border-0" value={editCardNumber} onChange={(e) => setEditCardNumber(e.target.value)} disabled={isLoading} />
                 </Form.Group>
                 <Row>
                   <Col sm={6}>
                     <Form.Group className="mb-4">
                       <Form.Label className="fw-700 small text-muted">EXPIRING DATE</Form.Label>
-                      <Form.Control type="text" className="rounded-3 py-2 bg-light border-0" {...register('cardExpiringDate')} disabled={isLoading} />
+                      <Form.Control type="text" name="cardExpiringDate" className="rounded-3 py-2 bg-light border-0" value={editCardExpiry} onChange={(e) => setEditCardExpiry(e.target.value)} disabled={isLoading} />
                     </Form.Group>
                   </Col>
                   <Col sm={6}>
                     <Form.Group className="mb-4">
                       <Form.Label className="fw-700 small text-muted">CVV</Form.Label>
-                      <Form.Control type="text" className="rounded-3 py-2 bg-light border-0" {...register('cardCvv')} disabled={isLoading} />
+                      <Form.Control type="text" name="cardCvv" className="rounded-3 py-2 bg-light border-0" value={editCardCvv} onChange={(e) => setEditCardCvv(e.target.value)} disabled={isLoading} />
                     </Form.Group>
                   </Col>
                 </Row>

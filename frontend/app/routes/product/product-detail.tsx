@@ -190,7 +190,7 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
               )}
 
               {/* Admin/Owner Actions */}
-              {user && (user.roles?.includes("ROLE_ADMIN") || user.id === product.seller?.id) && (
+              {user && user.id === product.seller?.id && (
                 <div className="d-flex gap-2 mb-4">
                   <Button 
                     className="rounded-3 px-4 fw-800 border-0"

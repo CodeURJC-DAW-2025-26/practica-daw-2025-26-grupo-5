@@ -43,13 +43,17 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
   const homeData = loaderData as HomePageDTO;
   const { user } = useUserStore();
 
+  // Filter out products from banned sellers
+  const activeProducts = homeData.products?.filter(p => !p.seller?.banned) || [];
+  const activeRecommendations = homeData.recommendedProducts?.filter(p => !p.seller?.banned) || [];
+
   // Fill recommended products to always show 4 (or available)
-  const recommendedCount = homeData.recommendedProducts?.length || 0;
-  const filledRecommendations = [...(homeData.recommendedProducts || [])];
+  const recommendedCount = activeRecommendations.length;
+  const filledRecommendations = [...activeRecommendations];
   
-  if (recommendedCount < 4 && homeData.products) {
+  if (recommendedCount < 4 && activeProducts) {
     const recommendedIds = new Set(filledRecommendations.map(p => p.id));
-    const fillers = homeData.products.filter(p => !recommendedIds.has(p.id));
+    const fillers = activeProducts.filter(p => !recommendedIds.has(p.id));
     const needed = 4 - recommendedCount;
     filledRecommendations.push(...fillers.slice(0, needed));
   }
@@ -92,7 +96,7 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
         </h2>
 
         <Row xs={1} md={2} lg={4} className="g-4">
-          {homeData.products.map((product: ProductDTO) => (
+          {activeProducts.map((product: ProductDTO) => (
             <Col key={`cat-${product.id}`}> {/* Prefisso cat- per evitare conflitti di chiavi */}
               <Link to={`/product/${product.id}`} className="text-decoration-none text-dark">
                 <div className="clay-card">

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
 import { redirect, useRevalidator } from 'react-router';
 import { Container, Row, Col, Card, Table, Button, Image, Stack, Alert, Modal, Form } from 'react-bootstrap';
 import { getAdminProducts, deleteProduct, createProduct, updateProduct, getAdminUsers } from '~/services/admin-service';
@@ -47,13 +46,9 @@ const getKPIBg = (color: string): string => {
   return map[color] || '#f8fafc';
 };
 
-interface ProductFormData {
-  name: string; category: string; price: string; location: string; description: string; status: string; sellerId: string;
-}
-
 export async function clientLoader() {
   try {
-    const data = await getAdminProducts(0, 1000); 
+    const data = await getAdminProducts(0, 1000);
     return data || {};
   } catch (error) {
     throw redirect('/login');
@@ -65,9 +60,14 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
   const pagedData = loaderData as PagedResponse<ProductDTO>;
   const products = pagedData.content || [];
 
-  const { register, handleSubmit, reset } = useForm<ProductFormData>({
-    defaultValues: { name: '', category: '', price: '', location: '', description: '', status: 'Active', sellerId: '' },
-  });
+  // Individual form field states for product modal
+  const [productSellerId, setProductSellerId] = useState('');
+  const [productName, setProductName] = useState('');
+  const [productCategory, setProductCategory] = useState('');
+  const [productPrice, setProductPrice] = useState('');
+  const [productLocation, setProductLocation] = useState('');
+  const [productStatus, setProductStatus] = useState('Active');
+  const [productDescription, setProductDescription] = useState('');
 
   const [rowData, setRowData] = useState<ProductDTO[]>(products);
   const [users, setUsers] = useState<UserDTO[]>([]);
@@ -77,7 +77,6 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
   const [formError, setFormError] = useState<string | null>(null);
-  const [isPending, setIsPending] = useState(false);
   const [isEditingProduct, setIsEditingProduct] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const itemsPerPage = 10;
@@ -91,22 +90,50 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
   }, [pagedData.content]);
 
   const handleAddProduct = () => {
-    setFormError(null); setIsEditingProduct(false); setSelectedFile(null); setShowAddModal(true);
-    reset({ name: '', category: '', price: '', location: '', description: '', status: 'Active', sellerId: '' });
+    setFormError(null);
+    setIsEditingProduct(false);
+    setSelectedFile(null);
+    setProductName('');
+    setProductCategory('');
+    setProductPrice('');
+    setProductLocation('');
+    setProductDescription('');
+    setProductStatus('Active');
+    setProductSellerId('');
+    setShowAddModal(true);
   };
 
   const handleEditProduct = (product: ProductDTO) => {
-    setFormError(null); setIsEditingProduct(true); setSelectedProduct(product); setSelectedFile(null); setShowAddModal(true);
-    reset({ name: product.name, category: product.category, price: String(product.price), location: product.location, description: product.description, status: product.status, sellerId: String(product.seller?.id || '') });
+    setFormError(null);
+    setIsEditingProduct(true);
+    setSelectedProduct(product);
+    setSelectedFile(null);
+    setProductSellerId(String(product.seller?.id || ''));
+    setProductName(product.name);
+    setProductCategory(product.category);
+    setProductPrice(String(product.price));
+    setProductLocation(product.location);
+    setProductDescription(product.description);
+    setProductStatus(product.status);
+    setShowAddModal(true);
   };
 
-  const onFormSubmit = async (formData: ProductFormData) => {
-    setIsPending(true); setFormError(null);
-    const formDataObj = new FormData();
-    Object.entries(formData).forEach(([key, value]) => formDataObj.append(key, value));
-    if (selectedFile) formDataObj.append('image', selectedFile);
-
+  const handleProductFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setFormError(null);
+    setIsLoading(true);
+    
     try {
+      const formDataObj = new FormData();
+      formDataObj.append('sellerId', productSellerId);
+      formDataObj.append('name', productName);
+      formDataObj.append('category', productCategory);
+      formDataObj.append('price', productPrice);
+      formDataObj.append('location', productLocation);
+      formDataObj.append('description', productDescription);
+      formDataObj.append('status', productStatus);
+      if (selectedFile) formDataObj.append('image', selectedFile);
+
       if (isEditingProduct && selectedProduct) {
         const updatedProduct = await updateProduct(selectedProduct.id, formDataObj);
         setRowData((prev) => prev.map((p) => (p.id === selectedProduct.id ? updatedProduct : p)));
@@ -114,10 +141,14 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
         const newProduct = await createProduct(formDataObj);
         setRowData((prev) => [newProduct, ...prev]);
       }
-      setShowAddModal(false); revalidator.revalidate();
+      setShowAddModal(false);
+      revalidator.revalidate();
     } catch (error: any) {
-      setFormError(error.response?.data?.message || 'Action failed.');
-    } finally { setIsPending(false); }
+      const errorMsg = error.message || 'Action failed. Please try again.';
+      setFormError(errorMsg);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleDeleteClick = (product: ProductDTO) => { setSelectedProduct(product); setShowDeleteModal(true); };
@@ -144,7 +175,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
   };
 
   const totalProducts = pagedData.totalElements || 0;
-  const activeListings = rowData.filter(p => p.status?.toLowerCase() === "active").length;
+  const activeListings = rowData.filter(p => p.status?.toLowerCase() === "active" && !p.seller?.banned).length;
   const averagePrice = rowData.length > 0 ? rowData.reduce((sum, p) => sum + (p.price || 0), 0) / rowData.length : 0;
   const totalValue = rowData.reduce((sum, p) => sum + (p.price || 0), 0);
 
@@ -247,12 +278,12 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
         </Modal.Header>
         <Modal.Body className="p-4">
           {formError && <Alert variant="danger">{formError}</Alert>}
-          <Form onSubmit={handleSubmit(onFormSubmit)}>
+          <Form onSubmit={handleProductFormSubmit}>
             <Row>
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label className="fw-700 small text-uppercase text-muted">Seller</Form.Label>
-                  <Form.Select required {...register('sellerId')} className="rounded-3 py-2 bg-light border-0">
+                  <Form.Select required name="sellerId" value={productSellerId} onChange={(e) => setProductSellerId(e.target.value)} className="rounded-3 py-2 bg-light border-0" disabled={isLoading}>
                     <option value="">Select user</option>
                     {users.map(u => <option key={u.id} value={u.id}>{u.name || u.email}</option>)}
                   </Form.Select>
@@ -261,7 +292,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label className="fw-700 small text-uppercase text-muted">Product Name</Form.Label>
-                  <Form.Control type="text" {...register('name')} required className="rounded-3 py-2 bg-light border-0" />
+                  <Form.Control type="text" name="name" value={productName} onChange={(e) => setProductName(e.target.value)} required className="rounded-3 py-2 bg-light border-0" disabled={isLoading} />
                 </Form.Group>
               </Col>
             </Row>
@@ -269,13 +300,13 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label className="fw-700 small text-uppercase text-muted">Category</Form.Label>
-                  <Form.Control type="text" {...register('category')} className="rounded-3 py-2 bg-light border-0" />
+                  <Form.Control type="text" name="category" value={productCategory} onChange={(e) => setProductCategory(e.target.value)} className="rounded-3 py-2 bg-light border-0" disabled={isLoading} />
                 </Form.Group>
               </Col>
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label className="fw-700 small text-uppercase text-muted">Price (€)</Form.Label>
-                  <Form.Control type="number" {...register('price')} required className="rounded-3 py-2 bg-light border-0" />
+                  <Form.Control type="number" name="price" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} required className="rounded-3 py-2 bg-light border-0" disabled={isLoading} />
                 </Form.Group>
               </Col>
             </Row>
@@ -283,13 +314,13 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label className="fw-700 small text-uppercase text-muted">Location</Form.Label>
-                  <Form.Control type="text" {...register('location')} className="rounded-3 py-2 bg-light border-0" />
+                  <Form.Control type="text" name="location" value={productLocation} onChange={(e) => setProductLocation(e.target.value)} className="rounded-3 py-2 bg-light border-0" disabled={isLoading} />
                 </Form.Group>
               </Col>
               <Col md={6}>
                 <Form.Group className="mb-3">
                   <Form.Label className="fw-700 small text-uppercase text-muted">Status</Form.Label>
-                  <Form.Select {...register('status')} className="rounded-3 py-2 bg-light border-0">
+                  <Form.Select name="status" value={productStatus} onChange={(e) => setProductStatus(e.target.value)} className="rounded-3 py-2 bg-light border-0" disabled={isLoading}>
                     <option value="Active">Active</option>
                     <option value="Hidden">Hidden</option>
                     <option value="Banned">Banned</option>
@@ -299,15 +330,15 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
             </Row>
             <Form.Group className="mb-4">
               <Form.Label className="fw-700 small text-uppercase text-muted">Description</Form.Label>
-              <Form.Control as="textarea" rows={4} {...register('description')} className="rounded-3 py-2 bg-light border-0" />
+              <Form.Control as="textarea" name="description" rows={4} value={productDescription} onChange={(e) => setProductDescription(e.target.value)} className="rounded-3 py-2 bg-light border-0" disabled={isLoading} />
             </Form.Group>
             <Form.Group className="mb-4">
               <Form.Label className="fw-700 small text-uppercase text-muted">Image</Form.Label>
-              <Form.Control type="file" onChange={(e: any) => setSelectedFile(e.target.files[0])} className="rounded-3 bg-light border-0" />
+              <Form.Control type="file" name="image" onChange={(e: any) => setSelectedFile(e.target.files[0])} className="rounded-3 bg-light border-0" disabled={isLoading} />
             </Form.Group>
             <Stack direction="horizontal" gap={3} className="justify-content-end mt-4">
-              <Button variant="light" className="rounded-pill px-4 fw-700" onClick={() => setShowAddModal(false)}>Cancel</Button>
-              <Button type="submit" variant="dark" className="rounded-pill px-4 fw-700" disabled={isPending}>{isPending ? 'Saving...' : 'Save Product'}</Button>
+              <Button variant="light" className="rounded-pill px-4 fw-700" onClick={() => setShowAddModal(false)} disabled={isLoading}>Cancel</Button>
+              <Button type="submit" variant="dark" className="rounded-pill px-4 fw-700" disabled={isLoading}>{isLoading ? 'Saving...' : 'Save Product'}</Button>
             </Stack>
           </Form>
         </Modal.Body>

@@ -11,8 +11,7 @@ import type ValorationDTO from "~/dto/ValorationDTO";
  */
 
 export const getAdminSummary = async (): Promise<AdminSummaryDTO> => {
-  const response = await api.get<AdminSummaryDTO>("/v1/admin/summary");
-  return response.data;
+  return await api.get<AdminSummaryDTO>("/v1/admin/summary");
 };
 
 /**
@@ -20,15 +19,13 @@ export const getAdminSummary = async (): Promise<AdminSummaryDTO> => {
  */
 
 export const getAdminUsers = async (page = 0, size = 10): Promise<PagedResponse<UserDTO>> => {
-  const response = await api.get<PagedResponse<UserDTO>>("/v1/admin/users", {
+  return await api.get<PagedResponse<UserDTO>>("/v1/admin/users", {
     params: { page, size },
   });
-  return response.data;
 };
 
 export const banUser = async (userId: number, ban: boolean): Promise<UserDTO> => {
-  const response = await api.put<UserDTO>(`/v1/admin/users/ban/${userId}`, { banned: ban });
-  return response.data;
+  return await api.put<UserDTO>(`/v1/admin/users/ban/${userId}`, { banned: ban });
 };
 
 export const deleteUser = async (userId: number): Promise<void> => {
@@ -36,8 +33,7 @@ export const deleteUser = async (userId: number): Promise<void> => {
 };
 
 export const updateUser = async (userId: number, formData: FormData): Promise<UserDTO> => {
-  const response = await api.patch<UserDTO>(`/v1/admin/users/${userId}`, formData);
-  return response.data;
+  return await api.patch<UserDTO>(`/v1/admin/users/${userId}`, formData);
 };
 
 /**
@@ -45,10 +41,9 @@ export const updateUser = async (userId: number, formData: FormData): Promise<Us
  */
 
 export const getAdminProducts = async (page = 0, size = 10): Promise<PagedResponse<ProductDTO>> => {
-  const response = await api.get<PagedResponse<ProductDTO>>("/v1/admin/products", {
+  return await api.get<PagedResponse<ProductDTO>>("/v1/admin/products", {
     params: { page, size },
   });
-  return response.data;
 };
 
 export const deleteProduct = async (productId: number): Promise<void> => {
@@ -56,21 +51,11 @@ export const deleteProduct = async (productId: number): Promise<void> => {
 };
 
 export const createProduct = async (formData: FormData): Promise<ProductDTO> => {
-  const response = await api.post<ProductDTO>("/v1/admin/products", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-  return response.data;
+  return await api.post<ProductDTO>("/v1/admin/products", formData);
 };
 
 export const updateProduct = async (productId: number, formData: FormData): Promise<ProductDTO> => {
-  const response = await api.patch<ProductDTO>(`/v1/admin/products/${productId}`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
-  return response.data;
+  return await api.patch<ProductDTO>(`/v1/admin/products/${productId}`, formData);
 };
 
 /**
@@ -78,10 +63,9 @@ export const updateProduct = async (productId: number, formData: FormData): Prom
  */
 
 export const getAdminTransactions = async (page = 0, size = 10): Promise<PagedResponse<TransactionDTO>> => {
-  const response = await api.get<PagedResponse<TransactionDTO>>("/v1/admin/transactions", {
+  return await api.get<PagedResponse<TransactionDTO>>("/v1/admin/transactions", {
     params: { page, size },
   });
-  return response.data;
 };
 
 /**
@@ -89,10 +73,9 @@ export const getAdminTransactions = async (page = 0, size = 10): Promise<PagedRe
  */
 
 export const getAdminValorations = async (page = 0, size = 10): Promise<PagedResponse<ValorationDTO>> => {
-  const response = await api.get<PagedResponse<ValorationDTO>>("/v1/admin/valorations", {
+  return await api.get<PagedResponse<ValorationDTO>>("/v1/admin/valorations", {
     params: { page, size },
   });
-  return response.data;
 };
 
 export const deleteValoration = async (valorationId: number): Promise<void> => {

@@ -1,24 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
 import { useNavigate, useLocation, Link } from 'react-router';
-import { Container, Alert, Card, Form, Button, Image, Stack } from 'react-bootstrap';
+import { Container, Alert, Card, Form, Button, Image } from 'react-bootstrap';
 import { useUserStore } from '~/stores/useUserStore';
 import type { Route } from './+types/login';
 import logo from "../assets/logo.png";
 import Footer from '~/components/footer';
 import Loader from '~/components/Loader';
 
-interface LoginFormData {
-  username: string;
-  password: string;
-}
-
 export default function Login({ }: Route.ComponentProps) {
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({ defaultValues: { username: '', password: '' } });
   const { loginUser, loginError, user } = useUserStore();
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   useEffect(() => {
     if (user && !isLoading) {
@@ -28,12 +23,20 @@ export default function Login({ }: Route.ComponentProps) {
     }
   }, [user, navigate, location, isLoading]);
 
-  const onSubmit = async (data: LoginFormData) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
     try {
-      await Promise.all([loginUser(data.username, data.password), new Promise((resolve) => setTimeout(resolve, 2000))]);
-    } catch (error) { console.error('Error:', error); }
-    finally { setIsLoading(false); }
+      await Promise.all([
+        loginUser(username, password), 
+        new Promise((resolve) => setTimeout(resolve, 2000))
+      ]);
+    } catch (error) { 
+      console.error('Error:', error); 
+    }
+    finally { 
+      setIsLoading(false); 
+    }
   };
 
   return (
@@ -62,15 +65,30 @@ export default function Login({ }: Route.ComponentProps) {
 
                 {loginError && <Alert variant="danger" className="text-center fw-700 mb-4 border-0 rounded-3">Wrong username or password</Alert>}
 
-                <Form onSubmit={handleSubmit(onSubmit)}>
+                <Form onSubmit={handleSubmit}>
                   <Form.Group className="mb-4">
                     <Form.Label className="fw-800 small text-muted ms-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Username</Form.Label>
-                    <Form.Control className="py-3 bg-light border-0 rounded-3 fw-600" placeholder="Enter your username" {...register('username', { required: true })} disabled={isLoading} isInvalid={!!errors.username} />
+                    <Form.Control 
+                      className="py-3 bg-light border-0 rounded-3 fw-600" 
+                      placeholder="Enter your username" 
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      disabled={isLoading} 
+                      required
+                    />
                   </Form.Group>
 
                   <Form.Group className="mb-5">
                     <Form.Label className="fw-800 small text-muted ms-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Password</Form.Label>
-                    <Form.Control type="password" className="py-3 bg-light border-0 rounded-3 fw-600" placeholder="Enter your password" {...register('password', { required: true })} disabled={isLoading} isInvalid={!!errors.password} />
+                    <Form.Control 
+                      type="password" 
+                      className="py-3 bg-light border-0 rounded-3 fw-600" 
+                      placeholder="Enter your password" 
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={isLoading} 
+                      required
+                    />
                   </Form.Group>
 
                   <Button type="submit" className="btn-sell w-100 py-3 fw-800 border-0 mb-4 rounded-pill shadow-lg" disabled={isLoading}>

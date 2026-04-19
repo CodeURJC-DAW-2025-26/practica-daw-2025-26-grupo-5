@@ -1,18 +1,5 @@
-import api from "./api";
+import api, { HttpError } from "./api";
 import type UserDTO from "~/dto/UserDTO";
-
-/**
- * HttpError: Custom error class for HTTP errors
- */
-export class HttpError extends Error {
-  constructor(
-    public status: number,
-    message: string
-  ) {
-    super(message);
-    this.name = "HttpError";
-  }
-}
 
 /**
  * Login Service
@@ -23,41 +10,22 @@ export class HttpError extends Error {
  * Check if user is logged in and get current user data
  */
 export async function reqIsLogged(): Promise<UserDTO> {
-  try {
-    const response = await api.get("/v1/users/me");
-    if (response.status === 200) {
-      return response.data;
-    }
-    throw new HttpError(response.status, "Not logged in");
-  } catch (error: any) {
-    if (error.response?.status === 401) {
-      throw new HttpError(401, "Not authenticated");
-    }
-    throw error;
-  }
+  return await api.get<UserDTO>("/v1/users/me");
 }
 
 /**
  * Login with username and password
  */
-export async function logIn(username: string, password: string): Promise<void> {
-  const response = await api.post("/v1/auth/login", {
+export async function logIn(username: string, password: string): Promise<UserDTO> {
+  return await api.post<UserDTO>("/v1/auth/login", {
     username,
     password,
   });
-
-  if (response.status !== 200) {
-    throw new HttpError(response.status, "Login failed");
-  }
 }
 
 /**
  * Logout user
  */
 export async function logOut(): Promise<void> {
-  const response = await api.post("/v1/auth/logout");
-
-  if (response.status !== 200) {
-    throw new HttpError(response.status, "Logout failed");
-  }
+  await api.post("/v1/auth/logout", {});
 }

@@ -4,11 +4,10 @@ import type ProductWriteRequestDTO from "~/dto/ProductWriteRequestDTO";
 import type PagedResponse from "~/dto/PagedResponse";
 import type ProductDetailsDTO from "~/dto/ProductDetailsDTO";
 import type HomePageDTO from "~/dto/HomePageDTO";
-import axios from "axios";
 
 /**
  * Products Service
- * Handles all API calls related to products
+ * Handles all API calls related to products using native fetch API
  */
 
 /**
@@ -16,20 +15,17 @@ import axios from "axios";
  * Backend returns PagedResponse, extract content array
  */
 export async function getProducts(): Promise<ProductDTO[]> {
-  const response = await api.get("/v1/products", {
-    params: { size: 1000 } // Fetch up to 1000 products to show all on home
+  const pagedResponse = await api.get<PagedResponse<ProductDTO>>("/v1/products", {
+    params: { size: 1000 }
   });
-  const pagedResponse = response.data as PagedResponse<ProductDTO>;
   return pagedResponse.content || [];
 }
 
 /**
  * Gets the products belonging to the currently authenticated user.
- * Matches Backend: @GetMapping("/me") -> List<ProductDTO>
  */
 export async function getMyProducts(): Promise<ProductDTO[]> {
-  const response = await api.get(`/v1/products/me`);
-  return response.data;
+  return await api.get<ProductDTO[]>("/v1/products/me");
 }
 
 export async function deleteProduct(id: number): Promise<void> {
@@ -41,8 +37,7 @@ export async function deleteProduct(id: number): Promise<void> {
  * Backend returns ProductDetailsDTO, extract product
  */
 export async function getProductById(id: number): Promise<ProductDTO> {
-  const response = await api.get(`/v1/products/${id}`);
-  const detailsDTO = response.data as ProductDetailsDTO;
+  const detailsDTO = await api.get<ProductDetailsDTO>(`/v1/products/${id}`);
   return detailsDTO.product;
 }
 
@@ -54,7 +49,6 @@ export async function addProduct(
 ): Promise<ProductDTO> {
   const formData = new FormData();
   
-  //This is the exact order that POST api/v1/products requires the info
   if (product.file) {
     formData.append("file", product.file); 
   }
@@ -64,16 +58,14 @@ export async function addProduct(
   formData.append("price", product.price.toString());
   formData.append("location", product.location);
   formData.append("status", product.status);
-  
 
-  const response = await api.post("/v1/products", formData);
-  return response.data;
+  return await api.post<ProductDTO>("/v1/products", formData);
 }
 
 /**
  * Update an existing product
  */
-export async function updateProduct(id: number, productData: any) {
+export async function updateProduct(id: number, productData: any): Promise<ProductDTO> {
   const formData = new FormData();
   
   formData.append('name', productData.name);
@@ -82,12 +74,8 @@ export async function updateProduct(id: number, productData: any) {
   formData.append('description', productData.description);
   formData.append('location', productData.location);
   formData.append('status', productData.status);
-  
-  
 
-  return await axios.patch(`/api/v1/products/${id}`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' }
-  });
+  return await api.patch<ProductDTO>(`/v1/products/${id}`, formData);
 }
 
 /**
@@ -106,26 +94,16 @@ export async function uploadProductImage(
 ): Promise<void> {
   const formData = new FormData();
   formData.append("image", file);
-  await api.post(`/v1/products/${productId}/image`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  await api.post(`/v1/products/${productId}/image`, formData);
 }
 
 /**
- * Replace an existing product image.
+ * Replace an existing product image
  */
 export async function replaceImage(productId: number, file: File): Promise<void> {
   const formData = new FormData();
-  
-  formData.append("file", file); 
-
-  await api.post(`/v1/products/${productId}/image`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  formData.append("file", file);
+  await api.post(`/v1/products/${productId}/image`, formData);
 }
 
 /**
@@ -135,34 +113,29 @@ export async function deleteProductImage(
   productId: number,
   imageId: number
 ): Promise<void> {
-  await api.delete(`/products/${productId}/image/${imageId}`);
+  await api.delete(`/v1/products/${productId}/image/${imageId}`);
 }
 
 /**
- * Get the catalog of products for the homepage, with optional search query and category filter
+ * Get the catalog of products for the homepage
  */
 export async function getCatalog(query?: string, category?: string, page: number = 0): Promise<HomePageDTO> {
-  const params = new URLSearchParams();
-  if (query) params.append("query", query);
-  if (category) params.append("category", category);
-  params.append("page", page.toString());
+  const params: Record<string, any> = {};
+  if (query) params.query = query;
+  if (category) params.category = category;
+  params.page = page.toString();
 
-  const response = await api.get("/v1/catalog", { params });
-  return response.data;
+  return await api.get<HomePageDTO>("/v1/catalog", { params });
 }
 
+/**
+ * Send an inquiry about a product
+ */
 export async function sendInquiry(data: {
   productId: number;
   phone: string;
   type: string;
   message: string;
-}) {
-  const response = await fetch("/api/v1/inquiries", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) throw new Error("Failed to send inquiry");
-  return response.json();
+}): Promise<any> {
+  return await api.post("/v1/inquiries", data);
 }

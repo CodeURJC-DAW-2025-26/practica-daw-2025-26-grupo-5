@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type UserDTO from "~/dto/UserDTO";
-import { HttpError, logIn, logOut, reqIsLogged } from "~/services/login-service";
+import { HttpError } from "~/services/api";
+import { logIn, logOut, reqIsLogged } from "~/services/login-service";
 
 /**
  * User Store State Interface

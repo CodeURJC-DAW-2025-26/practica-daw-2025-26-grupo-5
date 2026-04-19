@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "./api";
 import type UserDTO from "~/dto/UserDTO";
 
 /**
@@ -6,14 +6,9 @@ import type UserDTO from "~/dto/UserDTO";
  */
 export async function getUserDashboardStats() {
     try {
-        // La URL debe coincidir con tu RestController de Java
-        const response = await axios.get("/api/v1/users/me/dashboard");
-
-        // Devolvemos directamente los datos (el objeto con revenueLabels, sales, etc.)
-        return response.data;
+        return await api.get("/v1/users/me/dashboard");
     } catch (error) {
         console.error("Error fetching dashboard stats:", error);
-        // Devolvemos un objeto vacío o valores por defecto para que el 'spread' (...) no falle
         return {
             revenueLabels: [],
             revenueValues: [],
@@ -27,29 +22,22 @@ export async function getUserDashboardStats() {
 }
 
 /**
- * Fetch public profile of any user: for example, the seller
+ * Fetch public profile of any user
  */
 export async function getUserProfile(userId: string | number) {
-    const response = await axios.get(`/api/v1/users/${userId}/profile`);
-    return response.data;
+    return await api.get<UserDTO>(`/v1/users/${userId}/profile`);
 }
 
-export async function getUserPhoto(userId: string | number){
-
-    const response = await axios.get(`/api/v1/users/${userId}/profile-photo`);
-    return response.data;
+/**
+ * Fetch user profile photo
+ */
+export async function getUserPhoto(userId: string | number) {
+    return await api.get(`/v1/users/${userId}/profile-photo`);
 }
 
 /**
  * Update user settings (profile, email, card info, etc.)
  */
 export async function updateUserSettings(formData: FormData): Promise<UserDTO> {
-    const token = localStorage.getItem('token');
-    const response = await axios.patch<UserDTO>("/api/v1/users/me/profile", formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${token}`,
-        },
-    });
-    return response.data;
+    return await api.patch<UserDTO>("/v1/users/me/profile", formData);
 }
