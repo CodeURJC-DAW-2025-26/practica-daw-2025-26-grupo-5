@@ -1,4 +1,4 @@
-﻿# Stilnovo.es
+﻿# Stilnovo - Reinvent your space: Where design with history finds its new home.
 
 ## 👥 Miembros del Equipo
 | Nombre y Apellidos | Correo URJC | Usuario GitHub |
