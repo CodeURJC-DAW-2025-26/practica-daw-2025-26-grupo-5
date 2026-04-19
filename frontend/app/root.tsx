@@ -16,6 +16,19 @@ import "./app.css";
 import ErrorPage from "./routes/error-page";
 import Loader from '~/components/Loader';
 
+/**
+ * Adds the HTML content displayed during the loading phase
+ * of the SPA web interface.
+ * Only for building phase. 
+ * cmd => npm run build
+ * /build/client
+ * important! npx http-serve -p 8081 build/client 
+ * Important API_URL have to be absolute route to avoid errors
+ */
+export function HydrateFallback(){
+  return <p>Loading...</p>
+}
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -37,6 +50,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+export function ErrorBoundary() {
+  return <ErrorPage />;
+}
+
 export default function App() {
   const navigation = useNavigation();
   
@@ -48,8 +65,4 @@ export default function App() {
       <Outlet />
     </>
   );
-}
-
-export function ErrorBoundary() {
-  return <ErrorPage />;
 }

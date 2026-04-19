@@ -35,7 +35,7 @@ function buildUrl(endpoint: string, params?: Record<string, any>): string {
 }
 
 function getToken(): string | null {
-  // Get token from localStorage (if using JWT)
+  // Get token from localStorage (using JWT)
   return localStorage.getItem('token');
 }
 
