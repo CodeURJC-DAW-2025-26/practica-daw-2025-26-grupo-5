@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Card, Table, Button, Image, Badge, Alert, Stack } from 'react-bootstrap';
-import { getAdminTransactions } from '~/services/admin-service';
+import { Container, Row, Col, Card, Table, Button, Image, Badge, Alert, Stack, Modal } from 'react-bootstrap';
+import { getAdminTransactions, deleteTransaction } from '~/services/admin-service';
 import type TransactionDTO from '~/dto/TransactionDTO';
 import type PagedResponse from '~/dto/PagedResponse';
 
@@ -61,14 +61,19 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
   
   // Local state controlled pagination
   const [currentPage, setCurrentPage] = useState(0);
+  const [transactions, setTransactions] = useState<TransactionDTO[]>(rowData);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<TransactionDTO | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const itemsPerPage = 10;
 
-  const totalPages = Math.ceil(rowData.length / itemsPerPage);
-  const paginatedData = rowData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
+  const totalPages = Math.ceil(transactions.length / itemsPerPage);
+  const paginatedData = transactions.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage);
 
   // KPI Calculations
-  const totalAccumulated = rowData.reduce((acc, curr) => acc + (curr.finalPrice || 0), 0);
-  const averageTransaction = rowData.length > 0 ? totalAccumulated / rowData.length : 0;
+  const totalAccumulated = transactions.reduce((acc, curr) => acc + (curr.finalPrice || 0), 0);
+  const averageTransaction = transactions.length > 0 ? totalAccumulated / transactions.length : 0;
 
   return (
     <>
@@ -93,7 +98,7 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
         <Col xs={12} sm={6} lg={4}>
           <KPICard 
             label="Total Transactions" 
-            value={rowData.length} 
+            value={transactions.length} 
             color="#7c3aed" 
             icon="fa-credit-card" 
             bg={getKPIBg('#7c3aed')} 
@@ -125,6 +130,7 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
                   <th>SELLER</th>
                   <th>AMOUNT</th>
                   <th>STATUS</th>
+                  <th style={{ width: '50px' }}>ACTION</th>
                 </tr>
               </thead>
               <tbody>
@@ -163,11 +169,26 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
                           {transaction.transactionStatus === 'COMPLETED' ? '✓ COMPLETED' : 'PENDING'}
                         </Badge>
                       </td>
+                      <td>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          className="fw-700 rounded-pill"
+                          onClick={() => {
+                            setSelectedTransaction(transaction);
+                            setShowDeleteModal(true);
+                            setDeleteError(null);
+                          }}
+                          title="Delete transaction"
+                        >
+                          <i className="fa-solid fa-trash"></i>
+                        </Button>
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7} className="text-center py-5 text-muted fw-600">
+                    <td colSpan={8} className="text-center py-5 text-muted fw-600">
                       <i className="fa-solid fa-receipt fa-2x mb-3 opacity-50 d-block"></i>
                       No transactions found.
                     </td>
@@ -182,7 +203,7 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
             <Stack direction="horizontal" className="justify-content-between mt-4 pt-4 border-top">
               <span className="text-muted small fw-600">
                 Showing {currentPage * itemsPerPage + 1} to{' '}
-                {Math.min((currentPage + 1) * itemsPerPage, rowData.length)} of {rowData.length}
+                {Math.min((currentPage + 1) * itemsPerPage, transactions.length)} of {transactions.length}
               </span>
               
               <div className="btn-group gap-1">
@@ -236,6 +257,89 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
           )}
         </Card.Body>
       </Card>
+
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={() => !isDeleting && setShowDeleteModal(false)} centered backdrop={isDeleting ? "static" : true}>
+        <Modal.Header closeButton={!isDeleting} className="border-0 pb-0">
+          <div className="bg-danger-subtle text-danger rounded-circle d-inline-flex align-items-center justify-content-center me-3" style={{ width: '50px', height: '50px' }}>
+            <i className="fa-solid fa-triangle-exclamation fa-lg"></i>
+          </div>
+        </Modal.Header>
+        <Modal.Body className="text-center pt-2">
+          <h5 className="fw-800 text-danger mb-3">Confirm Transaction Deletion</h5>
+          {selectedTransaction && (
+            <div className="mb-4">
+              <p className="text-muted fw-600 mb-3">
+                Are you sure you want to delete transaction <strong>#{selectedTransaction.transactionId}</strong>?
+              </p>
+              <Alert variant="info" className="small mb-0">
+                <i className="fa-solid fa-info-circle me-2"></i>
+                The product will return to <strong>Active</strong> status and seller balance will be adjusted.
+              </Alert>
+            </div>
+          )}
+          {deleteError && (
+            <Alert variant="danger" className="small mb-3">
+              {deleteError}
+            </Alert>
+          )}
+        </Modal.Body>
+        <Modal.Footer className="border-0 pt-0">
+          <Button 
+            variant="light" 
+            className="fw-700 rounded-pill px-4"
+            onClick={() => setShowDeleteModal(false)}
+            disabled={isDeleting}
+          >
+            Cancel
+          </Button>
+          <Button 
+            variant="danger" 
+            className="fw-700 rounded-pill px-4"
+            onClick={async () => {
+              if (!selectedTransaction?.transactionId) return;
+              
+              setIsDeleting(true);
+              setDeleteError(null);
+              
+              try {
+                await deleteTransaction(selectedTransaction.transactionId);
+                
+                // Remove from transactions list
+                setTransactions(prev => 
+                  prev.filter(t => t.transactionId !== selectedTransaction.transactionId)
+                );
+                
+                // Reset pagination if needed
+                const newTotalPages = Math.ceil((transactions.length - 1) / itemsPerPage);
+                if (currentPage >= newTotalPages && currentPage > 0) {
+                  setCurrentPage(currentPage - 1);
+                }
+                
+                setShowDeleteModal(false);
+                setSelectedTransaction(null);
+              } catch (error: any) {
+                setDeleteError(error.response?.data?.message || error.message || 'Failed to delete transaction');
+              } finally {
+                setIsDeleting(false);
+              }
+            }}
+            disabled={isDeleting}
+          >
+            {isDeleting ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Deleting...
+              </>
+            ) : (
+              <>
+                <i className="fa-solid fa-trash me-2"></i>
+                Delete Forever
+              </>
+            )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }
