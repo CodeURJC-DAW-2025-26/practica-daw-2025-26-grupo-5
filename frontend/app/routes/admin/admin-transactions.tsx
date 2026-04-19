@@ -1,77 +1,141 @@
-import { useState } from 'react';
-import { redirect } from 'react-router';
-import { Container, Row, Col, Card, Table, Button, Image, Badge, Pagination, Alert, Stack } from 'react-bootstrap';
-import { getAdminTransactions } from '~/services/admin-service';
-import type TransactionDTO from '~/dto/TransactionDTO';
-import type PagedResponse from '~/dto/PagedResponse';
-import AdminHeader from '~/components/admin/AdminHeader';
+import { useEffect, useMemo, useState } from "react";
+import { redirect } from "react-router";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Table,
+  Button,
+  Image,
+  Badge,
+  Pagination,
+  Alert,
+} from "react-bootstrap";
+import { deleteTransaction, getAdminTransactions } from "~/services/admin-service";
+import type TransactionDTO from "~/dto/TransactionDTO";
+import type PagedResponse from "~/dto/PagedResponse";
+import AdminHeader from "~/components/admin/AdminHeader";
+import ConfirmModal from "~/components/confirm-modal";
 
 export async function clientLoader() {
   try {
     const data = await getAdminTransactions(0, 100);
     return data || {};
   } catch (error) {
-    console.error('Failed to fetch transactions:', error);
-    throw redirect('/login');
+    console.error("Failed to fetch transactions:", error);
+    throw redirect("/login");
   }
 }
 
-interface KPIData {
-  readonly label: string;
-  readonly value: string | number;
-  readonly color: string;
-  readonly icon: string;
-}
-
-const KPICard = ({ label, value, color, icon, bg }: KPIData & { readonly bg: string }) => (
-  <Card className="clay-card border-0 h-100" style={{ borderLeft: `5px solid ${color}` }}>
-    <Card.Body className="p-4">
-      <Stack direction="horizontal" gap={3} className="justify-content-between align-items-start mb-3">
-        <h5 className="fw-800 mb-0 text-dark">{label}</h5>
-        <div style={{
-          padding: '10px 14px',
-          borderRadius: '10px',
-          backgroundColor: bg,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          <i className={`fa-solid ${icon}`} style={{ color, fontSize: '1.2rem' }} />
-        </div>
-      </Stack>
-      <h2 className="fw-800 mb-0" style={{ color, fontSize: '2.2rem' }}>{value}</h2>
+const KPICard = ({
+  icon,
+  label,
+  value,
+  color,
+}: {
+  icon: string;
+  label: string;
+  value: string | number;
+  color: string;
+}) => (
+  <Card
+    className="border-0 h-100"
+    style={{ boxShadow: "0 10px 30px rgba(0,0,0,0.12)", borderRadius: "16px" }}
+  >
+    <Card.Body className="text-center p-5">
+      <i
+        className={`fa-solid ${icon}`}
+        style={{ fontSize: "2.5rem", color, marginBottom: "12px", display: "block" }}
+      />
+      <p className="text-muted small fw-700 mb-2 text-uppercase" style={{ letterSpacing: "0.5px" }}>
+        {label}
+      </p>
+      <h2 className="fw-900 mb-0" style={{ color, fontSize: "2rem" }}>
+        {value}
+      </h2>
     </Card.Body>
   </Card>
 );
 
-const getKPIBg = (color: string): string => {
-  const map: Record<string, string> = {
-    '#059669': '#ecfdf5',
-    '#7c3aed': '#f3e8ff',
-    '#f59e0b': '#fef3c7',
-  };
-  return map[color] || '#f8fafc';
-};
+function isCompletedStatus(status?: string) {
+  return (status ?? "").trim().toLowerCase() === "completed";
+}
+
+function formatMoney(value: number) {
+  return new Intl.NumberFormat("es-ES", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value ?? 0);
+}
 
 export default function AdminTransactions({ loaderData }: { readonly loaderData: any }) {
   const pagedData = loaderData as PagedResponse<TransactionDTO>;
-  const transactions = pagedData.content || [];
+  const transactions = pagedData?.content || [];
 
-  const [rowData] = useState<TransactionDTO[]>(transactions);
+  const [rowData, setRowData] = useState<TransactionDTO[]>(transactions);
   const [currentPage, setCurrentPage] = useState(0);
+  const [selectedTransaction, setSelectedTransaction] = useState<TransactionDTO | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const itemsPerPage = 10;
 
-  const totalAccumulated = transactions.reduce((sum, t) => sum + (t.finalPrice || 0), 0);
-  const averageTransaction = transactions.length > 0 ? totalAccumulated / transactions.length : 0;
+  useEffect(() => {
+    setRowData(transactions);
+  }, [transactions]);
 
-  const paginatedData = rowData.slice(
-    currentPage * itemsPerPage,
-    (currentPage + 1) * itemsPerPage
+  const completedTransactions = useMemo(
+    () => rowData.filter((transaction) => isCompletedStatus(transaction.transactionStatus)),
+    [rowData]
   );
+
+  const totalVolume = useMemo(
+    () => completedTransactions.reduce((sum, transaction) => sum + (transaction.finalPrice || 0), 0),
+    [completedTransactions]
+  );
+
+  const paginatedData = useMemo(
+    () => rowData.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage),
+    [rowData, currentPage]
+  );
+
   const totalPages = Math.ceil(rowData.length / itemsPerPage);
+
+  useEffect(() => {
+    if (currentPage > 0 && currentPage >= totalPages) {
+      setCurrentPage(Math.max(0, totalPages - 1));
+    }
+  }, [currentPage, totalPages]);
 
   const handlePreviousPage = () => setCurrentPage(Math.max(0, currentPage - 1));
   const handleNextPage = () => setCurrentPage(Math.min(totalPages - 1, currentPage + 1));
+
+  const handleDeleteClick = (transaction: TransactionDTO) => {
+    setSelectedTransaction(transaction);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedTransaction) return;
+
+    setIsDeleting(true);
+    try {
+      await deleteTransaction(selectedTransaction.transactionId);
+      setRowData((prev) =>
+        prev.filter((transaction) => transaction.transactionId !== selectedTransaction.transactionId)
+      );
+      setShowDeleteModal(false);
+      setSelectedTransaction(null);
+    } catch (error) {
+      console.error("Failed to delete transaction:", error);
+      alert("Could not delete the transaction.");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <>
@@ -80,77 +144,99 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
         subtitle="Overview of all historical financial movements."
       />
 
-        {/* KPI Row */}
-        <Row className="g-3 mb-4">
-          <Col xs={12} sm={6} lg={4}>
-            <KPICard label="Total Volume" value={`€${totalAccumulated.toFixed(0)}`} color="#059669" icon="fa-euro-sign" bg={getKPIBg('#059669')} />
+      <Container
+        fluid
+        className="py-5"
+        style={{ background: "linear-gradient(135deg, #f5f7fa 0%, #f0f4f8 100%)", minHeight: "100vh" }}
+      >
+        <Row className="g-4 mb-4">
+          <Col xs={12} sm={6} lg={6}>
+            <KPICard
+              icon="fa-euro-sign"
+              label="Total Volume"
+              value={formatMoney(totalVolume)}
+              color="#059669"
+            />
           </Col>
-          <Col xs={12} sm={6} lg={4}>
-            <KPICard label="Total Transactions" value={rowData.length} color="#7c3aed" icon="fa-credit-card" bg={getKPIBg('#7c3aed')} />
-          </Col>
-          <Col xs={12} sm={6} lg={4}>
-            <KPICard label="Average Transaction" value={`€${averageTransaction.toFixed(2)}`} color="#f59e0b" icon="fa-chart-line" bg={getKPIBg('#f59e0b')} />
+          <Col xs={12} sm={6} lg={6}>
+            <KPICard
+              icon="fa-credit-card"
+              label="Completed Transactions"
+              value={completedTransactions.length}
+              color="#7c3aed"
+            />
           </Col>
         </Row>
 
-        {/* Table Card */}
-        <Card className="clay-card border-0 p-3">
-          <Card.Body>
-            <h5 className="fw-800 text-dark mb-4">Recent Transactions</h5>
-            <div style={{ overflowX: 'auto' }}>
-              <Table hover responsive className="table-admin mb-0 align-middle">
-                <thead>
+        <Card className="border-0" style={{ boxShadow: "0 10px 30px rgba(0,0,0,0.12)", borderRadius: "16px" }}>
+          <Card.Body className="p-4">
+            <h5 className="fw-800 mb-4">Recent Transactions</h5>
+            <div style={{ overflowX: "auto" }}>
+              <Table hover responsive className="mb-0">
+                <thead style={{ backgroundColor: "#f5f7fa", borderBottom: "2px solid #e5e7eb" }}>
                   <tr>
-                    <th>TRX ID</th>
-                    <th>DATE</th>
-                    <th>PRODUCT</th>
-                    <th>BUYER</th>
-                    <th>SELLER</th>
-                    <th>AMOUNT</th>
-                    <th>STATUS</th>
+                    <th className="text-muted fw-700 small">TRX ID</th>
+                    <th className="text-muted fw-700 small">DATE</th>
+                    <th className="text-muted fw-700 small">PRODUCT</th>
+                    <th className="text-muted fw-700 small">BUYER</th>
+                    <th className="text-muted fw-700 small">SELLER</th>
+                    <th className="text-muted fw-700 small">AMOUNT</th>
+                    <th className="text-muted fw-700 small">STATUS</th>
+                    <th className="text-muted fw-700 small">ACTION</th>
                   </tr>
                 </thead>
                 <tbody>
                   {paginatedData.length > 0 ? (
                     paginatedData.map((transaction) => (
-                      <tr key={transaction.transactionId}>
+                      <tr key={transaction.transactionId} style={{ borderBottom: "1px solid #e5e7eb" }}>
                         <td className="text-muted small fw-700">#{transaction.transactionId}</td>
                         <td className="text-muted small fw-600">
                           {transaction.formattedDate || new Date(transaction.createdAt).toLocaleDateString()}
                         </td>
                         <td>
-                          <Stack direction="horizontal" gap={2} className="align-items-center">
+                          <div className="d-flex align-items-center gap-2">
                             <Image
                               src={`/api/v1/products/${transaction.product?.id}/image?t=${Date.now()}`}
                               alt={transaction.product?.name}
                               width={36}
                               height={36}
                               rounded
-                              style={{ objectFit: 'cover', backgroundColor: '#e5e7eb' }}
-                              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                              style={{ objectFit: "cover", backgroundColor: "#e5e7eb" }}
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = "none";
+                              }}
                             />
-                            <span className="fw-700 small mb-0">{transaction.product?.name || 'Deleted'}</span>
-                          </Stack>
+                            <span className="fw-600 small">{transaction.product?.name || "Deleted"}</span>
+                          </div>
                         </td>
-                        <td className="text-muted small fw-600">{transaction.buyer?.name || 'Unknown'}</td>
-                        <td className="text-muted small fw-600">{transaction.seller?.name || 'Unknown'}</td>
-                        <td className="fw-800 text-success">
-                          €{transaction.finalPrice?.toFixed(2)}
+                        <td className="text-muted small">{transaction.buyer?.name || "Unknown"}</td>
+                        <td className="text-muted small">{transaction.seller?.name || "Unknown"}</td>
+                        <td className="fw-700 small" style={{ color: "#059669" }}>
+                          {formatMoney(transaction.finalPrice || 0)}
                         </td>
                         <td>
                           <Badge
-                            bg={transaction.transactionStatus === 'COMPLETED' ? 'success' : 'warning'}
-                            text={transaction.transactionStatus === 'COMPLETED' ? 'white' : 'dark'}
-                            className="fw-700 px-3 py-2 rounded-pill"
+                            bg={isCompletedStatus(transaction.transactionStatus) ? "success" : "warning"}
+                            text={isCompletedStatus(transaction.transactionStatus) ? "white" : "dark"}
                           >
-                            {transaction.transactionStatus === 'COMPLETED' ? '✓ COMPLETED' : 'PENDING'}
+                            {isCompletedStatus(transaction.transactionStatus) ? "✓ COMPLETED" : "PENDING"}
                           </Badge>
+                        </td>
+                        <td>
+                          <Button
+                            variant="link"
+                            className="p-0 text-danger"
+                            onClick={() => handleDeleteClick(transaction)}
+                            aria-label={`Delete transaction ${transaction.transactionId}`}
+                          >
+                            <i className="fa-solid fa-trash" />
+                          </Button>
                         </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={7} className="text-center py-4 text-muted">
+                      <td colSpan={8} className="text-center py-4 text-muted">
                         No transactions found
                       </td>
                     </tr>
@@ -159,63 +245,45 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
               </Table>
             </div>
 
-            {/* Pagination Controls */}
             {totalPages > 1 && (
-              <Stack direction="horizontal" className="justify-content-between mt-4 pt-3 border-top">
-                <span className="text-muted small fw-600">
-                  Showing {currentPage * itemsPerPage + 1} to{' '}
+              <div className="d-flex justify-content-between align-items-center mt-4 pt-3 px-3 border-top">
+                <small className="text-muted">
+                  Showing {currentPage * itemsPerPage + 1} to{" "}
                   {Math.min((currentPage + 1) * itemsPerPage, rowData.length)} of {rowData.length}
-                </span>
-                
-                <div className="btn-group">
-                  <Button 
-                    className="fw-800 rounded-3 border-0"
-                    style={{
-                      background: currentPage === 0 ? '#e5e7eb' : 'linear-gradient(135deg, #2f6ced 0%, #1e479a 100%)',
-                      color: currentPage === 0 ? '#9ca3af' : 'white',
-                      padding: '8px 12px',
-                      transition: 'all 0.3s ease'
-                    }}
-                    onClick={() => setCurrentPage(Math.max(0, currentPage - 1))} 
-                    disabled={currentPage === 0}
-                  >
-                    <i className="fa-solid fa-chevron-left" />
-                  </Button>
+                </small>
+                <Pagination className="mb-0">
+                  <Pagination.First onClick={() => setCurrentPage(0)} disabled={currentPage === 0} />
+                  <Pagination.Prev onClick={handlePreviousPage} disabled={currentPage === 0} />
                   {Array.from({ length: totalPages }, (_, i) => (
-                    <Button 
-                      key={i}
-                      className="fw-800 rounded-3 border-0"
-                      style={{
-                        background: currentPage === i 
-                          ? 'linear-gradient(135deg, #2f6ced 0%, #1e479a 100%)'
-                          : '#f3f4f6',
-                        color: currentPage === i ? 'white' : '#4b5563',
-                        padding: '8px 12px',
-                        transition: 'all 0.3s ease'
-                      }}
-                      onClick={() => setCurrentPage(i)}
-                    >
+                    <Pagination.Item key={i} active={currentPage === i} onClick={() => setCurrentPage(i)}>
                       {i + 1}
-                    </Button>
+                    </Pagination.Item>
                   ))}
-                  <Button 
-                    className="fw-800 rounded-3 border-0"
-                    style={{
-                      background: currentPage === totalPages - 1 ? '#e5e7eb' : 'linear-gradient(135deg, #2f6ced 0%, #1e479a 100%)',
-                      color: currentPage === totalPages - 1 ? '#9ca3af' : 'white',
-                      padding: '8px 12px',
-                      transition: 'all 0.3s ease'
-                    }}
-                    onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))} 
+                  <Pagination.Next onClick={handleNextPage} disabled={currentPage === totalPages - 1} />
+                  <Pagination.Last
+                    onClick={() => setCurrentPage(totalPages - 1)}
                     disabled={currentPage === totalPages - 1}
-                  >
-                    <i className="fa-solid fa-chevron-right" />
-                  </Button>
-                </div>
-              </Stack>
+                  />
+                </Pagination>
+              </div>
             )}
           </Card.Body>
         </Card>
+      </Container>
+
+      <ConfirmModal
+        show={showDeleteModal}
+        title="Delete Record?"
+        message="Are you sure you want to remove this transaction record?"
+        confirmText="Delete"
+        variant="danger"
+        isLoading={isDeleting}
+        onConfirm={confirmDelete}
+        onCancel={() => {
+          setShowDeleteModal(false);
+          setSelectedTransaction(null);
+        }}
+      />
     </>
   );
 }
@@ -223,14 +291,10 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
 export function ErrorBoundary({ error }: { readonly error: Error }) {
   return (
     <Container className="mt-5">
-      <Alert variant="danger" className="clay-card">
-        <Alert.Heading className="fw-800">Error Loading Transactions!</Alert.Heading>
-        <p className="fw-600">{error instanceof Error ? error.message : 'An unexpected error occurred'}</p>
-        <Button
-          variant="outline-danger"
-          className="fw-700 rounded-pill px-4"
-          onClick={() => (globalThis.location.href = '/')}
-        >
+      <Alert variant="danger">
+        <Alert.Heading>Error Loading Transactions!</Alert.Heading>
+        <p>{error instanceof Error ? error.message : "An unexpected error occurred"}</p>
+        <Button variant="outline-danger" onClick={() => (globalThis.location.href = "/")}>
           Back to home
         </Button>
       </Alert>

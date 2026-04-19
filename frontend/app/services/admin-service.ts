@@ -68,6 +68,10 @@ export const getAdminTransactions = async (page = 0, size = 10): Promise<PagedRe
   });
 };
 
+export const deleteTransaction = async (transactionId: number): Promise<void> => {
+  await api.delete(`/v1/admin/transactions/${transactionId}`);
+};
+
 /**
  * --- VALORATIONS ---
  */
