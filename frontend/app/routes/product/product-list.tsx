@@ -1,9 +1,10 @@
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
+import { useState } from "react";
 import type { Route } from "./+types/product-list";
-import { getCatalog } from "~/services/products-service"; 
+import { getCatalog, getMoreProducts } from "~/services/products-service"; 
 import type ProductDTO from "~/dto/ProductDTO";
 import type HomePageDTO from "~/dto/HomePageDTO"; 
-import { Container, Row, Col, Button } from "react-bootstrap";
+import { Container, Row, Col, Button, Spinner } from "react-bootstrap";
 import { useUserStore } from "~/stores/useUserStore";
 
 /**
@@ -42,10 +43,17 @@ export async function clientLoader({}: Route.ClientLoaderArgs) {
 export default function ProductsList({ loaderData }: Route.ComponentProps) {
   const homeData = loaderData as HomePageDTO;
   const { user } = useUserStore();
+  const [searchParams] = useSearchParams();
 
   // Filter out products from banned sellers
   const activeProducts = homeData.products?.filter(p => !p.seller?.banned) || [];
   const activeRecommendations = homeData.recommendedProducts?.filter(p => !p.seller?.banned) || [];
+  const [products, setProducts] = useState<ProductDTO[]>(activeProducts);
+
+  // Pageable handled
+  const [page, setPage] = useState(0); 
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
   // Fill recommended products to always show 4 (or available)
   const recommendedCount = activeRecommendations.length;
@@ -57,6 +65,48 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
     const needed = 4 - recommendedCount;
     filledRecommendations.push(...fillers.slice(0, needed));
   }
+  
+  // handleLoadMore function adapted to Paged Response
+  const handleLoadMore = async () => {
+    setIsLoading(true);
+    try {
+      const queryParam = searchParams.get('query') || '';
+      const categoryParam = searchParams.get('category') || '';
+
+      const delayPromise = new Promise(resolve => setTimeout(resolve, 800));
+      
+      const fetchPromise = getMoreProducts(page, queryParam, categoryParam);
+
+      const [pagedResponse] = await Promise.all([fetchPromise, delayPromise]);
+
+      const newProducts = pagedResponse.content || pagedResponse.items || [];
+
+      if (newProducts.length === 0) {
+        setHasMore(false); 
+      } else {
+        const validNewProducts = newProducts.filter((p: ProductDTO) => !p.seller?.banned);
+        setProducts(prev => {
+          const existingIds = new Set(prev.map(p => p.id));
+          const uniqueNewProducts = validNewProducts.filter((p: ProductDTO) => !existingIds.has(p.id));
+          return [...prev, ...uniqueNewProducts];
+        });
+        setPage(prev => prev + 1); 
+
+        if (pagedResponse.last === true) {
+            setHasMore(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading more products:', error);
+      alert("Could not load more products.");
+    } finally {
+      setIsLoading(false);
+    }
+
+  };
+
+    const currentlyRecommendedIds = new Set(filledRecommendations.map(p => p.id));
+    const displayProducts = products.filter(p => !currentlyRecommendedIds.has(p.id));
 
   return (
     <Container className="pt-5">
@@ -67,7 +117,7 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
           <h2 className="fw-800 mb-5 text-center text-primary">Recommended for You</h2>
           <Row xs={1} md={2} lg={4} className="g-4">
             {filledRecommendations.map((product: ProductDTO) => (
-              <Col key={`rec-${product.id}`}> {/* Prefisso rec- per evitare conflitti di chiavi */}
+              <Col key={`rec-${product.id}`}> {/* Prefix cat- to avoid key conflicts */}
                 <Link to={`/product/${product.id}`} className="text-decoration-none text-dark">
                   <div className="clay-card">
                     <div className="img-container">
@@ -96,7 +146,7 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
         </h2>
 
         <Row xs={1} md={2} lg={4} className="g-4">
-          {activeProducts.map((product: ProductDTO) => (
+          {displayProducts.map((product: ProductDTO) => (
             <Col key={`cat-${product.id}`}> {/* Prefisso cat- per evitare conflitti di chiavi */}
               <Link to={`/product/${product.id}`} className="text-decoration-none text-dark">
                 <div className="clay-card">
@@ -116,6 +166,30 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
           ))}
         </Row>
       </div>
+
+      {/* LOAD MORE BUTTON */}
+        <div className="text-center mt-5 mb-5">
+          {hasMore ? (
+            <Button 
+              onClick={handleLoadMore} 
+              disabled={isLoading}
+              className="btn-load-more px-4 py-2 fw-bold"
+            >
+              {isLoading ? (
+                <>
+                  <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" className="me-2" />
+                  Loading treasures...
+                </>
+              ) : (
+                "Load More"
+              )}
+            </Button>
+          ) : (
+            <Button disabled variant="secondary" className="btn-no-more px-4 py-2">
+              No more treasures found
+            </Button>
+          )}
+        </div>
 
       {user && (
         <div className="text-center mt-5">

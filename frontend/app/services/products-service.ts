@@ -139,3 +139,13 @@ export async function sendInquiry(data: {
 }): Promise<any> {
   return await api.post("/v1/inquiries", data);
 }
+
+// Funtion aiming to get a paged list of products
+export async function getMoreProducts(page: number, query: string, category: string) {
+    const url = `/api/v1/products?page=${page}&size=10&query=${query}&category=${category}`;
+    
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Network response was not ok');
+    
+    return response.json();
+}

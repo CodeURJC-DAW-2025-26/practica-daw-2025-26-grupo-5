@@ -38,7 +38,7 @@ export default function HeroSection() {
                             </p>
                             <div className="hero-btns mt-5 d-flex gap-3">
                                 <Link
-                                    to={user ? "/user-products-page" : "/login"}
+                                    to="/product/new"
                                     className="btn-sell text-decoration-none"
                                 >
                                     Sell Now
