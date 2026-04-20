@@ -1526,15 +1526,19 @@ Por motivos de seguridad, esta funcionalidad está **deshabilitada por defecto**
 
 #### **Alumno 1 - Victor Hugo Oliveira Petroceli**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+Me he encargado del desarrollo e integración de varias funcionalidades clave del proyecto, incluyendo la gestión de usuarios, el sistema de valoraciones, la integración de inteligencia artificial en diferentes flujos (creación, edición de productos y ayudas al usuario mediante simulación de un ChatBot), así como mejoras generales en la interfaz y experiencia de usuario.
 
-| Nº    | Commits      | Files      |
-|:------------: |:------------:| :------------:|
-|1| [Descripción commit 1](URL_commit_1)  | [Archivo1](URL_archivo_1)   |
-|2| [Descripción commit 2](URL_commit_2)  | [Archivo2](URL_archivo_2)   |
-|3| [Descripción commit 3](URL_commit_3)  | [Archivo3](URL_archivo_3)   |
-|4| [Descripción commit 4](URL_commit_4)  | [Archivo4](URL_archivo_4)   |
-|5| [Descripción commit 5](URL_commit_5)  | [Archivo5](URL_archivo_5)   |
+También he trabajado en la configuración de la nueva ruta `/new/` para la integración de la SPA, en la mejora estética de distintas partes de la aplicación, y en la revisión exhaustiva del código para asegurar consistencia, calidad y correcto funcionamiento del sistema.
+
+Además, he participado en la implementación y refinamiento de funcionalidades relacionadas con productos, dashboards de usuario y componentes reutilizables de la interfaz, contribuyendo a una arquitectura más limpia y mantenible.
+
+| Nº | Commits | Files |
+|:--:|:--------|:------|
+| 1 | [feat: implement product creation and Gemini AI integration](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/9ab5e616c1d26b035e74da6db30e9eca84521981) | [AIService.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/service/AI/AIService.java) |
+| 2 | [feat: integrate SPA into /new subpath and configure resource routing](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/7960b196620640375f88524893b6ac9a40468395) | [SpaRoutingConfig.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/SpaRoutingConfig.java) |
+| 3 | [feat(valorations): implement review management system](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/01b0befca9b4fb0e5de4813039798a1afd516040) | [valorations-service.ts](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/services/valorations-service.ts) |
+| 4 | [feat(products): refine CRUD flow and integrate AI in editing](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/8150ed69f042afa7476e1c51f13a20ddc0636482) | [ProductForm.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/components/ProductForm.tsx) |
+| 5 | [feat: implement common sidebar and user dashboard UI](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/daa3e3830bbbf4e3d7a050c8478678eaa69f3f69) | [Sidebar.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/components/Sidebar.tsx) |
 
 ---
 
