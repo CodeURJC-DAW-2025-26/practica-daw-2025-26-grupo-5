@@ -89,15 +89,15 @@ export default function UserStatistics({ loaderData }: { loaderData: any }) {
     setIsDownloading(true);
     try {
       const link = document.createElement('a');
-      link.href = '/api/v1/users/me/statistics-report'; 
+      link.href = '/api/v1/users/me/statistics-report';
       link.download = 'Statistics_Report.pdf';
-      document.body.appendChild(link); 
-      link.click(); 
+      document.body.appendChild(link);
+      link.click();
       document.body.removeChild(link);
-    } catch (error) { 
-      console.error('Failed to download PDF:', error); 
-    } finally { 
-      setIsDownloading(false); 
+    } catch (error) {
+      console.error('Failed to download PDF:', error);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -109,19 +109,24 @@ export default function UserStatistics({ loaderData }: { loaderData: any }) {
           <p className="text-muted small fw-600 mb-0">Comprehensive performance and interest analysis.</p>
         </div>
         <Stack direction="horizontal" gap={3}>
-          <Button variant="outline-primary" className="fw-700 rounded-pill px-4" onClick={downloadStatisticsPDF} disabled={isDownloading}>
-            <i className={`fa-solid ${isDownloading ? 'fa-spinner fa-spin' : 'fa-file-pdf'} me-2`} />
+          <button
+            className="btn-sell py-2 px-3 small"
+            style={{ height: 'auto', border: 'none' }}
+            onClick={downloadStatisticsPDF}
+            disabled={isDownloading}
+          >
+            <i className={`fa-solid ${isDownloading ? 'fa-spinner fa-spin' : 'fa-file-export'} me-2`}></i>
             {isDownloading ? 'Exporting...' : 'Export PDF'}
-          </Button>
+          </button>
           {user && (
             <Link to="/user/settings">
-              <Image 
-                src={`/api/v1/users/me/profile-photo?t=${Date.now()}`} 
-                className="rounded-circle border border-2 shadow-sm" 
-                width="48" 
-                height="48" 
-                alt="Profile" 
-                onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')} 
+              <Image
+                src={`/api/v1/users/me/profile-photo?t=${Date.now()}`}
+                className="rounded-circle border border-2 shadow-sm"
+                width="48"
+                height="48"
+                alt="Profile"
+                onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')}
               />
             </Link>
           )}

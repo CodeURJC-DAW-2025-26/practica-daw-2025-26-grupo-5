@@ -137,7 +137,7 @@ public class AdminService {
         
         // Display active listings as preview on dashboard
         int totalProducts = (int) allProducts.size();
-        int activeListingsCount = (int) activeListings.size();
+        //int activeListingsCount = (int) activeListings.size();
         
         // Calculate total revenue from completed transactions
         double totalRevenue = transactionService.getTotalRevenue();

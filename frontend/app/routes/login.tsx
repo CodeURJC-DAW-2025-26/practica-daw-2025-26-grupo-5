@@ -67,7 +67,7 @@ export default function Login({ }: Route.ComponentProps) {
 
                 <Form onSubmit={handleSubmit}>
                   <Form.Group className="mb-4">
-                    <Form.Label className="fw-800 small text-muted ms-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Username</Form.Label>
+                    <Form.Label className="fw-800 small text-muted ms-2" style={{ letterSpacing: '0.5px' }}>Username</Form.Label>
                     <Form.Control 
                       className="py-3 bg-light border-0 rounded-3 fw-600" 
                       placeholder="Enter your username" 
@@ -79,7 +79,7 @@ export default function Login({ }: Route.ComponentProps) {
                   </Form.Group>
 
                   <Form.Group className="mb-5">
-                    <Form.Label className="fw-800 small text-muted ms-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Password</Form.Label>
+                    <Form.Label className="fw-800 small text-muted ms-2" style={{ letterSpacing: '0.5px' }}>Password</Form.Label>
                     <Form.Control 
                       type="password" 
                       className="py-3 bg-light border-0 rounded-3 fw-600" 
@@ -91,7 +91,7 @@ export default function Login({ }: Route.ComponentProps) {
                     />
                   </Form.Group>
 
-                  <Button type="submit" className="btn-sell w-100 py-3 fw-800 border-0 mb-4 rounded-pill shadow-lg" disabled={isLoading}>
+                  <Button type="submit" className="btn-sell w-100 justify-content-center mb-4" disabled={isLoading}>
                     {isLoading ? 'Logging in...' : 'Login to My Account'}
                   </Button>
 

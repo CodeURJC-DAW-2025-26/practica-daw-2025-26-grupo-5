@@ -78,12 +78,6 @@ export async function updateProduct(id: number, productData: any): Promise<Produ
   return await api.patch<ProductDTO>(`/v1/products/${id}`, formData);
 }
 
-/**
- * Delete a product
- */
-export async function removeProduct(id: number): Promise<void> {
-  await api.delete(`/v1/products/${id}`);
-}
 
 /**
  * Upload a product image

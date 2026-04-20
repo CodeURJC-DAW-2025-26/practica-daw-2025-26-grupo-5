@@ -71,7 +71,7 @@ export default function MyProducts() {
 
                 {/* AQUÍ ESTÁ LA CORRECCIÓN: Link envolviendo al Button */}
                 <Link to="/product/new" className="text-decoration-none">
-                    <Button variant="primary" className="fw-700 rounded-pill px-4" style={{ backgroundColor: '#2f6ced', border: 'none' }}>
+                    <Button variant="primary" className="btn-sell py-2 px-4 shadow-sm text-decoration-none d-flex align-items-center" style={{ backgroundColor: '#2f6ced', border: 'none' }}>
                         <i className="fa-solid fa-plus me-2"></i>Add Product
                     </Button>
                 </Link>
@@ -118,8 +118,9 @@ export default function MyProducts() {
                                                     <i className="fa-solid fa-pen-to-square text-secondary"></i>
                                                 </Button>
                                             </Link>
-                                            <Button variant="outline-danger" size="sm" className="d-flex align-items-center justify-content-center border-0" style={{ width: '40px', height: '40px', padding: '0', borderRadius: '8px', backgroundColor: '#fef2f2' }} onClick={() => handleDeleteClick(product.id)} title="Delete product">
-                                                <i className="fa-solid fa-trash-can text-danger"></i>
+                                            <Button variant="outline-danger" size="sm" className="d-flex align-items-center justify-content-center border-0" style={{ width: '40px', height: '40px', padding: '0', borderRadius: '8px', backgroundColor: '#fef2f2' 
+                                                }} onClick={() => handleDeleteClick(product.id)} title="Delete product">
+                                                    <i className="fa-solid fa-trash-can text-danger"></i>
                                             </Button>
                                         </Stack>
                                     </Col>

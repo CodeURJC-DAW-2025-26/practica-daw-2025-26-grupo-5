@@ -1,9 +1,8 @@
-import { useNavigate, useParams, useNavigation } from "react-router";
-import { getProductById, removeProduct } from "~/services/products-service";
+import { useNavigate } from "react-router";
+import { getProductById, deleteProduct } from "~/services/products-service";
 import {
   Alert,
   Button,
-  Container,
   Row,
   Col,
   Modal,
@@ -53,7 +52,7 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
     setPendingDelete(true);
     setDeleteError(null);
     try {
-      await removeProduct(product.id);
+      await deleteProduct(product.id);
       navigate("/");
     } catch (err) {
       console.error(err);
@@ -137,25 +136,28 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
               {isActive ? (
                 <div className="d-grid gap-3 mb-5">
                   {!isSelfProduct ? (
-                    <Link to={`../transactions/payment/${product.id}`} className="btn-sell py-3 fw-800 shadow-lg rounded-pill d-flex align-items-center justify-content-center gap-2 border-0 text-decoration-none" style={{ fontSize: '1.1rem' }}>
+                    <Link to={`../transactions/payment/${product.id}`} className="btn-sell py-3 fw-800 shadow-sm rounded-pill d-flex align-items-center justify-content-center gap-2 border-0 text-decoration-none" style={{ fontSize: '1.1rem' }}>
                       <i className="fa-solid fa-bag-shopping"></i> Buy Now
                     </Link>
                   ) : (
-                    <div 
-                      className="py-3 fw-800 shadow-lg rounded-3 d-flex align-items-center justify-content-center gap-2 border-0 text-decoration-none"
+                    <div
+                      className="py-3 fw-800 shadow-sm rounded-pill d-flex align-items-center justify-content-center gap-2 border-0 text-decoration-none"
                       style={{
-                        fontSize: '1rem',
+                        fontSize: '1.1rem',
                         background: 'linear-gradient(135deg, #f50519 0%, #dc2626 100%)',
-                        color: 'white'
+                        color: 'white',
+                        cursor: 'default' // Indicamos que no es clickeable
                       }}
                     >
                       <i className="fa-solid fa-lock"></i> This is your product
                     </div>
                   )}
                   <Link
-                    to={`../product/contact/${product.id}`}  
+                    to={`../product/contact/${product.id}`}
                     state={{ productName: product.name, productId: product.id }}
-                    className="btn btn-outline-primary py-3 fw-800 rounded-pill border-2 d-flex align-items-center justify-content-center gap-2 text-decoration-none">
+                    className="btn btn-outline-primary py-3 fw-800 rounded-pill border-2 d-flex align-items-center justify-content-center gap-2 text-decoration-none"
+                    style={{ fontSize: '1.1rem' }}
+                  >
                     <i className="fa-regular fa-comment-dots fa-lg"></i> Send Message to Seller
                   </Link>
                 </div>
@@ -191,45 +193,26 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
 
               {/* Admin/Owner Actions */}
               {user && user.id === product.seller?.id && (
-                <div className="d-flex gap-2 mb-4">
-                  <Button 
-                    className="rounded-3 px-4 fw-800 border-0"
-                    style={{
-                      background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
-                      color: 'white',
-                      transition: 'all 0.3s ease'
-                    }}
-                    onClick={handleOpenDeleteDialog}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(239, 68, 68, 0.4)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
-                  >
-                    <i className="fa-solid fa-trash-can me-2"></i> Remove Listing
-                  </Button>
-                  <Button 
-                    className="rounded-3 px-4 fw-800 border-0"
-                    style={{
-                      background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                      color: 'white',
-                      transition: 'all 0.3s ease'
-                    }}
-                    onClick={() => navigate(`/product/${product.id}/edit`)}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-2px)';
-                      e.currentTarget.style.boxShadow = '0 6px 20px rgba(245, 158, 11, 0.4)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
-                  >
-                    <i className="fa-solid fa-pen-to-square me-2"></i> Edit Details
-                  </Button>
+                <div className="row g-3 mb-4">
+                  <div className="col-6">
+                    <button
+                      type="button"
+                      className="btn btn-danger-custom w-100 py-3 small fw-800 shadow-sm border-0 rounded-pill d-flex align-items-center justify-content-center gap-2"
+                      onClick={handleOpenDeleteDialog}
+                    >
+                      <i className="fa-solid fa-trash-can"></i> Delete Product
+                    </button>
+                  </div>
+                  <div className="col-6">
+                    <button
+                      type="button"
+                      className="btn-sell w-100 py-3 small fw-800 shadow-sm border-0 rounded-pill d-flex align-items-center justify-content-center gap-2"
+                      style={{ height: 'auto' }}
+                      onClick={() => navigate(`/product/${product.id}/edit`)}
+                    >
+                      <i className="fa-solid fa-pen-to-square"></i> Edit Details
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -249,24 +232,61 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
         </Row>
       </main>
 
-      {/* DELETE MODAL - FIXED SECTION */}
-      <Modal show={isDeleteDialogOpen} onHide={handleCloseDeleteDialog} centered>
-        <Modal.Header className="bg-danger text-white border-0" closeButton>
-          <Modal.Title className="fw-800">Delete Product</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="py-4 text-center">
-          <p className="mb-2 fw-600">Are you sure you want to delete <b>"{product.name}"</b>?</p>
-          <p className="small text-muted mb-0">This action cannot be undone.</p>
-          {deleteError && <Alert variant="danger" className="mt-3">{deleteError}</Alert>}
+      {/* DELETE MODAL */}
+      <Modal
+        show={isDeleteDialogOpen}
+        onHide={handleCloseDeleteDialog}
+        centered
+        contentClassName="clay-card border-0 shadow-lg text-center bg-white"
+        style={{ '--bs-modal-border-radius': '24px' } as React.CSSProperties} // Fuerza el radio curvo en Bootstrap 5
+      >
+        <Modal.Body className="p-4 p-md-5">
+          {/* Icono de advertencia */}
+          <div
+            className="bg-danger-subtle text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-3 mx-auto"
+            style={{ width: '60px', height: '60px' }}
+          >
+            <i className="fa-solid fa-triangle-exclamation fa-2x"></i>
+          </div>
+
+          <h3 className="fw-800 h5 mb-2 text-danger">Confirm Deletion</h3>
+
+          <p className="small text-muted fw-700 mb-4 px-3">
+            Are you sure you want to remove <strong>{product.name}</strong>?
+          </p>
+
+          {/* Manejo de errores de React */}
+          {deleteError && (
+            <Alert variant="danger" className="mb-4 small fw-600 rounded-4">
+              {deleteError}
+            </Alert>
+          )}
+
+          {/* Botones de acción (d-grid para que ocupen el 100% y estén apilados) */}
+          <div className="d-grid gap-2">
+            <button
+              type="button"
+              className="btn btn-danger w-100 py-3 rounded-pill fw-800 border-0 shadow-sm"
+              onClick={handleDelete}
+              disabled={isPendingDelete}
+            >
+              {isPendingDelete ? (
+                <><i className="fa-solid fa-spinner fa-spin me-2"></i>Deleting...</>
+              ) : (
+                "Delete Forever"
+              )}
+            </button>
+
+            <button
+              type="button"
+              className="btn btn-light w-100 py-3 rounded-pill fw-800 border-0"
+              onClick={handleCloseDeleteDialog}
+              disabled={isPendingDelete}
+            >
+              Cancel
+            </button>
+          </div>
         </Modal.Body>
-        <Modal.Footer className="border-0">
-          <Button variant="secondary" className="rounded-3 fw-bold" onClick={handleCloseDeleteDialog} disabled={isPendingDelete}>
-            Cancel
-          </Button>
-          <Button variant="danger" className="rounded-3 fw-bold" onClick={handleDelete} disabled={isPendingDelete}>
-            {isPendingDelete ? "Deleting..." : "Confirm Delete"}
-          </Button>
-        </Modal.Footer>
       </Modal>
     </>
   );

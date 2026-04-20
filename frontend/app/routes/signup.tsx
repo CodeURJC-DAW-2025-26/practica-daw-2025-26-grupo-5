@@ -51,7 +51,12 @@ export default function Signup({ }: Route.ComponentProps) {
 
     try {
       const [response] = await Promise.all([
-        fetch(`${window.location.origin}/api/v1/users`, { method: 'POST', body: data, credentials: 'include' }),
+
+        fetch(`${window.location.origin}/api/v1/users`, { 
+          method: 'POST', 
+          body: data, 
+          credentials: 'include' }),
+
         new Promise((resolve) => setTimeout(resolve, 2500))
       ]);
       if (response.ok) navigate('/login');
@@ -95,12 +100,12 @@ export default function Signup({ }: Route.ComponentProps) {
                       {!previewUrl ? <i className="fa-solid fa-user-plus text-muted fs-3"></i> : <Image src={previewUrl} className="position-absolute w-100 h-100" style={{ objectFit: 'cover' }} />}
                       <input type="file" accept="image/*" className="file-input-hidden position-absolute w-100 h-100 opacity-0" onChange={handleImageChange} style={{ cursor: 'pointer' }} />
                     </div>
-                    <label className="fw-700 x-small mt-2 text-primary cursor-pointer text-uppercase">Upload Avatar</label>
+                    <label className="fw-700 x-small mt-2 text-primary cursor-pointer">Upload Avatar</label>
                   </div>
 
                   <Row className="g-3 mb-4">
                     <Col xs={12}>
-                      <Form.Label className="fw-800 small text-muted ms-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Full Name</Form.Label>
+                      <Form.Label className="fw-800 small text-muted ms-2" style={{ letterSpacing: '0.5px' }}>Full Name</Form.Label>
                       <Form.Control 
                         className="py-2 bg-light border-0 rounded-3 fw-600" 
                         placeholder="Your name" 
@@ -111,7 +116,7 @@ export default function Signup({ }: Route.ComponentProps) {
                       />
                     </Col>
                     <Col xs={12}>
-                      <Form.Label className="fw-800 small text-muted ms-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Email Address</Form.Label>
+                      <Form.Label className="fw-800 small text-muted ms-2" style={{ letterSpacing: '0.5px' }}>Email Address</Form.Label>
                       <Form.Control 
                         type="email" 
                         className="py-2 bg-light border-0 rounded-3 fw-600" 
@@ -123,7 +128,7 @@ export default function Signup({ }: Route.ComponentProps) {
                       />
                     </Col>
                     <Col md={6}>
-                      <Form.Label className="fw-800 small text-muted ms-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Password</Form.Label>
+                      <Form.Label className="fw-800 small text-muted ms-2" style={{ letterSpacing: '0.5px' }}>Password</Form.Label>
                       <Form.Control 
                         type="password" 
                         className="py-2 bg-light border-0 rounded-3 fw-600" 
@@ -136,7 +141,7 @@ export default function Signup({ }: Route.ComponentProps) {
                       />
                     </Col>
                     <Col md={6}>
-                      <Form.Label className="fw-800 small text-muted ms-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Confirm</Form.Label>
+                      <Form.Label className="fw-800 small text-muted ms-2" style={{ letterSpacing: '0.5px' }}>Confirm</Form.Label>
                       <Form.Control 
                         type="password" 
                         className="py-2 bg-light border-0 rounded-3 fw-600" 
@@ -149,7 +154,7 @@ export default function Signup({ }: Route.ComponentProps) {
                     </Col>
                   </Row>
 
-                  <Button type="submit" className="btn-sell w-100 py-3 fw-800 border-0 mb-3 rounded-pill" disabled={isLoading}>
+                  <Button type="submit" className="btn-sell w-100 justify-content-center mb-3" disabled={isLoading}>
                     {isLoading ? 'Creating Account...' : 'Create Account'}
                   </Button>
 
