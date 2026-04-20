@@ -1495,7 +1495,9 @@ Diagrama mostrando los componentes React, hooks personalizados, servicios y sus 
 
 ### **Integración con Gemini AI**
 
-Como valor añadido a la plataforma Stilnovo, hemos integrado **Gemini AI** para asistir a los usuarios en la redacción de descripciones de productos. Esta funcionalidad permite generar textos profesionales y atractivos automáticamente, tanto al crear un nuevo artículo como al editar uno existente.
+Como valor añadido a la plataforma Stilnovo, hemos integrado **Gemini AI** para asistir a los usuarios tanto en la redacción de descripciones de productos como en la resolución de dudas. Esta funcionalidad permite generar textos profesionales y atractivos automáticamente, tanto al crear un nuevo artículo como al editar uno existente.
+
+Además, hemos ampliado la experiencia de soporte incorporando asistencia inteligente en el **footer** y en el **Help Center**, donde los usuarios registrados pueden recibir ayuda contextual mediante IA de forma rápida y eficiente.
 
 #### **Configuración del Asistente**
 
@@ -1516,7 +1518,7 @@ Por motivos de seguridad, esta funcionalidad está **deshabilitada por defecto**
 
 3.  **Finalización:**
     * Reinicia la aplicación de Spring Boot. 
-    * El sistema detectará la clave automáticamente y habilitará el botón **"Improve with AI"** en los formularios de producto.
+    * El sistema detectará la clave automáticamente y habilitará el botón **"Improve with AI"** en los formularios de producto y las secciones de ayuda con ia serán funcionales.
 
 > **Nota:** La aplicación cuenta con "degradación progresiva" (*graceful degradation*). Si decides no configurar la IA, Stilnovo arrancará con normalidad y el resto de funciones de gestión de productos seguirán operativas sin errores.
 
