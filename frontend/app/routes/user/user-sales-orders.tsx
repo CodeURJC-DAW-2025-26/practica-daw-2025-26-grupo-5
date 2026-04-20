@@ -230,7 +230,7 @@ const UserSalesOrders = () => {
                                 <>
                                     <Card className="border-0 mb-4" style={{ backgroundColor: '#f0f9ff', borderLeft: '4px solid #06b6d4', boxShadow: '0 4px 12px rgba(6, 182, 212, 0.1)', borderRadius: '10px' }}>
                                         <Card.Body>
-                                            <span className="x-small fw-800 text-muted text-uppercase">Shipping Address</span>
+                                            <span className="x-small fw-800 text-muted">Shipping Address</span>
                                             <p className="small fw-700 mb-0">{selectedTransaction.product.location}</p>
                                         </Card.Body>
                                     </Card>

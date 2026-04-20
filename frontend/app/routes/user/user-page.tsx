@@ -71,10 +71,15 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
                     <p className="text-muted small fw-600 mb-0">Tracking your design treasures performance.</p>
                 </div>
                 <Stack direction="horizontal" gap={3}>
-                    <div className="d-none d-md-flex">
-                        <span className="badge bg-white text-dark border border-2 px-3 py-2 fw-700 shadow-sm rounded-pill">
-                            <i className="fa-solid fa-calendar-day me-2 text-primary"></i> {loaderData.date}
-                        </span>
+                    <div className="d-flex align-items-center gap-4">
+                        <div className="d-flex gap-3 d-none d-md-flex">
+                            <button
+                                type="button"
+                                className="btn-about py-2 px-3 small"
+                            >
+                                <i className="fa-solid fa-calendar-day me-2"></i> {loaderData.date}
+                            </button>
+                        </div>
                     </div>
                     {user && (
                         <Link to="/user/settings">

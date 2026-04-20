@@ -107,8 +107,8 @@ export default function UserValorations() {
       <Row className="g-4 mb-5">
         <Col md={6} lg={4}>
           <Card className="clay-card border-0 h-100 p-3">
-            <Card.Body>
-              <p className="text-muted small fw-700 mb-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Completed Reviews</p>
+            <Card.Body  style={{textAlign: 'center'}}>
+              <p className="text-muted small fw-700 mb-2" style={{ letterSpacing: '0.5px' }}>Completed Reviews</p>
               <h2 className="fw-800 text-success mb-1">Total: {completedCount}</h2>
               <span className="text-muted fw-600 small">Feedback submitted</span>
             </Card.Body>
@@ -116,8 +116,8 @@ export default function UserValorations() {
         </Col>
         <Col md={6} lg={4}>
           <Card className="clay-card border-0 h-100 p-3">
-            <Card.Body>
-              <p className="text-muted small fw-700 mb-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Pending for Rating</p>
+            <Card.Body  style={{textAlign: 'center'}}>
+              <p className="text-muted small fw-700 mb-2" style={{ letterSpacing: '0.5px' }}>Pending for Rating</p>
               <h2 className="fw-800 text-warning mb-1">Waiting: {pendingCount}</h2>
               <span className="text-muted fw-600 small">Purchases to review</span>
             </Card.Body>
@@ -125,9 +125,9 @@ export default function UserValorations() {
         </Col>
         <Col md={6} lg={4}>
           <Card className="clay-card border-0 h-100 p-3">
-            <Card.Body>
-              <p className="text-muted small fw-700 mb-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Average Rating Given</p>
-              <h2 className="fw-800 text-info mb-1">{averageRating} <i className="fa-solid fa-star small"></i></h2>
+            <Card.Body style={{textAlign: 'center'}}>
+              <p className="text-muted small fw-700 mb-2" style={{ letterSpacing: '0.5px' }}>Average Rating Given</p>
+              <h2 className="fw-800 text-info mb-1">{averageRating}</h2>
               <span className="text-muted fw-600 small">Your feedback score</span>
             </Card.Body>
           </Card>

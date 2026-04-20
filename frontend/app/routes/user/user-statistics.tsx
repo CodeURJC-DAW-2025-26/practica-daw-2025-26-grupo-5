@@ -137,8 +137,8 @@ export default function UserStatistics({ loaderData }: { loaderData: any }) {
       <Row className="g-4 mb-4">
         <Col md={6} lg={3}>
           <Card className="clay-card border-0 h-100 p-3">
-            <Card.Body>
-              <p className="text-muted small fw-700 mb-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Total Sales</p>
+            <Card.Body  style={{textAlign: 'center'}}>
+              <p className="text-muted small fw-700 mb-2" style={{ letterSpacing: '0.5px' }}>Total Sales</p>
               <h2 className="fw-800 text-success mb-1">€{loaderData.formattedTotalRevenue}</h2>
               <span className="text-muted fw-600 small">Cumulative earnings</span>
             </Card.Body>
@@ -146,8 +146,8 @@ export default function UserStatistics({ loaderData }: { loaderData: any }) {
         </Col>
         <Col md={6} lg={3}>
           <Card className="clay-card border-0 h-100 p-3">
-            <Card.Body>
-              <p className="text-muted small fw-700 mb-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Items Sold</p>
+            <Card.Body  style={{textAlign: 'center'}}>
+              <p className="text-muted small fw-700 mb-2" style={{ letterSpacing: '0.5px' }}>Items Sold</p>
               <h2 className="fw-800 text-primary mb-1">{loaderData.userSales?.length || 0}</h2>
               <span className="text-muted fw-600 small">Total transactions</span>
             </Card.Body>
@@ -155,8 +155,8 @@ export default function UserStatistics({ loaderData }: { loaderData: any }) {
         </Col>
         <Col md={6} lg={3}>
           <Card className="clay-card border-0 h-100 p-3">
-            <Card.Body>
-              <p className="text-muted small fw-700 mb-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Inventory Value</p>
+            <Card.Body  style={{textAlign: 'center'}}>
+              <p className="text-muted small fw-700 mb-2" style={{ letterSpacing: '0.5px' }}>Inventory Value</p>
               <h2 className="fw-800 text-warning mb-1">€{loaderData.formattedBalance}</h2>
               <span className="text-muted fw-600 small">Active products worth</span>
             </Card.Body>
@@ -164,9 +164,9 @@ export default function UserStatistics({ loaderData }: { loaderData: any }) {
         </Col>
         <Col md={6} lg={3}>
           <Card className="clay-card border-0 h-100 p-3">
-            <Card.Body>
-              <p className="text-muted small fw-700 mb-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Average Rating</p>
-              <h2 className="fw-800 text-info mb-1">0.0 <i className="fa-solid fa-star small"></i></h2>
+            <Card.Body  style={{textAlign: 'center'}}>
+              <p className="text-muted small fw-700 mb-2" style={{ letterSpacing: '0.5px' }}>Average Rating</p>
+              <h2 className="fw-800 text-info mb-1">0.0</h2>
               <span className="text-muted fw-600 small">Community score</span>
             </Card.Body>
           </Card>
