@@ -14,9 +14,10 @@ import 'ag-grid-community/styles/ag-theme-quartz.css';
 import type { Route } from "./+types/root";
 import "./app.css";
 import ErrorPage from "./routes/error-page";
-import Loader from '~/components/Loader';
+import AppLoader from '~/components/AppLoader';
 
 /**
+ * This is the App loader when the app starts (not the same as pages navigation loaders)
  * Adds the HTML content displayed during the loading phase
  * of the SPA web interface.
  * Only for building phase. 
@@ -26,7 +27,7 @@ import Loader from '~/components/Loader';
  * Important API_URL have to be absolute route to avoid errors
  */
 export function HydrateFallback() {
-  return <Loader />;
+  return <AppLoader />;
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {

@@ -2200,7 +2200,7 @@ main.overflow-auto {
     }
 }
 
-/* app/app.css */
+/* app/app.css STARTER SPINNER*/
 .page-spinner-overlay {
     position: fixed;
     /* Fixed relative to the viewport, not the content */
@@ -2245,6 +2245,7 @@ main.overflow-auto {
         transform: rotate(360deg);
     }
 }
+
 /* --- HEADER FIXES --- */
 
 .custom-nav-dropdown .dropdown-toggle::after {
@@ -2283,6 +2284,7 @@ main.overflow-auto {
     font-size: 9rem;
     font-weight: 900;
     background: linear-gradient(to bottom, #3b82f6, #1e3a8a);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     line-height: 1;

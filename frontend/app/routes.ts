@@ -11,7 +11,7 @@ import { type RouteConfig, index, layout, route } from "@react-router/dev/routes
  * - Admin routes are nested under admin layout
  */
 export default [
-  // Protected routes - wrapped with ban status check
+  // Protected routes - wrapped with ban status check 
   layout("routes/protected-layout.tsx", [
     layout("routes/home.tsx", [
       //products
@@ -50,10 +50,11 @@ export default [
     ]),
   ]),
 
-  // Public routes - NOT protected
+  // Public routes - NOT protected (All users)
   route("login", "routes/login.tsx"),
   route("signup", "routes/signup.tsx"),
   route("banned", "routes/banned.tsx"),
+  route("about", "routes/about-us.tsx"),
 
   route("*", "routes/error-page.tsx"),
 ] satisfies RouteConfig;
