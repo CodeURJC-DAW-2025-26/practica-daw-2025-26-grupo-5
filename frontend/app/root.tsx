@@ -25,8 +25,8 @@ import Loader from '~/components/Loader';
  * important! npx http-serve -p 8081 build/client 
  * Important API_URL have to be absolute route to avoid errors
  */
-export function HydrateFallback(){
-  return <p>Loading...</p>
+export function HydrateFallback() {
+  return <Loader />;
 }
 
 export function Layout({ children }: { children: React.ReactNode }) {

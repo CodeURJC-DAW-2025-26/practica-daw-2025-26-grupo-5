@@ -14,13 +14,6 @@ export default function Home() {
 
   return (
     <>
-      {/* If loading a product, show YOUR loader centered on screen */}
-      {isLoading && isGoingToProduct && (
-        <div className="page-spinner-overlay">
-          <Loader /> 
-        </div>
-      )}
-
       <Header />
       <main>
         {location.pathname === "/" && <HeroSection />}

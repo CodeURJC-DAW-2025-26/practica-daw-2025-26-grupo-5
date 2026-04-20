@@ -2200,38 +2200,43 @@ main.overflow-auto {
     }
 }
 
+/* app/app.css */
 .page-spinner-overlay {
     position: fixed;
+    /* Fixed relative to the viewport, not the content */
     top: 0;
     left: 0;
     width: 100vw;
+    /* Full window width */
     height: 100vh;
-    /* Fondo mucho más transparente (0.3) */
-    background: rgba(255, 255, 255, 0.3);
-    /* Desenfoque ligero para que no parezca una mancha blanca */
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
-    /* Soporte para Safari */
+    /* Full window height */
+    background-color: rgba(255, 255, 255, 0.8);
+    /* Semi-transparent background */
     display: flex;
-    align-items: center;
+    /* Enable flexbox */
+    flex-direction: column;
+    /* Align spinner and text in a column */
     justify-content: center;
+    /* Vertical centering */
+    align-items: center;
+    /* Horizontal centering */
     z-index: 9999;
-    transition: all 0.3s ease;
-    /* Transición suave */
+    /* Above everything else (header, footer, etc.) */
+    backdrop-filter: blur(2px);
+    /* Optional: subtle background blur */
 }
 
+/* Spinner adjustments if needed */
 .custom-loader {
     width: 50px;
     height: 50px;
-    border: 5px solid #e5e7eb;
-    /* Gris claro */
-    border-top: 5px solid #3b82f6;
-    /* Azul Stilnovo */
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
     border-radius: 50%;
-    animation: spin-loader 1s linear infinite;
+    animation: spin 1s linear infinite;
 }
 
-@keyframes spin-loader {
+@keyframes spin {
     0% {
         transform: rotate(0deg);
     }
@@ -2240,18 +2245,14 @@ main.overflow-auto {
         transform: rotate(360deg);
     }
 }
-
 /* --- HEADER FIXES --- */
 
-/* Quitar la flecha negra por defecto de Bootstrap en el dropdown de usuario */
 .custom-nav-dropdown .dropdown-toggle::after {
     display: none !important;
 }
 
-/* Asegurar que el logo 'Stilnovo' tenga el mismo tamaño siempre */
 .brand {
     font-size: 1.5rem;
-    /* Ajusta este valor al tamaño que prefieras para ambos */
 }
 
 /* app/app.css */
