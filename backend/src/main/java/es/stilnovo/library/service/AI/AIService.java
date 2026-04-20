@@ -13,6 +13,9 @@ public class AIService {
 
     @Value("${google.ai.api.key:}")
     private String apiKey;
+    // Colors for logs
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_RESET = "\u001B[0m";
 
     private final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=";
 
@@ -20,7 +23,17 @@ public class AIService {
     public String callAI(String prompt) {
 
         if (apiKey == null || apiKey.trim().isEmpty()) {
-            return "AI Service is disabled. Please configure a valid API key (check readme documentation). You can put a normal description here as always.";
+
+            // This stays in your server logs for you to fix it
+            System.out.println(ANSI_RED + "----------------------------------------------------------------------------------------------------------"
+                    + ANSI_RESET);
+            System.out.println(ANSI_RED + "[DEV]: Gemini API key is missing. Please configure it in your environment variables. Create an 'ai-application-key.properties' file in the backend (next to 'application.properties') and define: google.ai.api.key=YOUR_API_KEY"
+                    + ANSI_RESET);
+            System.out.println(ANSI_RED + "----------------------------------------------------------------------------------------------------------"
+                    + ANSI_RESET);
+
+            // This is the sophisticated message the user will actually see
+            return "Our AI assistant is currently unavailable. Please try again in a few moments.";
         }
 
         RestTemplate restTemplate = new RestTemplate();
