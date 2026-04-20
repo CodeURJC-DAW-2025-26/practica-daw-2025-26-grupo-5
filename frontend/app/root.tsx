@@ -15,6 +15,8 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import ErrorPage from "./routes/error-page";
 import AppLoader from '~/components/AppLoader';
+import Loader from '~/components/Loader';
+
 
 /**
  * This is the App loader when the app starts (not the same as pages navigation loaders)
