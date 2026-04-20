@@ -10,7 +10,7 @@ interface Message {
 
 export default function UserHelpCenter() {
   const [messages, setMessages] = useState<Message[]>([
-    { text: "Hello. How can I help you navigate Stilnovo today?", isBot: true }
+    { text: "Hello. How can I help you today?", isBot: true }
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
