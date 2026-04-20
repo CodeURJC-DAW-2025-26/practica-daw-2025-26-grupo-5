@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Modal } from 'react-bootstrap';
+import { Modal, Form, Button, InputGroup, Spinner } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router'; // Corrected import for v7
 import logo from "../assets/logo.png";
 import '../app.css';
 import { useUserStore } from "~/stores/useUserStore";
+import { chatBotHelper } from "~/services/AI/ai-service";
 
 export default function Footer() {
   const navigate = useNavigate();
@@ -13,11 +14,32 @@ export default function Footer() {
   const [showSafety, setShowSafety] = useState(false);
   const [showCookie, setShowCookie] = useState(false);
 
+  // Integrated AI Assistant State
+  const [aiQuestion, setAiQuestion] = useState("");
+  const [aiAnswer, setAiAnswer] = useState<string | null>(null);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+
   const handleHelpCenter = () => {
     if (user) {
-      navigate('/user/help-center');
+      navigate('/user/help');
     } else {
       setShowHelp(true);
+    }
+  };
+
+  const handleAiAsk = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!aiQuestion.trim() || isAiLoading) return;
+
+    setIsAiLoading(true);
+    try {
+      const response = await chatBotHelper(aiQuestion);
+      setAiAnswer(response);
+    } catch (err) {
+      setAiAnswer("I'm having trouble connecting to the Stilnovo brain.");
+    } finally {
+      setIsAiLoading(false);
+      setAiQuestion("");
     }
   };
 
@@ -34,6 +56,7 @@ export default function Footer() {
       <footer className="footer-stilnovo mt-5">
         <div className="container">
           <div className="row g-4">
+
             {/* Branding Column */}
             <div className="col-lg-4">
               <div className="mb-3">
@@ -58,6 +81,71 @@ export default function Footer() {
                   <i className="fa-brands fa-youtube fs-5"></i>
                 </a>
               </div>
+
+              {/* AI Assistant - Clean & Minimalist Version */}
+              {user && (
+                <div className="ai-footer-integration mt-4 p-4 rounded-4 shadow-sm"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)'
+                  }}>
+
+                  <div className="d-flex align-items-center gap-2 mb-3">
+                    <i className={`fa-solid fa-sparkles text-primary ${isAiLoading ? 'fa-spin' : ''}`}></i>
+                    <span className="fw-bold text-white">Stilnovo AI Assistant</span>
+                    {isAiLoading && <small className="text-muted ms-2 italic">thinking...</small>}
+                  </div>
+
+                  {aiAnswer && (
+                    <div className="ai-response-box mb-4 p-3 rounded-3 bg-white shadow-sm animate__animated animate__fadeIn"
+                      style={{
+                        fontSize: '0.9rem',
+                        color: '#334155',
+                        lineHeight: '1.6',
+                        borderLeft: '3px solid #007bff'
+                      }}>
+                      {aiAnswer}
+                    </div>
+                  )}
+
+                  <Form onSubmit={handleAiAsk}>
+                    <InputGroup className="overflow-hidden rounded-3 shadow-sm" style={{ border: 'none' }}>
+                      <Form.Control
+                        className="py-2 px-3 fw-500 border-0"
+                        placeholder="How can I help you today?"
+                        value={aiQuestion}
+                        onChange={(e) => setAiQuestion(e.target.value)}
+                        style={{
+                          backgroundColor: '#ffffff', 
+                          color: '#1e293b',         
+                          fontSize: '0.9rem',
+                          outline: 'none',
+                          boxShadow: 'none'
+                        }}
+                      />
+                      <Button
+                        type="submit"
+                        variant="primary"
+                        className="px-4 fw-bold border-0"
+                        disabled={isAiLoading || !aiQuestion.trim()}
+                        style={{ fontSize: '0.75rem' }}
+                      >
+                        {isAiLoading ? (
+                          <Spinner animation="border" size="sm" />
+                        ) : (
+                          "Ask Stilnovo AI"
+                        )}
+                      </Button>
+                    </InputGroup>
+                  </Form>
+
+                  <div className="mt-3 opacity-50">
+                    <small className="text-white fw-500" style={{ fontSize: '0.75rem' }}>
+                      Exclusive access for our community
+                    </small>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Platform Column */}
@@ -130,35 +218,6 @@ export default function Footer() {
           </div> {/* Row closure */}
         </div> {/* Container closure */}
       </footer>
-
-      {/* --- MODALS --- */}
-      {/* Help Modal */}
-      <Modal show={showHelp} onHide={toggleHelp} centered contentClassName="stn-modal-content p-4">
-        <Modal.Header closeButton className="border-0 pb-0 btn-close-white">
-          <Modal.Title className="stn-modal-title w-100 text-center text-white">Need Assistance?</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="stn-modal-body text-center">
-          <p>To access our official support and FAQs, please follow this path:</p>
-          <div className="stn-path-box my-3 p-2 bg-dark rounded text-white">
-            My Account <i className="fa-solid fa-chevron-right mx-2 fs-small"></i> Help Center
-          </div>
-          <p className="text-danger small fw-bold">
-            <i className="fa-solid fa-lock me-1"></i> You must be logged in to view this section.
-          </p>
-          <button className="btn-about" onClick={toggleHelp}>UNDERSTOOD</button>
-        </Modal.Body>
-      </Modal>
-
-      {/* Terms Modal */}
-      <Modal show={showTerms} onHide={toggleTerms} centered size="lg" contentClassName="stn-modal-content p-4">
-        <Modal.Header closeButton className="border-0 pb-0 btn-close-white">
-          <Modal.Title className="stn-modal-title text-white">Terms of Service</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="stn-modal-body text-white">
-          <p>By using Stilnovo, you agree to our community guidelines. We provide a platform for circular fashion.</p>
-          <button className="btn-about" onClick={toggleTerms}>I accept the terms</button>
-        </Modal.Body>
-      </Modal>
 
       {/* Privacy, Safety and Cookie modals follow same logic... */}
 

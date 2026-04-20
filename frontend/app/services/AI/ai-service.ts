@@ -6,3 +6,9 @@ export async function improveDescription(productName: string, basicInfo: string)
         basicInfo
     });
 }
+
+export async function chatBotHelper(userQuestion: string): Promise<string>{
+    return await api.post<string>('/v1/ai/generate-help-response', {
+        userQuestion
+    });
+}
