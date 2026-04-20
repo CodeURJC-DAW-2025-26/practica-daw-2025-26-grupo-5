@@ -51,9 +51,14 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
   const [products, setProducts] = useState<ProductDTO[]>(activeProducts);
 
   // Pageable handled
-  const [page, setPage] = useState(0); 
+  const [page, setPage] = useState(1); 
   const [isLoading, setIsLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(() => {
+    if (typeof homeData.last === 'boolean') {
+      return !homeData.last; 
+    }
+    return activeProducts.length >= 10; 
+  });
 
   // Fill recommended products to always show 4 (or available)
   const recommendedCount = activeRecommendations.length;
@@ -79,7 +84,7 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
 
       const [pagedResponse] = await Promise.all([fetchPromise, delayPromise]);
 
-      const newProducts = pagedResponse.content || pagedResponse.items || [];
+      const newProducts = pagedResponse.content || [];
 
       if (newProducts.length === 0) {
         setHasMore(false); 
@@ -105,8 +110,11 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
 
   };
 
-    const currentlyRecommendedIds = new Set(filledRecommendations.map(p => p.id));
-    const displayProducts = products.filter(p => !currentlyRecommendedIds.has(p.id));
+  const currentlyRecommendedIds = new Set(filledRecommendations.map(p => p.id));
+  const allFilteredProducts = products.filter(p => !currentlyRecommendedIds.has(p.id));
+
+  const displayProductsLimit = Math.max(0, products.length - filledRecommendations.length);
+  const displayProducts = allFilteredProducts.slice(0, displayProductsLimit);
 
   return (
     <Container className="pt-5">

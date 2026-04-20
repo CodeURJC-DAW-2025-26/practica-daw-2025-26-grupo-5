@@ -141,11 +141,14 @@ export async function sendInquiry(data: {
 }
 
 // Funtion aiming to get a paged list of products
-export async function getMoreProducts(page: number, query: string, category: string) {
-    const url = `/api/v1/products?page=${page}&size=10&query=${query}&category=${category}`;
-    
-    const response = await fetch(url);
-    if (!response.ok) throw new Error('Network response was not ok');
-    
-    return response.json();
+export async function getMoreProducts(page: number, query: string, category: string): Promise<PagedResponse<ProductDTO>> {
+  const params: Record<string, any> = {
+    page: page.toString(),
+    size: '10'
+  };
+  
+  if (query) params.query = query;
+  if (category) params.category = category;
+
+  return await api.get<PagedResponse<ProductDTO>>("/v1/products", { params });
 }

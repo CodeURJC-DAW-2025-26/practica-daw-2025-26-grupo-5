@@ -83,17 +83,9 @@ public class MainService {
         boolean isFirstPage = pageable.getPageNumber() == 0;
         List<Product> recommendedProducts = (searching || !isFirstPage) ? List.of()
                 : productService.getRecommendations(user);
-
-        // Dynamic page size: if recommendations used slots, reduce catalog items accordingly
-        // Example: 10 items per page, 3 recommendations = 7 catalog products this page
-        int recommendedSize = recommendedProducts.size();
-        int regularLimit = Math.max(0, pageable.getPageSize() - recommendedSize);
         
         // Fetch catalog products based on search/category or browse all
-        CatalogPageResult catalogPage = regularLimit > 0
-                ? productService.getCatalogPage(query, category, user,
-                        PageRequest.of(pageable.getPageNumber(), regularLimit))
-                : new CatalogPageResult(List.of(), true, 0, 0, 0);
+        CatalogPageResult catalogPage = productService.getCatalogPage(query, category, user, pageable);
 
         // Normalize query display: use query if searching by text, category if filtering by category
         String normalizedQuery = query != null ? query : (category != null ? category : "");
