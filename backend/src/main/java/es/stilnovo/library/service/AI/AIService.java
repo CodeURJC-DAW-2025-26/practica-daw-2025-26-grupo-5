@@ -63,7 +63,7 @@ public class AIService {
                 List<Map<String, Object>> parts = (List<Map<String, Object>>) content.get("parts");
                 return (String) parts.get(0).get("text");
             }
-            return "No se ha podido generar la descripción.";
+            return "The description could not be generated. Try again later.";
 
         } catch (HttpClientErrorException e) {
             if (e.getStatusCode() == HttpStatus.TOO_MANY_REQUESTS) {
@@ -76,7 +76,7 @@ public class AIService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "Error interno al generar descripción.";
+            return "Internal error while generating the description. Please try again.";
         }
     }
 }
