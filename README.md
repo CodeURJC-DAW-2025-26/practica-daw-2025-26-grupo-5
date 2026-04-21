@@ -1558,15 +1558,17 @@ Además, he participado en la implementación y refinamiento de funcionalidades 
 
 #### **Alumno 3 - Raúl Tejada Merinero**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+Me he encargado del desarrollo integral del panel de administración del proyecto, implementando los sistemas completos de gestión de usuarios, transacciones, inventario de productos y moderación de valoraciones. Además, he desarrollado el sistema de reportes, programando la generación y exportación de los tres documentos PDF clave para la plataforma.
+
+Por otro lado, he liderado gran parte del diseño y desarrollo de la interfaz gráfica del frontend. Mi enfoque principal ha sido la mejora estética y funcional de las vistas, creando una aplicación web moderna, accesible y centrada en la usabilidad del usuario final, garantizando una navegación fluida, intuitiva y coherente en toda la plataforma.
 
 | Nº    | Commits      | Files      |
 |:------------: |:------------:| :------------:|
-|1| [Descripción commit 1](URL_commit_1)  | [Archivo1](URL_archivo_1)   |
-|2| [Descripción commit 2](URL_commit_2)  | [Archivo2](URL_archivo_2)   |
-|3| [Descripción commit 3](URL_commit_3)  | [Archivo3](URL_archivo_3)   |
-|4| [Descripción commit 4](URL_commit_4)  | [Archivo4](URL_archivo_4)   |
-|5| [Descripción commit 5](URL_commit_5)  | [Archivo5](URL_archivo_5)   |
+|1| [fix: Refactor project structure to match professor's Practice 3 implementation - React Router v7 SPA with Spring Boot](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/cb17625dd579a8752054ab723abada8bd3641c9e)  | [admin-inventory.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/routes/admin/admin-inventory.tsx)   |
+|2| [style: unify UI architecture with react-bootstrap and enhance global aesthetic](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/a57c939e8337b969f5896822e7209268c68b052c)  | [admin-transactions.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/routes/admin/admin-transactions.tsx)   |
+|3| [Add initial frontend setup with Vite and Initialize React SPA with TypeScript, Zustand, React Router, and Bootstrap.](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/3c29e24d994ea818dafb0653d7a374e32f873566)  | [admin-dashboard.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/routes/admin/admin-dashboard.tsx)   |
+|4| [feat(frontend): migrate all SPA routes to react-bootstrap with visual improvements](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/ffe1b70d7656df6364b82eb5f78489261d34255d)  | [user-settings.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/routes/user/user-settings.tsx)   |
+|5| [feat: Add admin inventory management, transactions, valorations, and login functionality (NOT FINISHED)](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/e12c235d4b3c0fcb7d0df62d88dbf70946791b54)  | [admin-users.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/routes/admin/admin-users.tsx)   |
 
 ---
 
