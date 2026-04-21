@@ -95,8 +95,7 @@
 import { getSellerProfile } from "~/services/user-service";
 import type { Route } from "./+types/seller-profile";
 import { Link } from "react-router";
-import { useState } from "react";
-import { Container, Row, Col, Card, Button, Image, Badge, Tab, Tabs, ListGroup } from "react-bootstrap";
+import { Container, Row, Col, Card, Button, Image, Badge, Tab, Nav } from "react-bootstrap";
 
 /**
  * Client-side loader: Fetch seller profile data
@@ -129,7 +128,7 @@ export default function SellerProfile({ loaderData }: Route.ComponentProps) {
         <main className="flex-grow-1">
             {/* Hero Card */}
             <Container className="pt-5 pb-4">
-                <Card className="border-0 shadow-sm">
+                <Card className="border-0 shadow-sm" style={{ borderRadius: '24px' }}>
                     <Card.Body className="p-4 p-md-5">
                         <Row className="align-items-center g-4">
                             {/* Profile Image */}
@@ -142,7 +141,7 @@ export default function SellerProfile({ loaderData }: Route.ComponentProps) {
                                     width={125}
                                     height={125}
                                     style={{ objectFit: "cover", borderColor: "#fff" }}
-                                    onError={(e) => { (e.target as HTMLImageElement).src = '/assets/no-profile-picture.png' }}
+                                    onError={(e) => { (e.target as HTMLImageElement).src = '/images/profile-photo.png' }}
                                 />
                             </Col>
 
@@ -160,7 +159,7 @@ export default function SellerProfile({ loaderData }: Route.ComponentProps) {
                                     <Badge
                                         bg="light"
                                         text="dark"
-                                        className="px-3 py-2"
+                                        className="px-3 py-2 rounded-pill"
                                         style={{ fontSize: '14px' }}
                                     >
                                         <span className="fw-800 text-primary">{seller.rating}</span>
@@ -169,7 +168,7 @@ export default function SellerProfile({ loaderData }: Route.ComponentProps) {
                                     <Badge
                                         bg="light"
                                         text="dark"
-                                        className="px-3 py-2"
+                                        className="px-3 py-2 rounded-pill"
                                         style={{ fontSize: '14px' }}
                                     >
                                         <span className="fw-800 text-primary">{seller.numRatings}</span>
@@ -178,10 +177,10 @@ export default function SellerProfile({ loaderData }: Route.ComponentProps) {
                                 </div>
                             </Col>
 
-                            {/* Edit Profile Button */}
+                            {/* Edit Profile Button (Manteniendo tu ubicación original) */}
                             {owner && (
                                 <Col md="auto" className="text-center text-md-end">
-                                    <Link to="/user-page" className="text-decoration-none">
+                                    <Link to="/user/settings" className="text-decoration-none">
                                         <Button
                                             variant="outline-dark"
                                             className="fw-800 px-4 py-2 rounded-pill shadow-sm"
@@ -195,8 +194,7 @@ export default function SellerProfile({ loaderData }: Route.ComponentProps) {
                         </Row>
 
                         {/* Seller Bio */}
-                        <hr className="my-4" />
-                        <div>
+                        <div className="mt-4 pt-4 border-top">
                             <small className="fw-800 text-uppercase text-muted d-block mb-2">
                                 Seller's Note
                             </small>
@@ -208,143 +206,116 @@ export default function SellerProfile({ loaderData }: Route.ComponentProps) {
                 </Card>
             </Container>
 
-            {/* Tabs */}
-            <Container className="py-4">
-                <Tabs
-                    defaultActiveKey="items"
-                    className="mb-4"
-                    style={{
-                        borderBottom: '1px solid #e5e7eb'
-                    }}
-                >
-                    {/* Items Tab */}
-                    <Tab
-                        eventKey="items"
-                        title={
-                            <>
-                                <span className="fw-800">{products.length}</span> Items for Sale
-                            </>
-                        }
-                    >
-                        <div className="py-4">
+            {/* Tabs Stilnovo Style - CENTRADAS */}
+            <Tab.Container defaultActiveKey="items">
+                <div className="tab-divider-container my-4">
+                    <Container>
+                        {/* justify-content-center para centrar las pestañas */}
+                        <div className="d-flex justify-content-center border-bottom">
+                            <Nav className="nav-stilnovo-tabs border-0" id="sellerTabNav">
+                                <Nav.Item>
+                                    <Nav.Link eventKey="items" className="fw-800 border-0 bg-transparent py-3 text-dark px-4">
+                                        <span className="text-primary me-1">{products.length}</span> Items for Sale
+                                    </Nav.Link>
+                                </Nav.Item>
+                                <Nav.Item>
+                                    <Nav.Link eventKey="reviews" className="fw-800 border-0 bg-transparent py-3 text-dark px-4">
+                                        <span className="text-primary me-1">{valorations.length}</span> Community Reviews
+                                    </Nav.Link>
+                                </Nav.Item>
+                            </Nav>
+                        </div>
+                    </Container>
+                </div>
+
+                <Container className="py-4">
+                    <Tab.Content>
+                        {/* PRODUCTS */}
+                        <Tab.Pane eventKey="items">
                             {products.length > 0 ? (
                                 <Row className="g-4">
                                     {products.map((product: any) => (
-                                        <Col key={product.id} xs={6} md={4} lg={3}>
+                                        <Col xs={6} md={4} lg={3} key={product.id}>
                                             <Link to={`/product/${product.id}`} className="text-decoration-none">
-                                                <Card
-                                                    className="border-0 shadow-sm h-100"
-                                                    style={{
-                                                        transition: 'transform 0.2s, box-shadow 0.2s',
-                                                        cursor: 'pointer'
-                                                    }}
-                                                    onMouseEnter={(e) => {
-                                                        e.currentTarget.style.transform = 'translateY(-4px)';
-                                                        e.currentTarget.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
-                                                    }}
-                                                    onMouseLeave={(e) => {
-                                                        e.currentTarget.style.transform = 'translateY(0)';
-                                                        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-                                                    }}
-                                                >
-                                                    <Card.Img
-                                                        variant="top"
-                                                        src={`/api/v1/products/${product.image.id}/image?t=${Date.now()}`}
-                                                        style={{
-                                                            height: '180px',
-                                                            objectFit: 'cover',
-                                                            backgroundColor: '#f8fafc'
-                                                        }}
-                                                    />
-                                                    <Card.Body className="text-center p-3">
-                                                        <h6 className="fw-800 mb-2 text-dark">
-                                                            {product.price}€
-                                                        </h6>
-                                                        <p className="small text-muted text-truncate fw-700 mb-0">
-                                                            {product.name}
-                                                        </p>
-                                                    </Card.Body>
-                                                </Card>
+                                                <div className="clay-card p-2 h-100 shadow-sm border-0 bg-white hover-up">
+                                                    <div className="rounded-4 overflow-hidden mb-3" style={{ height: '180px', background: '#f8fafc' }}>
+                                                        <img 
+                                                            src={`/api/v1/products/${product.image?.id || product.id}/image?t=${Date.now()}`} 
+                                                            className="img-fluid w-100 h-100" 
+                                                            style={{ objectFit: 'cover' }} 
+                                                            alt={product.name}
+                                                        />
+                                                    </div>
+                                                    <div className="px-2 pb-2 text-center">
+                                                        <p className="fw-800 h5 mb-1 text-dark">{product.price}&euro;</p>
+                                                        <p className="x-small text-muted text-truncate fw-700 mb-0" style={{ fontSize: '0.85rem' }}>{product.name}</p>
+                                                    </div>
+                                                </div>
                                             </Link>
                                         </Col>
                                     ))}
                                 </Row>
                             ) : (
-                                <div className="text-center py-5">
-                                    <p className="text-muted">This seller has no active products.</p>
+                                <div className="text-center py-5 clay-card" style={{ maxWidth: '600px', margin: '0 auto' }}>
+                                    <i className="fa-solid fa-box-open fa-3x text-muted mb-3 opacity-50"></i>
+                                    <h4 className="fw-800 text-dark">No items available</h4>
+                                    <p className="text-muted mb-0">This seller currently has no active products.</p>
                                 </div>
                             )}
-                        </div>
-                    </Tab>
+                        </Tab.Pane>
 
-                    {/* Reviews Tab */}
-                    <Tab
-                        eventKey="reviews"
-                        title={
-                            <>
-                                <span className="fw-800">{valorations.length}</span> Reviews
-                            </>
-                        }
-                    >
-                        <div className="py-4">
-                            {valorations.length > 0 ? (
-                                <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                                    {valorations.map((val: any) => (
-                                        <Card key={val.id} className="border-0 shadow-sm mb-3">
-                                            <Card.Body className="p-4">
-                                                {/* Review Header */}
-                                                <Row className="align-items-center mb-3">
-                                                    <Col className="d-flex align-items-center gap-3">
-                                                        <Image
-                                                            src={`/api/v1/users/search/profile-photo?name=${encodeURIComponent(val.buyerName)}&t=${Date.now()}`}
-                                                            alt={val.buyerName}
-                                                            roundedCircle
-                                                            width={45}
-                                                            height={45}
-                                                            className="border shadow-sm"
-                                                            onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')}
-                                                        />
-                                                        <div>
-                                                            <h6 className="fw-800 mb-1">{val.buyerName}</h6>
-                                                            <small
-                                                                className="d-flex align-items-center gap-1"
-                                                                style={{ color: 'var(--brand-blue)' }}
-                                                            >
-                                                                <i className="fa-solid fa-circle-check" style={{ fontSize: '0.8rem' }} />
-                                                                <span className="fw-800 text-uppercase">Verified Purchase</span>
-                                                            </small>
+                        {/* REVIEWS */}
+                        <Tab.Pane eventKey="reviews">
+                            <div className="mx-auto" style={{ maxWidth: '800px' }}>
+                                {valorations.length > 0 ? (
+                                    valorations.map((val: any) => (
+                                        <div key={val.id} className="clay-card p-4 mb-3 bg-white border-0 shadow-sm animate slideIn">
+                                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                                <div className="d-flex align-items-center gap-3">
+                                                    <Image 
+                                                        src={`/api/v1/users/search/profile-photo?name=${encodeURIComponent(val.buyerName)}&t=${Date.now()}`} 
+                                                        alt={val.buyerName} 
+                                                        roundedCircle
+                                                        className="border shadow-sm" 
+                                                        width={45} height={45} 
+                                                        style={{ objectFit: 'cover' }}
+                                                        onError={(e) => { (e.target as HTMLImageElement).src = '/images/profile-photo.png' }}
+                                                    />
+                                                    <div>
+                                                        <h4 className="fw-800 h6 mb-0 text-dark">{val.buyerName}</h4>
+                                                        <div className="d-flex align-items-center gap-1 mt-1" style={{ color: 'var(--brand-blue, #0d6efd)' }}>
+                                                            <i className="fa-solid fa-circle-check" style={{ fontSize: '0.8rem' }}></i>
+                                                            <span className="fw-800 text-uppercase" style={{ fontSize: '0.65rem', letterSpacing: '0.5px' }}>Verified Purchase</span>
                                                         </div>
-                                                    </Col>
-                                                    <Col xs="auto">
-                                                        <Badge
-                                                            bg="warning"
-                                                            text="dark"
-                                                            className="px-2 py-1"
-                                                        >
-                                                            <i className="fa-solid fa-star me-1"></i>
-                                                            {val.rating}
-                                                        </Badge>
-                                                    </Col>
-                                                </Row>
-
-                                                {/* Review Comment */}
-                                                <p className="small text-muted mb-0" style={{ fontStyle: 'italic', lineHeight: '1.6' }}>
-                                                    "{val.comment}"
-                                                </p>
-                                            </Card.Body>
-                                        </Card>
-                                    ))}
-                                </div>
-                            ) : (
-                                <div className="text-center py-5" style={{ opacity: '0.5' }}>
-                                    <i className="fa-solid fa-comments fa-3x mb-3"></i>
-                                    <p className="fw-800">This seller hasn't received any reviews yet.</p>
-                                </div>
-                            )}
-                        </div>
-                    </Tab>
-                </Tabs>
-            </Container>
+                                                    </div>
+                                                </div>
+                                                <div className="text-warning small d-flex align-items-center gap-1 bg-light px-2 py-1 rounded-pill border border-light-subtle">
+                                                    <i className="fa-solid fa-star"></i>
+                                                    <span className="fw-800 text-dark">{val.rating}</span>
+                                                </div>
+                                            </div>
+                                            <p className="small text-muted mb-0 lh-base" style={{ fontStyle: 'italic' }}>
+                                                "{val.comment}"
+                                            </p>
+                                            <div className="mt-3 pt-3 border-top d-flex align-items-center gap-2">
+                                                <i className="fa-solid fa-box-open opacity-50" style={{ fontSize: '0.75rem' }}></i>
+                                                <span className="fw-700 text-muted" style={{ fontSize: '0.75rem' }}>
+                                                    Item: <span className="text-dark">{val.productName || 'Stilnovo Item'}</span>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center py-5 opacity-50">
+                                        <i className="fa-solid fa-comments fa-3x text-muted mb-3"></i>
+                                        <p className="fw-800 text-dark">This seller hasn't received any reviews yet.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </Tab.Pane>
+                    </Tab.Content>
+                </Container>
+            </Tab.Container>
         </main>
     );
 }

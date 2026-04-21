@@ -289,68 +289,71 @@ export default function AdminValorations({ loaderData }: { readonly loaderData: 
         subtitle="Monitor and manage user feedback and platform integrity."
       />
 
-      <Card className="clay-card border-0 p-3 mb-4">
-        <Card.Body>
-          <Form onSubmit={handleSearchSubmit}>
-            <Row className="g-3 align-items-end">
-              {searchMode === 'id' ? (
-                <Col xs={12} lg={9}>
-                  <Form.Label className="fw-700 small text-uppercase text-muted">Search valoration by ID</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={searchId}
-                    onChange={(e) => setSearchId(e.target.value)}
-                    placeholder="Type a valoration id..."
-                    className="rounded-3 py-2 bg-light border-0"
-                  />
+      <Card className="border-0 p-4 mb-4 shadow-sm" style={{ backgroundColor: '#192b56', borderRadius: '16px' }}>
+        <Card.Body className="p-0">
+          <div className="mx-auto" style={{ maxWidth: '850px' }}>
+            <Form onSubmit={handleSearchSubmit}>
+              <Row className="g-3 align-items-end justify-content-center">
+
+                {searchMode === 'id' ? (
+                  <Col xs={12} lg={6}>
+                    <Form.Label className="fw-800 small text-uppercase mb-2" style={{ letterSpacing: '0.5px', color: '#CBD5E1' }}>
+                      <i className="fa-solid fa-hashtag me-2"></i> Search by ID
+                    </Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={searchId}
+                      onChange={(e) => setSearchId(e.target.value)}
+                      placeholder="Type the ID number..."
+                      className="py-2 px-3 border-0 shadow-none bg-white"
+                      style={{ borderRadius: '12px' }}
+                    />
+                  </Col>
+                ) : (
+                  <>
+                    <Col xs={12} lg={3}>
+                      <Form.Label className="fw-800 small text-uppercase mb-2" style={{ letterSpacing: '0.5px', color: '#CBD5E1' }}>Seller</Form.Label>
+                      <Form.Control type="text" value={searchSeller} onChange={(e) => setSearchSeller(e.target.value)} placeholder="Type seller name..." className="py-2 px-3 border-0 shadow-none bg-white" style={{ borderRadius: '12px' }} />
+                    </Col>
+                    <Col xs={12} lg={3}>
+                      <Form.Label className="fw-800 small text-uppercase mb-2" style={{ letterSpacing: '0.5px', color: '#CBD5E1' }}>Buyer</Form.Label>
+                      <Form.Control type="text" value={searchBuyer} onChange={(e) => setSearchBuyer(e.target.value)} placeholder="Type buyer name..." className="py-2 px-3 border-0 shadow-none bg-white" style={{ borderRadius: '12px' }} />
+                    </Col>
+                  </>
+                )}
+
+                <Col xs={12} lg={2}>
+                  <Form.Label className="fw-800 small text-uppercase mb-2" style={{ letterSpacing: '0.5px', color: '#CBD5E1' }}>Search Mode</Form.Label>
+                  <Form.Select
+                    value={searchMode}
+                    onChange={(e) => setSearchMode(e.target.value as 'id' | 'users')}
+                    className="py-2 px-3 border-0 shadow-none bg-white"
+                    style={{ borderRadius: '12px' }}
+                  >
+                    <option value="id">By ID</option>
+                    <option value="users">By Users</option>
+                  </Form.Select>
                 </Col>
-              ) : (
-                <>
-                  <Col xs={12} lg={4}>
-                    <Form.Label className="fw-700 small text-uppercase text-muted">Seller</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={searchSeller}
-                      onChange={(e) => setSearchSeller(e.target.value)}
-                      placeholder="Type seller name..."
-                      className="rounded-3 py-2 bg-light border-0"
-                    />
-                  </Col>
-                  <Col xs={12} lg={4}>
-                    <Form.Label className="fw-700 small text-uppercase text-muted">Buyer</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={searchBuyer}
-                      onChange={(e) => setSearchBuyer(e.target.value)}
-                      placeholder="Type buyer name..."
-                      className="rounded-3 py-2 bg-light border-0"
-                    />
-                  </Col>
-                </>
-              )}
 
-              <Col xs={12} lg={3}>
-                <Form.Label className="fw-700 small text-uppercase text-muted">Search mode</Form.Label>
-                <Form.Select
-                  value={searchMode}
-                  onChange={(e) => setSearchMode(e.target.value as 'id' | 'users')}
-                  className="rounded-3 py-2 bg-light border-0"
-                >
-                  <option value="id">by id</option>
-                  <option value="users">by users</option>
-                </Form.Select>
-              </Col>
-            </Row>
+                <Col xs={12} md={4} lg={4}>
+                  <Stack direction="horizontal" gap={2} className="justify-content-md-end mt-3 mt-md-0">
+                    <Button type="submit" variant="primary" className="px-4 py-2 fw-800 border-0 shadow-sm" style={{ borderRadius: '12px' }} disabled={isSearching}>
+                      {isSearching ? <><i className="fa-solid fa-spinner fa-spin me-2"></i>...</> : 'Search'}
+                    </Button>
+                    <Button type="button" className="px-4 py-2 fw-700 border-0"
+                      style={{ borderRadius: '12px', backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#F8FAFC', transition: 'background-color 0.2s' }}
+                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
+                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
+                      onClick={handleClearSearch} disabled={isSearching}
+                    >
+                      Clear
+                    </Button>
+                  </Stack>
+                </Col>
 
-            <Stack direction="horizontal" gap={2} className="justify-content-end mt-3">
-              <Button type="submit" variant="dark" className="fw-700 rounded-pill px-4" disabled={isSearching}>
-                {isSearching ? 'Searching...' : 'Search'}
-              </Button>
-              <Button type="button" variant="light" className="fw-700 rounded-pill px-4" onClick={handleClearSearch} disabled={isSearching}>
-                Clear
-              </Button>
-            </Stack>
-          </Form>
+              </Row>
+            </Form>
+          </div>
         </Card.Body>
       </Card>
 

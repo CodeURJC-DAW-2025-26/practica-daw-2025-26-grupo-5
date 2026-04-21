@@ -211,16 +211,16 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
     try {
       const updatedUser = await banUser(selectedUser.id, !selectedUser.banned);
       setRowData((prev) => prev.map((u) => (u.id === selectedUser.id ? updatedUser : u)));
-      
+
       // Handle product banning/unbanning based on user's ban status
       try {
         const productsPage = await getAdminProducts(0, 1000);
         const userProducts = productsPage.content?.filter(p => p.seller?.id === selectedUser.id) || [];
-        
+
         // If banning (user.banned is false -> true), ban all products
         // If unbanning (user.banned is true -> false), unban all products to Active
         const newProductStatus = !selectedUser.banned ? 'Banned' : 'Active';
-        
+
         for (const product of userProducts) {
           const formData = new FormData();
           formData.append('name', product.name);
@@ -236,7 +236,7 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
         console.error('Failed to update user products:', productError);
         // Don't fail the entire operation if product update fails
       }
-      
+
       setModalType(null);
       setSelectedUser(null);
       await loadUsers(searchTerm);
@@ -277,32 +277,42 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
     <>
       <AdminHeader title="User Management" subtitle="Moderate access and user permissions." />
 
-      <Card className="clay-card border-0 p-3 mb-4">
-        <Card.Body>
-          <Form onSubmit={handleSearchSubmit}>
-            <Row className="g-3 align-items-end">
-              <Col md={9}>
-                <Form.Label className="fw-700 small text-uppercase text-muted">Search users by name</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Type a username..."
-                  className="rounded-3 py-2 bg-light border-0"
-                />
-              </Col>
-              <Col md={3}>
-                <Stack direction="horizontal" gap={2} className="justify-content-end">
-                  <Button type="submit" variant="dark" className="rounded-pill px-4 fw-700" disabled={isSearching}>
-                    {isSearching ? 'Searching...' : 'Search'}
-                  </Button>
-                  <Button type="button" variant="light" className="rounded-pill px-4 fw-700" onClick={handleClearSearch} disabled={isSearching}>
-                    Clear
-                  </Button>
-                </Stack>
-              </Col>
-            </Row>
-          </Form>
+      <Card className="border-0 p-4 mb-4 shadow-sm" style={{ backgroundColor: '#192b56', borderRadius: '16px' }}>
+        <Card.Body className="p-0">
+          <div className="mx-auto" style={{ maxWidth: '850px' }}>
+            <Form onSubmit={handleSearchSubmit}>
+              <Row className="g-3 align-items-end justify-content-center">
+                <Col xs={12} md={8} lg={8}>
+                  <Form.Label className="fw-800 small text-uppercase mb-2" style={{ letterSpacing: '0.5px', color: '#CBD5E1' }}>
+                    <i className="fa-solid fa-user me-2"></i> User Search
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Type a username..."
+                    className="py-2 px-3 border-0 shadow-none bg-white"
+                    style={{ borderRadius: '12px' }}
+                  />
+                </Col>
+                <Col xs={12} md={4} lg={4}>
+                  <Stack direction="horizontal" gap={2} className="justify-content-md-end mt-3 mt-md-0">
+                    <Button type="submit" variant="primary" className="px-4 py-2 fw-800 border-0 shadow-sm" style={{ borderRadius: '12px' }} disabled={isSearching}>
+                      {isSearching ? <><i className="fa-solid fa-spinner fa-spin me-2"></i>...</> : 'Search'}
+                    </Button>
+                    <Button type="button" className="px-4 py-2 fw-700 border-0"
+                      style={{ borderRadius: '12px', backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#F8FAFC', transition: 'background-color 0.2s' }}
+                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
+                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
+                      onClick={handleClearSearch} disabled={isSearching}
+                    >
+                      Clear
+                    </Button>
+                  </Stack>
+                </Col>
+              </Row>
+            </Form>
+          </div>
         </Card.Body>
       </Card>
 
@@ -354,9 +364,9 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
                       <td className="text-muted small fw-600">{user.email}</td>
                       <td><span className="badge bg-light text-dark fw-700">{user.roles?.join(', ') || 'USER'}</span></td>
                       <td>
-                         <span className={`badge-status ${user.banned ? 'status-banned' : 'status-active'}`}>
-                            {user.banned ? 'BANNED' : 'ACTIVE'}
-                         </span>
+                        <span className={`badge-status ${user.banned ? 'status-banned' : 'status-active'}`}>
+                          {user.banned ? 'BANNED' : 'ACTIVE'}
+                        </span>
                       </td>
                       <td>
                         <Stack direction="horizontal" gap={2}>

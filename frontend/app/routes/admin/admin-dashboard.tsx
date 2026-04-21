@@ -129,7 +129,7 @@ export default function AdminDashboard({ loaderData }: DashboardProps) {
   const averageTransactionValue = summary?.averageTransactionValue || 0;
   const averageRating = (summary?.globalAverageRating || 0).toFixed(1);
   const activeUsers = numUsers - numBanneds;
-  
+
   // Products by category
   const categoryMap: Record<string, number> = {};
   products.forEach((p: any) => {
@@ -171,210 +171,210 @@ export default function AdminDashboard({ loaderData }: DashboardProps) {
     <>
       <AdminHeader title="Platform Overview" subtitle="System status and content moderation." />
 
-        {/* KPI Row 1 - Financial & Core */}
-        <Row className="g-3 mb-4">
-          {mainKPIs.map((kpi) => (
-            <Col key={kpi.label} xs={12} sm={6} lg={3}>
-              <KPICard {...kpi} bg={getKPIBg(kpi.color)} />
-            </Col>
-          ))}
-        </Row>
+      {/* KPI Row 1 - Financial & Core */}
+      <Row className="g-3 mb-4">
+        {mainKPIs.map((kpi) => (
+          <Col key={kpi.label} xs={12} sm={6} lg={3}>
+            <KPICard {...kpi} bg={getKPIBg(kpi.color)} />
+          </Col>
+        ))}
+      </Row>
 
-        {/* KPI Row 2 - Users & Listings */}
-        <Row className="g-3 mb-4">
-          {mainKPIs2.map((kpi) => (
-            <Col key={kpi.label} xs={12} sm={6} lg={3}>
-              <KPICard {...kpi} bg={getKPIBg(kpi.color)} />
-            </Col>
-          ))}
-        </Row>
+      {/* KPI Row 2 - Users & Listings */}
+      <Row className="g-3 mb-4">
+        {mainKPIs2.map((kpi) => (
+          <Col key={kpi.label} xs={12} sm={6} lg={3}>
+            <KPICard {...kpi} bg={getKPIBg(kpi.color)} />
+          </Col>
+        ))}
+      </Row>
 
-        <Row className="g-4 mb-4">
-          {/* User Management */}
-          <Col lg={6}>
-            <Card className="clay-card border-0 h-100 p-3">
-              <Card.Body>
-                <Stack direction="horizontal" gap={3} className="justify-content-between align-items-start mb-4">
-                  <div>
-                    <h5 className="fw-800 mb-0 text-dark">User Management</h5>
-                    <p className="text-muted small mb-0">Moderate access and user permissions.</p>
-                  </div>
-                  <Link to="/admin/users" className="btn btn-outline-primary btn-sm fw-700 rounded-pill px-3">
-                    View All
-                  </Link>
-                </Stack>
-               
-                {users.length > 0 ? (
-                  <div style={{ overflowX: 'auto' }}>
-                    <Table hover responsive className="table-admin mb-0 align-middle">
-                      <thead>
-                        <tr>
-                          <th>USER</th>
-                          <th>EMAIL</th>
-                          <th>STATUS</th>
+      <Row className="g-4 mb-4">
+        {/* User Management */}
+        <Col lg={6}>
+          <Card className="clay-card border-0 h-100 p-3">
+            <Card.Body>
+              <Stack direction="horizontal" gap={3} className="justify-content-between align-items-start mb-4">
+                <div>
+                  <h5 className="fw-800 mb-0 text-dark">User Management</h5>
+                  <p className="text-muted small mb-0">Moderate access and user permissions.</p>
+                </div>
+                <Link to="/admin/users" className="btn btn-outline-primary btn-sm fw-700 rounded-pill px-3">
+                  View All
+                </Link>
+              </Stack>
+
+              {users.length > 0 ? (
+                <div style={{ overflowX: 'auto' }}>
+                  <Table hover responsive className="table-admin mb-0 align-middle">
+                    <thead>
+                      <tr>
+                        <th>USER</th>
+                        <th>EMAIL</th>
+                        <th>STATUS</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {users.slice(0, 5).map((user: any) => (
+                        <tr key={user.userId}>
+                          <td>
+                            <Stack direction="horizontal" gap={2} className="align-items-center">
+                              <Image
+                                src={`/api/v1/users/${user.userId}/profile-photo?t=${Date.now()}`}
+                                alt={user.name}
+                                width={36}
+                                height={36}
+                                roundedCircle
+                                style={{ objectFit: 'cover', backgroundColor: '#e5e7eb' }}
+                                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                              />
+                              <span className="mb-0 fw-700 small">{user.name}</span>
+                            </Stack>
+                          </td>
+                          <td className="text-muted small">{user.email}</td>
+                          <td>
+                            <span className={`badge-status ${user.banned ? 'status-banned' : 'status-active'}`}>
+                              {user.banned ? 'BANNED' : 'ACTIVE'}
+                            </span>
+                          </td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {users.slice(0, 5).map((user: any) => (
-                          <tr key={user.userId}>
-                            <td>
-                              <Stack direction="horizontal" gap={2} className="align-items-center">
-                                <Image
-                                  src={`/api/v1/users/${user.userId}/profile-photo?t=${Date.now()}`}
-                                  alt={user.name}
-                                  width={36}
-                                  height={36}
-                                  roundedCircle
-                                  style={{ objectFit: 'cover', backgroundColor: '#e5e7eb' }}
-                                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                                />
-                                <span className="mb-0 fw-700 small">{user.name}</span>
-                              </Stack>
-                            </td>
-                            <td className="text-muted small">{user.email}</td>
-                            <td>
-                               <span className={`badge-status ${user.banned ? 'status-banned' : 'status-active'}`}>
-                                  {user.banned ? 'BANNED' : 'ACTIVE'}
-                               </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </Table>
-                  </div>
-                ) : (
-                  <p className="text-muted text-center py-4">No users found</p>
-                )}
-              </Card.Body>
-            </Card>
-          </Col>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              ) : (
+                <p className="text-muted text-center py-4">No users found</p>
+              )}
+            </Card.Body>
+          </Card>
+        </Col>
 
-          {/* Products by Category */}
-          <Col lg={6}>
-            <Card className="clay-card border-0 h-100 p-3">
-              <Card.Body>
-                <h5 className="fw-800 mb-4 text-dark">Products by Category</h5>
-                {Object.keys(categoryMap).length > 0 ? (
-                  <div style={{ maxHeight: '350px', overflowY: 'auto' }} className="pe-2">
-                    {Object.entries(categoryMap).map(([category, count]) => {
-                      const percentage = totalProducts > 0 ? (count / totalProducts) * 100 : 0;
-                      return (
-                        <div key={category} className="mb-4">
-                          <Stack direction="horizontal" gap={3} className="justify-content-between mb-2">
-                            {/* Texto normal */}
-                            <span className="small fw-700 text-dark">{category}</span>
-                            <span className="small text-muted fw-600">{count} ({percentage.toFixed(0)}%)</span>
-                          </Stack>
-                          <ProgressBar now={percentage} style={{ height: '8px', borderRadius: '10px' }} />
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <p className="text-muted text-center py-4">No products available</p>
-                )}
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
+        {/* Products by Category */}
+        <Col lg={6}>
+          <Card className="clay-card border-0 h-100 p-3">
+            <Card.Body>
+              <h5 className="fw-800 mb-4 text-dark">Products by Category</h5>
+              {Object.keys(categoryMap).length > 0 ? (
+                <div style={{ maxHeight: '350px', overflowY: 'auto' }} className="pe-2">
+                  {Object.entries(categoryMap).map(([category, count]) => {
+                    const percentage = totalProducts > 0 ? (count / totalProducts) * 100 : 0;
+                    return (
+                      <div key={category} className="mb-4">
+                        <Stack direction="horizontal" gap={3} className="justify-content-between mb-2">
+                          {/* Texto normal */}
+                          <span className="small fw-700 text-dark">{category}</span>
+                          <span className="small text-muted fw-600">{count} ({percentage.toFixed(0)}%)</span>
+                        </Stack>
+                        <ProgressBar now={percentage} style={{ height: '8px', borderRadius: '10px' }} />
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-muted text-center py-4">No products available</p>
+              )}
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
-        <Row className="g-4 mb-4">
-          <Col lg={8}>
-            <Card className="clay-card border-0 h-100 p-3">
-              <Card.Body>
-                <Stack direction="horizontal" gap={3} className="justify-content-between align-items-start mb-4">
-                  <div>
-                    <h5 className="fw-800 mb-0 text-dark">Active Listings Products</h5>
-                    {/* Texto normal */}
-                    <p className="text-muted small mb-0">{activeProductsCount} products visible</p>
-                  </div>
-                  <Link to="/admin/inventory" className="btn btn-outline-primary btn-sm fw-700 rounded-pill px-3">
-                    See All
-                  </Link>
-                </Stack>
-                
-                {activeProducts.length > 0 ? (
-                  <div style={{ overflowX: 'auto' }}>
-                    <Table hover responsive className="table-admin mb-0 align-middle">
-                      <thead>
-                        <tr>
-                          <th>PRODUCT</th>
-                          <th>CATEGORY</th>
-                          <th>PRICE</th>
-                          <th>SELLER</th>
+      <Row className="g-4 mb-4">
+        <Col lg={8}>
+          <Card className="clay-card border-0 h-100 p-3">
+            <Card.Body>
+              <Stack direction="horizontal" gap={3} className="justify-content-between align-items-start mb-4">
+                <div>
+                  <h5 className="fw-800 mb-0 text-dark">Active Listings Products</h5>
+                  {/* Texto normal */}
+                  <p className="text-muted small mb-0">{activeProductsCount} products visible</p>
+                </div>
+                <Link to="/admin/inventory" className="btn btn-outline-primary btn-sm fw-700 rounded-pill px-3">
+                  See All
+                </Link>
+              </Stack>
+
+              {activeProducts.length > 0 ? (
+                <div style={{ overflowX: 'auto' }}>
+                  <Table hover responsive className="table-admin mb-0 align-middle">
+                    <thead>
+                      <tr>
+                        <th>PRODUCT</th>
+                        <th>CATEGORY</th>
+                        <th>PRICE</th>
+                        <th>SELLER</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {activeProducts.slice(0, 8).map((product: any) => (
+                        <tr key={product.id}>
+                          <td>
+                            <Stack direction="horizontal" gap={2} className="align-items-center">
+                              <Image
+                                src={`/api/v1/products/${product.id}/image?t=${Date.now()}`}
+                                alt={product.name}
+                                width={40}
+                                height={40}
+                                className="product-img-thumb"
+                                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                              />
+                              <span className="mb-0 fw-700 small">{product.name}</span>
+                            </Stack>
+                          </td>
+                          <td><span className="badge-cat cat-tech">{product.category}</span></td>
+                          <td className="text-nowrap fw-800 text-success">{product.price?.toFixed(2)} €</td>
+                          <td className="text-muted small fw-600">{product.seller?.name || 'Unknown'}</td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        {activeProducts.slice(0, 8).map((product: any) => (
-                          <tr key={product.id}>
-                            <td>
-                              <Stack direction="horizontal" gap={2} className="align-items-center">
-                                <Image
-                                  src={`/api/v1/products/${product.id}/image?t=${Date.now()}`}
-                                  alt={product.name}
-                                  width={40}
-                                  height={40}
-                                  className="product-img-thumb"
-                                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                                />
-                                <span className="mb-0 fw-700 small">{product.name}</span>
-                              </Stack>
-                            </td>
-                            <td><span className="badge-cat cat-tech">{product.category}</span></td>
-                            <td className="text-nowrap fw-800 text-success">{product.price?.toFixed(2)} €</td>
-                            <td className="text-muted small fw-600">{product.seller?.name || 'Unknown'}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </Table>
-                  </div>
-                ) : (
-                  <p className="text-muted text-center py-4">No active products available</p>
-                )}
-              </Card.Body>
-            </Card>
-          </Col>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              ) : (
+                <p className="text-muted text-center py-4">No active products available</p>
+              )}
+            </Card.Body>
+          </Card>
+        </Col>
 
-          {/* System Status */}
-          <Col lg={4}>
-            <Card className="clay-card border-0 h-100 p-3">
-              <Card.Body>
-                <h5 className="fw-800 mb-4 text-dark">System Status</h5>
-                <Stack gap={4}>
-                  <div>
-                    {/* Texto normal */}
-                    <p className="text-muted small fw-600 mb-2">Memory Usage</p>
-                    <Stack direction="horizontal" gap={3} className="justify-content-between mb-2">
-                      <span className="small fw-800">{memoryUsage}%</span>
-                      <span className="text-muted small fw-600">of 512 MB</span>
-                    </Stack>
-                    <ProgressBar now={Math.min(memoryUsage, 100)} variant="info" style={{ height: '8px', borderRadius: '10px' }} />
-                  </div>
+        {/* System Status */}
+        <Col lg={4}>
+          <Card className="clay-card border-0 h-100 p-3">
+            <Card.Body>
+              <h5 className="fw-800 mb-4 text-dark">System Status</h5>
+              <Stack gap={4}>
+                <div>
+                  {/* Texto normal */}
+                  <p className="text-muted small fw-600 mb-2">Memory Usage</p>
+                  <Stack direction="horizontal" gap={3} className="justify-content-between mb-2">
+                    <span className="small fw-800">{memoryUsage}%</span>
+                    <span className="text-muted small fw-600">of 512 MB</span>
+                  </Stack>
+                  <ProgressBar now={Math.min(memoryUsage, 100)} variant="info" style={{ height: '8px', borderRadius: '10px' }} />
+                </div>
 
-                  <div>
-                    {/* Texto normal */}
-                    <p className="text-muted small fw-600 mb-2">Banned Users</p>
-                    <Stack direction="horizontal" gap={3} className="justify-content-between mb-2">
-                      <span className="small fw-800">{numBanneds}/{numUsers}</span>
-                      <span className="text-muted small fw-600">{numUsers > 0 ? ((numBanneds / numUsers) * 100).toFixed(1) : 0}%</span>
-                    </Stack>
-                    <ProgressBar now={numUsers > 0 ? (numBanneds / numUsers) * 100 : 0} variant="danger" style={{ height: '8px', borderRadius: '10px' }} />
-                  </div>
+                <div>
+                  {/* Texto normal */}
+                  <p className="text-muted small fw-600 mb-2">Banned Users</p>
+                  <Stack direction="horizontal" gap={3} className="justify-content-between mb-2">
+                    <span className="small fw-800">{numBanneds}/{numUsers}</span>
+                    <span className="text-muted small fw-600">{numUsers > 0 ? ((numBanneds / numUsers) * 100).toFixed(1) : 0}%</span>
+                  </Stack>
+                  <ProgressBar now={numUsers > 0 ? (numBanneds / numUsers) * 100 : 0} variant="danger" style={{ height: '8px', borderRadius: '10px' }} />
+                </div>
 
-                  <div className="p-3 bg-light rounded-3 mt-2 border">
-                    {/* Texto normal */}
-                    <p className="text-muted small fw-600 mb-2">Platform Status</p>
-                    <Stack direction="horizontal" gap={2} className="align-items-center mb-1">
-                      <span className="status-pulse"></span>
-                      <span className="fw-800 text-success">Stable</span>
-                    </Stack>
-                    <p className="text-muted small fw-600 mb-0">All systems operational</p>
-                  </div>
-                </Stack>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
+                <div className="p-3 bg-light rounded-3 mt-2 border">
+                  {/* Texto normal */}
+                  <p className="text-muted small fw-600 mb-2">Platform Status</p>
+                  <Stack direction="horizontal" gap={2} className="align-items-center mb-1">
+                    <span className="status-pulse"></span>
+                    <span className="fw-800 text-success">Stable</span>
+                  </Stack>
+                  <p className="text-muted small fw-600 mb-0">All systems operational</p>
+                </div>
+              </Stack>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
     </>
   );
 }

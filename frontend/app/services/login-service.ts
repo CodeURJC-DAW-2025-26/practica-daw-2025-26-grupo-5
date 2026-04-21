@@ -207,5 +207,14 @@ export async function logIn(username: string, password: string): Promise<UserDTO
  * }
  */
 export async function logOut(): Promise<void> {
-  await api.post("/v1/auth/logout", {});
+  try {
+    // Tell the server to invalidate the session/token
+    await api.post("/v1/auth/logout", {});
+  } catch (error) {
+    console.error("Server logout failed, but local token will still be cleared", error);
+  } finally {
+    // THIS is where you add it:
+    // Always remove the token from the browser, even if the server request fails
+    localStorage.removeItem('token');
+  }
 }

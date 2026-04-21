@@ -288,6 +288,8 @@ public class TransactionService {
         valorationRepository.deleteByTransactionIn(List.of(transaction));
 
         User seller = transaction.getSeller();
+        seller.setNumRatings(seller.getNumRatings() - 1);
+
         Product product = transaction.getProduct();
 
         if (product != null) {
