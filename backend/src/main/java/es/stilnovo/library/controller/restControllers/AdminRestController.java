@@ -368,6 +368,9 @@ public class AdminRestController {
     /**
      * Retrieves a paginated list of all system transactions.
      * @param pageable Pagination and sorting information.
+     * @param id Optional filter by transaction id.
+     * @param seller Optional filter by seller name.
+     * @param buyer Optional filter by buyer name.
      * @return PagedResponse of TransactionDTOs.
      */
     @GetMapping("/transactions")
@@ -375,8 +378,12 @@ public class AdminRestController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Transactions retrieved successfully")
     })
-    public PagedResponse<TransactionDTO> getTransactions(@PageableDefault(size = 10) Pageable pageable) {
-        var page = adminService.getTransactionsPage(pageable);
+    public PagedResponse<TransactionDTO> getTransactions(
+            @PageableDefault(size = 10) Pageable pageable,
+            @RequestParam(required = false) Long id,
+            @RequestParam(required = false) String seller,
+            @RequestParam(required = false) String buyer) {
+        var page = adminService.getTransactionsPage(pageable, id, seller, buyer);
         return new PagedResponse<>(transactionMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(),
                 page.getTotalElements(), page.isLast());
     }
@@ -420,6 +427,9 @@ public class AdminRestController {
     /**
      * Retrieves a paginated list of all user valorations/reviews.
      * @param pageable Pagination and sorting information.
+     * @param id Optional filter by valoration id.
+     * @param seller Optional filter by seller name.
+     * @param buyer Optional filter by buyer name.
      * @return PagedResponse of ValorationDTOs.
      */
     @GetMapping("/valorations")
@@ -427,8 +437,12 @@ public class AdminRestController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Valorations retrieved successfully")
     })
-    public PagedResponse<ValorationDTO> getValorations(@PageableDefault(size = 10) Pageable pageable) {
-        var page = adminService.getValorationsPage(pageable);
+    public PagedResponse<ValorationDTO> getValorations(
+            @PageableDefault(size = 10) Pageable pageable,
+            @RequestParam(required = false) Long id,
+            @RequestParam(required = false) String seller,
+            @RequestParam(required = false) String buyer) {
+        var page = adminService.getValorationsPage(pageable, id, seller, buyer);
         return new PagedResponse<>(valorationMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(),
                 page.getTotalElements(), page.isLast());
     }

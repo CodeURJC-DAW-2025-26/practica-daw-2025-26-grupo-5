@@ -1,16 +1,16 @@
 package es.stilnovo.library.repository;
 
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.model.User;
-import java.util.List;
 
 /**
  * TransactionRepository interface for Transaction entity database operations
@@ -48,6 +48,31 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
      * @return list of transactions involving this user
      */
     List<Transaction> findByBuyerOrSeller(User buyer, User seller);
+
+    /**
+     * Search transactions by seller name.
+     * Used by admin search.
+     * @param sellerName seller name or partial seller name
+     * @return matching transactions
+     */
+    List<Transaction> findBySellerNameContainingIgnoreCase(String sellerName);
+
+    /**
+     * Search transactions by buyer name.
+     * Used by admin search.
+     * @param buyerName buyer name or partial buyer name
+     * @return matching transactions
+     */
+    List<Transaction> findByBuyerNameContainingIgnoreCase(String buyerName);
+
+    /**
+     * Search transactions by seller and buyer name.
+     * Used by admin search.
+     * @param sellerName seller name or partial seller name
+     * @param buyerName buyer name or partial buyer name
+     * @return matching transactions
+     */
+    List<Transaction> findBySellerNameContainingIgnoreCaseAndBuyerNameContainingIgnoreCase(String sellerName, String buyerName);
 
     // Finds all transactions where this specific product was involved
     List<Transaction> findByProduct(Product product);

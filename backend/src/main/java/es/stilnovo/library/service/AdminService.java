@@ -24,6 +24,7 @@ import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.TransactionRepository;
 import es.stilnovo.library.repository.UserInteractionRepository;
 import es.stilnovo.library.repository.UserRepository;
+import es.stilnovo.library.repository.ValorationRepository;
 
 /**
  * AdminService: Manages administrative operations
@@ -65,6 +66,9 @@ public class AdminService {
 
     @Autowired
     private ValorationService valorationService;
+
+    @Autowired
+    private ValorationRepository valorationRepository;
 
     public record AdminPanelData(
             int numUsers,
@@ -201,7 +205,27 @@ public class AdminService {
 
     @Transactional(readOnly = true)
     public Page<Transaction> getTransactionsPage(Pageable pageable) {
-        return toPage(transactionService.getAllTransactions(), pageable);
+        return getTransactionsPage(pageable, null, null, null);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Transaction> getTransactionsPage(Pageable pageable, Long id, String seller, String buyer) {
+        List<Transaction> source;
+        if (id != null) {
+            source = transactionRepository.findById(id)
+                    .map(List::of)
+                    .orElseGet(() -> List.of());
+        } else if (hasText(seller) && hasText(buyer)) {
+            source = transactionRepository.findBySellerNameContainingIgnoreCaseAndBuyerNameContainingIgnoreCase(
+                    seller.trim(), buyer.trim());
+        } else if (hasText(seller)) {
+            source = transactionRepository.findBySellerNameContainingIgnoreCase(seller.trim());
+        } else if (hasText(buyer)) {
+            source = transactionRepository.findByBuyerNameContainingIgnoreCase(buyer.trim());
+        } else {
+            source = transactionService.getAllTransactions();
+        }
+        return toPage(source, pageable);
     }
 
     @Transactional(readOnly = true)
@@ -223,7 +247,27 @@ public class AdminService {
 
     @Transactional(readOnly = true)
     public Page<Valoration> getValorationsPage(Pageable pageable) {
-        return toPage(valorationService.findAll(), pageable);
+        return getValorationsPage(pageable, null, null, null);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Valoration> getValorationsPage(Pageable pageable, Long id, String seller, String buyer) {
+        List<Valoration> source;
+        if (id != null) {
+            source = valorationRepository.findById(id)
+                    .map(List::of)
+                    .orElseGet(() -> List.of());
+        } else if (hasText(seller) && hasText(buyer)) {
+            source = valorationRepository.findBySellerNameContainingIgnoreCaseAndBuyerNameContainingIgnoreCase(
+                    seller.trim(), buyer.trim());
+        } else if (hasText(seller)) {
+            source = valorationRepository.findBySellerNameContainingIgnoreCase(seller.trim());
+        } else if (hasText(buyer)) {
+            source = valorationRepository.findByBuyerNameContainingIgnoreCase(buyer.trim());
+        } else {
+            source = valorationService.findAll();
+        }
+        return toPage(source, pageable);
     }
 
     @Transactional
@@ -398,6 +442,10 @@ public class AdminService {
         // Now that no Inquiries or Interactions point to this ID, SQL allows the
         // deletion
         productRepository.delete(product);
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
     private <T> Page<T> toPage(List<T> source, Pageable pageable) {

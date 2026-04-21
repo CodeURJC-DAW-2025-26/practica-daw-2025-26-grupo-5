@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Row, Col, Card, Table, Button, Image, Badge, Alert, Stack, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Card, Table, Button, Image, Badge, Alert, Stack, Modal, Form } from 'react-bootstrap';
 import { getAdminTransactions, deleteTransaction } from '~/services/admin-service';
 import type TransactionDTO from '~/dto/TransactionDTO';
 import type PagedResponse from '~/dto/PagedResponse';
@@ -66,6 +66,12 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
   const [selectedTransaction, setSelectedTransaction] = useState<TransactionDTO | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [searchMode, setSearchMode] = useState<'id' | 'users'>('id');
+  const [searchId, setSearchId] = useState('');
+  const [searchSeller, setSearchSeller] = useState('');
+  const [searchBuyer, setSearchBuyer] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+
   const itemsPerPage = 10;
 
   const totalPages = Math.ceil(transactions.length / itemsPerPage);
@@ -75,6 +81,64 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
   const totalAccumulated = transactions.reduce((acc, curr) => acc + (curr.finalPrice || 0), 0);
   const averageTransaction = transactions.length > 0 ? totalAccumulated / transactions.length : 0;
 
+  const loadTransactions = async (
+    options?: {
+      mode?: 'id' | 'users';
+      id?: string;
+      seller?: string;
+      buyer?: string;
+    }
+  ) => {
+    const mode = options?.mode ?? searchMode;
+    const idValue = options?.id ?? searchId;
+    const sellerValue = options?.seller ?? searchSeller;
+    const buyerValue = options?.buyer ?? searchBuyer;
+
+    setIsSearching(true);
+    try {
+      if (mode === 'id') {
+        const trimmedId = idValue.trim();
+        const parsedId = trimmedId ? Number(trimmedId) : undefined;
+
+        if (trimmedId && Number.isNaN(parsedId)) {
+          alert('Please enter a valid transaction ID.');
+          return;
+        }
+
+        const response = await getAdminTransactions(0, 1000, parsedId);
+        setTransactions(response.content || []);
+      } else {
+        const response = await getAdminTransactions(
+          0,
+          1000,
+          undefined,
+          sellerValue.trim() || undefined,
+          buyerValue.trim() || undefined
+        );
+        setTransactions(response.content || []);
+      }
+
+      setCurrentPage(0);
+    } catch (error: any) {
+      setDeleteError(error?.message || 'Failed to load transactions');
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSearchSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await loadTransactions();
+  };
+
+  const handleClearSearch = async () => {
+    setSearchMode('id');
+    setSearchId('');
+    setSearchSeller('');
+    setSearchBuyer('');
+    await loadTransactions({ mode: 'id', id: '', seller: '', buyer: '' });
+  };
+
   return (
     <>
       <header className="d-flex justify-content-between align-items-center mb-5">
@@ -83,6 +147,71 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
           <p className="text-muted small fw-600 mb-0">Overview of all historical financial movements.</p>
         </div>
       </header>
+
+      <Card className="clay-card border-0 p-3 mb-4">
+        <Card.Body>
+          <Form onSubmit={handleSearchSubmit}>
+            <Row className="g-3 align-items-end">
+              {searchMode === 'id' ? (
+                <Col xs={12} lg={9}>
+                  <Form.Label className="fw-700 small text-uppercase text-muted">Search transaction by ID</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={searchId}
+                    onChange={(e) => setSearchId(e.target.value)}
+                    placeholder="Type a transaction id..."
+                    className="rounded-3 py-2 bg-light border-0"
+                  />
+                </Col>
+              ) : (
+                <>
+                  <Col xs={12} lg={4}>
+                    <Form.Label className="fw-700 small text-uppercase text-muted">Seller</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={searchSeller}
+                      onChange={(e) => setSearchSeller(e.target.value)}
+                      placeholder="Type seller name..."
+                      className="rounded-3 py-2 bg-light border-0"
+                    />
+                  </Col>
+                  <Col xs={12} lg={4}>
+                    <Form.Label className="fw-700 small text-uppercase text-muted">Buyer</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={searchBuyer}
+                      onChange={(e) => setSearchBuyer(e.target.value)}
+                      placeholder="Type buyer name..."
+                      className="rounded-3 py-2 bg-light border-0"
+                    />
+                  </Col>
+                </>
+              )}
+
+              <Col xs={12} lg={3}>
+                <Form.Label className="fw-700 small text-uppercase text-muted">Search mode</Form.Label>
+                <Form.Select
+                  value={searchMode}
+                  onChange={(e) => setSearchMode(e.target.value as 'id' | 'users')}
+                  className="rounded-3 py-2 bg-light border-0"
+                >
+                  <option value="id">by id</option>
+                  <option value="users">by users</option>
+                </Form.Select>
+              </Col>
+            </Row>
+
+            <Stack direction="horizontal" gap={2} className="justify-content-end mt-3">
+              <Button type="submit" variant="dark" className="fw-700 rounded-pill px-4" disabled={isSearching}>
+                {isSearching ? 'Searching...' : 'Search'}
+              </Button>
+              <Button type="button" variant="light" className="fw-700 rounded-pill px-4" onClick={handleClearSearch} disabled={isSearching}>
+                Clear
+              </Button>
+            </Stack>
+          </Form>
+        </Card.Body>
+      </Card>
 
       {/* KPI Row */}
       <Row className="g-3 mb-4">
@@ -306,15 +435,7 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
                 await deleteTransaction(selectedTransaction.transactionId);
                 
                 // Remove from transactions list
-                setTransactions(prev => 
-                  prev.filter(t => t.transactionId !== selectedTransaction.transactionId)
-                );
-                
-                // Reset pagination if needed
-                const newTotalPages = Math.ceil((transactions.length - 1) / itemsPerPage);
-                if (currentPage >= newTotalPages && currentPage > 0) {
-                  setCurrentPage(currentPage - 1);
-                }
+                await loadTransactions();
                 
                 setShowDeleteModal(false);
                 setSelectedTransaction(null);

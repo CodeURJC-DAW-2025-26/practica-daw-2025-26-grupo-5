@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { redirect, useRevalidator } from 'react-router';
-import { Container, Row, Col, Card, Table, Button, Stack, Alert } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { redirect } from 'react-router';
+import { Container, Row, Col, Card, Table, Button, Stack, Alert, Form, Modal } from 'react-bootstrap';
 import { getAdminValorations, deleteValoration } from '~/services/admin-service';
 import type ValorationDTO from '~/dto/ValorationDTO';
 import type PagedResponse from '~/dto/PagedResponse';
@@ -43,7 +43,7 @@ const getKPIBg = (color: string): string => {
 
 export async function clientLoader() {
   try {
-    const data = await getAdminValorations(0, 100);
+    const data = await getAdminValorations(0, 1000);
     return data || {};
   } catch (error) {
     console.error('Failed to fetch valorations:', error);
@@ -52,7 +52,6 @@ export async function clientLoader() {
 }
 
 export default function AdminValorations({ loaderData }: { readonly loaderData: any }) {
-  const revalidator = useRevalidator();
   const pagedData = loaderData as PagedResponse<ValorationDTO>;
   const valorations = pagedData.content || [];
 
@@ -61,8 +60,74 @@ export default function AdminValorations({ loaderData }: { readonly loaderData: 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
+  const [searchMode, setSearchMode] = useState<'id' | 'users'>('id');
+  const [searchId, setSearchId] = useState('');
+  const [searchSeller, setSearchSeller] = useState('');
+  const [searchBuyer, setSearchBuyer] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
 
   const itemsPerPage = 10;
+
+  const loadValorations = async (
+    options?: {
+      mode?: 'id' | 'users';
+      id?: string;
+      seller?: string;
+      buyer?: string;
+    }
+  ) => {
+    const mode = options?.mode ?? searchMode;
+    const idValue = options?.id ?? searchId;
+    const sellerValue = options?.seller ?? searchSeller;
+    const buyerValue = options?.buyer ?? searchBuyer;
+
+    setIsSearching(true);
+    setSearchError(null);
+
+    try {
+      if (mode === 'id') {
+        const trimmedId = idValue.trim();
+        const parsedId = trimmedId ? Number(trimmedId) : undefined;
+
+        if (trimmedId && Number.isNaN(parsedId)) {
+          setSearchError('Please enter a valid valoration ID.');
+          return;
+        }
+
+        const response = await getAdminValorations(0, 1000, parsedId);
+        setRowData(response.content || []);
+      } else {
+        const response = await getAdminValorations(
+          0,
+          1000,
+          undefined,
+          sellerValue.trim() || undefined,
+          buyerValue.trim() || undefined
+        );
+        setRowData(response.content || []);
+      }
+
+      setCurrentPage(0);
+    } catch (error: any) {
+      setSearchError(error?.message || 'Failed to load reviews.');
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSearchSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await loadValorations();
+  };
+
+  const handleClearSearch = async () => {
+    setSearchMode('id');
+    setSearchId('');
+    setSearchSeller('');
+    setSearchBuyer('');
+    await loadValorations({ mode: 'id', id: '', seller: '', buyer: '' });
+  };
 
   const handleDeleteClick = (val: ValorationDTO) => {
     setSelectedVal(val);
@@ -77,7 +142,6 @@ export default function AdminValorations({ loaderData }: { readonly loaderData: 
       setRowData(prev => prev.filter(v => v.id !== selectedVal.id));
       setShowDeleteModal(false);
       setSelectedVal(null);
-      revalidator.revalidate();
     } catch {
       alert('Failed to delete review.');
     } finally {
@@ -85,7 +149,7 @@ export default function AdminValorations({ loaderData }: { readonly loaderData: 
     }
   };
 
-  // ✅ KPIs CORRECTOS (stars en vez de rating)
+  // ✅ KPIs CORRECTOS
   const totalReviews = rowData.length;
   const averageRating =
     totalReviews > 0
@@ -107,6 +171,77 @@ export default function AdminValorations({ loaderData }: { readonly loaderData: 
         title="Global Valorations"
         subtitle="Monitor and manage user feedback and platform integrity."
       />
+
+      <Card className="clay-card border-0 p-3 mb-4">
+        <Card.Body>
+          <Form onSubmit={handleSearchSubmit}>
+            <Row className="g-3 align-items-end">
+              {searchMode === 'id' ? (
+                <Col xs={12} lg={9}>
+                  <Form.Label className="fw-700 small text-uppercase text-muted">Search valoration by ID</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={searchId}
+                    onChange={(e) => setSearchId(e.target.value)}
+                    placeholder="Type a valoration id..."
+                    className="rounded-3 py-2 bg-light border-0"
+                  />
+                </Col>
+              ) : (
+                <>
+                  <Col xs={12} lg={4}>
+                    <Form.Label className="fw-700 small text-uppercase text-muted">Seller</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={searchSeller}
+                      onChange={(e) => setSearchSeller(e.target.value)}
+                      placeholder="Type seller name..."
+                      className="rounded-3 py-2 bg-light border-0"
+                    />
+                  </Col>
+                  <Col xs={12} lg={4}>
+                    <Form.Label className="fw-700 small text-uppercase text-muted">Buyer</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={searchBuyer}
+                      onChange={(e) => setSearchBuyer(e.target.value)}
+                      placeholder="Type buyer name..."
+                      className="rounded-3 py-2 bg-light border-0"
+                    />
+                  </Col>
+                </>
+              )}
+
+              <Col xs={12} lg={3}>
+                <Form.Label className="fw-700 small text-uppercase text-muted">Search mode</Form.Label>
+                <Form.Select
+                  value={searchMode}
+                  onChange={(e) => setSearchMode(e.target.value as 'id' | 'users')}
+                  className="rounded-3 py-2 bg-light border-0"
+                >
+                  <option value="id">by id</option>
+                  <option value="users">by users</option>
+                </Form.Select>
+              </Col>
+            </Row>
+
+            <Stack direction="horizontal" gap={2} className="justify-content-end mt-3">
+              <Button type="submit" variant="dark" className="fw-700 rounded-pill px-4" disabled={isSearching}>
+                {isSearching ? 'Searching...' : 'Search'}
+              </Button>
+              <Button type="button" variant="light" className="fw-700 rounded-pill px-4" onClick={handleClearSearch} disabled={isSearching}>
+                Clear
+              </Button>
+            </Stack>
+          </Form>
+        </Card.Body>
+      </Card>
+
+      {searchError && (
+        <Alert variant="danger" className="mb-4">
+          {searchError}
+        </Alert>
+      )}
 
       {/* KPI */}
       <Row className="g-3 mb-4">

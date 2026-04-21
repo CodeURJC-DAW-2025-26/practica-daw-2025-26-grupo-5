@@ -81,10 +81,19 @@ export const updateProduct = async (
 
 export const getAdminTransactions = async (
   page = 0,
-  size = 10
+  size = 10,
+  id?: number,
+  seller?: string,
+  buyer?: string
 ): Promise<PagedResponse<TransactionDTO>> => {
   return await api.get<PagedResponse<TransactionDTO>>("/v1/admin/transactions", {
-    params: { page, size },
+    params: {
+      page,
+      size,
+      id: id ?? undefined,
+      seller: seller?.trim() || undefined,
+      buyer: buyer?.trim() || undefined,
+    },
   });
 };
 
@@ -98,10 +107,19 @@ export const deleteTransaction = async (transactionId: number): Promise<void> =>
 
 export const getAdminValorations = async (
   page = 0,
-  size = 10
+  size = 10,
+  id?: number,
+  seller?: string,
+  buyer?: string
 ): Promise<PagedResponse<ValorationDTO>> => {
   return await api.get<PagedResponse<ValorationDTO>>("/v1/admin/valorations", {
-    params: { page, size },
+    params: {
+      page,
+      size,
+      id: id ?? undefined,
+      seller: seller?.trim() || undefined,
+      buyer: buyer?.trim() || undefined,
+    },
   });
 };
 

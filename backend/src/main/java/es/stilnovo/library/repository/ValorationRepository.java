@@ -1,5 +1,7 @@
 package es.stilnovo.library.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -7,10 +9,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import es.stilnovo.library.model.Valoration;
 import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.model.User;
-import java.util.List;
+import es.stilnovo.library.model.Valoration;
 
 /**
  * ValorationRepository interface for Valoration entity database operations
@@ -42,6 +43,31 @@ public interface ValorationRepository extends JpaRepository<Valoration, Long> {
      * @return list of ratings authored by this buyer
      */
     List<Valoration> findByBuyer(User buyer);
+
+    /**
+     * Search valorations by seller name.
+     * Used by admin search.
+     * @param sellerName seller name or partial seller name
+     * @return matching valorations
+     */
+    List<Valoration> findBySellerNameContainingIgnoreCase(String sellerName);
+
+    /**
+     * Search valorations by buyer name.
+     * Used by admin search.
+     * @param buyerName buyer name or partial buyer name
+     * @return matching valorations
+     */
+    List<Valoration> findByBuyerNameContainingIgnoreCase(String buyerName);
+
+    /**
+     * Search valorations by seller and buyer name.
+     * Used by admin search.
+     * @param sellerName seller name or partial seller name
+     * @param buyerName buyer name or partial buyer name
+     * @return matching valorations
+     */
+    List<Valoration> findBySellerNameContainingIgnoreCaseAndBuyerNameContainingIgnoreCase(String sellerName, String buyerName);
 
     /**
      * Delete all ratings associated with specific transactions
