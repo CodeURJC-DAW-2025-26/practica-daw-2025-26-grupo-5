@@ -1,4 +1,5 @@
 import api from "./api";
+import type SellerDTO from "~/dto/SellerDTO";
 import type UserDTO from "~/dto/UserDTO";
 
 /**
@@ -22,10 +23,10 @@ export async function getUserDashboardStats() {
 }
 
 /**
- * Fetch public profile of any user
+ * Fetch public profile of sellers
  */
-export async function getUserProfile(userId: string | number) {
-    return await api.get<UserDTO>(`/v1/users/${userId}/profile`);
+export async function getSellerProfile(userId: string | number) {
+    return await api.get<SellerDTO>(`/v1/users/${userId}/profile`);
 }
 
 /**

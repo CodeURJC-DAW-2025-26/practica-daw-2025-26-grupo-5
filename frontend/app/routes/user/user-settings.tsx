@@ -131,7 +131,7 @@ export default function UserSettings() {
                         className="img-fluid rounded-circle p-1"
                         alt="Profile"
                         style={{ width: '120px', height: '120px', objectFit: 'cover' }}
-                        onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')}
+                        onError={(e) => (e.currentTarget.src = '/images/no-profile-picture.png')}
                       />
                       <input
                         type="file"

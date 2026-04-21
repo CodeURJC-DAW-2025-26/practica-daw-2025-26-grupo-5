@@ -1,4 +1,4 @@
-import { getUserProfile } from "~/services/user-service";
+import { getSellerProfile } from "~/services/user-service";
 import type { Route } from "./+types/seller-profile";
 import { Link } from "react-router";
 import { useState } from "react";
@@ -6,7 +6,7 @@ import { Container, Row, Col, Card, Button, Image, Badge, Tab, Tabs, ListGroup }
 
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
     const sellerId = params.id;
-    const seller = await getUserProfile(sellerId);
+    const seller = await getSellerProfile(sellerId);
     return seller;
 }
 
