@@ -62,7 +62,8 @@ import { logIn, logOut, reqIsLogged } from "~/services/login-service";
  * - setUser: Manually set user (rarely used)
  */
 interface UserState {
-  /** Currently authenticated user object or null if not logged in */\n  user: UserDTO | null;
+  /** Currently authenticated user object or null if not logged in */
+  user: UserDTO | null;
 
   /** Error message displayed when login fails */
   loginError: string | null;
