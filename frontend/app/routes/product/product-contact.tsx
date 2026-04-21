@@ -1,9 +1,81 @@
+/**
+ * Contact Seller / Product Inquiry Form
+ *
+ * Allows buyers to send inquiries to product sellers.
+ * Used for asking questions about products before purchase.
+ *
+ * Features:
+ * - Authentication check (redirects to login if not logged in)
+ * - Product information display (name, price, seller)
+ * - Inquiry form with fields:
+ *    - Type (Question, Offer, Shipping inquiry, etc.)
+ *    - Phone number
+ *    - Message body
+ * - Client-side form validation
+ * - Loading state while submitting
+ * - Success confirmation after submission
+ * - Error handling with user feedback
+ * - Back button to product page
+ *
+ * Data Flow:
+ * 1. User clicks "Contact Seller" from product detail page
+ * 2. Passes product data via location.state:
+ *    - productId (from URL params)
+ *    - productName (from location state)
+ *    - productPrice (from location state)
+ *    - sellerName (from location state)
+ * 3. Check if user logged in (if not, redirect to login)
+ * 4. Display inquiry form with product context
+ * 5. User fills form and submits
+ * 6. sendInquiry() API call creates inquiry in database
+ * 7. Show success message with back button
+ * 8. User can return to product page
+ *
+ * Authentication:
+ * - Requires logged-in user (useUserStore check)
+ * - If not logged in, redirects to /login with state
+ * - Prevents anonymous inquiries
+ *
+ * Form Submission:
+ * - Uses useActionState hook (React 19 server action pattern)
+ * - contactAction handles form validation and API call
+ * - Prevents empty submissions
+ * - Phone number captured for seller contact
+ * - Message type categorizes inquiry (Question, Offer, etc.)
+ *
+ * Error Handling:
+ * - API errors caught and displayed to user
+ * - Generic "Please try again" message on failure
+ * - Success state persists to show confirmation
+ * - User can navigate back if needed
+ *
+ * Success State:
+ * - Shows checkmark icon
+ * - Displays confirmation message
+ * - Button to return to product
+ * - Prevents further submissions
+ *
+ * Seller Notification:
+ * - Inquiry saved to backend database
+ * - Seller notified via dashboard or email
+ * - Contains buyer phone for direct contact
+ *
+ * @component
+ * @returns Contact form page with product context
+ */
+
 import { useNavigate, useLocation, useParams, Navigate } from "react-router";
 import { useActionState } from "react"; 
 import { sendInquiry } from "~/services/products-service";
 import { useUserStore } from "~/stores/useUserStore";
 import { Alert, Button, Container, Row, Col } from "react-bootstrap";
 
+/**
+ * Contact Seller Page Component
+ *
+ * Renders inquiry form for contacting product sellers.
+ * Requires authentication and product context from location state.
+ */
 export default function ContactSellerPage() {
     const { id } = useParams();
     const navigate = useNavigate();

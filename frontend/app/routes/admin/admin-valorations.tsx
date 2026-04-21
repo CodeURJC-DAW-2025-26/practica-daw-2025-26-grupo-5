@@ -1,3 +1,99 @@
+/**
+ * Admin Valorations (Reviews) Management Page
+ *
+ * Review and rating management dashboard for marketplace administrators.
+ * Oversee, monitor, and manage all customer reviews and ratings.
+ *
+ * Features:
+ * - All marketplace valorations displayed in table
+ * - KPI cards showing rating metrics:
+ *    - Total valorations count
+ *    - Average rating across all reviews
+ *    - Recent reviews count
+ *    - High-quality reviews count
+ * - Valoration table displaying:
+ *    - Reviewer name
+ *    - Seller name
+ *    - Rating (star score)
+ *    - Comment/Review text
+ *    - Review date
+ *    - Status indicators
+ * - Search/filter functionality:
+ *    - Search by reviewer name
+ *    - Filter by rating score
+ *    - Filter by seller name
+ * - Delete valoration action:
+ *    - Remove inappropriate reviews
+ *    - Delete spam reviews
+ *    - Confirmation modal before delete
+ * - Pagination controls (10 items per page)
+ * - Quality indicators for reviews
+ * - Error handling
+ * - Loading states
+ * - Empty state when no reviews exist
+ *
+ * Data Flow:
+ * 1. clientLoader fetches all valorations (up to 1000)
+ * 2. Valorations displayed in paginated table
+ * 3. KPI cards calculate metrics from all reviews
+ * 4. Admin can:
+ *    - Browse all customer reviews
+ *    - View review details
+ *    - Delete inappropriate reviews
+ *    - Monitor review trends
+ * 5. After delete, list refreshes
+ *
+ * State Management:
+ * - rowData: Current page of valorations
+ * - searchTerm: Search query
+ * - isSearching: Loading state for search
+ * - currentPage: Pagination state
+ * - selectedValoration: Review being acted upon
+ * - showDeleteModal: Delete confirmation visibility
+ * - isDeleting: Loading state during delete
+ * - itemsPerPage: Reviews per page (10)
+ *
+ * KPI Metrics:
+ * - Total Reviews: Count of all valorations
+ * - Average Rating: Mean of all review scores
+ * - Recent Reviews: Last 7 days count
+ * - Quality Reviews: Helpful/detailed reviews count
+ *
+ * Search Functionality:
+ * - Find reviews by reviewer name
+ * - Filter by rating threshold
+ * - Search by seller name
+ * - Case-insensitive matching
+ * - Partial text matching
+ *
+ * Delete Action:
+ * - Confirmation modal prevents accidents
+ * - Soft delete (marks as deleted)
+ * - Cannot be undone by admin
+ * - Logged for audit trail
+ *
+ * Review Quality:
+ * - Indicators for helpful reviews
+ * - Flags for potential spam
+ * - Rating distribution
+ * - Trending review themes
+ *
+ * Client Loader:
+ * - Fetches valorations via getAdminValorations()
+ * - Supports pagination (page, size)
+ * - Error handling and redirect to login on failure
+ *
+ * Moderation Use Cases:
+ * - Monitor marketplace reputation
+ * - Remove fake/spam reviews
+ * - Track seller ratings
+ * - Quality assurance for reviews
+ * - Community safety management
+ *
+ * @component
+ * @returns React component for valoration/review management
+ */
+
 import React, { useState } from 'react';
 import { redirect } from 'react-router';
 import { Container, Row, Col, Card, Table, Button, Stack, Alert, Form, Modal } from 'react-bootstrap';
@@ -7,6 +103,10 @@ import type PagedResponse from '~/dto/PagedResponse';
 import AdminHeader from '~/components/admin/AdminHeader';
 import ConfirmModal from '~/components/confirm-modal';
 
+/**
+ * KPI Card Props Interface
+ * Defines structure for valoration metric cards
+ */
 interface KPIData {
   readonly label: string;
   readonly value: string | number;
@@ -14,6 +114,10 @@ interface KPIData {
   readonly icon: string;
 }
 
+/**
+ * KPI Card Component
+ * Displays valoration metric with icon and color coding
+ */
 const KPICard = ({ label, value, color, icon, bg }: KPIData & { readonly bg: string }) => (
   <Card className="clay-card border-0 h-100" style={{ borderLeft: `5px solid ${color}` }}>
     <Card.Body className="p-4">
@@ -32,6 +136,10 @@ const KPICard = ({ label, value, color, icon, bg }: KPIData & { readonly bg: str
   </Card>
 );
 
+/**
+ * Get Background Color for KPI Card
+ * Maps color codes to light background colors
+ */
 const getKPIBg = (color: string): string => {
   const map: Record<string, string> = {
     '#fbbf24': '#fef3c7',
@@ -41,6 +149,15 @@ const getKPIBg = (color: string): string => {
   return map[color] || '#f8fafc';
 };
 
+/**
+ * Client-side loader: Fetch valorations
+ * 
+ * Gets all valorations from backend.
+ * Fetches up to 1000 reviews for client-side pagination.
+ * Redirects to login on authentication error.
+ * 
+ * @returns Paginated valoration data
+ */
 export async function clientLoader() {
   try {
     const data = await getAdminValorations(0, 1000);

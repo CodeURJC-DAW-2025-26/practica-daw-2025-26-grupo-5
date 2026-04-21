@@ -1,3 +1,75 @@
+/**
+ * Payment / Checkout Page
+ *
+ * Checkout page where buyers complete purchase transactions.
+ * Displays product details and collects payment information.
+ *
+ * Features:
+ * - Product information display:
+ *    - Product image
+ *    - Product name
+ *    - Seller location
+ *    - Price
+ * - Shipping information (secure door-to-door delivery)
+ * - Buyer protection status
+ * - Payment form fields:
+ *    - Cardholder name
+ *    - Card number
+ *    - Expiry date
+ *    - CVV (security code)
+ * - Security badge (Stripe powered)
+ * - Error handling and display
+ * - Loading state during payment processing
+ * - Responsive layout (side-by-side on desktop)
+ *
+ * Data Flow:
+ * 1. User clicks "Buy Now" from product detail
+ * 2. Navigates to /transactions/checkout/{productId}
+ * 3. clientLoader fetches checkout details (product, price, buyer info)
+ * 4. Page displays product and payment form
+ * 5. User fills payment details
+ * 6. On submit: createTransaction() API call
+ * 7. On success: Redirect to /user/sales-orders
+ * 8. localStorage flag 'justPurchased' set for success notification
+ * 9. On error: Display error message in alert
+ *
+ * Security:
+ * - Stripe payment processing (PCI compliant)
+ * - Card details are encrypted and not stored locally
+ * - HTTPS transmission
+ * - Server-side payment processing
+ * - Buyer protection active
+ *
+ * Client Loader:
+ * - Validates product ID format
+ * - Fetches checkout details (product, buyer, price info)
+ * - Handles errors: 401 (redirect to login), 404 (not found)
+ * - Passes data as loaderData prop
+ *
+ * Form Validation:
+ * - All payment fields required
+ * - Product ID validation
+ * - Error messages displayed for failures
+ * - User prevented from submitting during processing
+ *
+ * State Management:
+ * - processing: Loading state during payment
+ * - error: Error message from API
+ * - paymentForm: Card details input
+ * - Validates before submission
+ *
+ * Layout:
+ * - Two-column design (product left, form right)
+ * - Mobile: Stacked layout
+ * - Product image centered
+ * - Form below image on mobile
+ * - Gradient background
+ * - Clay-card styling
+ *
+ * @component
+ * @returns React component for payment/checkout page
+ */
+
 import React, { useState } from 'react';
 import { useNavigate, redirect } from 'react-router';
 import { Container, Row, Col, Card, Form, Button, Alert, Image, Spinner } from 'react-bootstrap';
@@ -6,6 +78,22 @@ import { useUserStore } from '~/stores/useUserStore';
 import { getProductImageUrl } from '~/services/products-service'
 import { getCheckoutDetails, createTransaction } from '~/services/transaction-service';
 
+/**
+ * Client-side loader: Fetch checkout details
+ * 
+ * Process:
+ * 1. Extract product ID from route params
+ * 2. Validate ID format (must be numeric)
+ * 3. Call getCheckoutDetails() API
+ * 4. Handle errors:
+ *    - 401: Redirect to login (not authenticated)
+ *    - 404: Throw "Product not found" error
+ *    - Other: Throw "Failed to load checkout" error
+ * 5. Return checkout data to component
+ * 
+ * @param params - Route parameters including product ID
+ * @returns Checkout data or redirect/error
+ */
 export async function clientLoader({ params }: { params: { id: string } }) {
   try {
     // "401 redirect" logic is typically handled in the 'api' object interceptor,
@@ -23,17 +111,28 @@ export async function clientLoader({ params }: { params: { id: string } }) {
   }
 }
 
+/**
+ * Props Interface for Payment Page
+ */
 interface PaymentPageProps {
   readonly loaderData: CheckoutDTO;
 }
 
+/**
+ * Payment Page Component Implementation
+ * 
+ * Displays checkout form and product summary.
+ * Handles payment submission and transaction creation.
+ */
 const PaymentPage = ({ loaderData }: PaymentPageProps) => {
   const navigate = useNavigate();
   const { user } = useUserStore();
   
+  // Payment processing state
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Payment form state
   const [paymentForm, setPaymentForm] = useState({
     cardHolder: '',
     cardNumber: '',
@@ -41,15 +140,33 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
     cvv: ''
   });
 
+  // Extract checkout data
   const checkoutData = loaderData;
   const { product, buyer } = checkoutData || {};
   const productId = checkoutData?.product?.id;
 
+  /**
+   * Handle Payment Form Input Changes
+   * Updates form state as user types
+   */
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setPaymentForm(prev => ({ ...prev, [name]: value }));
   };
 
+  /**
+   * Handle Payment Form Submission
+   * 
+   * Process:
+   * 1. Prevent default form submission
+   * 2. Validate product ID exists
+   * 3. Set processing state (disable submit button)
+   * 4. Call createTransaction() API
+   * 5. On success:
+   *    - Set 'justPurchased' flag in localStorage
+   *    - Redirect to sales orders page
+   * 6. On error: Display error message
+   */
   const handlePaymentSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setProcessing(true);
@@ -69,6 +186,9 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
     }
   };
 
+  /**
+   * Show Error Alert if Error Occurs
+   */
   if (error && !processing) {
     return (
       <Container className="mt-5 text-center">

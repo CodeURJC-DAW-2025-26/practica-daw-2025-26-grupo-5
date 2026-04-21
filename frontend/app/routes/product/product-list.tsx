@@ -1,3 +1,90 @@
+/**
+ * Product List / Catalog Page
+ *
+ * Main marketplace catalog display with search and filtering.
+ * Shows available products with pagination and category filtering.
+ *
+ * Features:
+ * - Product grid/list layout
+ * - Search products by name or query
+ * - Filter by category (Fashion, Tech, Cars, Home)
+ * - Pagination with "Load More" button
+ * - Product cards with:
+ *    - Product image
+ *    - Product name
+ *    - Price
+ *    - Seller info
+ *    - Status indicator
+ *    - Link to product detail
+ * - Empty state when no products found
+ * - Loading spinner during fetch
+ * - Cache optimization to prevent reload on back navigation
+ * - Revalidation after purchase to show updated stock
+ *
+ * Data Flow:
+ * 1. User lands on homepage (/product or with query params)
+ * 2. clientLoader fetches initial catalog data
+ * 3. Component displays product grid
+ * 4. User can:
+ *    - Search by query parameter (?query=...)
+ *    - Filter by category (?category=...)
+ *    - Click product to view details
+ *    - Click "Load More" to fetch more products
+ * 5. Navigate back: List stays cached (no reload)
+ * 6. After purchase: List revalidates to show updated products
+ *
+ * Query Parameters:
+ * - query: Search text (e.g., ?query=vintage)
+ * - category: Category filter (e.g., ?category=Fashion)
+ * - Combined: ?query=vintage&category=Fashion
+ *
+ * Pagination:
+ * - Initial load: Fetches first page of results
+ * - Load More button: Fetches next page
+ * - Can load multiple pages in same session
+ * - Appends to existing list (infinite scroll pattern)
+ *
+ * Cache Optimization:
+ * - shouldRevalidate() prevents reload on back
+ * - When user returns to catalog, previous list displayed
+ * - Faster UX by avoiding unnecessary refetch
+ * - EXCEPTION: After purchase, list revalidated
+ *
+ * Purchase Tracking:
+ * - localStorage flag 'justPurchased' set after buy
+ * - Triggers revalidation to update product list
+ * - Shows purchased item as sold/unavailable
+ * - Flag cleared after revalidation
+ *
+ * Search Implementation:
+ * - URL-based filtering (shareable links)
+ * - Query sent to getCatalog() API
+ * - Both text search and category filters work together
+ * - Backend handles search logic
+ *
+ * Category Filtering:
+ * - Predefined categories for browsing
+ * - Category links in hero section navigation
+ * - Can be combined with text search
+ * - URL updates to reflect active filter
+ *
+ * Client Loader:
+ * - Extracts search params from URL
+ * - Calls getCatalog() with filters
+ * - Handles errors gracefully (returns empty list)
+ * - No artificial delay (fast page load)
+ *
+ * Components:
+ * - Product grid: Responsive columns
+ * - Product card: Image, name, price, seller
+ * - Load More button: Pagination control
+ * - Empty state: "No products found" message
+ * - Loading spinner: During data fetch
+ *
+ * @component
+ * @returns React component with searchable product catalog
+ */
+
 import { Link, useSearchParams } from "react-router";
 import { useState, useEffect } from "react";
 import type { Route } from "./+types/product-list";
@@ -8,9 +95,15 @@ import { Container, Row, Col, Button, Spinner } from "react-bootstrap";
 import { useUserStore } from "~/stores/useUserStore";
 
 /**
- * Optimization: Prevent the list from reloading when coming back from a product.
- * This makes the "Back to Gallery" button instant.
- * EXCEPTION: Revalidate if a purchase just occurred to refresh the product list.
+ * Determine if Component Should Revalidate
+ * 
+ * Optimization: Prevent list reload when navigating back from product detail.
+ * Cache the product list for better UX.
+ * EXCEPTION: Revalidate after purchase to show updated stock.
+ * 
+ * @param currentUrl - Current URL
+ * @param nextUrl - Next URL to navigate to
+ * @returns True if should revalidate, false to use cache
  */
 export function shouldRevalidate({currentUrl, nextUrl }: any) {
   if (currentUrl.search !== nextUrl.search) {
@@ -26,8 +119,17 @@ export function shouldRevalidate({currentUrl, nextUrl }: any) {
 }
 
 /**
- * Client-side loader: Fetches the combined catalog data from the Spring Boot API.
- * NO setTimeout here to keep the Home page fast.
+ * Client-side loader: Fetch product catalog
+ * 
+ * Process:
+ * 1. Extract query and category from URL search params
+ * 2. Call getCatalog() with filters
+ * 3. Return catalog data (products, recommendations)
+ * 4. Handle errors by returning empty list
+ * 5. No artificial delay for fast loading
+ * 
+ * @param request - Route request with URL
+ * @returns Catalog data with products
  */
 export async function clientLoader({ request }: Route.ClientLoaderArgs) {
   try {
@@ -46,6 +148,11 @@ export async function clientLoader({ request }: Route.ClientLoaderArgs) {
   }
 }
 
+/**
+ * Product List Component Implementation
+ * 
+ * Displays searchable product catalog with pagination.
+ */
 export default function ProductsList({ loaderData }: Route.ComponentProps) {
   const homeData = loaderData as HomePageDTO;
   const { user } = useUserStore();

@@ -1,15 +1,127 @@
+/**
+ * Seller Profile / Public Storefront
+ *
+ * Displays public profile of any seller in the marketplace.
+ * Shows seller information, ratings, products, and reviews.
+ *
+ * Features:
+ * - Seller profile card with:
+ *    - Profile photo
+ *    - Name and "Verified Seller" badge
+ *    - Rating score
+ *    - Number of reviews
+ *    - Edit button (if viewing own profile)
+ * - Tabs for browsing:
+ *    - Products: All items seller is currently selling
+ *    - Valuations: All reviews/ratings given by buyers
+ * - Products section shows:
+ *    - Product grid with images
+ *    - Price, name, and status
+ *    - Click to view product detail
+ * - Valuations section shows:
+ *    - Buyer ratings and comments
+ *    - Star ratings (1-5)
+ *    - Buyer name and review text
+ *    - Average seller rating calculation
+ * - Responsive layout (desktop/mobile)
+ *
+ * Data Flow:
+ * 1. User navigates to /user/{sellerId}
+ * 2. clientLoader fetches seller profile via getSellerProfile()
+ * 3. Component receives seller data:
+ *    - seller: Object with id, name, rating, bio
+ *    - products: Array of current listings
+ *    - valorations: Array of reviews from buyers
+ *    - fullStars: Average rating (1-5 stars)
+ *    - owner: Boolean (true if viewing own profile)
+ * 4. Display hero card with profile info
+ * 5. Show tabs for Products and Valuations
+ * 6. User can:
+ *    - View all seller's products
+ *    - Read all seller's reviews
+ *    - Click product to purchase
+ *    - Navigate to edit profile (if owner)
+ *
+ * Profile Information:
+ * - Seller name displayed prominently
+ * - Rating score (e.g., 4.8)
+ * - Number of reviews received
+ * - Profile photo with fallback
+ * - Join date/member since info
+ * - Optional bio/about section
+ *
+ * Products Display:
+ * - Shows all active product listings
+ * - Thumbnail images with price overlay
+ * - "Sold Out" indicator for unavailable items
+ * - Click to navigate to product detail
+ * - Sortable/filterable (if implemented)
+ *
+ * Valuations Display:
+ * - Shows all reviews left by other buyers
+ * - Star rating visual (1-5 stars)
+ * - Reviewer name and comment
+ * - Review date
+ * - Aggregate rating calculation
+ *
+ * Owner Functionality:
+ * - "Edit Profile" button visible only if owner
+ * - Navigates to /user-page for profile editing
+ * - Owner can update profile photo and bio
+ * - Owner can manage products and responses
+ *
+ * Profile Image Handling:
+ * - Loads from /api/v1/users/{id}/profile-photo
+ * - Cache busting with Date.now() timestamp
+ * - Fallback to no-profile-picture.png if missing
+ * - Responsive sizing (125x125px)
+ * - Circular shape with border
+ *
+ * Accessibility:
+ * - All images have alt text
+ * - Semantic HTML structure
+ * - Proper heading hierarchy
+ * - Responsive tabs for mobile
+ *
+ * Performance:
+ * - Client-side loader pre-fetches data
+ * - No pagination needed for initial load
+ * - Images lazy-loaded by browser
+ *
+ * @component
+ * @returns Public seller profile page with products and reviews
+ */
+
 import { getSellerProfile } from "~/services/user-service";
 import type { Route } from "./+types/seller-profile";
 import { Link } from "react-router";
 import { useState } from "react";
 import { Container, Row, Col, Card, Button, Image, Badge, Tab, Tabs, ListGroup } from "react-bootstrap";
 
+/**
+ * Client-side loader: Fetch seller profile data
+ * 
+ * Process:
+ * 1. Extract seller ID from URL params
+ * 2. Call getSellerProfile(sellerId) API
+ * 3. Returns seller object with profile, products, and reviews
+ * 4. Error handling catches failed fetches
+ * 5. Data passed to component via loaderData prop
+ * 
+ * @param params - Route params with seller ID
+ * @returns Seller profile object with products and valuations
+ */
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
     const sellerId = params.id;
     const seller = await getSellerProfile(sellerId);
     return seller;
 }
 
+/**
+ * Seller Profile Component Implementation
+ * 
+ * Displays seller storefront with profile info, products, and reviews.
+ */
 export default function SellerProfile({ loaderData }: Route.ComponentProps) {
     const { seller, products, valorations, fullStars, owner } = loaderData;
 

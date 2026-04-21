@@ -1,8 +1,62 @@
+/**
+ * Admin Dashboard Page
+ *
+ * Main overview page for marketplace administrators.
+ * Displays key performance indicators and system health metrics.
+ *
+ * Features:
+ * - Revenue and transaction analytics
+ * - User statistics (total, active, banned)
+ * - Product inventory overview (total, active listings)
+ * - System memory usage monitoring
+ * - Recent users table showing latest registrations
+ * - Recent products table showing latest listings
+ * - Category breakdown of available products
+ * - KPI cards with color coding and icons
+ * - Quick navigation links to detailed management pages
+ *
+ * KPI Sections:
+ * 1. Revenue Metrics:
+ *    - Total Revenue (all transactions)
+ *    - Total Transactions (count)
+ *    - Average Transaction Value
+ *    - Total Products (inventory)
+ *
+ * 2. User Metrics:
+ *    - Total Users (active + banned)
+ *    - Active Users (not banned)
+ *    - Banned Users (restricted accounts)
+ *    - Active Listings (products for sale)
+ *
+ * 3. Data Tables:
+ *    - Recent Users: Latest 5 user registrations with roles
+ *    - Recent Products: Latest products added with status
+ *
+ * 4. System Info:
+ *    - Memory Usage progress bar
+ *    - Global Average Rating from all valorations
+ *    - Products by Category breakdown
+ *
+ * Data Flow:
+ * 1. clientLoader fetches getAdminSummary() data
+ * 2. Server calculates all metrics and returns summary
+ * 3. Component extracts and formats data
+ * 4. KPI cards, tables, and charts display information
+ * 5. Links navigate to detailed management pages
+ *
+ * @component
+ * @returns React component with admin dashboard and KPIs
+ */
+
 import { redirect, Link } from 'react-router';
 import { Container, Row, Col, Card, Table, Badge, Button, Image, ProgressBar, Stack, Alert } from 'react-bootstrap';
 import { getAdminSummary } from '~/services/admin-service';
 import AdminHeader from '~/components/admin/AdminHeader';
 
+/**
+ * Client-side loader: Fetches admin summary data
+ * Called before component mounts to prepare dashboard data
+ */
 export async function clientLoader() {
   try {
     const data = await getAdminSummary();
@@ -13,6 +67,10 @@ export async function clientLoader() {
   }
 }
 
+/**
+ * KPI Card Props Interface
+ * Defines structure for dashboard metric cards
+ */
 interface KPIData {
   readonly label: string;
   readonly value: string | number;
@@ -20,10 +78,19 @@ interface KPIData {
   readonly icon: string;
 }
 
+/**
+ * Dashboard Props Interface
+ * Defines shape of loaderData passed to component
+ */
 interface DashboardProps {
   readonly loaderData: any;
 }
 
+/**
+ * KPI Card Component
+ * Reusable component for displaying key performance indicators
+ * Shows metric name, value, icon, and color-coded styling
+ */
 const KPICard = ({ label, value, color, icon, bg }: KPIData & { readonly bg: string }) => (
   <Card className="clay-card border-0 h-100" style={{ borderLeft: `5px solid ${color}` }}>
     <Card.Body className="p-4">
@@ -44,8 +111,6 @@ const KPICard = ({ label, value, color, icon, bg }: KPIData & { readonly bg: str
     </Card.Body>
   </Card>
 );
-
-
 
 export default function AdminDashboard({ loaderData }: DashboardProps) {
   const summary = loaderData || {};

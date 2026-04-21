@@ -1,3 +1,90 @@
+/**
+ * User Sales Orders & Purchases Page
+ *
+ * Comprehensive transaction management page for sellers and buyers.
+ * Displays both sales (items sold) and purchases (items bought).
+ *
+ * Features:
+ * - Dual-tab interface:
+ *    - Sales tab: Products sold by user
+ *    - Purchases tab: Products bought by user
+ * - For each transaction displays:
+ *    - Product image
+ *    - Product name
+ *    - Buyer/Seller name (depending on tab)
+ *    - Amount/Price
+ *    - Transaction status
+ *    - Transaction date
+ * - Rating system:
+ *    - Rate purchases you've received
+ *    - Rate sales (buyer rates seller)
+ *    - Shows valoration modal for rating submissions
+ *    - Displays existing ratings
+ * - Success notification:
+ *    - Shows after purchase completion
+ *    - Auto-dismisses after 5 seconds
+ *    - Uses localStorage flag 'justPurchased'
+ * - Transaction status indicators
+ * - Empty state messages
+ * - Loading state during data fetch
+ * - Error handling
+ * - Responsive table layout
+ *
+ * Data Flow:
+ * 1. Component mounts and fetches transactions
+ * 2. Fetches user's transactions via /api/v1/users/me/transactions
+ * 3. Separates sales and purchases into two arrays
+ * 4. Displays active tab (purchases by default)
+ * 5. User can:
+ *    - Switch between Sales/Purchases tabs
+ *    - Click "Rate" button to open valoration modal
+ *    - Submit rating and comment
+ *    - View existing ratings
+ * 6. After rating submission, transaction updates
+ *
+ * State Management:
+ * - sales: Array of user's sales transactions
+ * - purchases: Array of user's purchases
+ * - selectedTransactionId: Currently selected for rating
+ * - loading: Initial data fetch state
+ * - error: Error message if fetch fails
+ * - isProcessing: Loading state during rating submit
+ * - showModal: Valoration modal visibility
+ * - activeTransaction: Transaction being rated
+ *
+ * HTTP Requests:
+ * - Fetches transactions from /api/v1/users/me/transactions
+ * - Uses Bearer token from localStorage
+ * - Manual fetch (not using api service) with direct headers
+ * - Token auto-included in Authorization header
+ *
+ * Valoration (Rating):
+ * - Users can rate completed transactions
+ * - Rating scale: 1-5 stars
+ * - Optional comment/review
+ * - Submitted to /v1/valorations endpoint
+ * - Affects seller rating and reputation
+ *
+ * Success Notification:
+ * - Triggered by 'justPurchased' localStorage flag
+ * - Shows success alert with transaction summary
+ * - Auto-hides after 5 seconds
+ * - Clears flag after display
+ *
+ * Transaction Types:
+ * - Sales: User is seller (showed in Sales tab)
+ * - Purchases: User is buyer (showed in Purchases tab)
+ * - Status shows transaction state (Completed, Pending, etc.)
+ *
+ * Protected Component:
+ * - Requires user authentication
+ * - Redirects to login if not logged in
+ * - Shows loading spinner during fetch
+ *
+ * @component
+ * @returns React component for transaction history and rating
+ */
+
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Container, Row, Col, Card, Badge, Button, Image, Spinner, Stack, Alert } from 'react-bootstrap';
@@ -7,24 +94,36 @@ import ValorationModal from "~/components/valoration-modal";
 import type TransactionDTO from '~/dto/TransactionDTO';
 import { createValoration } from '~/services/valorations-service';
 
+/**
+ * User Sales Orders Component
+ * 
+ * Displays user's transaction history and manages product ratings.
+ */
 const UserSalesOrders = () => {
-    // 1. State management
+    // State management
     const [sales, setSales] = useState<TransactionDTO[]>([]);
     const [purchases, setPurchases] = useState<TransactionDTO[]>([]);
     const [selectedTransactionId, setSelectedTransactionId] = useState<number | null>(null);
 
+    // UI state
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
 
-    // Modal Control
+    // Modal control
     const [showModal, setShowModal] = useState(false);
     const [activeTransaction, setActiveTransaction] = useState<TransactionDTO | null>(null);
 
     const { user } = useUserStore();
     const navigate = useNavigate();
 
-    // 2. Fetch data
+    /**
+     * Fetch User Transactions
+     * 
+     * Gets all user's sales and purchases from backend.
+     * Separates them into two arrays for tab display.
+     * Handles authentication and error cases.
+     */
     useEffect(() => {
         const fetchAllTransactions = async () => {
             try {

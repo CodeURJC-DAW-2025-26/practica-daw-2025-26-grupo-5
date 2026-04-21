@@ -1,10 +1,100 @@
+/**
+ * Admin Transactions Management Page
+ *
+ * Transaction oversight dashboard for marketplace administrators.
+ * Monitor, search, and manage all marketplace transactions/sales.
+ *
+ * Features:
+ * - Transaction listing with search and filtering
+ * - Search by:
+ *    - Transaction ID
+ *    - Seller username
+ *    - Buyer username
+ * - KPI cards showing transaction metrics:
+ *    - Total transactions count
+ *    - Total revenue from all sales
+ *    - Average transaction value
+ *    - Other relevant metrics
+ * - Transaction table displaying:
+ *    - Transaction ID
+ *    - Product name
+ *    - Seller name
+ *    - Buyer name
+ *    - Amount paid
+ *    - Transaction date/time
+ *    - Status (completed, pending, etc.)
+ * - Quick actions:
+ *    - View transaction details
+ *    - Delete transaction
+ * - Pagination controls
+ * - Delete confirmation modal
+ * - Error handling and display
+ * - Loading states during search/operations
+ * - Empty state when no transactions found
+ *
+ * Data Flow:
+ * 1. clientLoader fetches initial transactions (up to 1000)
+ * 2. Transactions displayed in paginated table
+ * 3. Admin enters search query (ID, seller, or buyer)
+ * 4. Search filters transactions
+ * 5. Admin can:
+ *    - View transaction details
+ *    - Delete transaction if needed
+ *    - Sort/filter in table
+ * 6. After delete, list refreshes
+ *
+ * State Management:
+ * - rowData: Current transactions displayed
+ * - searchFilters: Active search parameters (id, seller, buyer)
+ * - isSearching: Loading state during search
+ * - currentPage: Pagination state
+ * - selectedTransaction: Transaction being acted upon
+ * - showDeleteModal: Delete confirmation visibility
+ * - isDeleting: Loading state during delete
+ *
+ * Search Functionality:
+ * - Case-insensitive search
+ * - Filters by transaction ID (exact match)
+ * - Filters by seller name (partial match)
+ * - Filters by buyer name (partial match)
+ * - Supports multiple filter types simultaneously
+ *
+ * Delete Action:
+ * - Shows confirmation modal before deletion
+ * - Prevents accidental data loss
+ * - After deletion, list updates
+ * - Shows error if delete fails
+ *
+ * KPI Calculations:
+ * - Total transactions: Count of all transactions
+ * - Total revenue: Sum of all transaction amounts
+ * - Average transaction: Total revenue / transaction count
+ * - Displayed in header cards
+ *
+ * Client Loader:
+ * - Fetches transactions via getAdminTransactions()
+ * - Supports pagination (page, size parameters)
+ * - Can filter by ID, seller, buyer on backend
+ * - Error handling for API failures
+ *
+ * @component
+ * @returns React component for transaction management
+ */
+
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, Table, Button, Image, Badge, Alert, Stack, Modal, Form } from 'react-bootstrap';
 import { getAdminTransactions, deleteTransaction } from '~/services/admin-service';
 import type TransactionDTO from '~/dto/TransactionDTO';
 import type PagedResponse from '~/dto/PagedResponse';
 
-// 1. Native Loader (Fetches data on route load)
+/**
+ * Client-side loader: Fetch transactions
+ * 
+ * Gets initial transaction list from backend.
+ * Fetches up to 1000 transactions for client-side pagination.
+ * 
+ * @returns Paginated transaction data
+ */
 export async function clientLoader() {
   try {
     // Fetching up to 1000 items for client-side pagination example. 
@@ -16,7 +106,10 @@ export async function clientLoader() {
   }
 }
 
-// 2. Interfaces and Utilities for KPIs
+/**
+ * KPI Card Props Interface
+ * Defines structure for transaction metric cards
+ */
 interface KPIData {
   readonly label: string;
   readonly value: string | number;
@@ -24,6 +117,10 @@ interface KPIData {
   readonly icon: string;
 }
 
+/**
+ * Get Background Color for KPI Card
+ * Maps color codes to light background colors
+ */
 const getKPIBg = (color: string): string => {
   const map: Record<string, string> = {
     '#059669': '#ecfdf5',
@@ -33,6 +130,10 @@ const getKPIBg = (color: string): string => {
   return map[color] || '#f8fafc';
 };
 
+/**
+ * KPI Card Component
+ * Displays transaction metric with icon and color coding
+ */
 const KPICard = ({ label, value, color, icon, bg }: KPIData & { readonly bg: string }) => (
   <Card className="clay-card border-0 h-100" style={{ borderLeft: `5px solid ${color}` }}>
     <Card.Body className="p-4">

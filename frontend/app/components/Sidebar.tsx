@@ -1,14 +1,75 @@
+/**
+ * Sidebar Navigation Component
+ *
+ * Reusable navigation sidebar for admin and user dashboard pages.
+ * Provides responsive navigation that works on desktop and mobile.
+ *
+ * Features:
+ * - Desktop sidebar: Fixed left panel (sticky)
+ * - Mobile sidebar: Offcanvas drawer (hidden by default)
+ * - Logo and branding section
+ * - Admin badge indicator
+ * - Dynamic navigation links
+ * - Active page highlighting
+ * - "Browse Market" call-to-action button
+ * - Logout functionality
+ * - Responsive icons using Font Awesome
+ *
+ * Props:
+ * - title (string): Title displayed in mobile header
+ * - links (SidebarLink[]): Array of navigation links
+ *    - to: Route path
+ *    - label: Display text
+ *    - icon: Font Awesome icon class (e.g., 'fa-users')
+ * - isAdmin (boolean): If true, shows ADMIN badge
+ * - activePage (string): Optional page to highlight
+ *
+ * Responsive Behavior:
+ * - Desktop: Always visible, sticky positioning
+ * - Mobile: Toggle button in top-left corner
+ * - Offcanvas drawer slides in from left
+ * - Automatic close on navigation
+ *
+ * Active Link Highlighting:
+ * - Compares current route with link.to
+ * - Or compares activePage prop with link label
+ * - Applies 'active' class for styling
+ *
+ * Layout:
+ * - Header with logo and branding
+ * - Navigation section with dynamic links
+ * - Bottom section with market button and logout
+ * - Flexible height: Content grows, logout sticks to bottom
+ *
+ * State Management:
+ * - showOffcanvas: Tracks mobile drawer visibility
+ * - Uses useLocation() to detect current page
+ * - Uses Zustand logoutUser action
+ *
+ * @component
+ * @param {SidebarProps} props - Component props
+ * @returns React component for dashboard navigation
+ */
+
 import { Button, Offcanvas } from 'react-bootstrap';
 import { Link, useNavigate, useLocation } from 'react-router';
 import { useState } from 'react';
 import { useUserStore } from '~/stores/useUserStore';
 
+/**
+ * Navigation Link Interface
+ * Defines structure for sidebar navigation items
+ */
 interface SidebarLink {
     to: string;
     label: string;
     icon: string;
 }
 
+/**
+ * Sidebar Props Interface
+ * Defines component input properties
+ */
 interface SidebarProps {
     title: string;
     links: SidebarLink[];
@@ -16,11 +77,26 @@ interface SidebarProps {
     activePage?: string;
 }
 
+/**
+ * Sidebar Component Implementation
+ * 
+ * Renders responsive sidebar with desktop and mobile layouts.
+ * Provides primary navigation for dashboard pages.
+ */
 export default function Sidebar({ title, links, isAdmin = false, activePage }: SidebarProps) {
     const [showOffcanvas, setShowOffcanvas] = useState(false);
     const { logoutUser } = useUserStore();
     const location = useLocation();
 
+    /**
+     * Sidebar Content (Shared between desktop and mobile)
+     * 
+     * Includes:
+     * - Logo header
+     * - Navigation links with active highlighting
+     * - Market browse button
+     * - Logout button
+     */
     const sidebarContent = (
         <div className="d-flex flex-column h-100">
 

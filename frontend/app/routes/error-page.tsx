@@ -1,7 +1,67 @@
+/**
+ * Error Page Component
+ *
+ * Fallback page displayed when route errors occur or page not found.
+ * Provides user-friendly error messages with navigation options.
+ *
+ * Features:
+ * - Displays error status code (404, 500, etc.)
+ * - Shows descriptive error message based on status
+ * - Stilnovo logo/branding
+ * - Navigation buttons:
+ *    - "Back to Homepage" → Navigate to root
+ *    - "Go Back" → Browser back navigation
+ * - Responsive card layout
+ * - Centered on page
+ *
+ * Error Handling:
+ * - Detects if error is a RouteErrorResponse
+ * - Shows specific message for 404 (Not Found)
+ * - Shows generic message for other errors (500+)
+ * - Default: 500 Server Error
+ *
+ * Messages:
+ * - 404: "We couldn't find the treasure you were looking for..."
+ * - 500+: "Something went wrong on our end. Our tech treasures..."
+ * - Both maintain Stilnovo marketplace branding/tone
+ *
+ * Navigation Options:
+ * - "Back to Homepage": Reliable way back to main page
+ * - "Go Back": Browser history button
+ * - Both prevent user frustration
+ *
+ * Use Cases:
+ * - Route not found (404)
+ * - Server error (500+)
+ * - Route resolution fails
+ * - Any unhandled error in React Router
+ *
+ * Styling:
+ * - Clay-card design consistent with app
+ * - Full viewport height (min-vh-100)
+ * - Centered layout with flexbox
+ * - Large error number (72px) for visibility
+ * - Light background
+ *
+ * Accessibility:
+ * - Semantic HTML (heading structure)
+ * - Clear error description
+ * - Multiple navigation paths
+ * - Button styling for easy interaction
+ *
+ * @component
+ * @returns React component for error pages
+ */
+
 import { useNavigate, useRouteError, isRouteErrorResponse } from "react-router";
 import { Container, Row, Col, Button, Stack, Image, Card } from "react-bootstrap";
 import logo from "../assets/logo.png";
 
+/**
+ * Error Page Component Implementation
+ * 
+ * Renders error message based on route error status.
+ */
 export default function ErrorPage() {
   const navigate = useNavigate();
   const error = useRouteError();
@@ -9,6 +69,12 @@ export default function ErrorPage() {
   let title = "Server Error";
   let message = "Something went wrong on our end. Our tech treasures are being polished.";
 
+  /**
+   * Detect Error Type and Set Messages
+   * 
+   * Checks if error is a route response to determine status code.
+   * Shows specific messages for common errors (404).
+   */
   if (isRouteErrorResponse(error)) {
     status = error.status;
     if (status === 404) {

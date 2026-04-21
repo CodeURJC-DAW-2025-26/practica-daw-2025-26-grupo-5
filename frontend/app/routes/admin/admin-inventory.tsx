@@ -1,3 +1,76 @@
+/**
+ * Admin Inventory Management Page
+ *
+ * Comprehensive product management dashboard for administrators.
+ * View, search, edit, and delete products from the marketplace inventory.
+ *
+ * Features:
+ * - Product listing with search and pagination
+ * - KPI cards showing inventory metrics:
+ *    - Total products count
+ *    - Active listings (available for sale)
+ *    - Sold products count
+ *    - Featured products count
+ * - Product table with details:
+ *    - Product image
+ *    - Product name
+ *    - Category
+ *    - Price
+ *    - Status (Active/Sold)
+ *    - Seller name (linked to seller profile)
+ * - Search functionality by product name or ID
+ * - Edit product button (opens edit modal)
+ * - Delete product button with confirmation
+ * - Product quick-view/edit modal
+ * - Pagination controls (10 products per page)
+ * - Empty state message when no products found
+ * - Loading states during search/operations
+ * - Error handling and display
+ *
+ * Data Flow:
+ * 1. clientLoader fetches initial product list (first 1000)
+ * 2. Products displayed in paginated table
+ * 3. Admin enters search query
+ * 4. Search submits and reloads products with filter
+ * 5. Admin can:
+ *    - Click product row to view details
+ *    - Click edit button to modify product
+ *    - Click delete button to remove product
+ *    - View modal for quick edit
+ *    - Confirm delete action in modal
+ * 6. After edit/delete, list refreshes
+ *
+ * State Management:
+ * - rowData: Current page of products
+ * - searchTerm: Search query
+ * - isSearching: Loading state for search
+ * - currentPage: Pagination
+ * - selectedProduct: Product being edited/deleted
+ * - modalType: Which modal is open ('view', 'edit', 'delete')
+ * - isLoading: Loading state during operations
+ *
+ * Modals:
+ * - View Modal: Quick preview of product info
+ * - Edit Modal: Update product details
+ * - Delete Confirmation: Confirm product deletion
+ * - All modals show product image, details, and action buttons
+ *
+ * Permissions:
+ * - Admin can view all products
+ * - Admin can edit all product metadata
+ * - Admin can delete any product
+ * - No restrictions on seller products
+ *
+ * KPI Calculations:
+ * - Total products: All products in inventory
+ * - Active listings: Products with status = "Active"
+ * - Sold products: Products with status = "Sold"
+ * - Featured: Calculated from product data
+ *
+ * @component
+ * @returns React component for admin inventory management
+ */
+
 import { useState, useEffect } from 'react';
 import { redirect } from 'react-router';
 import { Container, Row, Col, Card, Table, Button, Image, Stack, Alert, Modal, Form } from 'react-bootstrap';
@@ -8,6 +81,10 @@ import type PagedResponse from '~/dto/PagedResponse';
 import AdminHeader from '~/components/admin/AdminHeader';
 import ConfirmModal from '~/components/confirm-modal';
 
+/**
+ * KPI Card Props Interface
+ * Defines structure for dashboard metric cards
+ */
 interface KPIData {
   readonly label: string;
   readonly value: string | number;
@@ -15,6 +92,10 @@ interface KPIData {
   readonly icon: string;
 }
 
+/**
+ * KPI Card Component
+ * Displays key performance indicator with icon and color coding
+ */
 const KPICard = ({ label, value, color, icon, bg }: KPIData & { readonly bg: string }) => (
   <Card className="clay-card border-0 h-100" style={{ borderLeft: `5px solid ${color}` }}>
     <Card.Body className="p-4">

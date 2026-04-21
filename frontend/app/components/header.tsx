@@ -1,3 +1,24 @@
+/**
+ * Header Navigation Component
+ *
+ * The Header component is the main navigation bar of the Stilnovo marketplace.
+ * It appears at the top of every page and provides:
+ * - Logo and branding
+ * - Search functionality (on homepage only)
+ * - User authentication status and profile access
+ * - Navigation links for logged-in and guest users
+ * - Admin access link for administrators
+ *
+ * User States Handled:
+ * 1. Authentication Loading - Shows placeholder while fetching session
+ * 2. Logged-in User - Displays profile dropdown with user menu
+ * 3. Banned User - Shows online status indicator hidden (no green dot)
+ * 4. Guest User - Shows Login/Sign up links
+ *
+ * Component Dependencies:
+ * - React Bootstrap, React Router 7, Zustand
+ */
+
 import React, { useEffect, useState } from "react";
 import { Modal, Button, NavDropdown } from "react-bootstrap";
 import { useUserStore } from "~/stores/useUserStore";
@@ -6,6 +27,7 @@ import "~/app.css";
 import logo from "../assets/logo.png";
 
 export default function Header() {
+  // State for login error modal and profile image fallback
   const [isErrorLoginDialogOpen, setErrorLoginDialogOpen] = useState(false);
   const [profileImageError, setProfileImageError] = useState(false);
 
@@ -14,14 +36,21 @@ export default function Header() {
   const { user, loginError, isAuthLoading, loadLoggedUser, logoutUser } = useUserStore();
 
   const isHome = location.pathname === "/";
-
   const [searchInput, setSearchInput] = useState("");
 
+  /**
+   * Load current user session on mount
+   * Checks if user is logged in from localStorage
+   */
   useEffect(() => {
     loadLoggedUser();
   }, []);
 
   const handleCloseErrorLoginDialog = () => setErrorLoginDialogOpen(false);
+
+  /**
+   * Handle search form submission with URL encoding
+   */
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); 
 

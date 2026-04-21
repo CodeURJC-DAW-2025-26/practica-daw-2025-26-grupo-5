@@ -6,13 +6,37 @@ import type ProductDetailsDTO from "~/dto/ProductDetailsDTO";
 import type HomePageDTO from "~/dto/HomePageDTO";
 
 /**
- * Products Service
- * Handles all API calls related to products using native fetch API
+ * PRODUCTS SERVICE
+ * Core business logic for all product-related API operations
+ * 
+ * Responsibilities:
+ * - CRUD operations: Create, Read, Update, Delete products
+ * - Image management: Upload, replace, and delete product images  
+ * - Product discovery: Search, filter by category, pagination
+ * - User products: Retrieve products owned by the logged-in seller
+ * - Seller discovery: Get seller profiles and product inquiries
+ * - AI integration: Product description improvement
+ * 
+ * Data Flow:
+ * 1. User uploads product -> addProduct() sends FormData with image file
+ * 2. Backend validates and returns ProductDTO with ID
+ * 3. Frontend displays product on user dashboard and marketplace
+ * 4. Buyers discover via getCatalog() with pagination
+ * 5. Buyers send inquiries -> sendInquiry() -> notifies seller
  */
 
 /**
- * Get all products from the backend
- * Backend returns PagedResponse, extract content array
+ * Fetches ALL products from the backend with pagination
+ * 
+ * Flow: 
+ * 1. Requests /v1/products with size=1000 to get all in one batch
+ * 2. Backend returns PagedResponse<ProductDTO> wrapper
+ * 3. Extracts and returns just the content array
+ * 
+ * @returns Array of ProductDTO objects (empty array if API fails)
+ * 
+ * Note: This is used for admin dashboard, not public homepage
+ * The public homepage uses getCatalog() instead for better UX
  */
 export async function getProducts(): Promise<ProductDTO[]> {
   const pagedResponse = await api.get<PagedResponse<ProductDTO>>("/v1/products", {
@@ -22,7 +46,10 @@ export async function getProducts(): Promise<ProductDTO[]> {
 }
 
 /**
- * Gets the products belonging to the currently authenticated user.
+ * Retrieves products owned by the currently logged-in user (seller dashboard)
+ * Flow: Backend validates JWT token and returns ONLY that user's products
+ * Security: Backend enforces ownership - users cannot retrieve other users' products
+ * @returns Array of products owned by current user (empty if no products)
  */
 export async function getMyProducts(): Promise<ProductDTO[]> {
   return await api.get<ProductDTO[]>("/v1/products/me");
@@ -91,7 +118,7 @@ export function getProductImageUrl(productId: number): string {
  * Gets the user profile photo
  */
 export function getUserProfilePhotoUrl(userId: number): string {
-  const baseUrl = '/api'; // El proxy de Vite se encarga del resto
+  const baseUrl = '/api'; // The Vite proxy handles the rest (routing to backend)
   const timestamp = Date.now();
   return `${baseUrl}/v1/users/${userId}/profile-photo?t=${timestamp}`;
 }

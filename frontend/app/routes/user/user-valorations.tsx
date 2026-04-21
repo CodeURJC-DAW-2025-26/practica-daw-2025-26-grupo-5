@@ -1,3 +1,89 @@
+/**
+ * User Valorations / Received Reviews Page
+ *
+ * Displays reviews/ratings that other buyers have left for the current user (as seller).
+ * Shows feedback received and pending ratings from purchases.
+ *
+ * Features:
+ * - Header with user profile photo link to settings
+ * - Summary statistics cards:
+ *    - Completed reviews: Number of ratings received
+ *    - Pending reviews: Purchases awaiting rating
+ *    - Average rating: Calculated from all reviews
+ * - Completed Reviews section:
+ *    - Shows all ratings and comments from buyers
+ *    - Displays rating (1-5 stars)
+ *    - Buyer name and review text
+ *    - Product name (what was being reviewed)
+ *    - Date of review
+ *    - Seller can respond to reviews (if implemented)
+ * - Pending Purchases section:
+ *    - Shows unrated purchases requiring seller rating
+ *    - Buyer name and purchase details
+ *    - "Rate" button to submit feedback
+ *    - Helps complete transaction record
+ * - Empty state messages:
+ *    - "No reviews yet" when no valorations
+ *    - "All purchases rated" when no pending
+ *
+ * Data Flow:
+ * 1. User navigates to /user/valorations
+ * 2. Authentication check: If not logged in, redirect to /login
+ * 3. Fetch two data sources:
+ *    - GET /api/v1/users/me/valorations?page=0&size=100 (received reviews)
+ *    - GET /api/v1/users/me/transactions (all purchases)
+ * 4. Combine data:
+ *    - Extract transaction IDs from valorations
+ *    - Filter transactions to find pending ones (not in valoration list)
+ * 5. Display summary stats:
+ *    - completedCount: Length of valorations array
+ *    - pendingCount: Length of pending transactions
+ *    - averageRating: Sum all ratings / count
+ * 6. Render two sections:
+ *    - Completed: Display all received reviews
+ *    - Pending: Display unrated purchases with "Rate" button
+ * 7. User can click "Rate" to open rating modal
+ *
+ * API Endpoints:
+ * - GET /api/v1/users/me/valorations: Fetch all reviews received
+ *    - Returns: { content: ValorationDTO[] }
+ *    - Each: { rating, comment, buyerName, productName, transactionId, date }
+ * - GET /api/v1/users/me/transactions: Fetch all transactions
+ *    - Returns: { orders: TransactionDTO[] }
+ *    - Each: { transactionId, buyerName, productName, purchaseDate }
+ *
+ * Authentication:
+ * - Requires Bearer token in header
+ * - Redirects to login if not authenticated
+ * - Session expiration check (401 response)
+ *
+ * State Management:
+ * - valorations: Array of received reviews
+ * - transactions: Array of pending purchases needing rating
+ * - loading: True while fetching data
+ * - error: Error message if API call fails
+ *
+ * Error Handling:
+ * - Catches API errors (network, 401, 500)
+ * - Displays user-friendly error messages
+ * - Shows loading spinner during fetch
+ * - Graceful fallback with empty lists
+ *
+ * Statistics Calculation:
+ * - Completed count: valorations.length
+ * - Pending count: transactions.length (filtered)
+ * - Average rating: sum(ratings) / count (rounded to 1 decimal)
+ *
+ * Styling:
+ * - Responsive layout (single column mobile, multi-column desktop)
+ * - Card-based design for reviews
+ * - Star rating visualization
+ * - Color-coded pending vs completed
+ *
+ * @component
+ * @returns Page displaying received reviews and pending ratings
+ */
+
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useUserStore } from '~/stores/useUserStore';
@@ -5,19 +91,55 @@ import type ValorationDTO from '~/dto/ValorationDTO';
 import type TransactionDTO from '~/dto/TransactionDTO';
 import { Row, Col, Card, Alert, Image, Stack, Button, Spinner } from 'react-bootstrap';
 
+/**
+ * User Valorations Component Implementation
+ * 
+ * Displays reviews received and pending ratings to submit.
+ */
 export default function UserValorations() {
+  // All reviews/ratings received by current user (as seller)
   const [valorations, setValorations] = useState<ValorationDTO[]>([]);
+  
+  // Purchases awaiting user's rating
   const [transactions, setTransactions] = useState<TransactionDTO[]>([]);
+  
+  // Loading state while fetching data
   const [loading, setLoading] = useState(true);
+  
+  // Error message if API call fails
   const [error, setError] = useState<string | null>(null);
 
   const { user } = useUserStore();
   const navigate = useNavigate();
 
+  /**
+   * Check Authentication
+   * 
+   * Redirects to login if user not logged in.
+   * Ensures only authenticated users access this page.
+   */
   useEffect(() => {
     if (!user) navigate('/login');
   }, [user, navigate]);
 
+  /**
+   * Fetch User Reviews and Pending Ratings
+   * 
+   * Process:
+   * 1. Check if user is authenticated (skip if not)
+   * 2. Fetch all received valorations (reviews)
+   *    - Endpoint: /api/v1/users/me/valorations
+   *    - Includes: rating, comment, buyer info, product info
+   * 3. Fetch all user transactions (purchases)
+   *    - Endpoint: /api/v1/users/me/transactions
+   *    - Includes: buyer, product, transaction details
+   * 4. Find pending transactions:
+   *    - Extract transaction IDs already in valorations
+   *    - Filter transactions to exclude already-rated ones
+   * 5. Update state with combined data
+   * 6. Handle errors with 401 session expiration check
+   * 
+   */
   useEffect(() => {
     const fetchData = async () => {
       try {

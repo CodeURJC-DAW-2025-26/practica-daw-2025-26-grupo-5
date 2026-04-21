@@ -1,7 +1,71 @@
+/**
+ * Valoration (Rating) Modal Component
+ *
+ * Modal dialog for submitting transaction reviews and seller ratings.
+ * Allows buyers to rate sellers and leave feedback after purchase.
+ *
+ * Features:
+ * - Star rating (1-5 scale)
+ * - Text comment for detailed feedback
+ * - Displays product name and final price
+ * - Shows seller profile information:
+ *    - Seller name
+ *    - Current rating
+ *    - Profile photo with fallback
+ * - Submit button with loading state
+ * - Modal closes on cancel
+ * - Form resets after submission
+ * - Accessibility features (form labels, required fields)
+ *
+ * Props:
+ * - show: Boolean controlling modal visibility
+ * - onHide: Callback when modal closes
+ * - transaction: TransactionDTO with product/seller/price data
+ * - onSubmit: Callback when form submitted (rating, comment)
+ * - isProcessing: Boolean for loading state during submission
+ *
+ * Data Display:
+ * - Product name from transaction.product.name
+ * - Final price from transaction.finalPrice
+ * - Seller name from transaction.seller.name
+ * - Seller rating from transaction.seller.rating
+ * - Seller photo URL constructed from transaction.seller.id
+ *
+ * Form Fields:
+ * - Rating: Number input, 1-5, default 5
+ * - Comment: Textarea, placeholder prompts about item and shipping
+ * - Both fields required
+ *
+ * Image Fallback:
+ * - Attempts to load seller profile photo
+ * - Falls back to default /images/profile-photo.png if error
+ * - Uses onError handler for fallback
+ * - Photo URL includes cache buster (Date.now())
+ *
+ * Styling:
+ * - Clay-card styling with shadow
+ * - Rounded corners (20px)
+ * - Light background for seller info
+ * - Centered form layout
+ * - Blue primary color for heading
+ *
+ * State Reset:
+ * - Rating resets to 5 after submission
+ * - Comment clears after submission
+ * - Parent component handles modal close
+ *
+ * @component
+ * @param {ValorationModalProps} props - Modal configuration
+ * @returns React component for rating modal
+ */
+
 import { useState } from 'react';
 import { Modal, Form, Button } from 'react-bootstrap';
 import type TransactionDTO from '~/dto/TransactionDTO';
 
+/**
+ * Props Interface for Valoration Modal
+ */
 interface ValorationModalProps {
     show: boolean;
     onHide: () => void;
@@ -10,12 +74,30 @@ interface ValorationModalProps {
     isProcessing: boolean;
 }
 
+/**
+ * Valoration Modal Component Implementation
+ * 
+ * Renders form for submitting transaction ratings and reviews.
+ */
 export default function ValorationModal({ show, onHide, transaction, onSubmit, isProcessing }: ValorationModalProps) {
     const [rating, setRating] = useState(5);
     const [comment, setComment] = useState("");
 
+    /**
+     * Return null if transaction not provided
+     * Prevents rendering without required data
+     */
     if (!transaction) return null;
 
+    /**
+     * Handle Form Submission
+     * 
+     * Process:
+     * 1. Prevent default form submission
+     * 2. Call onSubmit callback with rating and comment
+     * 3. Reset form fields to defaults
+     * 4. Parent component closes modal via onHide
+     */
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         await onSubmit(rating, comment);

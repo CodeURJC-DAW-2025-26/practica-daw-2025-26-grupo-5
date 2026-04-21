@@ -1,3 +1,55 @@
+/**
+ * Product Detail Page
+ *
+ * Displays comprehensive product information and purchasing interface.
+ * Shows product images, specifications, seller info, pricing, and reviews.
+ *
+ * Features:
+ * - Large product image with sold-out overlay if inactive
+ * - Technical specifications (category, status, location, price)
+ * - Product description with AI-enhanced formatting
+ * - Seller profile section with ratings and statistics
+ * - Recent valuations/reviews from other buyers
+ * - Purchase button (checkout flow)
+ * - Delete button for product owners
+ * - Share product links
+ * - Image gallery (if multiple images available)
+ * - Status indicators (active/sold out)
+ * - Inquiry contact form (if not sold)
+ *
+ * Purchase Flow:
+ * 1. User clicks "Buy Now" button
+ * 2. Checks if user is logged in
+ * 3. Prevents self-purchase (seller can't buy own product)
+ * 4. Navigates to checkout page
+ * 5. Confirms transaction
+ *
+ * Delete Flow (Seller Only):
+ * 1. Only product owner can delete
+ * 2. Opens confirmation modal
+ * 3. If confirmed, calls deleteProduct()
+ * 4. Redirects to homepage
+ * 5. Shows error if product in transaction
+ *
+ * State Management:
+ * - deleteError: Error message if delete fails
+ * - isPendingDelete: Loading state during deletion
+ * - isDeleteDialogOpen: Controls delete confirmation modal
+ *
+ * Seller Information:
+ * - Shows seller name, rating, sales count
+ * - Links to seller public profile
+ * - Average rating from buyer valuations
+ *
+ * Recent Reviews:
+ * - Displays recent valorations/ratings from buyers
+ * - Shows comment, rating, and reviewer name
+ * - Limited to recent valuations (last 3-5)
+ *
+ * @component
+ * @returns React component for product details and purchase
+ */
+
 import { useNavigate } from "react-router";
 import { getProductById, deleteProduct, getProductImageUrl, getUserProfilePhotoUrl } from "~/services/products-service";
 import {
@@ -15,6 +67,12 @@ import { isSelfPurchase } from "~/services/transaction-service";
 
 /**
  * Client-side loader: Fetches product details
+ * 
+ * Process:
+ * 1. Receives product ID from URL params
+ * 2. Calls getProductById() to fetch from backend
+ * 3. Adds artificial delay for better UX
+ * 4. Returns product data to component
  */
 export async function clientLoader({ params }: { params: any }) {
   await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -23,24 +81,35 @@ export async function clientLoader({ params }: { params: any }) {
 }
 
 /**
- * Product Detail Component
- * Fixed syntax and logic for Stilnovo P3
+ * Product Detail Component Implementation
+ * 
+ * Main component showing all product information, seller details, and purchase options.
  */
 export default function ProductDetail({ loaderData }: { loaderData: any }) {
   const { user } = useUserStore();
   const product = loaderData;
   const navigate = useNavigate();
 
+  // Delete operation state
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isPendingDelete, setPendingDelete] = useState(false);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  // Logical checks for product status
+  /**
+   * Check if product is available for purchase
+   * Active products can be purchased; sold-out/inactive cannot
+   */
   const isActive = product.status?.toLowerCase() === "active" || product.active === true;
 
+  /**
+   * Open Delete Confirmation Modal
+   */
   const handleOpenDeleteDialog = () => setDeleteDialogOpen(true);
 
-  // FIXED: Function name consistency
+  /**
+   * Close Delete Confirmation Modal
+   * Only allows closing if not currently deleting
+   */
   const handleCloseDeleteDialog = () => {
     if (!isPendingDelete) {
       setDeleteDialogOpen(false);
@@ -48,6 +117,15 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
     }
   };
 
+  /**
+   * Execute Product Deletion
+   * 
+   * Process:
+   * 1. Set deleting state
+   * 2. Call deleteProduct() API
+   * 3. Redirect to homepage on success
+   * 4. Show error message on failure
+   */
   async function handleDelete() {
     setPendingDelete(true);
     setDeleteError(null);
@@ -61,6 +139,10 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
     }
   }
 
+  /**
+   * Check if current user is the product owner
+   * Prevents users from purchasing their own products
+   */
   const isSelfProduct = isSelfPurchase(product, user)
 
   return (
@@ -146,7 +228,7 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
                         fontSize: '1.1rem',
                         background: 'linear-gradient(135deg, #f50519 0%, #dc2626 100%)',
                         color: 'white',
-                        cursor: 'default' // Indicamos que no es clickeable
+                        cursor: 'default' // Indicate that it's not clickable (seller viewing own product)
                       }}
                     >
                       <i className="fa-solid fa-lock"></i> This is your product
@@ -265,7 +347,7 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
             </Alert>
           )}
 
-          {/* Botones de acción (d-grid para que ocupen el 100% y estén apilados) */}
+          {/* Action buttons using d-grid to make them full-width and stack vertically on mobile */}
           <div className="d-grid gap-2">
             <button
               type="button"

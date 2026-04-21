@@ -1,24 +1,99 @@
+/**
+ * Banned Account Page
+ *
+ * Page displayed when a user with a banned/suspended account tries to access the marketplace.
+ * Shows account suspension status and provides appeal/logout options.
+ *
+ * Features:
+ * - Clear notification of account suspension status
+ * - User information display (name, email)
+ * - Explanation of why account was suspended
+ * - Appeal suspension button (mailto link)
+ * - Logout button
+ * - Support contact information
+ * - Protection against non-banned users (redirects to home)
+ * - Responsive design for mobile/desktop
+ *
+ * Flow:
+ * 1. User with banned account navigates to any protected route
+ * 2. protected-layout.tsx detects banned status
+ * 3. Redirects to /banned route
+ * 4. This component renders suspension message
+ * 5. User can:
+ *    - Logout
+ *    - Appeal suspension (email support)
+ *    - Contact support
+ *
+ * Security:
+ * - Only displays if user.banned === true
+ * - Redirects non-banned users to homepage
+ * - useEffect cleanup on navigation
+ * - Prevents access to marketplace features
+ *
+ * Visual Design:
+ * - Warning color scheme (red/danger)
+ * - Large ban icon
+ * - Card-based centered layout
+ * - Simple, clear messaging
+ * - Contact email provided
+ *
+ * State Management:
+ * - Uses Zustand user store
+ * - logoutUser action for logout
+ * - user.banned flag for conditional rendering
+ *
+ * @component
+ * @returns React component showing account suspension message
+ */
+
 import { Link, useNavigate } from 'react-router';
 import { useEffect } from 'react';
 import { Container, Card, Button, Alert, Stack, Image } from 'react-bootstrap';
 import logo from "../assets/logo.png";
 import { useUserStore } from '~/stores/useUserStore';
 
+/**
+ * Banned Page Component
+ * 
+ * Displays suspension message for banned users.
+ * Allows logout or appeal of suspension.
+ */
 export default function Banned() {
   const navigate = useNavigate();
   const { logoutUser, user } = useUserStore();
 
+  /**
+   * Redirect Non-Banned Users to Home
+   * 
+   * Effect:
+   * - Checks if user is no longer banned
+   * - If banned flag is false, navigates to home
+   * - Prevents banned page from being shown to non-banned users
+   * - Uses replace: true to replace history entry
+   */
   useEffect(() => {
     if (user && !user.banned) {
       navigate('/', { replace: true });
     }
   }, [user, navigate]);
 
+  /**
+   * Handle Logout Action
+   * 
+   * Process:
+   * 1. Call logoutUser() from store
+   * 2. Navigate to login page
+   * 3. Clear auth token and user data
+   */
   const handleLogout = async () => {
     await logoutUser();
     navigate('/login');
   };
 
+  /**
+   * Show Nothing if Not Banned
+   * Prevents brief display of banned page before redirect
+   */
   if (!user || !user.banned) {
     return null;
   }

@@ -1,3 +1,32 @@
+/**
+ * User Dashboard Page Component
+ *
+ * Displays the seller's dashboard with key performance metrics and analytics.
+ * Shows revenue tracking, sales by category, and recent transactions.
+ *
+ * Key Features:
+ * - Real-time revenue statistics (total revenue, current balance)
+ * - Line chart showing monthly revenue trend
+ * - Doughnut chart showing sales distribution by category
+ * - Table of recent sales with status indicators
+ * - Quick link to edit user profile
+ * - Profile photo with fallback to default image
+ *
+ * Data Flow:
+ * 1. clientLoader() fetches dashboard stats from server
+ * 2. Stats include revenue labels, values, sales history
+ * 3. Chart.js renders interactive charts for visualization
+ * 4. Table displays recent transactions with product details
+ *
+ * Chart Initialization:
+ * - Uses useEffect to initialize Chart.js instances
+ * - Cleans up charts on component unmount to prevent memory leaks
+ * - Two chart types: Line chart (revenue) and Doughnut chart (categories)
+ *
+ * @component
+ * @returns React component with seller dashboard and analytics
+ */
+
 import { useEffect, useRef } from "react";
 import { Row, Col, Table, Badge, Card, Stack, Image } from "react-bootstrap";
 import { Link } from "react-router";
@@ -6,6 +35,18 @@ import type { Route } from "./+types/user-page";
 import { getUserDashboardStats } from "~/services/user-service";
 import Chart from "chart.js/auto";
 
+/**
+ * Client-side loader function
+ * Fetches dashboard statistics for the currently logged-in seller
+ * 
+ * Process:
+ * 1. Calls getUserDashboardStats() to get data from backend
+ * 2. Formats revenue and balance to 2 decimal places
+ * 3. Prepares chart data (labels and values)
+ * 4. Formats current date in GB locale
+ * 
+ * @returns Object containing formatted stats for dashboard display
+ */
 export async function clientLoader() {
     const stats = await getUserDashboardStats();
     const apiData = stats || {};
@@ -21,11 +62,27 @@ export async function clientLoader() {
     };
 }
 
+/**
+ * User Dashboard Component
+ * 
+ * Main component for displaying seller analytics and performance metrics.
+ * Renders header with user greeting, KPI cards, charts, and sales table.
+ */
 export default function UserPage({ loaderData }: Route.ComponentProps) {
     const { user } = useUserStore();
     const revenueChartRef = useRef<HTMLCanvasElement>(null);
     const categoryChartRef = useRef<HTMLCanvasElement>(null);
 
+    /**
+     * Initialize Chart.js Charts
+     * 
+     * Effect runs when loaderData changes (component mount or data refresh).
+     * Creates two interactive charts:
+     * 1. Line chart: Revenue trend over time (monthly data)
+     * 2. Doughnut chart: Sales distribution by category
+     * 
+     * Cleanup: Destroys charts on unmount to prevent memory leaks
+     */
     useEffect(() => {
         if (!revenueChartRef.current || !categoryChartRef.current) return;
         const revCtx = revenueChartRef.current.getContext("2d");

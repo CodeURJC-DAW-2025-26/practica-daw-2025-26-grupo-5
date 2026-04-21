@@ -1,3 +1,70 @@
+/**
+ * User Settings Page
+ *
+ * Comprehensive user profile settings management page.
+ * Allows users to update personal and payment information.
+ *
+ * Features:
+ * - Profile photo upload with preview
+ * - Update user email address
+ * - Update user description/bio
+ * - Update payment card information (number, expiry, CVV)
+ * - CVV field toggle for security (show/hide)
+ * - Form validation
+ * - Success/error notifications
+ * - Loading states during submission
+ * - Admin-only sections (if user is admin)
+ * - Form state management with controlled inputs
+ * - Photo preview before upload
+ *
+ * Form Sections:
+ * 1. Profile Section:
+ *    - Current profile photo display
+ *    - Photo upload input
+ *    - Image preview
+ *
+ * 2. Personal Information:
+ *    - Email address
+ *    - Description/bio (seller bio)
+ *
+ * 3. Payment Information:
+ *    - Card number (masked)
+ *    - Expiry date (MM/YY format)
+ *    - CVV (masked by default, toggle to show)
+ *
+ * State Management:
+ * - Form fields: description, email, cardNumber, expiry, cvv
+ * - UI state: loading, error, success
+ * - Photo handling: selectedPhoto, previewUrl
+ * - Security: showCvv toggle
+ *
+ * Photo Upload:
+ * - Uses FileReader to create preview URL
+ * - Displays image preview before submission
+ * - Includes photo in FormData when updating
+ * - Falls back to default if not provided
+ *
+ * Error Handling:
+ * - Shows error alert if update fails
+ * - Provides user-friendly error messages
+ * - Resets form state on failure
+ * - Prevents submission during loading
+ *
+ * Success Handling:
+ * - Updates Zustand store with new user data
+ * - Shows success notification (auto-hides after 4 seconds)
+ * - Revalidates page data
+ * - Clears selected photo
+ *
+ * Protected Component:
+ * - Redirects to login if not authenticated
+ * - Shows loading spinner while user data loads
+ * - Admin-specific sections hidden from regular users
+ *
+ * @component
+ * @returns React component for user settings management
+ */
+
 import { useState, useEffect } from 'react';
 import { Navigate, useRevalidator } from 'react-router';
 import { useUserStore } from '~/stores/useUserStore';
@@ -5,11 +72,16 @@ import { updateUserSettings } from '~/services/user-service';
 import { Spinner, Alert } from 'react-bootstrap';
 import { getSystemErrorMap } from 'util';
 
+/**
+ * User Settings Component Implementation
+ * 
+ * Manages user profile and payment information updates.
+ */
 export default function UserSettings() {
   const { user, setUser } = useUserStore();
   const revalidator = useRevalidator();
 
-  // Local state for controlled inputs
+  // Form field state (controlled inputs)
   const [description, setDescription] = useState(user?.description || '');
   const [email, setEmail] = useState(user?.email || '');
   const [cardNumber, setCardNumber] = useState(user?.cardNumber || '');
@@ -24,6 +96,10 @@ export default function UserSettings() {
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
 
+  /**
+   * Initialize Form with Current User Data
+   * Called when user data is loaded
+   */
   useEffect(() => {
     if (user) {
       setEmail(user.email || '');
@@ -35,6 +111,15 @@ export default function UserSettings() {
     }
   }, [user]);
 
+  /**
+   * Handle Profile Photo Selection
+   * 
+   * Process:
+   * 1. Get selected file from input
+   * 2. Store in selectedPhoto state
+   * 3. Create preview URL using FileReader
+   * 4. Display preview in UI
+   */
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -47,6 +132,18 @@ export default function UserSettings() {
     }
   };
 
+  /**
+   * Handle Form Submission
+   * 
+   * Process:
+   * 1. Clear previous errors/success messages
+   * 2. Build FormData with all fields
+   * 3. Include photo if one was selected
+   * 4. Submit to API via updateUserSettings()
+   * 5. Update Zustand store with response
+   * 6. Show success message
+   * 7. Handle and display errors
+   */
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
@@ -82,9 +179,15 @@ export default function UserSettings() {
     }
   };
 
+  /**
+   * Toggle CVV Field Visibility
+   * For security: CVV hidden by default
+   */
   const toggleCvv = () => setShowCvv(!showCvv);
 
-  // 1. Check if the user is logged in
+  /**
+   * Redirect to Login if Not Authenticated
+   */
   if (!user) {
     return (
       <div className="d-flex justify-content-center align-items-center py-5 w-100">
@@ -97,7 +200,7 @@ export default function UserSettings() {
 
   return (
     <>
-      {/* Eliminamos el contenedor con ancho fijo y usamos container-fluid para adaptarnos al sidebar */}
+      {/* We remove the fixed-width container and use container-fluid to adapt to the sidebar */}
       <main className="settings-page-container pb-4 w-100">
         <div className="container-fluid px-4 py-4">
 
@@ -115,10 +218,10 @@ export default function UserSettings() {
             </Alert>
           )}
 
-          {/* Reducimos el gap (g-4) para que los elementos no estén tan separados */}
+          {/* We use g-4 spacing to reduce gap between elements for better visual hierarchy */}
           <div className="row g-4">
 
-            {/* LEFT COLUMN: EDIT PROFILE FORM (Le damos más espacio, de col-lg-5 a col-xl-6 / col-xxl-7) */}
+            {/* LEFT COLUMN: EDIT PROFILE FORM - Takes col-xxl-7 (70%) to give form more space, col-xl-6 (60%) on xl, full width on lg */}
             <div className="col-xxl-7 col-xl-6 col-lg-12">
               <div className="clay-card p-4 p-md-5 settings-card h-100">
                 <h2 className="fw-800 mb-4">Edit Profile</h2>
@@ -277,8 +380,8 @@ export default function UserSettings() {
 
             {/* RIGHT COLUMN: DIGITAL SELLER CARD */}
             <div className="col-xxl-5 col-xl-6 col-lg-12">
-              {/* AÑADIMOS position-sticky Y style={{ top: '6rem' }} 
-                (El top de 6rem asegura que no se solape con el navbar superior)
+              {/* Add position-sticky and style={{ top: '6rem' }}
+                (The top of 6rem ensures it doesn't overlap with the top navbar)
               */}
               <div
                 className="sticky-card-column position-sticky d-flex flex-column align-items-center"

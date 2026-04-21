@@ -1,9 +1,64 @@
+/**
+ * About Us Page
+ *
+ * Static marketing page introducing Stilnovo marketplace to visitors.
+ * Highlights company mission, values, and key statistics.
+ *
+ * Sections:
+ * 1. Hero Section:
+ *    - Main headline and tagline
+ *    - Company founding year badge (EST. 2026)
+ *    - Mission statement about sustainability and design
+ *    - Call-to-action buttons:
+ *      - "Explore Market" → Homepage
+ *      - "Join Community" → Signup page
+ *    - Hero image/banner
+ *
+ * 2. Statistics Section:
+ *    - Shows key metrics:
+ *      - 5K+ Active Users
+ *      - 12K+ Treasures Sold
+ *      - 100% Curated Quality
+ *    - Card-based layout with dividers
+ *
+ * 3. Core Principles:
+ *    - Sustainability: Circular economy focus
+ *    - Curation: Quality and authenticity standards
+ *    - Security: Transaction and buyer/seller protection
+ *    - Each principle has icon and description
+ *    - 3-column responsive grid
+ *
+ * Layout:
+ * - Full page with Header and Footer
+ * - Bootstrap Container and Row/Col for responsive design
+ * - "about-page" class for page-specific styling
+ * - Image assets from ~/assets folder
+ *
+ * No State Management:
+ * - Completely static content
+ * - No API calls or dynamic data
+ * - No user authentication required
+ * - Accessible to all visitors
+ *
+ * Navigation:
+ * - Header component with site navigation
+ * - Footer component with additional links
+ * - Links to marketplace and signup from hero
+ *
+ * @component
+ * @returns React component with company information page
+ */
+
 import { Container, Row, Col, Button, Badge, Image } from 'react-bootstrap';
 import { Link } from "react-router";
 import Header from "~/components/header";
 import Footer from "~/components/footer";
 import mainBanner from "~/assets/main-banner.png";
 
+/**
+ * About Us Component
+ * Displays marketing content about Stilnovo marketplace
+ */
 export default function AboutUs() {
     return (
         <>

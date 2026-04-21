@@ -1,10 +1,64 @@
+/**
+ * Hero Section Component
+ *
+ * Eye-catching hero banner for the homepage.
+ * Introduces users to Stilnovo marketplace and guides them to actions.
+ *
+ * Sections:
+ * 1. Category Navigation:
+ *    - Horizontal category menu
+ *    - Links filter products by category
+ *    - Categories: Fashion, Technology, Cars, Home
+ *    - Scrolls to featured products section when clicked
+ *
+ * 2. Main Hero Banner:
+ *    - Large headline: "Reinvent your space..."
+ *    - Subtitle: "Start buying or selling..."
+ *    - Call-to-action buttons:
+ *      - "Sell Now" → Create new product (/product/new)
+ *      - "About Us" → Company info page
+ *    - Banner image on right side
+ *    - Decorative glow background effect
+ *    - Responsive layout (stacked on mobile)
+ *
+ * 3. Scroll Indicator:
+ *    - Chevron icon appearing on desktop
+ *    - Guides users to featured products section
+ *    - Links to #featured-treasures anchor
+ *
+ * 4. Content Divider:
+ *    - Section separator below hero
+ *    - Motivational phrase: "Curated treasures..."
+ *    - Smooth transition to product listings
+ *
+ * Responsive Design:
+ * - Desktop: Side-by-side text and image
+ * - Tablet: Stacked layout
+ * - Mobile: Full-width text, image below
+ * - Scroll indicator hidden on mobile/tablet
+ *
+ * Assets:
+ * - bannerImg: Main promotional image
+ * - Clay-style card with floating effect
+ * - Glow background element
+ *
+ * Navigation Flow:
+ * - Categories allow instant filtering
+ * - CTA buttons lead to key user journeys
+ * - Scroll indicator encourages product discovery
+ *
+ * @component
+ * @returns React component with homepage hero section
+ */
+
 import { Link } from "react-router";
 import { useUserStore } from "~/stores/useUserStore";
 import bannerImg from "~/assets/main-banner.png"; // Use your main banner image here
 
 /**
- * HeroSection Component
- * Corrected structure to match Stilnovo's P2 design and prevent content overlap
+ * Hero Section Component Implementation
+ * 
+ * Renders hero banner with category navigation, call-to-action, and scroll guide.
  */
 export default function HeroSection() {
     const { user } = useUserStore();

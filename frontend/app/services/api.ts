@@ -1,6 +1,30 @@
 /**
+ * HTTP ERROR CLASS
+ * Custom error class that encapsulates HTTP error responses from the backend
+ * 
+ * Properties:
+ * - status: HTTP status code (401, 404, 500, etc.)
+ * - statusText: HTTP status text (Unauthorized, Not Found, etc.)
+ * - message: Custom error message (often from backend API response)
+ * 
+ * Usage: catch (error) { if (error instanceof HttpError) { handle by status } }
+ */
+
+/**
  * Fetch API wrapper - Native HTTP client replacing axios
- * Follows professor's pattern: validate response.ok, throw HttpError, include token in headers
+ * This module provides a lightweight HTTP client using the native Fetch API
+ * that follows the professor's recommended pattern: validate response.ok, throw HttpError, include token in headers
+ * 
+ * Key Features:
+ * - JWT Bearer token authentication: Automatically attaches JWT token from localStorage to all requests
+ * - FormData & Blob support: Handles multipart/form-data for file uploads and binary responses
+ * - Custom HttpError class: Throws structured errors with status codes and messages from backend
+ * - Dynamic query parameter builder: Supports arrays, null filtering, and nested objects
+ * - Automatic content-type detection: Handles JSON, images, and text responses
+ * 
+ * Base URL: Constructs from window.location.origin + '/api' to work with Spring Boot context path (/api)
+ * Authentication: Reads JWT token from localStorage.token automatically on each request
+ * Credentials: Includes credentials mode for cookie-based session management
  */
 
 export class HttpError extends Error {

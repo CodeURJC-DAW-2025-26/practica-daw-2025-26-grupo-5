@@ -1,3 +1,52 @@
+/**
+ * Admin Users Management Page
+ *
+ * Comprehensive admin dashboard for managing all marketplace users.
+ * Provides complete CRUD operations and user lifecycle management.
+ *
+ * Features:
+ * - User search and filtering functionality
+ * - View all users with pagination (10 users per page)
+ * - Edit user profiles (name, email, payment info, description)
+ * - Ban/unban users to restrict marketplace access
+ * - Delete user accounts permanently
+ * - Profile photo upload during user edit
+ * - KPI cards showing key metrics (total users, admins, banned, products)
+ * - Status indicators and role badges
+ * - Confirmation modals for destructive actions
+ * - Permission checks (can't edit admins, can't ban self)
+ *
+ * KPI Dashboard:
+ * - Shows total users, active admins, banned users, product count
+ * - Each KPI has icon and color coding
+ * - Real-time data loaded from backend
+ *
+ * Data Flow:
+ * 1. clientLoader fetches initial user data from backend
+ * 2. Users displayed in paginated table
+ * 3. Admin clicks action (edit/ban/delete)
+ * 4. Appropriate modal opens
+ * 5. On confirmation → API call updates backend
+ * 6. UI refreshes with updated data
+ *
+ * State Management:
+ * - rowData: Current page of users
+ * - selectedUser: User being edited/banned/deleted
+ * - modalType: Which action modal is open ('edit', 'ban', 'delete')
+ * - searchTerm: Search query
+ * - isLoading: Loading state during operations
+ * - currentPage: Pagination state
+ * - selectedPhoto: New profile photo if editing
+ *
+ * Permissions:
+ * - Admins cannot be edited or banned by other admins
+ * - Users cannot ban/delete themselves
+ * - Edit access is role-based
+ *
+ * @component
+ * @returns React component for admin user management dashboard
+ */
+
 import { useState } from 'react';
 import { redirect } from 'react-router';
 import { Modal, Form, Button, Container, Row, Col, Card, Table, Image, Stack, Alert } from 'react-bootstrap';
@@ -8,6 +57,10 @@ import type PagedResponse from '~/dto/PagedResponse';
 import AdminHeader from '~/components/admin/AdminHeader';
 import ConfirmModal from '~/components/confirm-modal';
 
+/**
+ * KPI Card Props Interface
+ * Defines structure for dashboard metric cards
+ */
 interface KPIData {
   readonly label: string;
   readonly value: string | number;
@@ -15,6 +68,10 @@ interface KPIData {
   readonly icon: string;
 }
 
+/**
+ * KPI Card Component
+ * Displays key performance indicator with icon and color coding
+ */
 const KPICard = ({ label, value, color, icon, bg }: KPIData & { readonly bg: string }) => (
   <Card className="clay-card border-0 h-100" style={{ borderLeft: `5px solid ${color}` }}>
     <Card.Body className="p-4">

@@ -1,3 +1,46 @@
+/**
+ * Footer Component
+ *
+ * Main footer for the Stilnovo marketplace appearing on every page.
+ * Provides company branding, navigation links, social media, and AI assistance.
+ *
+ * Sections:
+ * 1. Branding Column:
+ *    - Stilnovo logo and tagline
+ *    - Social media links (Instagram, YouTube)
+ *    - AI Assistant widget (for logged-in users only)
+ *
+ * 2. Platform Column:
+ *    - About Us link
+ *    - Terms of Service modal
+ *    - Safety Rules modal
+ *
+ * 3. Support Column:
+ *    - Help Center (redirects to /user/help for logged-in users)
+ *    - Privacy Policy modal
+ *    - Cookies Policy modal
+ *
+ * 4. Call-to-Action Column:
+ *    - Personalized greeting (logged in)
+ *    - "Sell New Treasure" button
+ *    - Or prompt to sign up (for guests)
+ *
+ * AI Assistant Features (Logged-in Users Only):
+ * - Ask questions about the marketplace
+ * - Get AI-powered responses using chatBotHelper service
+ * - Real-time typing indicator while loading
+ * - Formatted responses displayed in styled box
+ * - Clean, minimalist design integrated into footer
+ *
+ * Modal Management:
+ * - Multiple state variables for different modals
+ * - Toggle functions for each modal
+ * - Smooth fade-in animations for responses
+ *
+ * @component
+ * @returns React component for page footer with links and AI assistant
+ */
+
 import React, { useState } from 'react';
 import { Modal, Form, Button, InputGroup, Spinner } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router'; // Corrected import for v7
@@ -6,19 +49,32 @@ import '../app.css';
 import { useUserStore } from "~/stores/useUserStore";
 import { chatBotHelper } from "~/services/AI/ai-service";
 
+/**
+ * Footer Component Implementation
+ * 
+ * Manages footer state including modal visibility and AI assistant interaction.
+ * Renders different content based on user authentication state.
+ */
 export default function Footer() {
   const navigate = useNavigate();
+  
+  // Modal visibility states
   const [showHelp, setShowHelp] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showSafety, setShowSafety] = useState(false);
   const [showCookie, setShowCookie] = useState(false);
 
-  // Integrated AI Assistant State
+  // AI Assistant state
   const [aiQuestion, setAiQuestion] = useState("");
   const [aiAnswer, setAiAnswer] = useState<string | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
 
+  /**
+   * Navigate to Help Center
+   * If user is logged in: redirect to /user/help
+   * If guest: show help modal
+   */
   const handleHelpCenter = () => {
     if (user) {
       navigate('/user/help');
@@ -27,6 +83,17 @@ export default function Footer() {
     }
   };
 
+  /**
+   * Handle AI Assistant Question Submission
+   * 
+   * Process:
+   * 1. Validate question is not empty
+   * 2. Set loading state to show spinner
+   * 3. Call chatBotHelper service with question
+   * 4. Display response in styled box
+   * 5. Handle errors gracefully
+   * 6. Clear input field after submission
+   */
   const handleAiAsk = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!aiQuestion.trim() || isAiLoading) return;
@@ -43,6 +110,7 @@ export default function Footer() {
     }
   };
 
+  // Modal toggle functions
   const toggleHelp = () => setShowHelp(!showHelp);
   const toggleTerms = () => setShowTerms(!showTerms);
   const togglePrivacy = () => setShowPrivacy(!showPrivacy);

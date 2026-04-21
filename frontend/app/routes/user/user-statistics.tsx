@@ -1,3 +1,119 @@
+/**
+ * User Statistics / Seller Analytics Dashboard
+ *
+ * Comprehensive analytics and reporting dashboard for sellers.
+ * Visualizes sales performance, revenue trends, and customer engagement.
+ *
+ * Features:
+ * - KPI Summary Cards:
+ *    - Total Revenue: Sum of all sales (formatted as €)
+ *    - Current Balance: Available funds
+ *    - Sales Count: Number of items sold
+ *    - Average Sale Value: Revenue / sales count
+ * - Revenue Chart (Line):
+ *    - Shows monthly revenue trend
+ *    - X-axis: Months (labels from backend)
+ *    - Y-axis: Revenue amount in €
+ *    - Point styling with blue color scheme
+ * - Sales by Category (Doughnut):
+ *    - Breakdown of sales by product category
+ *    - Shows which categories sell best
+ *    - Color-coded slices for each category
+ * - Visits & Interest (Bar):
+ *    - Grouped bars showing visits vs interest per category
+ *    - Helps identify engagement patterns
+ *    - Tracks potential customer interest
+ * - Statistics Report:
+ *    - PDF download button
+ *    - Generates professional report
+ *    - Includes all dashboard metrics
+ *    - Timestamped with report generation date
+ * - Responsive Layout:
+ *    - Single column on mobile
+ *    - Multi-column on desktop
+ *    - Charts responsive to screen size
+ *
+ * Data Flow:
+ * 1. Page loads with clientLoader() pre-fetching stats
+ *    - GET /api/v1/users/me/dashboard-stats
+ *    - Returns: salesCount, chartLabels, chartValues, totalRevenue, balance,
+ *               barLabels, visitsByCategory, interestByCategory
+ * 2. Component renders KPI cards with formatted values
+ * 3. Three charts initialize with Chart.js:
+ *    - Revenue line chart (time series)
+ *    - Category doughnut (pie variant)
+ *    - Visits/Interest bar chart (grouped)
+ * 4. User can download PDF report:
+ *    - GET /api/v1/users/me/statistics-report
+ *    - Downloads: Statistics_Report.pdf
+ * 5. Charts update if loaderData changes
+ * 6. Charts destroyed and recreated to prevent memory leaks
+ *
+ * Chart Initialization:
+ * - Revenue Chart:
+ *    - Type: Line
+ *    - Color: Blue (#2f6ced)
+ *    - Features: Area fill (light blue background), smooth curves
+ * - Category Chart:
+ *    - Type: Doughnut (donut style pie)
+ *    - Colors: 6 shades of blue (gradient)
+ *    - Legend: Bottom position
+ * - Visits Chart:
+ *    - Type: Bar (grouped)
+ *    - 2 datasets: Visits and Interest
+ *    - Colors: Dark blue and light blue
+ *    - Rounded corners on bars
+ *
+ * Client Loader:
+ * - Pre-fetches stats from backend
+ * - Transforms API data to chart-ready format
+ * - Provides default values for safety
+ * - Calculates current date for header
+ * - No artificial delay (fast page load)
+ *
+ * Authentication:
+ * - Requires logged-in user
+ * - Redirects to login if not authenticated
+ * - Uses useUserStore for auth check
+ *
+ * PDF Download:
+ * - Triggered by download button
+ * - Shows loading state during download
+ * - Creates temporary link element
+ * - Downloads to user's default download folder
+ * - Filename: Statistics_Report.pdf
+ * - Error handling with console logging
+ *
+ * State Management:
+ * - loaderData: Pre-fetched statistics from backend
+ * - isDownloading: Loading state for PDF download
+ * - Chart refs: References to canvas elements (DOM)
+ * - Chart instances: Stored for cleanup/destroy
+ *
+ * Performance:
+ * - Chart.js initialization in useEffect
+ * - Cleanup function destroys charts on unmount
+ * - Prevents memory leaks with destroy() calls
+ * - Re-initialization on loaderData changes
+ * - No unnecessary re-renders
+ *
+ * Styling:
+ * - KPI cards: Large text, color-coded
+ * - Charts: Responsive canvas elements
+ * - Buttons: Primary color with shadow
+ * - Background: Light gray container
+ * - Text: Dark font on light background
+ *
+ * Data Formatting:
+ * - Currency: EUR format with 2 decimals (€)
+ * - Numbers: Rounded/formatted for readability
+ * - Dates: Locale-specific format
+ * - Charts: Color-coded for visual hierarchy
+ *
+ * @component
+ * @returns Analytics dashboard with charts and KPI cards
+ */
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useUserStore } from '~/stores/useUserStore';
@@ -5,6 +121,19 @@ import { getUserDashboardStats } from '~/services/user-service';
 import Chart from 'chart.js/auto';
 import { Row, Col, Table, Badge, Card, Stack, Image, Button } from 'react-bootstrap';
 
+/**
+ * Client-side loader: Fetch User Dashboard Statistics
+ * 
+ * Process:
+ * 1. Call getUserDashboardStats() from user service
+ * 2. Extract and format statistics data
+ * 3. Transform for chart.js compatibility
+ * 4. Provide default values if missing
+ * 5. Calculate current date for header display
+ * 6. Return formatted data object
+ * 
+ * @returns Dashboard statistics with formatted values and chart data
+ */
 export async function clientLoader() {
   const stats = await getUserDashboardStats();
   const apiData = stats || {};
@@ -21,25 +150,65 @@ export async function clientLoader() {
   };
 }
 
+/**
+ * User Statistics Component Implementation
+ * 
+ * Displays seller analytics with charts and KPI metrics.
+ */
 export default function UserStatistics({ loaderData }: { loaderData: any }) {
   const { user } = useUserStore();
   const navigate = useNavigate();
+  
+  // Loading state for PDF download
   const [isDownloading, setIsDownloading] = useState(false);
 
+  // Canvas element references for Chart.js
   const revenueChartRef = useRef<HTMLCanvasElement>(null);
   const categoryChartRef = useRef<HTMLCanvasElement>(null);
   const visitsChartRef = useRef<HTMLCanvasElement>(null);
+  
+  // Chart.js instance references (for cleanup)
   const revenueChartInstance = useRef<any>(null);
   const categoryChartInstance = useRef<any>(null);
   const visitsChartInstance = useRef<any>(null);
 
+  /**
+   * Check Authentication
+   * 
+   * Redirects to login if user not authenticated.
+   * Ensures only logged-in sellers access statistics.
+   */
   useEffect(() => {
     if (!user) navigate('/login');
   }, [user, navigate]);
 
+  /**
+   * Initialize Chart.js Charts
+   * 
+   * Process:
+   * 1. Check if all canvas refs exist (if not, skip)
+   * 2. Destroy previous chart instances to prevent memory leaks
+   * 3. Get 2D contexts from canvas elements
+   * 4. Create Revenue Chart (Line):
+   *    - X-axis: Month labels from data
+   *    - Y-axis: Revenue values
+   *    - Styling: Blue color, area fill, smooth curves
+   * 5. Create Category Chart (Doughnut):
+   *    - Labels: Category names
+   *    - Data: Sales count per category
+   *    - Colors: 6-color blue gradient
+   * 6. Create Visits Chart (Bar):
+   *    - 2 datasets: Visits and Interest
+   *    - Grouped bars for comparison
+   *    - Colors: Dark blue (visits), light blue (interest)
+   * 7. Return cleanup function that destroys all charts
+   * 
+   * Dependencies: Runs when loaderData changes (new stats)
+   */
   useEffect(() => {
     if (!revenueChartRef.current || !categoryChartRef.current || !visitsChartRef.current) return;
 
+    // Destroy previous instances
     revenueChartInstance.current?.destroy();
     categoryChartInstance.current?.destroy();
     visitsChartInstance.current?.destroy();
@@ -48,6 +217,7 @@ export default function UserStatistics({ loaderData }: { loaderData: any }) {
     const catCtx = categoryChartRef.current.getContext("2d");
     const visCtx = visitsChartRef.current.getContext("2d");
 
+    // Revenue Line Chart: Shows monthly revenue trend
     revenueChartInstance.current = new Chart(revCtx!, {
       type: 'line',
       data: {
@@ -57,6 +227,7 @@ export default function UserStatistics({ loaderData }: { loaderData: any }) {
       options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
     });
 
+    // Category Doughnut Chart: Sales breakdown by category
     categoryChartInstance.current = new Chart(catCtx!, {
       type: 'doughnut',
       data: {
@@ -66,6 +237,7 @@ export default function UserStatistics({ loaderData }: { loaderData: any }) {
       options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
     });
 
+    // Visits & Interest Bar Chart: Engagement by category
     visitsChartInstance.current = new Chart(visCtx!, {
       type: 'bar',
       data: {
@@ -78,6 +250,7 @@ export default function UserStatistics({ loaderData }: { loaderData: any }) {
       options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { beginAtZero: true } } }
     });
 
+    // Cleanup: Destroy charts on unmount to prevent memory leaks
     return () => {
       revenueChartInstance.current?.destroy();
       categoryChartInstance.current?.destroy();
@@ -85,6 +258,20 @@ export default function UserStatistics({ loaderData }: { loaderData: any }) {
     };
   }, [loaderData]);
 
+  /**
+   * Download Statistics Report as PDF
+   * 
+   * Process:
+   * 1. Set loading state to true
+   * 2. Create temporary link element
+   * 3. Set href to /api/v1/users/me/statistics-report endpoint
+   * 4. Set download attribute with filename
+   * 5. Append to document body (required for Firefox)
+   * 6. Click link to trigger download
+   * 7. Remove link from DOM
+   * 8. Clear loading state
+   * 9. Catch and log errors gracefully
+   */
   const downloadStatisticsPDF = async () => {
     setIsDownloading(true);
     try {

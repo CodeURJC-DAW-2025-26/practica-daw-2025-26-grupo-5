@@ -1,3 +1,50 @@
+/**
+ * My Products Page Component
+ *
+ * Allows sellers to manage their product inventory.
+ * Displays all products owned by the current user with edit/delete capabilities.
+ *
+ * Features:
+ * - List all user's products in card format
+ * - Quick actions: Edit and Delete buttons
+ * - Product status indicators (Active/Inactive)
+ * - Product image with fallback to placeholder
+ * - Reference number (ST-ID format) for quick tracking
+ * - Formatted prices using German locale (€ symbol)
+ * - Create new product button
+ * - Empty state message when no products exist
+ * - Delete confirmation modal before permanent deletion
+ * - Automatic refresh after operations
+ *
+ * Data Flow:
+ * 1. Component mounts and fetches user's products via getMyProducts()
+ * 2. Products displayed as cards in a stack
+ * 3. User clicks edit → Navigate to /product/{id}/edit
+ * 4. User clicks delete → Show confirmation modal
+ * 5. After confirmation → Delete via deleteProduct() and refresh list
+ * 6. Error handling if product is part of active transaction
+ *
+ * State Management:
+ * - products: Array of product objects
+ * - loading: Tracks initial data fetch
+ * - showDeleteModal: Controls delete confirmation
+ * - idToDelete: Tracks which product is being deleted
+ * - isDeleting: Loading state during deletion
+ *
+ * Image Caching:
+ * - Product images include cache-bust with Date.now()
+ * - Fallback to placeholder on image load error
+ * - Ensures fresh images when products are updated
+ *
+ * Price Formatting:
+ * - Uses German locale (de-DE) for European format
+ * - Minimum 0, maximum 2 decimal places
+ * - Displays with € symbol
+ *
+ * @component
+ * @returns React component for managing seller inventory
+ */
+
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { Button, Badge, Image, Stack, Card, Row, Col, Spinner } from "react-bootstrap";
@@ -5,22 +52,44 @@ import { getMyProducts, deleteProduct } from "~/services/products-service";
 import ConfirmModal from "~/components/confirm-modal";
 import type ProductDTO from "~/dto/ProductDTO";
 
+/**
+ * My Products Component Implementation
+ * 
+ * Manages seller's product inventory with CRUD operations.
+ * Fetches initial products and handles edit/delete operations.
+ */
 export default function MyProducts() {
+    // State management for products and modals
     const [products, setProducts] = useState<ProductDTO[]>([]);
     const [loading, setLoading] = useState(true);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [idToDelete, setIdToDelete] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
 
+    /**
+     * Price Formatter
+     * Uses German locale (€) for European marketplace
+     * Min: 0 decimals, Max: 2 decimals
+     */
     const priceFormatter = new Intl.NumberFormat('de-DE', {
         minimumFractionDigits: 0,
         maximumFractionDigits: 2
     });
 
+    /**
+     * Fetch Products on Component Mount
+     * Called once when component loads
+     */
     useEffect(() => {
         fetchProducts();
     }, []);
 
+    /**
+     * Fetch User's Products from API
+     * 
+     * Calls getMyProducts() service to retrieve all products owned by current user.
+     * Handles errors gracefully and clears loading state.
+     */
     const fetchProducts = async () => {
         try {
             const data = await getMyProducts();
@@ -32,11 +101,28 @@ export default function MyProducts() {
         }
     };
 
+    /**
+     * Initiate Delete Process
+     * Opens confirmation modal before actual deletion
+     * 
+     * @param id - Product ID to delete
+     */
     const handleDeleteClick = (id: number) => {
         setIdToDelete(id);
         setShowDeleteModal(true);
     };
 
+    /**
+     * Confirm and Execute Delete
+     * 
+     * Process:
+     * 1. Set deleting state to show spinner
+     * 2. Artificial 1-second delay for UX
+     * 3. Call deleteProduct() API
+     * 4. Remove product from local state
+     * 5. Close modal
+     * 6. Handle errors (e.g., product in active transaction)
+     */
     const handleConfirmDelete = async () => {
         if (idToDelete === null) return;
         setIsDeleting(true);
@@ -54,6 +140,9 @@ export default function MyProducts() {
         }
     };
 
+    /**
+     * Show Loading Spinner During Initial Fetch
+     */
     if (loading) return (
         <div className="d-flex justify-content-center align-items-center py-5 w-100">
             <Spinner animation="border" variant="primary" />
