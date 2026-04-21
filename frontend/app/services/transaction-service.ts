@@ -24,3 +24,10 @@ export const isSelfPurchase = (product: ProductDTO, currentUser: UserDTO | null)
 export const getCheckoutDetails = async (productId: number): Promise<CheckoutDTO> => {
     return await api.get<CheckoutDTO>(`/v1/transactions/${productId}/checkout`);
 };
+
+/**
+ * Processes the creation of a transaction (payment)
+ */
+export async function createTransaction(productId: number): Promise<any> {
+    return await api.post("/v1/transactions", { productId });
+}

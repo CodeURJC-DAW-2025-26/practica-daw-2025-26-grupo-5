@@ -1,7 +1,7 @@
 import { Link, useSearchParams } from "react-router";
 import { useState } from "react";
 import type { Route } from "./+types/product-list";
-import { getCatalog, getMoreProducts } from "~/services/products-service"; 
+import { getCatalog, getMoreProducts, getProductImageUrl } from "~/services/products-service"; 
 import type ProductDTO from "~/dto/ProductDTO";
 import type HomePageDTO from "~/dto/HomePageDTO"; 
 import { Container, Row, Col, Button, Spinner } from "react-bootstrap";
@@ -130,7 +130,7 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
                   <div className="clay-card">
                     <div className="img-container">
                       <img 
-                        src={`/api/v1/products/${product.id}/image?t=${Date.now()}`} 
+                        src={getProductImageUrl(product.id)}
                         alt={product.name} 
                       />
                     </div>
@@ -160,7 +160,7 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
                 <div className="clay-card">
                   <div className="img-container">
                     <img 
-                      src={`/api/v1/products/${product.id}/image?t=${Date.now()}`} 
+                      src={getProductImageUrl(product.id)}
                       alt={product.name} 
                     />
                   </div>

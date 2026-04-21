@@ -78,6 +78,23 @@ export async function updateProduct(id: number, productData: any): Promise<Produ
   return await api.patch<ProductDTO>(`/v1/products/${id}`, formData);
 }
 
+/**
+ * Return the URL of an image
+ */
+export function getProductImageUrl(productId: number): string {
+  const baseUrl = '/api'; 
+  const timestamp = Date.now();
+  
+  return `${baseUrl}/v1/products/${productId}/image?t=${timestamp}`;
+}
+/**
+ * Gets the user profile photo
+ */
+export function getUserProfilePhotoUrl(userId: number): string {
+  const baseUrl = '/api'; // El proxy de Vite se encarga del resto
+  const timestamp = Date.now();
+  return `${baseUrl}/v1/users/${userId}/profile-photo?t=${timestamp}`;
+}
 
 /**
  * Upload a product image

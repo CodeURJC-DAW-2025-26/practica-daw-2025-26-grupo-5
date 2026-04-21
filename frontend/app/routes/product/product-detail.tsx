@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { getProductById, deleteProduct } from "~/services/products-service";
+import { getProductById, deleteProduct, getProductImageUrl, getUserProfilePhotoUrl } from "~/services/products-service";
 import {
   Alert,
   Button,
@@ -82,7 +82,7 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
               )}
 
               <img
-                src={`/api/v1/products/${product.id}/image?t=${Date.now()}`}
+                src={getProductImageUrl(product.id)}
                 alt={product.name}
                 className={`main-product-image img-fluid rounded-4 ${!isActive ? 'opacity-25 grayscale' : ''}`}
                 style={{ maxHeight: '500px', objectFit: 'contain' }}
@@ -174,11 +174,14 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
                   <div className="seller-card p-3 rounded-4 bg-light border d-flex align-items-center justify-content-between mb-4 shadow-sm">
                     <div className="d-flex align-items-center gap-3">
                       <img
-                        src={`/api/v1/users/${product.seller.id}/profile-photo?t=${Date.now()}`}
+                        src={getUserProfilePhotoUrl(product.seller.id)}
                         className="rounded-circle border border-white shadow-sm"
-                        width="55" height="55"
+                        width="55"
+                        height="55"
                         style={{ objectFit: 'cover' }}
-                        onError={(e) => { (e.target as HTMLImageElement).src = '/images/no-profile-picture.png' }}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/images/no-profile-picture.png'
+                        }}
                         alt="Seller"
                       />
                       <div>

@@ -3,29 +3,24 @@ import { useNavigate, redirect } from 'react-router';
 import { Container, Row, Col, Card, Form, Button, Alert, Image, Spinner } from 'react-bootstrap';
 import type CheckoutDTO from '~/dto/CheckoutDTO';
 import { useUserStore } from '~/stores/useUserStore';
+import { getProductImageUrl } from '~/services/products-service'
+import { getCheckoutDetails, createTransaction } from '~/services/transaction-service';
 
 export async function clientLoader({ params }: { params: { id: string } }) {
-  const response = await fetch(`/api/v1/transactions/${params.id}/checkout`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include', // Envía las cookies de autenticación
-  });
-
-  if (response.status === 401) {
-    return redirect('/login');
-  }
-
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error('Product not found');
+  try {
+    // "401 redirect" logic is typically handled in the 'api' object interceptor,
+    // but here we simply call the service
+    const numericId = Number(params.id);
+    if (isNaN(numericId)) {
+      throw new Error('Invalid ID format'); 
     }
-    throw new Error(`Failed to load checkout: ${response.statusText}`);
-  }
 
-  const data: CheckoutDTO = await response.json();
-  return data;
+    return await getCheckoutDetails(numericId);
+  } catch (error: any) {
+    if (error.status === 401) return redirect('/login');
+    if (error.status === 404) throw new Error('Product not found');
+    throw new Error('Failed to load checkout');
+  }
 }
 
 interface PaymentPageProps {
@@ -59,38 +54,17 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
     e.preventDefault();
     setProcessing(true);
     setError(null);
-
     if (!productId) {
       setError("Product ID is missing.");
       setProcessing(false);
       return;
     }
-
     try {
-      const response = await fetch('/api/v1/transactions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Envía las cookies de autenticación
-        body: JSON.stringify({
-          productId: parseInt(productId.toString(), 10),
-        })
-      });
-
-      if (!response.ok) {
-        throw new Error('Transaction failed. Please try again.');
-      }
-
+      await createTransaction(parseInt(productId.toString(), 10));
       localStorage.setItem('justPurchased', 'true');
       navigate(`../../user/sales-orders`);
-
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("An unexpected error occurred during payment processing.");
-      }
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred during payment processing.");
       setProcessing(false);
     }
   };
@@ -120,7 +94,7 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
                       <Col lg={5} className="text-center border-end pe-lg-5">
                         <div className="position-relative mb-4">
                           <Image
-                            src={`/api/v1/products/${product.id}/image?t=${Date.now()}`}
+                            src={getProductImageUrl(product.id)}
                             alt={product.name}
                             fluid
                             rounded
