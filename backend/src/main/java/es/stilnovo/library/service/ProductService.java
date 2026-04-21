@@ -501,14 +501,19 @@ public class ProductService {
     }
 
     public Page<Product> findActiveProducts(String query, String category, Pageable pageable) {
+        String activeStatus = "Active";
+
         if (query != null && !query.isBlank()) {
-            return productRepository.findByStatusIgnoreCaseAndNameContainingIgnoreCase("Active", query, pageable);
+            String cleanQuery = query.trim();
+            return productRepository.searchByStatusAndKeyword(activeStatus, cleanQuery, pageable);
         }
+
         if (category != null && !category.isBlank()) {
-            return productRepository.findByStatusIgnoreCaseAndCategoryContainingIgnoreCase("Active", category,
+            return productRepository.findByStatusIgnoreCaseAndCategoryContainingIgnoreCase(activeStatus, category,
                     pageable);
         }
-        return productRepository.findByStatusIgnoreCase("Active", pageable);
+
+        return productRepository.findByStatusIgnoreCase(activeStatus, pageable);
     }
 
     public CatalogPageResult getCatalogPage(String query, String category, User user, Pageable pageable) {

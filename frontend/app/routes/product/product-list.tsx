@@ -1,5 +1,5 @@
 import { Link, useSearchParams } from "react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Route } from "./+types/product-list";
 import { getCatalog, getMoreProducts, getProductImageUrl } from "~/services/products-service"; 
 import type ProductDTO from "~/dto/ProductDTO";
@@ -12,7 +12,10 @@ import { useUserStore } from "~/stores/useUserStore";
  * This makes the "Back to Gallery" button instant.
  * EXCEPTION: Revalidate if a purchase just occurred to refresh the product list.
  */
-export function shouldRevalidate() {
+export function shouldRevalidate({currentUrl, nextUrl }: any) {
+  if (currentUrl.search !== nextUrl.search) {
+    return true;
+  }
   // Check if a purchase was just completed
   const justPurchased = localStorage.getItem('justPurchased');
   if (justPurchased === 'true') {
@@ -26,12 +29,15 @@ export function shouldRevalidate() {
  * Client-side loader: Fetches the combined catalog data from the Spring Boot API.
  * NO setTimeout here to keep the Home page fast.
  */
-export async function clientLoader({}: Route.ClientLoaderArgs) {
+export async function clientLoader({ request }: Route.ClientLoaderArgs) {
   try {
-    return await getCatalog();
+    const url = new URL(request.url);
+    const query = url.searchParams.get("query") || undefined;
+    const category = url.searchParams.get("category") || undefined;
+
+    return await getCatalog(query, category, 0);
   } catch (error) {
     console.warn("Failed to fetch catalog, showing empty list:", error);
-    // Return a default empty homepage DTO
     return {
       products: [],
       recommendedProducts: [],
@@ -59,6 +65,17 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
     }
     return activeProducts.length >= 10; 
   });
+
+  useEffect(() => {
+    setProducts(activeProducts);
+    setPage(1);
+    
+    if (typeof homeData.last === 'boolean') {
+      setHasMore(!homeData.last);
+    } else {
+      setHasMore(activeProducts.length > 10);
+    }
+  }, [homeData]);
 
   // Fill recommended products to always show 4 (or available)
   const recommendedCount = activeRecommendations.length;

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.Query;
 
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
@@ -123,5 +124,23 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
      * @return page of products with this status
      */
     Page<Product> findByStatus(String status, Pageable pageable);
+
+    /**
+     * Search active products by a keyword present in either the name OR the
+     * description.
+     * Uses case-insensitive matching for a better user experience.
+     * * @param status the exact status to filter by (e.g., "Active")
+     * 
+     * @param keyword  the text to search for in both name and description
+     * @param pageable pagination parameters
+     * @return a page of products matching the criteria
+     */
+    @Query("SELECT p FROM ProductTable p WHERE LOWER(p.status) = LOWER(:status) " +
+            "AND (LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(p.description) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<Product> searchByStatusAndKeyword(
+            @Param("status") String status,
+            @Param("keyword") String keyword,
+            Pageable pageable);
 
 }

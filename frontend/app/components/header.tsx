@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, NavDropdown } from "react-bootstrap";
 import { useUserStore } from "~/stores/useUserStore";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import "~/app.css";
 import logo from "../assets/logo.png";
 
@@ -10,15 +10,29 @@ export default function Header() {
   const [profileImageError, setProfileImageError] = useState(false);
 
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, loginError, isAuthLoading, loadLoggedUser, logoutUser } = useUserStore();
 
   const isHome = location.pathname === "/";
+
+  const [searchInput, setSearchInput] = useState("");
 
   useEffect(() => {
     loadLoggedUser();
   }, []);
 
   const handleCloseErrorLoginDialog = () => setErrorLoginDialogOpen(false);
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault(); 
+
+    if (searchInput.trim()) {
+      navigate(`/?query=${encodeURIComponent(searchInput)}#featured-treasures`);
+    } else {
+      navigate(`/#featured-treasures`);
+    }
+    
+    setSearchInput("");
+  };
 
   return (
     <>
@@ -44,9 +58,15 @@ export default function Header() {
 
         {/* CENTER SECTION: Search Box (Home only) */}
         {isHome && (
-          <form action="/#featured-treasures" method="get" className="search-box d-none d-md-flex mx-auto">
+          <form onSubmit={handleSearch} className="search-box d-none d-md-flex mx-auto">
             <i className="fa-solid fa-magnifying-glass"></i>
-            <input type="text" name="query" placeholder="Search for treasures..." />
+            <input
+              type="text"
+              name="query"
+              placeholder="Search for treasures..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
             <button type="submit" className="d-none"></button>
           </form>
         )}
