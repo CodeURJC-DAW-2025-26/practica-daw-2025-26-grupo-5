@@ -76,7 +76,7 @@ const KPICard = ({ label, value, color, icon, bg }: KPIData & { readonly bg: str
   <Card className="clay-card border-0 h-100" style={{ borderLeft: `5px solid ${color}` }}>
     <Card.Body className="p-4">
       <Stack direction="horizontal" gap={3} className="justify-content-between align-items-start mb-3">
-        <h5 className="fw-800 mb-0 text-dark">{label}</h5>
+        <h5 className="mb-0 text-dark">{label}</h5>
         <div style={{
           padding: '10px 14px',
           borderRadius: '10px',
