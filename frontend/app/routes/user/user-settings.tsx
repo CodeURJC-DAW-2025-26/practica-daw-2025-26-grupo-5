@@ -70,7 +70,6 @@ import { Navigate, useRevalidator } from 'react-router';
 import { useUserStore } from '~/stores/useUserStore';
 import { updateUserSettings } from '~/services/user-service';
 import { Spinner, Alert } from 'react-bootstrap';
-import { getSystemErrorMap } from 'util';
 
 /**
  * User Settings Component Implementation

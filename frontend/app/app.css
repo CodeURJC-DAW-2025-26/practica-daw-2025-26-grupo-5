@@ -2361,3 +2361,16 @@ main.overflow-auto {
 .back-link:hover {
     color: #212529;
 }
+
+.btn-stilnovo-rate {
+    background-color: #ffffff;
+    color: #1e293b;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+}
+
+.btn-stilnovo-rate:hover {
+    background-color: #fef3c7;
+    border-color: #f59e0b;
+    color: #b45309;
+}

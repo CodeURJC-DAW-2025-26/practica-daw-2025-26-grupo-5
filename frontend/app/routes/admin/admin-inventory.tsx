@@ -227,7 +227,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
     e.preventDefault();
     setFormError(null);
     setIsLoading(true);
-    
+
     try {
       const formDataObj = new FormData();
       formDataObj.append('sellerId', productSellerId);
@@ -301,32 +301,71 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
     <>
       <AdminHeader title="Global Inventory" subtitle="Audit, edit, or remove any listing on the platform." />
 
-      <Card className="clay-card border-0 p-3 mb-4">
-        <Card.Body>
-          <Form onSubmit={handleSearchSubmit}>
-            <Row className="g-3 align-items-end">
-              <Col md={9}>
-                <Form.Label className="fw-700 small text-uppercase text-muted">Search products by name or category</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Type a product name or category..."
-                  className="rounded-3 py-2 bg-light border-0"
-                />
-              </Col>
-              <Col md={3}>
-                <Stack direction="horizontal" gap={2} className="justify-content-end">
-                  <Button type="submit" variant="dark" className="rounded-pill px-4 fw-700" disabled={isSearching}>
-                    {isSearching ? 'Searching...' : 'Search'}
-                  </Button>
-                  <Button type="button" variant="light" className="rounded-pill px-4 fw-700" onClick={handleClearSearch} disabled={isSearching}>
-                    Clear
-                  </Button>
-                </Stack>
-              </Col>
-            </Row>
-          </Form>
+      {/* SearchBarAdmin.tsx here */}
+      <Card
+        className="border-0 p-4 mb-4 shadow-sm"
+        style={{ backgroundColor: '#192b56', borderRadius: '16px' }}
+      >
+        <Card.Body className="p-0">
+          <div className="mx-auto" style={{ maxWidth: '850px' }}>
+            <Form onSubmit={handleSearchSubmit}>
+              <Row className="g-3 align-items-end justify-content-center">
+
+                <Col xs={12} md={8} lg={8}>
+                  <Form.Label
+                    className="fw-800 small mb-2"
+                    style={{ letterSpacing: '0.6px', color: '#CBD5E1' }}
+                  >
+                    <i className="fa-solid fa-magnifying-glass me-2"></i>
+                    Inventory Search
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search products by name or category..."
+                    className="py-2 px-3 border-0 shadow-none bg-white"
+                    style={{ borderRadius: '12px' }}
+                  />
+                </Col>
+
+                <Col xs={12} md={4} lg={4}>
+                  <Stack direction="horizontal" gap={2} className="justify-content-md-end mt-3 mt-md-0">
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      className="px-4 py-2 fw-800 border-0 shadow-sm"
+                      style={{ borderRadius: '12px' }}
+                      disabled={isSearching}
+                    >
+                      {isSearching ? (
+                        <><i className="fa-solid fa-spinner fa-spin me-2"></i>...</>
+                      ) : (
+                        'Search'
+                      )}
+                    </Button>
+                    <Button
+                      type="button"
+                      className="px-4 py-2 fw-700 border-0"
+                      style={{
+                        borderRadius: '12px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        color: '#F8FAFC',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
+                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
+                      onClick={handleClearSearch}
+                      disabled={isSearching}
+                    >
+                      Clear
+                    </Button>
+                  </Stack>
+                </Col>
+
+              </Row>
+            </Form>
+          </div>
         </Card.Body>
       </Card>
 
@@ -348,7 +387,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
       <Card className="clay-card border-0 p-3">
         <Card.Body>
           <Stack direction="horizontal" className="justify-content-end mb-4">
-            <Button variant="primary" className="fw-700 rounded-pill px-4" style={{ backgroundColor: '#7c3aed', border: 'none' }} onClick={handleAddProduct}>
+            <Button variant="primary" className="fw-700 rounded-pill px-4" style={{ backgroundColor: '#192b56', border: 'none' }} onClick={handleAddProduct}>
               <i className="fa-solid fa-plus me-2" /> Add Product
             </Button>
           </Stack>
@@ -379,9 +418,9 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
                       <td><span className="badge-cat cat-tech">{product.category}</span></td>
                       <td className="fw-800 text-success">€{product.price?.toFixed(2)}</td>
                       <td>
-                         <span className={`badge-status ${product.status === 'Banned' ? 'status-banned' : 'status-active'}`}>
-                            {product.status?.toUpperCase()}
-                         </span>
+                        <span className={`badge-status ${product.status === 'Banned' ? 'status-banned' : 'status-active'}`}>
+                          {product.status?.toUpperCase()}
+                        </span>
                       </td>
                       <td>
                         <Stack direction="horizontal" gap={2}>
@@ -416,7 +455,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
 
       {/* Edit/Add Modal */}
       <Modal show={showAddModal} onHide={() => setShowAddModal(false)} size="lg" centered contentClassName="bg-white border-0 shadow-lg clay-card">
-         <Modal.Header closeButton className="border-0 pb-0">
+        <Modal.Header closeButton className="border-0 pb-0">
           <Modal.Title className="fw-800 text-dark">{isEditingProduct ? 'Edit Product' : 'Create Product For Any User'}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="p-4">

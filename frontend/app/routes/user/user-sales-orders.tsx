@@ -258,9 +258,19 @@ const UserSalesOrders = () => {
                                 onMouseLeave={(e) => { e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.1)'; e.currentTarget.style.transform = 'translateY(0)'; }}
                             >
                                 <Card.Body>
-                                    <Stack direction="horizontal" gap={3} className="justify-content-between">
-                                        <h5 className="fw-800 mb-0">{purchase.product.name}</h5>
-                                        <Badge bg="info">Bought</Badge>
+                                    <Stack direction="horizontal" gap={3} className="justify-content-between align-items-center">
+                                        <h5 className="fw-800 mb-0 text-dark">{purchase.product.name}</h5>
+                                        <span
+                                            className="badge fw-800 px-3 py-2 rounded-pill"
+                                            style={{
+                                                backgroundColor: '#ecfdf5',
+                                                color: '#059669',
+                                                border: '1px solid #d1fae5',
+                                                letterSpacing: '0.5px'
+                                            }}
+                                        >
+                                            <i className="fa-solid fa-circle-check me-1"></i> Purchased
+                                        </span>
                                     </Stack>
                                     <Stack direction="horizontal" gap={3} className="justify-content-between align-items-center mt-4">
                                         {/* Seller Info Group */}
@@ -287,29 +297,14 @@ const UserSalesOrders = () => {
                                                 </Badge>
                                             ) : (
                                                 <Button
-                                                    className="d-flex align-items-center gap-2 fw-800 rounded-3 border-0 px-4 py-2"
-                                                    style={{
-                                                        background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                                                        color: 'white',
-                                                        fontSize: '14px',
-                                                        boxShadow: '0 4px 15px rgba(245, 158, 11, 0.35)',
-                                                        transition: 'all 0.3s ease',
-                                                        whiteSpace: 'nowrap'
-                                                    }}
+                                                    className="btn-stilnovo-rate d-flex align-items-center gap-2 fw-800 rounded-pill px-4 py-2 shadow-sm"
+                                                    style={{ fontSize: '14px', whiteSpace: 'nowrap' }}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         handleShowModal(purchase);
                                                     }}
-                                                    onMouseEnter={(e) => {
-                                                        e.currentTarget.style.transform = 'translateY(-2px)';
-                                                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(245, 158, 11, 0.45)';
-                                                    }}
-                                                    onMouseLeave={(e) => {
-                                                        e.currentTarget.style.transform = 'translateY(0)';
-                                                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(245, 158, 11, 0.35)';
-                                                    }}
                                                 >
-                                                    <i className="fa-solid fa-star" /> Rate Seller
+                                                    <i className="fa-solid fa-star" style={{ color: '#F59E0B' }} /> Rate Seller
                                                 </Button>
                                             )}
                                         </Stack>
@@ -337,52 +332,26 @@ const UserSalesOrders = () => {
                                         {/* Show Shipping Label only for sellers (sales) */}
                                         {sales.some(s => s.transactionId === selectedTransaction.transactionId) && (
                                             <Button
-                                                className="py-3 fw-800 rounded-3 border-0 d-flex align-items-center justify-content-center gap-2"
-                                                style={{
-                                                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                                                    color: 'white',
-                                                    fontSize: '15px',
-                                                    boxShadow: '0 6px 20px rgba(16, 185, 129, 0.35)',
-                                                    transition: 'all 0.3s ease'
-                                                }}
                                                 as="a"
                                                 href={`/api/v1/transactions/${selectedTransaction.transactionId}/shipping-label`}
                                                 target="_blank"
-                                                onMouseEnter={(e) => {
-                                                    e.currentTarget.style.transform = 'translateY(-3px)';
-                                                    e.currentTarget.style.boxShadow = '0 8px 25px rgba(16, 185, 129, 0.45)';
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    e.currentTarget.style.transform = 'translateY(0)';
-                                                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(16, 185, 129, 0.35)';
-                                                }}
+                                                variant="outline-dark"
+                                                className="py-2 px-4 fw-800 rounded-pill d-flex align-items-center justify-content-center gap-2 shadow-sm"
+                                                style={{ fontSize: '15px' }}
                                             >
-                                                <i className="fa-solid fa-truck fs-5" /> Shipping Label
+                                                <i className="fa-solid fa-truck fs-5" style={{ color: '#10B981' }} /> Shipping Label
                                             </Button>
                                         )}
                                         {/* Show Invoice for everyone (both sales and purchases) */}
                                         <Button
-                                            className="py-3 fw-800 rounded-3 border-0 d-flex align-items-center justify-content-center gap-2"
-                                            style={{
-                                                background: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
-                                                color: 'white',
-                                                fontSize: '15px',
-                                                boxShadow: '0 6px 20px rgba(14, 165, 233, 0.35)',
-                                                transition: 'all 0.3s ease'
-                                            }}
                                             as="a"
                                             href={`/api/v1/transactions/${selectedTransaction.transactionId}/invoice`}
                                             target="_blank"
-                                            onMouseEnter={(e) => {
-                                                e.currentTarget.style.transform = 'translateY(-3px)';
-                                                e.currentTarget.style.boxShadow = '0 8px 25px rgba(14, 165, 233, 0.45)';
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                e.currentTarget.style.transform = 'translateY(0)';
-                                                e.currentTarget.style.boxShadow = '0 6px 20px rgba(14, 165, 233, 0.35)';
-                                            }}
+                                            variant="dark"
+                                            className="py-2 px-4 fw-800 rounded-pill d-flex align-items-center justify-content-center gap-2 shadow-sm"
+                                            style={{ fontSize: '15px' }}
                                         >
-                                            <i className="fa-solid fa-file-invoice fs-5" /> Invoice
+                                            <i className="fa-solid fa-file-invoice fs-5" style={{ color: '#94a3b8' }} /> View Invoice
                                         </Button>
                                     </Stack>
                                 </>

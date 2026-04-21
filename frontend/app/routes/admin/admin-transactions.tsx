@@ -99,7 +99,7 @@ export async function clientLoader() {
   try {
     // Fetching up to 1000 items for client-side pagination example. 
     // Adjust this according to your backend API capabilities.
-    const response = await getAdminTransactions(0, 1000); 
+    const response = await getAdminTransactions(0, 1000);
     return response;
   } catch (error: any) {
     throw new Error(error.message || "Failed to load transactions");
@@ -159,7 +159,7 @@ const KPICard = ({ label, value, color, icon, bg }: KPIData & { readonly bg: str
 export default function AdminTransactions({ loaderData }: { readonly loaderData: any }) {
   const pagedData = loaderData as PagedResponse<TransactionDTO>;
   const rowData = pagedData.content || [];
-  
+
   // Local state controlled pagination
   const [currentPage, setCurrentPage] = useState(0);
   const [transactions, setTransactions] = useState<TransactionDTO[]>(rowData);
@@ -249,98 +249,101 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
         </div>
       </header>
 
-      <Card className="clay-card border-0 p-3 mb-4">
-        <Card.Body>
-          <Form onSubmit={handleSearchSubmit}>
-            <Row className="g-3 align-items-end">
-              {searchMode === 'id' ? (
-                <Col xs={12} lg={9}>
-                  <Form.Label className="fw-700 small text-uppercase text-muted">Search transaction by ID</Form.Label>
-                  <Form.Control
-                    type="text"
-                    value={searchId}
-                    onChange={(e) => setSearchId(e.target.value)}
-                    placeholder="Type a transaction id..."
-                    className="rounded-3 py-2 bg-light border-0"
-                  />
+      <Card className="border-0 p-4 mb-4 shadow-sm" style={{ backgroundColor: '#192b56', borderRadius: '16px' }}>
+        <Card.Body className="p-0">
+          <div className="mx-auto" style={{ maxWidth: '850px' }}>
+            <Form onSubmit={handleSearchSubmit}>
+              <Row className="g-3 align-items-end justify-content-center">
+
+                {searchMode === 'id' ? (
+                  <Col xs={12} lg={6}>
+                    <Form.Label className="fw-800 small text-uppercase mb-2" style={{ letterSpacing: '0.5px', color: '#CBD5E1' }}>
+                      <i className="fa-solid fa-hashtag me-2"></i> Search by ID
+                    </Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={searchId}
+                      onChange={(e) => setSearchId(e.target.value)}
+                      placeholder="Type the ID number..."
+                      className="py-2 px-3 border-0 shadow-none bg-white"
+                      style={{ borderRadius: '12px' }}
+                    />
+                  </Col>
+                ) : (
+                  <>
+                    <Col xs={12} lg={3}>
+                      <Form.Label className="fw-800 small text-uppercase mb-2" style={{ letterSpacing: '0.5px', color: '#CBD5E1' }}>Seller</Form.Label>
+                      <Form.Control type="text" value={searchSeller} onChange={(e) => setSearchSeller(e.target.value)} placeholder="Type seller name..." className="py-2 px-3 border-0 shadow-none bg-white" style={{ borderRadius: '12px' }} />
+                    </Col>
+                    <Col xs={12} lg={3}>
+                      <Form.Label className="fw-800 small text-uppercase mb-2" style={{ letterSpacing: '0.5px', color: '#CBD5E1' }}>Buyer</Form.Label>
+                      <Form.Control type="text" value={searchBuyer} onChange={(e) => setSearchBuyer(e.target.value)} placeholder="Type buyer name..." className="py-2 px-3 border-0 shadow-none bg-white" style={{ borderRadius: '12px' }} />
+                    </Col>
+                  </>
+                )}
+
+                <Col xs={12} lg={2}>
+                  <Form.Label className="fw-800 small text-uppercase mb-2" style={{ letterSpacing: '0.5px', color: '#CBD5E1' }}>Search Mode</Form.Label>
+                  <Form.Select
+                    value={searchMode}
+                    onChange={(e) => setSearchMode(e.target.value as 'id' | 'users')}
+                    className="py-2 px-3 border-0 shadow-none bg-white"
+                    style={{ borderRadius: '12px' }}
+                  >
+                    <option value="id">By ID</option>
+                    <option value="users">By Users</option>
+                  </Form.Select>
                 </Col>
-              ) : (
-                <>
-                  <Col xs={12} lg={4}>
-                    <Form.Label className="fw-700 small text-uppercase text-muted">Seller</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={searchSeller}
-                      onChange={(e) => setSearchSeller(e.target.value)}
-                      placeholder="Type seller name..."
-                      className="rounded-3 py-2 bg-light border-0"
-                    />
-                  </Col>
-                  <Col xs={12} lg={4}>
-                    <Form.Label className="fw-700 small text-uppercase text-muted">Buyer</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={searchBuyer}
-                      onChange={(e) => setSearchBuyer(e.target.value)}
-                      placeholder="Type buyer name..."
-                      className="rounded-3 py-2 bg-light border-0"
-                    />
-                  </Col>
-                </>
-              )}
 
-              <Col xs={12} lg={3}>
-                <Form.Label className="fw-700 small text-uppercase text-muted">Search mode</Form.Label>
-                <Form.Select
-                  value={searchMode}
-                  onChange={(e) => setSearchMode(e.target.value as 'id' | 'users')}
-                  className="rounded-3 py-2 bg-light border-0"
-                >
-                  <option value="id">by id</option>
-                  <option value="users">by users</option>
-                </Form.Select>
-              </Col>
-            </Row>
+                <Col xs={12} md={4} lg={4}>
+                  <Stack direction="horizontal" gap={2} className="justify-content-md-end mt-3 mt-md-0">
+                    <Button type="submit" variant="primary" className="px-4 py-2 fw-800 border-0 shadow-sm" style={{ borderRadius: '12px' }} disabled={isSearching}>
+                      {isSearching ? <><i className="fa-solid fa-spinner fa-spin me-2"></i>...</> : 'Search'}
+                    </Button>
+                    <Button type="button" className="px-4 py-2 fw-700 border-0"
+                      style={{ borderRadius: '12px', backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#F8FAFC', transition: 'background-color 0.2s' }}
+                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
+                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
+                      onClick={handleClearSearch} disabled={isSearching}
+                    >
+                      Clear
+                    </Button>
+                  </Stack>
+                </Col>
 
-            <Stack direction="horizontal" gap={2} className="justify-content-end mt-3">
-              <Button type="submit" variant="dark" className="fw-700 rounded-pill px-4" disabled={isSearching}>
-                {isSearching ? 'Searching...' : 'Search'}
-              </Button>
-              <Button type="button" variant="light" className="fw-700 rounded-pill px-4" onClick={handleClearSearch} disabled={isSearching}>
-                Clear
-              </Button>
-            </Stack>
-          </Form>
+              </Row>
+            </Form>
+          </div>
         </Card.Body>
       </Card>
 
       {/* KPI Row */}
       <Row className="g-3 mb-4">
         <Col xs={12} sm={6} lg={4}>
-          <KPICard 
-            label="Total Volume" 
-            value={`€${totalAccumulated.toFixed(0)}`} 
-            color="#059669" 
-            icon="fa-euro-sign" 
-            bg={getKPIBg('#059669')} 
+          <KPICard
+            label="Total Volume"
+            value={`€${totalAccumulated.toFixed(0)}`}
+            color="#059669"
+            icon="fa-euro-sign"
+            bg={getKPIBg('#059669')}
           />
         </Col>
         <Col xs={12} sm={6} lg={4}>
-          <KPICard 
-            label="Total Transactions" 
-            value={transactions.length} 
-            color="#7c3aed" 
-            icon="fa-credit-card" 
-            bg={getKPIBg('#7c3aed')} 
+          <KPICard
+            label="Total Transactions"
+            value={transactions.length}
+            color="#7c3aed"
+            icon="fa-credit-card"
+            bg={getKPIBg('#7c3aed')}
           />
         </Col>
         <Col xs={12} sm={6} lg={4}>
-          <KPICard 
-            label="Average Transaction" 
-            value={`€${averageTransaction.toFixed(2)}`} 
-            color="#f59e0b" 
-            icon="fa-chart-line" 
-            bg={getKPIBg('#f59e0b')} 
+          <KPICard
+            label="Average Transaction"
+            value={`€${averageTransaction.toFixed(2)}`}
+            color="#f59e0b"
+            icon="fa-chart-line"
+            bg={getKPIBg('#f59e0b')}
           />
         </Col>
       </Row>
@@ -435,9 +438,9 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
                 Showing {currentPage * itemsPerPage + 1} to{' '}
                 {Math.min((currentPage + 1) * itemsPerPage, transactions.length)} of {transactions.length}
               </span>
-              
+
               <div className="btn-group gap-1">
-                <Button 
+                <Button
                   className="fw-800 rounded-3 border-0"
                   style={{
                     background: currentPage === 0 ? '#e5e7eb' : 'linear-gradient(135deg, #2f6ced 0%, #1e479a 100%)',
@@ -445,18 +448,18 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
                     padding: '8px 14px',
                     transition: 'all 0.3s ease'
                   }}
-                  onClick={() => setCurrentPage(Math.max(0, currentPage - 1))} 
+                  onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
                   disabled={currentPage === 0}
                 >
                   <i className="fa-solid fa-chevron-left" />
                 </Button>
-                
+
                 {Array.from({ length: totalPages }, (_, i) => (
-                  <Button 
+                  <Button
                     key={i}
                     className="fw-800 rounded-3 border-0"
                     style={{
-                      background: currentPage === i 
+                      background: currentPage === i
                         ? 'linear-gradient(135deg, #2f6ced 0%, #1e479a 100%)'
                         : '#f3f4f6',
                       color: currentPage === i ? 'white' : '#4b5563',
@@ -469,7 +472,7 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
                   </Button>
                 ))}
 
-                <Button 
+                <Button
                   className="fw-800 rounded-3 border-0"
                   style={{
                     background: currentPage === totalPages - 1 ? '#e5e7eb' : 'linear-gradient(135deg, #2f6ced 0%, #1e479a 100%)',
@@ -477,7 +480,7 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
                     padding: '8px 14px',
                     transition: 'all 0.3s ease'
                   }}
-                  onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))} 
+                  onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))}
                   disabled={currentPage === totalPages - 1}
                 >
                   <i className="fa-solid fa-chevron-right" />
@@ -515,29 +518,29 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
           )}
         </Modal.Body>
         <Modal.Footer className="border-0 pt-0">
-          <Button 
-            variant="light" 
+          <Button
+            variant="light"
             className="fw-700 rounded-pill px-4"
             onClick={() => setShowDeleteModal(false)}
             disabled={isDeleting}
           >
             Cancel
           </Button>
-          <Button 
-            variant="danger" 
+          <Button
+            variant="danger"
             className="fw-700 rounded-pill px-4"
             onClick={async () => {
               if (!selectedTransaction?.transactionId) return;
-              
+
               setIsDeleting(true);
               setDeleteError(null);
-              
+
               try {
                 await deleteTransaction(selectedTransaction.transactionId);
-                
+
                 // Remove from transactions list
                 await loadTransactions();
-                
+
                 setShowDeleteModal(false);
                 setSelectedTransaction(null);
               } catch (error: any) {

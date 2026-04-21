@@ -96,13 +96,10 @@ import { getCheckoutDetails, createTransaction } from '~/services/transaction-se
  */
 export async function clientLoader({ params }: { params: { id: string } }) {
   try {
-    // "401 redirect" logic is typically handled in the 'api' object interceptor,
-    // but here we simply call the service
     const numericId = Number(params.id);
     if (isNaN(numericId)) {
       throw new Error('Invalid ID format'); 
     }
-
     return await getCheckoutDetails(numericId);
   } catch (error: any) {
     if (error.status === 401) return redirect('/login');
@@ -171,11 +168,13 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
     e.preventDefault();
     setProcessing(true);
     setError(null);
+    
     if (!productId) {
       setError("Product ID is missing.");
       setProcessing(false);
       return;
     }
+    
     try {
       await createTransaction(parseInt(productId.toString(), 10));
       localStorage.setItem('justPurchased', 'true');
@@ -193,7 +192,7 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
     return (
       <Container className="mt-5 text-center">
         <Alert variant="danger" className="rounded-4 shadow-sm">{error}</Alert>
-        <Button variant="outline-primary" className="mt-3" onClick={() => navigate('/')}>
+        <Button variant="outline-primary" className="mt-3 rounded-pill fw-700 px-4" onClick={() => navigate('/')}>
           Return to home
         </Button>
       </Container>
@@ -201,48 +200,50 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
   }
 
   return (
-    <div className="bg-light min-vh-100" style={{ background: 'linear-gradient(135deg, #f5f7fa 0%, #fef3f2 100%)' }}>
-      <Container fluid className="main-wrapper d-flex align-items-center py-5">
+    <div className="bg-light pb-5 pt-4">
+      <Container fluid>
         <Container>
           <Row className="justify-content-center">
-            <Col xl={11}>
-              <Card className="border-0" style={{ boxShadow: '0 20px 50px rgba(0,0,0,0.15)', borderRadius: '20px' }}>
-                <Card.Body className="p-5 p-md-6">
-                  <Row className="align-items-center">
+            <Col xl={10} lg={11}>
+              <Card className="border-0 shadow-sm mx-auto" style={{ borderRadius: '24px', maxWidth: '1000px' }}>
+                <Card.Body className="p-4 p-md-5">
+                  <Row className="align-items-center g-4">
+                    
                     {/* Left Column: Product Info */}
                     {product && (
-                      <Col lg={5} className="text-center border-end pe-lg-5">
-                        <div className="position-relative mb-4">
+                      <Col lg={5} className="text-center border-end-lg pe-lg-4">
+                        <div className="position-relative mb-4 clay-card p-3" style={{ backgroundColor: '#f8fafc', borderRadius: '16px' }}>
                           <Image
                             src={getProductImageUrl(product.id)}
                             alt={product.name}
                             fluid
-                            rounded
-                            className="shadow-sm"
-                            style={{ maxHeight: '220px', objectFit: 'contain' }}
+                            className="rounded-3"
+                            style={{ maxHeight: '200px', objectFit: 'contain' }}
                           />
                         </div>
-                        <h2 className="fw-800 h3 mb-1">{product.name}</h2>
+                        <h3 className="fw-800 h4 mb-2 text-dark">{product.name}</h3>
                         <p className="text-muted small fw-700 mb-4">
-                          {product.location} &bull; Verified Seller
+                          <i className="fa-solid fa-location-dot me-1"></i> {product.location} &bull; Verified Seller
                         </p>
 
-                        <Alert variant="info" className="d-flex align-items-center gap-3 mb-4 mx-auto text-start" style={{ maxWidth: '350px' }}>
-                          <i className="fa-solid fa-truck-fast fs-3" />
+                        <div className="bg-light rounded-4 p-3 mb-4 mx-auto text-start d-flex align-items-center gap-3" style={{ maxWidth: '350px' }}>
+                          <div className="text-primary ps-2">
+                            <i className="fa-solid fa-truck-fast fs-3" />
+                          </div>
                           <div>
-                            <p className="small fw-800 mb-0">SECURE SHIPPING</p>
+                            <p className="small fw-800 mb-0 text-dark">SECURE SHIPPING</p>
                             <p className="small text-muted mb-0">Door-to-door delivery active.</p>
                           </div>
-                        </Alert>
+                        </div>
 
                         <div className="d-flex justify-content-center gap-4 align-items-center">
                           <div className="text-center">
-                            <p className="small fw-800 text-muted mb-0">PRICE</p>
-                            <p className="fw-800 h4 mb-0">{product.price.toFixed(2)} €</p>
+                            <p className="small fw-800 text-muted mb-1">PRICE</p>
+                            <p className="fw-800 h4 mb-0 text-dark">{product.price.toFixed(2)} €</p>
                           </div>
-                          <div style={{ width: '1px', height: '30px', backgroundColor: '#ccc', opacity: 0.25 }} />
+                          <div style={{ width: '2px', height: '30px', backgroundColor: '#e2e8f0' }} />
                           <div className="text-center">
-                            <p className="small fw-800 text-muted mb-0">PROTECTION</p>
+                            <p className="small fw-800 text-muted mb-1">PROTECTION</p>
                             <p className="fw-800 h4 mb-0 text-success">Active</p>
                           </div>
                         </div>
@@ -250,40 +251,40 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
                     )}
 
                     {/* Right Column: Checkout Form & User Info */}
-                    <Col lg={7} className="ps-lg-5 mt-5 mt-lg-0">
-                      <h5 className="fw-800 mb-4 text-dark">
-                        <i className="fa-solid fa-credit-card me-2 text-primary"></i>
-                        Secure Payment Details
-                      </h5>
+                    <Col lg={7} className="ps-lg-5">
+                      <h4 className="fw-800 mb-3 text-dark">
+                        <i className="fa-regular fa-credit-card me-2 text-primary"></i>
+                        Secure Payment
+                      </h4>
 
                       {/* Security Info */}
-                      <Alert variant="success" className="d-flex align-items-center gap-3 mb-4 border-0 rounded-3" style={{ backgroundColor: '#ecfdf5', boxShadow: '0 4px 12px rgba(16, 185, 129, 0.15)' }}>
-                        <i className="fa-solid fa-shield-check text-success fs-5" />
+                      <Alert variant="success" className="d-flex align-items-center gap-3 mb-4 py-2 border-0" style={{ borderRadius: '12px', backgroundColor: '#ecfdf5' }}>
+                        <i className="fa-solid fa-shield-halved text-success fs-4 ms-2" />
                         <div>
-                          <p className="small fw-800 mb-0 text-dark">Payments secured by Stripe</p>
+                          <p className="fw-800 mb-0 text-dark" style={{ fontSize: '0.9rem' }}>Payments secured by Stripe</p>
                           <p className="small mb-0 text-muted">Your card details are encrypted and never stored.</p>
                         </div>
                       </Alert>
 
                       {/* Payment Form */}
                       <Form onSubmit={handlePaymentSubmit}>
-                        <Form.Group className="mb-4">
+                        <Form.Group className="mb-3">
                           <Form.Label className="fw-800 mb-2 small text-uppercase text-muted">Cardholder Name</Form.Label>
                           <Form.Control
                             type="text"
                             name="cardHolder"
                             value={paymentForm.cardHolder}
                             onChange={handleInputChange}
-                            placeholder="John Doe"
-                            className="rounded-3 py-3"
-                            style={{ border: '2px solid #e5e7eb', fontSize: '14px' }}
+                            placeholder="Raul Oliveira"
+                            className="py-3 px-4 bg-light border-0 shadow-none"
+                            style={{ borderRadius: '12px', fontSize: '15px' }}
                             required
                           />
                         </Form.Group>
 
-                        <Form.Group className="mb-4">
+                        <Form.Group className="mb-3">
                           <Form.Label className="fw-800 mb-2 small text-uppercase text-muted">Card Number</Form.Label>
-                          <div style={{ position: 'relative' }}>
+                          <div className="position-relative">
                             <Form.Control
                               type="text"
                               name="cardNumber"
@@ -294,18 +295,16 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
                                 setPaymentForm(prev => ({ ...prev, cardNumber: value }));
                               }}
                               placeholder="1234 5678 9012 3456"
-                              className="rounded-3 py-3 ps-4"
-                              style={{ border: '2px solid #e5e7eb', fontSize: '14px', letterSpacing: '2px' }}
+                              className="py-3 px-4 bg-light border-0 shadow-none"
+                              style={{ borderRadius: '12px', fontSize: '15px', letterSpacing: '2px' }}
                               required
                             />
-                            <i className="fa-brands fa-cc-visa" style={{ 
-                              position: 'absolute', 
+                            <i className="fa-brands fa-cc-visa position-absolute" style={{ 
                               right: '16px', 
                               top: '50%', 
                               transform: 'translateY(-50%)', 
                               fontSize: '24px', 
-                              color: '#667eea',
-                              opacity: 0.7
+                              color: '#94a3b8'
                             }} />
                           </div>
                         </Form.Group>
@@ -326,8 +325,8 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
                                   setPaymentForm(prev => ({ ...prev, expiry: value }));
                                 }}
                                 placeholder="MM/YY"
-                                className="rounded-3 py-3 text-center"
-                                style={{ border: '2px solid #e5e7eb', fontSize: '14px', fontWeight: 'bold', letterSpacing: '2px' }}
+                                className="py-3 text-center bg-light border-0 shadow-none"
+                                style={{ borderRadius: '12px', fontSize: '15px', fontWeight: 'bold', letterSpacing: '2px' }}
                                 required
                               />
                             </Form.Group>
@@ -345,8 +344,8 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
                                   setPaymentForm(prev => ({ ...prev, cvv: value }));
                                 }}
                                 placeholder="•••"
-                                className="rounded-3 py-3 text-center"
-                                style={{ border: '2px solid #e5e7eb', fontSize: '14px', fontWeight: 'bold', letterSpacing: '2px' }}
+                                className="py-3 text-center bg-light border-0 shadow-none"
+                                style={{ borderRadius: '12px', fontSize: '15px', fontWeight: 'bold', letterSpacing: '2px' }}
                                 required
                               />
                             </Form.Group>
@@ -354,44 +353,29 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
                         </Row>
 
                         <Button
-                          variant="primary"
+                          variant="dark"
                           type="submit"
                           disabled={processing}
-                          className="w-100 py-3 fw-800 rounded-3 border-0"
-                          style={{ 
-                            fontSize: '16px', 
-                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                            boxShadow: '0 6px 20px rgba(102, 126, 234, 0.4)',
-                            transition: 'all 0.3s ease'
-                          }}
-                          onMouseEnter={(e) => {
-                            if (!processing) {
-                              e.currentTarget.style.transform = 'translateY(-2px)';
-                              e.currentTarget.style.boxShadow = '0 8px 25px rgba(102, 126, 234, 0.5)';
-                            }
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.4)';
-                          }}
+                          className="w-100 py-3 fw-800 rounded-pill border-0 shadow-sm"
+                          style={{ fontSize: '16px' }}
                         >
                           {processing ? (
                             <>
                               <Spinner animation="border" size="sm" className="me-2" />
-                              Processing...
+                              Processing securely...
                             </>
                           ) : (
                             <>
                               <i className="fa-solid fa-lock me-2" />
-                              Complete Purchase
+                              Pay {product?.price ? product.price.toFixed(2) : '0.00'} €
                             </>
                           )}
                         </Button>
 
                         <div className="text-center mt-3">
-                          <small className="text-muted">
-                            <i className="fa-solid fa-lock text-success me-1"></i>
-                            Your payment is secure and encrypted
+                          <small className="fw-700 text-muted">
+                            <i className="fa-solid fa-shield-check text-success me-1"></i>
+                            Encrypted and secure connection
                           </small>
                         </div>
                       </Form>
@@ -411,14 +395,11 @@ export default PaymentPage;
 
 export function ErrorBoundary({ error }: { readonly error: Error }) {
   return (
-    <Container className="mt-5">
-      <Alert variant="danger">
-        <Alert.Heading>Error Loading Payment!</Alert.Heading>
-        <p>{error instanceof Error ? error.message : 'An unexpected error occurred'}</p>
-        <Button
-          variant="outline-danger"
-          onClick={() => (globalThis.location.href = '/')}
-        >
+    <Container className="mt-5 text-center">
+      <Alert variant="danger" className="border-0 shadow-sm" style={{ borderRadius: '16px' }}>
+        <Alert.Heading className="fw-800"><i className="fa-solid fa-triangle-exclamation me-2"></i>Error Loading Checkout</Alert.Heading>
+        <p className="fw-700 text-muted">{error instanceof Error ? error.message : 'An unexpected error occurred'}</p>
+        <Button variant="outline-danger" className="mt-3 rounded-pill fw-700 px-4" onClick={() => (globalThis.location.href = '/')}>
           Back to home
         </Button>
       </Alert>
