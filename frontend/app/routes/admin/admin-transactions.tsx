@@ -86,6 +86,7 @@ import { Container, Row, Col, Card, Table, Button, Image, Badge, Alert, Stack, M
 import { getAdminTransactions, deleteTransaction } from '~/services/admin-service';
 import type TransactionDTO from '~/dto/TransactionDTO';
 import type PagedResponse from '~/dto/PagedResponse';
+import AdminHeader from '~/components/admin/AdminHeader';
 
 /**
  * Client-side loader: Fetch transactions
@@ -242,12 +243,8 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
 
   return (
     <>
-      <header className="d-flex justify-content-between align-items-center mb-5">
-        <div>
-          <h1 className="fw-800 h2 text-dark">Financial Overview</h1>
-          <p className="text-muted small fw-600 mb-0">Overview of all historical financial movements.</p>
-        </div>
-      </header>
+      <AdminHeader title="Financial Overview" subtitle="Overview of all historical financial movements." />
+      
 
       <Card className="border-0 p-4 mb-4 shadow-sm" style={{ backgroundColor: '#192b56', borderRadius: '16px' }}>
         <Card.Body className="p-0">
