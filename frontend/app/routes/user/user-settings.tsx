@@ -66,11 +66,10 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Navigate, useRevalidator } from 'react-router';
+import {useRevalidator } from 'react-router';
 import { useUserStore } from '~/stores/useUserStore';
 import { updateUserSettings } from '~/services/user-service';
 import { Spinner, Alert } from 'react-bootstrap';
-import { getSystemErrorMap } from 'util';
 
 /**
  * User Settings Component Implementation
@@ -196,7 +195,7 @@ export default function UserSettings() {
     );
   }
 
-  const isAdmin = user?.roles.includes('ROLE_ADMIN')
+  const isAdmin = user?.roles?.includes('ROLE_ADMIN');
 
   return (
     <>
