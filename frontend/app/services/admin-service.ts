@@ -18,13 +18,19 @@ export const getAdminSummary = async (): Promise<AdminSummaryDTO> => {
  * --- USERS MANAGEMENT ---
  */
 
-export const getAdminUsers = async (page = 0, size = 10): Promise<PagedResponse<UserDTO>> => {
+export const getAdminUsers = async (
+  page = 0,
+  size = 10
+): Promise<PagedResponse<UserDTO>> => {
   return await api.get<PagedResponse<UserDTO>>("/v1/admin/users", {
     params: { page, size },
   });
 };
 
-export const banUser = async (userId: number, ban: boolean): Promise<UserDTO> => {
+export const banUser = async (
+  userId: number,
+  ban: boolean
+): Promise<UserDTO> => {
   return await api.put<UserDTO>(`/v1/admin/users/ban/${userId}`, { banned: ban });
 };
 
@@ -32,7 +38,10 @@ export const deleteUser = async (userId: number): Promise<void> => {
   await api.delete(`/v1/admin/users/${userId}`);
 };
 
-export const updateUser = async (userId: number, formData: FormData): Promise<UserDTO> => {
+export const updateUser = async (
+  userId: number,
+  formData: FormData
+): Promise<UserDTO> => {
   return await api.patch<UserDTO>(`/v1/admin/users/${userId}`, formData);
 };
 
@@ -40,7 +49,10 @@ export const updateUser = async (userId: number, formData: FormData): Promise<Us
  * --- INVENTORY / PRODUCTS ---
  */
 
-export const getAdminProducts = async (page = 0, size = 10): Promise<PagedResponse<ProductDTO>> => {
+export const getAdminProducts = async (
+  page = 0,
+  size = 10
+): Promise<PagedResponse<ProductDTO>> => {
   return await api.get<PagedResponse<ProductDTO>>("/v1/admin/products", {
     params: { page, size },
   });
@@ -54,7 +66,10 @@ export const createProduct = async (formData: FormData): Promise<ProductDTO> => 
   return await api.post<ProductDTO>("/v1/admin/products", formData);
 };
 
-export const updateProduct = async (productId: number, formData: FormData): Promise<ProductDTO> => {
+export const updateProduct = async (
+  productId: number,
+  formData: FormData
+): Promise<ProductDTO> => {
   return await api.patch<ProductDTO>(`/v1/admin/products/${productId}`, formData);
 };
 
@@ -62,7 +77,10 @@ export const updateProduct = async (productId: number, formData: FormData): Prom
  * --- TRANSACTIONS ---
  */
 
-export const getAdminTransactions = async (page = 0, size = 10): Promise<PagedResponse<TransactionDTO>> => {
+export const getAdminTransactions = async (
+  page = 0,
+  size = 10
+): Promise<PagedResponse<TransactionDTO>> => {
   return await api.get<PagedResponse<TransactionDTO>>("/v1/admin/transactions", {
     params: { page, size },
   });
@@ -76,7 +94,10 @@ export const deleteTransaction = async (transactionId: number): Promise<void> =>
  * --- VALORATIONS ---
  */
 
-export const getAdminValorations = async (page = 0, size = 10): Promise<PagedResponse<ValorationDTO>> => {
+export const getAdminValorations = async (
+  page = 0,
+  size = 10
+): Promise<PagedResponse<ValorationDTO>> => {
   return await api.get<PagedResponse<ValorationDTO>>("/v1/admin/valorations", {
     params: { page, size },
   });
