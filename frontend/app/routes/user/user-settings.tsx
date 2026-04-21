@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useRevalidator } from 'react-router';
+import { useState, useEffect } from 'react';
+import { Navigate, useRevalidator } from 'react-router';
 import { useUserStore } from '~/stores/useUserStore';
 import { updateUserSettings } from '~/services/user-service';
 import { Spinner, Alert } from 'react-bootstrap';
+import { getSystemErrorMap } from 'util';
 
 export default function UserSettings() {
   const { user, setUser } = useUserStore();
@@ -83,6 +84,7 @@ export default function UserSettings() {
 
   const toggleCvv = () => setShowCvv(!showCvv);
 
+  // 1. Check if the user is logged in
   if (!user) {
     return (
       <div className="d-flex justify-content-center align-items-center py-5 w-100">
@@ -91,7 +93,7 @@ export default function UserSettings() {
     );
   }
 
-  const isAdmin = user.roles.includes('ADMIN');
+  const isAdmin = user?.roles.includes('ROLE_ADMIN')
 
   return (
     <>

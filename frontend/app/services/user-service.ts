@@ -42,3 +42,7 @@ export async function getUserPhoto(userId: string | number) {
 export async function updateUserSettings(formData: FormData): Promise<UserDTO> {
     return await api.patch<UserDTO>("/v1/users/me/profile", formData);
 }
+
+export async function deleteUser(){
+    return await api.post<UserDTO>("/v1/users/me")
+}

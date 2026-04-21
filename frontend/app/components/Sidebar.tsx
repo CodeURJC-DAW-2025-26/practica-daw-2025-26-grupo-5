@@ -13,23 +13,17 @@ interface SidebarProps {
     title: string;
     links: SidebarLink[];
     isAdmin?: boolean;
-    activePage?: string; 
+    activePage?: string;
 }
 
 export default function Sidebar({ title, links, isAdmin = false, activePage }: SidebarProps) {
     const [showOffcanvas, setShowOffcanvas] = useState(false);
-    const logoutUser = useUserStore((state) => state.logoutUser);
-    const navigate = useNavigate();
+    const { logoutUser } = useUserStore();
     const location = useLocation();
-
-    const handleLogout = () => {
-        logoutUser();
-        navigate('/login');
-    };
 
     const sidebarContent = (
         <div className="d-flex flex-column h-100">
-            {/* Logo Section - Ahora envía a "/" */}
+
             <div className="mb-5 pt-2">
                 <Link to="/" className="text-decoration-none d-flex align-items-center gap-2">
                     <img src="/logo.png" alt="Stilnovo" width="35" />
@@ -44,7 +38,7 @@ export default function Sidebar({ title, links, isAdmin = false, activePage }: S
             <nav className="nav flex-column gap-2">
                 {links.map((link) => {
                     const isActive = location.pathname === link.to || activePage === link.label.toLowerCase();
-                    
+
                     return (
                         <Link
                             key={link.to}
@@ -64,15 +58,9 @@ export default function Sidebar({ title, links, isAdmin = false, activePage }: S
                     <i className="fa-solid fa-shop" />
                     Browse Market
                 </Link>
-                <Button 
-                    variant="link" 
-                    className="nav-link-stilnovo logout-link text-decoration-none border-0 w-100 text-start d-flex align-items-center gap-3" 
-                    onClick={handleLogout}
-                    style={{ color: '#dc3545' }}
-                >
-                    <i className="fa-solid fa-arrow-right-from-bracket fs-5" style={{ width: '25px' }} />
-                    <span className="fw-700">Logout</span>
-                </Button>
+                <button onClick={() => logoutUser()} className="dropdown-item text-danger fw-700 small border-0 bg-transparent w-100 text-start">
+                    <i className="fa-solid fa-sign-out-alt me-2" /> Log out
+                </button>
             </div>
         </div>
     );
