@@ -1,5 +1,6 @@
 package es.stilnovo.library.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,7 +9,7 @@ import es.stilnovo.library.model.User;
 
 /**
  * UserRepository interface for User entity database operations
- * Provides CRUD operations and queries for user management and authentication
+ * Provides CRUD operations and custom queries for user management and authentication
  */
 public interface UserRepository extends JpaRepository<User, Long> {
     
@@ -46,4 +47,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return true if a user with the email exists, false otherwise
      */
     boolean existsByEmail(String email);
+
+    /**
+     * Find users whose name contains the given text, ignoring case.
+     * Used by admin search.
+     * @param name partial name to search
+     * @return list of matching users
+     */
+    List<User> findByNameContainingIgnoreCase(String name);
 }

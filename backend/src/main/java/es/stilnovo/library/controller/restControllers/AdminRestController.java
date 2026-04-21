@@ -45,7 +45,6 @@ import es.stilnovo.library.service.ProductService;
 import es.stilnovo.library.service.TransactionService;
 import es.stilnovo.library.service.UserService;
 import es.stilnovo.library.service.ValorationService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -128,6 +127,7 @@ public class AdminRestController {
     /**
      * Retrieves a paginated list of all users.
      * @param pageable Pagination and sorting information.
+     * @param user Optional filter by user name.
      * @return PagedResponse of UserDTOs.
      */
     @GetMapping("/users")
@@ -135,8 +135,10 @@ public class AdminRestController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Users retrieved successfully")
     })
-    public PagedResponse<UserDTO> getUsers(@PageableDefault(size = 10) Pageable pageable) {
-        var page = adminService.getUsersPage(pageable);
+    public PagedResponse<UserDTO> getUsers(
+            @PageableDefault(size = 10) Pageable pageable,
+            @RequestParam(name = "user", required = false) String user) {
+        var page = adminService.getUsersPage(pageable, user);
         return new PagedResponse<>(userMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(),
                 page.getTotalElements(), page.isLast());
     }
@@ -236,6 +238,7 @@ public class AdminRestController {
     /**
      * Retrieves a paginated list of all products in the inventory.
      * @param pageable Pagination and sorting information.
+     * @param query Optional filter by product name or category.
      * @return PagedResponse of ProductDTOs.
      */
     @GetMapping("/products")
@@ -243,8 +246,10 @@ public class AdminRestController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Products retrieved successfully")
     })
-    public PagedResponse<ProductDTO> getProducts(@PageableDefault(size = 10) Pageable pageable) {
-        var page = adminService.getInventoryPage(pageable);
+    public PagedResponse<ProductDTO> getProducts(
+            @PageableDefault(size = 10) Pageable pageable,
+            @RequestParam(required = false) String query) {
+        var page = adminService.getInventoryPage(pageable, query);
         return new PagedResponse<>(productMapper.toDTOs(page.getContent()), page.getNumber(), page.getSize(),
                 page.getTotalElements(), page.isLast());
     }

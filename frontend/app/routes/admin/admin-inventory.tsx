@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { redirect, useRevalidator } from 'react-router';
+import { redirect } from 'react-router';
 import { Container, Row, Col, Card, Table, Button, Image, Stack, Alert, Modal, Form } from 'react-bootstrap';
 import { getAdminProducts, deleteProduct, createProduct, updateProduct, getAdminUsers } from '~/services/admin-service';
 import type ProductDTO from '~/dto/ProductDTO';
@@ -56,9 +56,11 @@ export async function clientLoader() {
 }
 
 export default function AdminInventory({ loaderData }: { readonly loaderData: any }) {
-  const revalidator = useRevalidator();
   const pagedData = loaderData as PagedResponse<ProductDTO>;
   const products = pagedData.content || [];
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
 
   // Individual form field states for product modal
   const [productSellerId, setProductSellerId] = useState('');
@@ -82,12 +84,34 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
   const itemsPerPage = 10;
 
   useEffect(() => {
-    getAdminUsers(0, 100).then(data => { if (data?.content) setUsers(data.content); });
+    getAdminUsers(0, 1000).then(data => { if (data?.content) setUsers(data.content); });
   }, []);
 
   useEffect(() => {
-    setRowData(pagedData.content || []); setCurrentPage(0);
+    setRowData(pagedData.content || []);
+    setCurrentPage(0);
   }, [pagedData.content]);
+
+  const loadProducts = async (query = '') => {
+    setIsSearching(true);
+    try {
+      const data = await getAdminProducts(0, 1000, query);
+      setRowData(data.content || []);
+      setCurrentPage(0);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSearchSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await loadProducts(searchTerm);
+  };
+
+  const handleClearSearch = async () => {
+    setSearchTerm('');
+    await loadProducts('');
+  };
 
   const handleAddProduct = () => {
     setFormError(null);
@@ -135,14 +159,14 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
       if (selectedFile) formDataObj.append('image', selectedFile);
 
       if (isEditingProduct && selectedProduct) {
-        const updatedProduct = await updateProduct(selectedProduct.id, formDataObj);
-        setRowData((prev) => prev.map((p) => (p.id === selectedProduct.id ? updatedProduct : p)));
+        await updateProduct(selectedProduct.id, formDataObj);
       } else {
-        const newProduct = await createProduct(formDataObj);
-        setRowData((prev) => [newProduct, ...prev]);
+        await createProduct(formDataObj);
       }
+
       setShowAddModal(false);
-      revalidator.revalidate();
+      setSelectedProduct(null);
+      await loadProducts(searchTerm);
     } catch (error: any) {
       const errorMsg = error.message || 'Action failed. Please try again.';
       setFormError(errorMsg);
@@ -158,23 +182,33 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
     setIsLoading(true);
     try {
       await deleteProduct(selectedProduct.id);
-      setRowData((prev) => prev.filter((p) => p.id !== selectedProduct.id));
-      setShowDeleteModal(false); setSelectedProduct(null); revalidator.revalidate();
-    } catch (error) { alert('Failed to delete product.'); } finally { setIsLoading(false); }
+      setShowDeleteModal(false);
+      setSelectedProduct(null);
+      await loadProducts(searchTerm);
+    } catch (error) {
+      alert('Failed to delete product.');
+    } finally { setIsLoading(false); }
   };
 
   const handleBanProduct = async (product: ProductDTO) => {
     setIsLoading(true);
     try {
       const formData = new FormData();
-      formData.append('name', product.name); formData.append('category', product.category); formData.append('price', String(product.price)); formData.append('location', product.location); formData.append('description', product.description); formData.append('status', 'Banned'); formData.append('sellerId', String(product.seller?.id || ''));
-      const updatedProduct = await updateProduct(product.id, formData);
-      setRowData((prev) => prev.map((p) => (p.id === product.id ? updatedProduct : p)));
-      revalidator.revalidate();
-    } catch (error) { alert('Failed to ban product.'); } finally { setIsLoading(false); }
+      formData.append('name', product.name);
+      formData.append('category', product.category);
+      formData.append('price', String(product.price));
+      formData.append('location', product.location);
+      formData.append('description', product.description);
+      formData.append('status', 'Banned');
+      formData.append('sellerId', String(product.seller?.id || ''));
+      await updateProduct(product.id, formData);
+      await loadProducts(searchTerm);
+    } catch (error) {
+      alert('Failed to ban product.');
+    } finally { setIsLoading(false); }
   };
 
-  const totalProducts = pagedData.totalElements || 0;
+  const totalProducts = rowData.length;
   const activeListings = rowData.filter(p => p.status?.toLowerCase() === "active" && !p.seller?.banned).length;
   const averagePrice = rowData.length > 0 ? rowData.reduce((sum, p) => sum + (p.price || 0), 0) / rowData.length : 0;
   const totalValue = rowData.reduce((sum, p) => sum + (p.price || 0), 0);
@@ -186,90 +220,118 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
     <>
       <AdminHeader title="Global Inventory" subtitle="Audit, edit, or remove any listing on the platform." />
 
-      
-        <Row className="g-3 mb-4">
-          <Col xs={12} sm={6} lg={3}>
-            <KPICard label="Total Products" value={totalProducts} color="#7c3aed" icon="fa-box" bg={getKPIBg('#7c3aed')} />
-          </Col>
-          <Col xs={12} sm={6} lg={3}>
-            <KPICard label="Active Listings" value={activeListings} color="#ea580c" icon="fa-check-circle" bg={getKPIBg('#ea580c')} />
-          </Col>
-          <Col xs={12} sm={6} lg={3}>
-            <KPICard label="Average Price" value={`€${averagePrice.toFixed(0)}`} color="#059669" icon="fa-euro-sign" bg={getKPIBg('#059669')} />
-          </Col>
-          <Col xs={12} sm={6} lg={3}>
-            <KPICard label="Total Value" value={`€${totalValue.toFixed(0)}`} color="#0369a1" icon="fa-chart-line" bg={getKPIBg('#0369a1')} />
-          </Col>
-        </Row>
+      <Card className="clay-card border-0 p-3 mb-4">
+        <Card.Body>
+          <Form onSubmit={handleSearchSubmit}>
+            <Row className="g-3 align-items-end">
+              <Col md={9}>
+                <Form.Label className="fw-700 small text-uppercase text-muted">Search products by name or category</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Type a product name or category..."
+                  className="rounded-3 py-2 bg-light border-0"
+                />
+              </Col>
+              <Col md={3}>
+                <Stack direction="horizontal" gap={2} className="justify-content-end">
+                  <Button type="submit" variant="dark" className="rounded-pill px-4 fw-700" disabled={isSearching}>
+                    {isSearching ? 'Searching...' : 'Search'}
+                  </Button>
+                  <Button type="button" variant="light" className="rounded-pill px-4 fw-700" onClick={handleClearSearch} disabled={isSearching}>
+                    Clear
+                  </Button>
+                </Stack>
+              </Col>
+            </Row>
+          </Form>
+        </Card.Body>
+      </Card>
 
-        <Card className="clay-card border-0 p-3">
-          <Card.Body>
-            <Stack direction="horizontal" className="justify-content-end mb-4">
-              <Button variant="primary" className="fw-700 rounded-pill px-4" style={{ backgroundColor: '#7c3aed', border: 'none' }} onClick={handleAddProduct}>
-                <i className="fa-solid fa-plus me-2" /> Add Product
-              </Button>
+      <Row className="g-3 mb-4">
+        <Col xs={12} sm={6} lg={3}>
+          <KPICard label="Total Products" value={totalProducts} color="#7c3aed" icon="fa-box" bg={getKPIBg('#7c3aed')} />
+        </Col>
+        <Col xs={12} sm={6} lg={3}>
+          <KPICard label="Active Listings" value={activeListings} color="#ea580c" icon="fa-check-circle" bg={getKPIBg('#ea580c')} />
+        </Col>
+        <Col xs={12} sm={6} lg={3}>
+          <KPICard label="Average Price" value={`€${averagePrice.toFixed(0)}`} color="#059669" icon="fa-euro-sign" bg={getKPIBg('#059669')} />
+        </Col>
+        <Col xs={12} sm={6} lg={3}>
+          <KPICard label="Total Value" value={`€${totalValue.toFixed(0)}`} color="#0369a1" icon="fa-chart-line" bg={getKPIBg('#0369a1')} />
+        </Col>
+      </Row>
+
+      <Card className="clay-card border-0 p-3">
+        <Card.Body>
+          <Stack direction="horizontal" className="justify-content-end mb-4">
+            <Button variant="primary" className="fw-700 rounded-pill px-4" style={{ backgroundColor: '#7c3aed', border: 'none' }} onClick={handleAddProduct}>
+              <i className="fa-solid fa-plus me-2" /> Add Product
+            </Button>
+          </Stack>
+
+          <div style={{ overflowX: 'auto' }}>
+            <Table hover responsive className="table-admin mb-0 align-middle">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>PRODUCT</th>
+                  <th>CATEGORY</th>
+                  <th>PRICE</th>
+                  <th>STATUS</th>
+                  <th>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedData.length > 0 ? (
+                  paginatedData.map((product) => (
+                    <tr key={product.id}>
+                      <td className="text-muted small fw-700">#{product.id}</td>
+                      <td>
+                        <Stack direction="horizontal" gap={2} className="align-items-center">
+                          <Image src={`/api/v1/products/${product.id}/image?t=${Date.now()}`} alt={product.name} width={36} height={36} rounded style={{ objectFit: 'cover', backgroundColor: '#e5e7eb' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                          <span className="fw-700 small mb-0">{product.name}</span>
+                        </Stack>
+                      </td>
+                      <td><span className="badge-cat cat-tech">{product.category}</span></td>
+                      <td className="fw-800 text-success">€{product.price?.toFixed(2)}</td>
+                      <td>
+                         <span className={`badge-status ${product.status === 'Banned' ? 'status-banned' : 'status-active'}`}>
+                            {product.status?.toUpperCase()}
+                         </span>
+                      </td>
+                      <td>
+                        <Stack direction="horizontal" gap={2}>
+                          <Button variant="light" size="sm" className="btn-action-admin btn-edit" onClick={() => handleEditProduct(product)}><i className="fa-solid fa-edit" /></Button>
+                          <Button variant="light" size="sm" className="btn-action-admin btn-ban" onClick={() => handleBanProduct(product)} disabled={product.status === 'Banned'}><i className="fa-solid fa-lock" /></Button>
+                          <Button variant="light" size="sm" className="btn-action-admin btn-delete" onClick={() => handleDeleteClick(product)}><i className="fa-solid fa-trash" /></Button>
+                        </Stack>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr><td colSpan={6} className="text-center py-4 text-muted">No products found</td></tr>
+                )}
+              </tbody>
+            </Table>
+          </div>
+
+          {totalPages > 1 && (
+            <Stack direction="horizontal" className="justify-content-between mt-4 pt-3 border-top">
+              <span className="text-muted small fw-600">Showing {currentPage * itemsPerPage + 1} to {Math.min((currentPage + 1) * itemsPerPage, rowData.length)} of {rowData.length}</span>
+              <div className="btn-group">
+                <Button variant="outline-secondary" size="sm" onClick={() => setCurrentPage(Math.max(0, currentPage - 1))} disabled={currentPage === 0}><i className="fa-solid fa-chevron-left" /></Button>
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <Button key={i} variant={currentPage === i ? 'primary' : 'outline-secondary'} size="sm" onClick={() => setCurrentPage(i)}>{i + 1}</Button>
+                ))}
+                <Button variant="outline-secondary" size="sm" onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))} disabled={currentPage === totalPages - 1}><i className="fa-solid fa-chevron-right" /></Button>
+              </div>
             </Stack>
-
-            <div style={{ overflowX: 'auto' }}>
-              <Table hover responsive className="table-admin mb-0 align-middle">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>PRODUCT</th>
-                    <th>CATEGORY</th>
-                    <th>PRICE</th>
-                    <th>STATUS</th>
-                    <th>ACTIONS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedData.length > 0 ? (
-                    paginatedData.map((product) => (
-                      <tr key={product.id}>
-                        <td className="text-muted small fw-700">#{product.id}</td>
-                        <td>
-                          <Stack direction="horizontal" gap={2} className="align-items-center">
-                            <Image src={`/api/v1/products/${product.id}/image?t=${Date.now()}`} alt={product.name} width={36} height={36} rounded style={{ objectFit: 'cover', backgroundColor: '#e5e7eb' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                            <span className="fw-700 small mb-0">{product.name}</span>
-                          </Stack>
-                        </td>
-                        <td><span className="badge-cat cat-tech">{product.category}</span></td>
-                        <td className="fw-800 text-success">€{product.price?.toFixed(2)}</td>
-                        <td>
-                           <span className={`badge-status ${product.status === 'Banned' ? 'status-banned' : 'status-active'}`}>
-                              {product.status?.toUpperCase()}
-                           </span>
-                        </td>
-                        <td>
-                          <Stack direction="horizontal" gap={2}>
-                            <Button variant="light" size="sm" className="btn-action-admin btn-edit" onClick={() => handleEditProduct(product)}><i className="fa-solid fa-edit" /></Button>
-                            <Button variant="light" size="sm" className="btn-action-admin btn-ban" onClick={() => handleBanProduct(product)} disabled={product.status === 'Banned'}><i className="fa-solid fa-lock" /></Button>
-                            <Button variant="light" size="sm" className="btn-action-admin btn-delete" onClick={() => handleDeleteClick(product)}><i className="fa-solid fa-trash" /></Button>
-                          </Stack>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr><td colSpan={6} className="text-center py-4 text-muted">No products found</td></tr>
-                  )}
-                </tbody>
-              </Table>
-            </div>
-
-            {totalPages > 1 && (
-              <Stack direction="horizontal" className="justify-content-between mt-4 pt-3 border-top">
-                <span className="text-muted small fw-600">Showing {currentPage * itemsPerPage + 1} to {Math.min((currentPage + 1) * itemsPerPage, rowData.length)} of {rowData.length}</span>
-                <div className="btn-group">
-                  <Button variant="outline-secondary" size="sm" onClick={() => setCurrentPage(Math.max(0, currentPage - 1))} disabled={currentPage === 0}><i className="fa-solid fa-chevron-left" /></Button>
-                  {Array.from({ length: totalPages }, (_, i) => (
-                    <Button key={i} variant={currentPage === i ? 'primary' : 'outline-secondary'} size="sm" onClick={() => setCurrentPage(i)}>{i + 1}</Button>
-                  ))}
-                  <Button variant="outline-secondary" size="sm" onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))} disabled={currentPage === totalPages - 1}><i className="fa-solid fa-chevron-right" /></Button>
-                </div>
-              </Stack>
-            )}
-          </Card.Body>
-        </Card>
+          )}
+        </Card.Body>
+      </Card>
 
       {/* Edit/Add Modal */}
       <Modal show={showAddModal} onHide={() => setShowAddModal(false)} size="lg" centered contentClassName="bg-white border-0 shadow-lg clay-card">

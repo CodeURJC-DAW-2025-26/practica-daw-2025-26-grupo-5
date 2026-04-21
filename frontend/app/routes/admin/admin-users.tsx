@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { redirect, useRevalidator } from 'react-router';
+import { redirect } from 'react-router';
+import { Modal, Form, Button, Container, Row, Col, Card, Table, Image, Stack, Alert } from 'react-bootstrap';
 import { getAdminUsers, banUser, deleteUser, updateUser, getAdminProducts, updateProduct } from '~/services/admin-service';
 import { useUserStore } from '~/stores/useUserStore';
 import type UserDTO from '~/dto/UserDTO';
 import type PagedResponse from '~/dto/PagedResponse';
 import AdminHeader from '~/components/admin/AdminHeader';
 import ConfirmModal from '~/components/confirm-modal';
-import { Modal, Form, Button, Container, Row, Col, Card, Table, Image, Stack, Alert } from 'react-bootstrap';
 
 interface KPIData {
   readonly label: string;
@@ -48,7 +48,7 @@ const getKPIBg = (color: string): string => {
 
 export async function clientLoader() {
   try {
-    const data = await getAdminUsers(0, 100);
+    const data = await getAdminUsers(0, 1000);
     return data || {};
   } catch (error) {
     console.error('Failed to fetch admin users:', error);
@@ -57,10 +57,12 @@ export async function clientLoader() {
 }
 
 export default function AdminUsers({ loaderData }: { readonly loaderData: any }) {
-  const revalidator = useRevalidator();
   const pagedData = loaderData as PagedResponse<UserDTO>;
   const users = pagedData.content || [];
   const loggedInUser = useUserStore((state) => state.user);
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
 
   // Individual form field states for edit modal
   const [editName, setEditName] = useState('');
@@ -82,6 +84,27 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
   const isUserAnAdmin = (user: UserDTO) => user.roles?.includes('ADMIN') || user.roles?.includes('ROLE_ADMIN');
   const canEditUser = (user: UserDTO) => user.id !== loggedInUser?.id;
   const canBanOrDeleteUser = (user: UserDTO) => !isUserAnAdmin(user) && user.id !== loggedInUser?.id;
+
+  const loadUsers = async (userSearch = '') => {
+    setIsSearching(true);
+    try {
+      const data = await getAdminUsers(0, 1000, userSearch);
+      setRowData(data.content || []);
+      setCurrentPage(0);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSearchSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await loadUsers(searchTerm);
+  };
+
+  const handleClearSearch = async () => {
+    setSearchTerm('');
+    await loadUsers('');
+  };
 
   const handleEditClick = (user: UserDTO) => {
     setSelectedUser(user);
@@ -111,11 +134,10 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
       formDataObj.append('cardCvv', editCardCvv);
       if (selectedPhoto) formDataObj.append('newProfilePhoto', selectedPhoto);
 
-      const updatedUser = await updateUser(selectedUser.id, formDataObj);
-      setRowData((prev) => prev.map((u) => (u.id === selectedUser.id ? updatedUser : u)));
+      await updateUser(selectedUser.id, formDataObj);
       setModalType(null);
       setSelectedUser(null);
-      revalidator.revalidate();
+      await loadUsers(searchTerm);
     } catch (error: any) {
       const errorMsg = error.message || 'Failed to update user. Please try again.';
       setEditError(errorMsg);
@@ -158,9 +180,12 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
         // Don't fail the entire operation if product update fails
       }
       
-      setModalType(null); setSelectedUser(null); revalidator.revalidate();
+      setModalType(null);
+      setSelectedUser(null);
+      await loadUsers(searchTerm);
     } catch (error) {
-      console.error('Failed to ban user:', error); alert('Failed to ban user. Please try again.');
+      console.error('Failed to ban user:', error);
+      alert('Failed to ban user. Please try again.');
     } finally { setIsLoading(false); }
   };
 
@@ -171,10 +196,12 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
     setIsLoading(true);
     try {
       await deleteUser(selectedUser.id);
-      setRowData((prev) => prev.filter((u) => u.id !== selectedUser.id));
-      setModalType(null); setSelectedUser(null); revalidator.revalidate();
+      setModalType(null);
+      setSelectedUser(null);
+      await loadUsers(searchTerm);
     } catch (error) {
-      console.error('Failed to delete user:', error); alert('Failed to delete user. Please try again.');
+      console.error('Failed to delete user:', error);
+      alert('Failed to delete user. Please try again.');
     } finally { setIsLoading(false); }
   };
 
@@ -193,107 +220,136 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
     <>
       <AdminHeader title="User Management" subtitle="Moderate access and user permissions." />
 
-        {/* KPI Row */}
-        <Row className="g-3 mb-4">
-          <Col xs={12} sm={6} lg={3}>
-            <KPICard label="Total Users" value={totalUsers} color="#0369a1" icon="fa-users" bg={getKPIBg('#0369a1')} />
-          </Col>
-          <Col xs={12} sm={6} lg={3}>
-            <KPICard label="Active Users" value={activeUsers} color="#059669" icon="fa-check-circle" bg={getKPIBg('#059669')} />
-          </Col>
-          <Col xs={12} sm={6} lg={3}>
-            <KPICard label="Banned Users" value={bannedUsers} color="#dc2626" icon="fa-ban" bg={getKPIBg('#dc2626')} />
-          </Col>
-          <Col xs={12} sm={6} lg={3}>
-            <KPICard label="Active Rate" value={`${activeRate}%`} color="#7c3aed" icon="fa-chart-pie" bg={getKPIBg('#7c3aed')} />
-          </Col>
-        </Row>
-
-        {/* Table */}
-        <Card className="clay-card border-0 p-3">
-          <Card.Body>
-            <div style={{ overflowX: 'auto' }}>
-              <Table hover responsive className="table-admin mb-0 align-middle">
-                <thead>
-                  <tr>
-                    <th>USER</th>
-                    <th>EMAIL</th>
-                    <th>ROLE</th>
-                    <th>STATUS</th>
-                    <th>ACTIONS</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {paginatedData.length > 0 ? (
-                    paginatedData.map((user) => (
-                      <tr key={user.id}>
-                        <td>
-                          <Stack direction="horizontal" gap={2} className="align-items-center">
-                            <Image
-                              src={`/api/v1/users/${user.id}/profile-photo?t=${Date.now()}`}
-                              alt={user.name} width={36} height={36} roundedCircle
-                              style={{ objectFit: 'cover', backgroundColor: '#e5e7eb' }}
-                              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-                            />
-                            <span className="fw-700 small mb-0">{user.name}</span>
-                          </Stack>
-                        </td>
-                        <td className="text-muted small fw-600">{user.email}</td>
-                        <td><span className="badge bg-light text-dark fw-700">{user.roles?.join(', ') || 'USER'}</span></td>
-                        <td>
-                           <span className={`badge-status ${user.banned ? 'status-banned' : 'status-active'}`}>
-                              {user.banned ? 'BANNED' : 'ACTIVE'}
-                           </span>
-                        </td>
-                        <td>
-                          <Stack direction="horizontal" gap={2}>
-                            {canEditUser(user) && (
-                              <Button variant="light" size="sm" className="btn-action-admin btn-edit" onClick={() => handleEditClick(user)}>
-                                <i className="fa-solid fa-pencil" />
-                              </Button>
-                            )}
-                            {canBanOrDeleteUser(user) && (
-                              <Button variant="light" size="sm" className="btn-action-admin btn-ban" onClick={() => handleBanClick(user)}>
-                                <i className={`fa-solid fa-${user.banned ? 'unlock' : 'lock'}`} />
-                              </Button>
-                            )}
-                            {canBanOrDeleteUser(user) && (
-                              <Button variant="light" size="sm" className="btn-action-admin btn-delete" onClick={() => handleDeleteClick(user)}>
-                                <i className="fa-solid fa-trash" />
-                              </Button>
-                            )}
-                          </Stack>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr><td colSpan={5} className="text-center py-4 text-muted">No users found</td></tr>
-                  )}
-                </tbody>
-              </Table>
-            </div>
-
-            {/* Pagination Controls */}
-            {totalPages > 1 && (
-              <Stack direction="horizontal" className="justify-content-between mt-4 pt-3 border-top">
-                <span className="text-muted small fw-600">Showing {currentPage * itemsPerPage + 1} to {Math.min((currentPage + 1) * itemsPerPage, rowData.length)} of {rowData.length}</span>
-                <div className="btn-group">
-                  <Button variant="outline-secondary" size="sm" onClick={() => setCurrentPage(Math.max(0, currentPage - 1))} disabled={currentPage === 0}>
-                    <i className="fa-solid fa-chevron-left" />
+      <Card className="clay-card border-0 p-3 mb-4">
+        <Card.Body>
+          <Form onSubmit={handleSearchSubmit}>
+            <Row className="g-3 align-items-end">
+              <Col md={9}>
+                <Form.Label className="fw-700 small text-uppercase text-muted">Search users by name</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Type a username..."
+                  className="rounded-3 py-2 bg-light border-0"
+                />
+              </Col>
+              <Col md={3}>
+                <Stack direction="horizontal" gap={2} className="justify-content-end">
+                  <Button type="submit" variant="dark" className="rounded-pill px-4 fw-700" disabled={isSearching}>
+                    {isSearching ? 'Searching...' : 'Search'}
                   </Button>
-                  {Array.from({ length: totalPages }, (_, i) => (
-                    <Button key={i} variant={currentPage === i ? 'primary' : 'outline-secondary'} size="sm" onClick={() => setCurrentPage(i)}>
-                      {i + 1}
-                    </Button>
-                  ))}
-                  <Button variant="outline-secondary" size="sm" onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))} disabled={currentPage === totalPages - 1}>
-                    <i className="fa-solid fa-chevron-right" />
+                  <Button type="button" variant="light" className="rounded-pill px-4 fw-700" onClick={handleClearSearch} disabled={isSearching}>
+                    Clear
                   </Button>
-                </div>
-              </Stack>
-            )}
-          </Card.Body>
-        </Card>
+                </Stack>
+              </Col>
+            </Row>
+          </Form>
+        </Card.Body>
+      </Card>
+
+      {/* KPI Row */}
+      <Row className="g-3 mb-4">
+        <Col xs={12} sm={6} lg={3}>
+          <KPICard label="Total Users" value={totalUsers} color="#0369a1" icon="fa-users" bg={getKPIBg('#0369a1')} />
+        </Col>
+        <Col xs={12} sm={6} lg={3}>
+          <KPICard label="Active Users" value={activeUsers} color="#059669" icon="fa-check-circle" bg={getKPIBg('#059669')} />
+        </Col>
+        <Col xs={12} sm={6} lg={3}>
+          <KPICard label="Banned Users" value={bannedUsers} color="#dc2626" icon="fa-ban" bg={getKPIBg('#dc2626')} />
+        </Col>
+        <Col xs={12} sm={6} lg={3}>
+          <KPICard label="Active Rate" value={`${activeRate}%`} color="#7c3aed" icon="fa-chart-pie" bg={getKPIBg('#7c3aed')} />
+        </Col>
+      </Row>
+
+      {/* Table */}
+      <Card className="clay-card border-0 p-3">
+        <Card.Body>
+          <div style={{ overflowX: 'auto' }}>
+            <Table hover responsive className="table-admin mb-0 align-middle">
+              <thead>
+                <tr>
+                  <th>USER</th>
+                  <th>EMAIL</th>
+                  <th>ROLE</th>
+                  <th>STATUS</th>
+                  <th>ACTIONS</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedData.length > 0 ? (
+                  paginatedData.map((user) => (
+                    <tr key={user.id}>
+                      <td>
+                        <Stack direction="horizontal" gap={2} className="align-items-center">
+                          <Image
+                            src={`/api/v1/users/${user.id}/profile-photo?t=${Date.now()}`}
+                            alt={user.name} width={36} height={36} roundedCircle
+                            style={{ objectFit: 'cover', backgroundColor: '#e5e7eb' }}
+                            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                          />
+                          <span className="fw-700 small mb-0">{user.name}</span>
+                        </Stack>
+                      </td>
+                      <td className="text-muted small fw-600">{user.email}</td>
+                      <td><span className="badge bg-light text-dark fw-700">{user.roles?.join(', ') || 'USER'}</span></td>
+                      <td>
+                         <span className={`badge-status ${user.banned ? 'status-banned' : 'status-active'}`}>
+                            {user.banned ? 'BANNED' : 'ACTIVE'}
+                         </span>
+                      </td>
+                      <td>
+                        <Stack direction="horizontal" gap={2}>
+                          {canEditUser(user) && (
+                            <Button variant="light" size="sm" className="btn-action-admin btn-edit" onClick={() => handleEditClick(user)}>
+                              <i className="fa-solid fa-pencil" />
+                            </Button>
+                          )}
+                          {canBanOrDeleteUser(user) && (
+                            <Button variant="light" size="sm" className="btn-action-admin btn-ban" onClick={() => handleBanClick(user)}>
+                              <i className={`fa-solid fa-${user.banned ? 'unlock' : 'lock'}`} />
+                            </Button>
+                          )}
+                          {canBanOrDeleteUser(user) && (
+                            <Button variant="light" size="sm" className="btn-action-admin btn-delete" onClick={() => handleDeleteClick(user)}>
+                              <i className="fa-solid fa-trash" />
+                            </Button>
+                          )}
+                        </Stack>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr><td colSpan={5} className="text-center py-4 text-muted">No users found</td></tr>
+                )}
+              </tbody>
+            </Table>
+          </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <Stack direction="horizontal" className="justify-content-between mt-4 pt-3 border-top">
+              <span className="text-muted small fw-600">Showing {currentPage * itemsPerPage + 1} to {Math.min((currentPage + 1) * itemsPerPage, rowData.length)} of {rowData.length}</span>
+              <div className="btn-group">
+                <Button variant="outline-secondary" size="sm" onClick={() => setCurrentPage(Math.max(0, currentPage - 1))} disabled={currentPage === 0}>
+                  <i className="fa-solid fa-chevron-left" />
+                </Button>
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <Button key={i} variant={currentPage === i ? 'primary' : 'outline-secondary'} size="sm" onClick={() => setCurrentPage(i)}>
+                    {i + 1}
+                  </Button>
+                ))}
+                <Button variant="outline-secondary" size="sm" onClick={() => setCurrentPage(Math.min(totalPages - 1, currentPage + 1))} disabled={currentPage === totalPages - 1}>
+                  <i className="fa-solid fa-chevron-right" />
+                </Button>
+              </div>
+            </Stack>
+          )}
+        </Card.Body>
+      </Card>
 
       {/* Edit Modal (Bootstrap + Custom CSS) */}
       <Modal show={modalType === 'edit'} onHide={() => { setModalType(null); setSelectedUser(null); }} size="lg" centered contentClassName="bg-white border-0 shadow-lg clay-card">

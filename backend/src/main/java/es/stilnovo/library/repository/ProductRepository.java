@@ -2,12 +2,11 @@ package es.stilnovo.library.repository;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Page;
 
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
@@ -45,6 +44,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
      * @return list of products in this category
      */
     List<Product> findByCategoryContainingIgnoreCase(String category);
+
+    /**
+     * Search products by name or category (case-insensitive).
+     * Used by admin search.
+     * @param name product name or partial name
+     * @param category category or partial category
+     * @return list of matching products
+     */
+    List<Product> findByNameContainingIgnoreCaseOrCategoryContainingIgnoreCase(String name, String category);
 
     /**
      * Get products by seller username and status

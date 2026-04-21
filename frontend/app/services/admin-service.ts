@@ -20,10 +20,11 @@ export const getAdminSummary = async (): Promise<AdminSummaryDTO> => {
 
 export const getAdminUsers = async (
   page = 0,
-  size = 10
+  size = 10,
+  user?: string
 ): Promise<PagedResponse<UserDTO>> => {
   return await api.get<PagedResponse<UserDTO>>("/v1/admin/users", {
-    params: { page, size },
+    params: { page, size, user: user?.trim() || undefined },
   });
 };
 
@@ -51,10 +52,11 @@ export const updateUser = async (
 
 export const getAdminProducts = async (
   page = 0,
-  size = 10
+  size = 10,
+  query?: string
 ): Promise<PagedResponse<ProductDTO>> => {
   return await api.get<PagedResponse<ProductDTO>>("/v1/admin/products", {
-    params: { page, size },
+    params: { page, size, query: query?.trim() || undefined },
   });
 };
 

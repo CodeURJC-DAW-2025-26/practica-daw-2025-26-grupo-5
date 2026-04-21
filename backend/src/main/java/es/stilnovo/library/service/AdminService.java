@@ -14,16 +14,16 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import es.stilnovo.library.model.Image;
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.Transaction;
 import es.stilnovo.library.model.User;
+import es.stilnovo.library.model.Valoration;
 import es.stilnovo.library.repository.InquiryRepository;
 import es.stilnovo.library.repository.ProductRepository;
 import es.stilnovo.library.repository.TransactionRepository;
 import es.stilnovo.library.repository.UserInteractionRepository;
 import es.stilnovo.library.repository.UserRepository;
-import es.stilnovo.library.model.Image;
-import es.stilnovo.library.model.Valoration;
 
 /**
  * AdminService: Manages administrative operations
@@ -155,7 +155,18 @@ public class AdminService {
 
     @Transactional(readOnly = true)
     public Page<User> getUsersPage(Pageable pageable) {
-        return toPage(userService.findAll(), pageable);
+        return getUsersPage(pageable, null);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<User> getUsersPage(Pageable pageable, String userQuery) {
+        List<User> source;
+        if (userQuery != null && !userQuery.trim().isEmpty()) {
+            source = userRepository.findByNameContainingIgnoreCase(userQuery.trim());
+        } else {
+            source = userService.findAll();
+        }
+        return toPage(source, pageable);
     }
 
     /**
@@ -165,10 +176,19 @@ public class AdminService {
      */
     @Transactional(readOnly = true)
     public Page<Product> getInventoryPage(Pageable pageable) {
-        // Return ALL products including Sold status for complete inventory management
-        List<Product> allProducts = getAllProducts();
-        // Convert list to Page object with pagination info (size, number, etc)
-        return toPage(allProducts, pageable);
+        return getInventoryPage(pageable, null);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Product> getInventoryPage(Pageable pageable, String query) {
+        List<Product> source;
+        if (query != null && !query.trim().isEmpty()) {
+            source = productRepository.findByNameContainingIgnoreCaseOrCategoryContainingIgnoreCase(
+                    query.trim(), query.trim());
+        } else {
+            source = getAllProducts();
+        }
+        return toPage(source, pageable);
     }
 
     @Transactional(readOnly = true)
