@@ -58,26 +58,31 @@ function buildUrl(endpoint: string, params?: Record<string, any>): string {
   return url;
 }
 
+// MODIFY: Change localStorage key if token storage changes
 function getToken(): string | null {
-  // Get token from localStorage (using JWT)
+  // Get token from localStorage (using JWT). Modify here if backend changes token location
   return localStorage.getItem('token');
 }
 
+// Core HTTP function: All api.get/post/patch/delete call this
+// MODIFY: Add logging, caching, retry logic here (centralized)
 async function request<T = any>(
   method: string,
   endpoint: string,
   data?: any,
   params?: Record<string, any>
 ): Promise<T> {
+  // Build full URL: http://localhost:5173/api/v1/users/me + ?params
+  // MODIFY: Change /api if backend context path changes
   const baseURL = window.location.origin + '/api';
   const fullUrl = baseURL + buildUrl(endpoint, params);
   
   const headers: Record<string, string> = {};
   
-  // Add token if available
+  // Add JWT token to every request. MODIFY: Change header name if backend expects different auth scheme
   const token = getToken();
   if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+    headers['Authorization'] = `Bearer ${token}`; // Header format: "Bearer <token>"
   }
 
   const options: RequestInit = {
@@ -87,45 +92,54 @@ async function request<T = any>(
   };
 
   // Handle request body
+  // Handle request body: FormData (multipart) or JSON
+  // MODIFY: Add XML support if backend requires XML (detect via endpoint pattern)
   if (data) {
     if (data instanceof FormData) {
-      // FormData - let browser set Content-Type with boundary
+      // FormData: File uploads (photo, product images). Browser auto-sets boundary
       options.body = data;
     } else if (typeof data === 'object') {
-      // JSON - set Content-Type header
+      // JSON: Regular API calls (login, update profile, create product)
       headers['Content-Type'] = 'application/json';
       options.body = JSON.stringify(data);
     }
   }
 
+  // Execute HTTP request. MODIFY: Add retry logic, circuit breaker here
   const response = await fetch(fullUrl, options);
   
-  // Validate response - follow professor's pattern
+  // Error handling: Check response status (200-299 = success)
+  // MODIFY: Add 401 handler to refresh token or redirect to login
   if (!response.ok) {
     let errorMessage = `${response.status} ${response.statusText}`;
     
     try {
       const errorData = await response.json();
+      // Extract error message from backend response
       if (errorData.message) {
         errorMessage = errorData.message;
       } else if (errorData.error) {
         errorMessage = errorData.error;
       }
     } catch (e) {
-      // If response is not JSON, use statusText
+      // Response not JSON (e.g., HTML error page)
     }
     
     throw new HttpError(response.status, response.statusText, errorMessage);
   }
 
-  // Parse response based on content-type
+  // Response parsing: Detect content type and parse accordingly
+  // MODIFY: Add XML parsing if backend returns XML responses
   const contentType = response.headers.get('content-type');
   
   if (contentType?.includes('application/json')) {
+    // API returns JSON (most common: user data, products, transactions)
     return await response.json();
   } else if (contentType?.includes('image/')) {
+    // Backend returns binary image (profile photos, product images)
     return await response.blob() as any;
   } else {
+    // Plain text response
     return await response.text() as any;
   }
 }

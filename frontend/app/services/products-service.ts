@@ -70,6 +70,10 @@ export async function getProductById(id: number): Promise<ProductDTO> {
  * Interesting: FormData required because file upload is multipart/form-data
  * api.ts detects FormData and SKIPS Content-Type header (browser sets it with boundary)
  */
+// Called by: product creation form
+// Accepts: ProductWriteRequestDTO with file, name, category, price, etc.
+// Returns: New ProductDTO with generated ID
+// MODIFY: Add field validation here if backend schema expands
 export async function addProduct(
   product: ProductWriteRequestDTO
 ): Promise<ProductDTO> {
@@ -168,6 +172,10 @@ export async function getCatalog(query?: string, category?: string, page: number
 /**
  * Send an inquiry about a product
  */
+// Called by: product contact/inquiry form
+// Creates inquiry: Stores buyer phone + message + product link
+// Backend: Notifies seller, stores in Inquiry table
+// MODIFY: Add attachment support if buyer needs to send files
 export async function sendInquiry(data: {
   productId: number;
   phone: string;

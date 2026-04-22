@@ -63,40 +63,10 @@ import type UserDTO from "~/dto/UserDTO";
  * - If token missing or invalid, server returns 401 Unauthorized
  * - If valid, server returns UserDTO with current user details
  *
- * Token Management:
- * - Token stored in HTTP-only cookie (secure by default)
- * - API client automatically includes token in all requests
- * - No manual token handling needed in this function
- * - Token persists across page refreshes if still valid
+ * Called by: useUserStore.loadLoggedUser() on app init
+ * MODIFY: Change endpoint if backend user profile path changes
  *
- * Use Case:
- * - App initialization: Check if user is logged in
- * - After login: Fetch updated user data
- * - Periodic validation: Ensure token hasn't expired
- *
- * @returns Promise<UserDTO> Current user object containing:
- *   - id: Unique user identifier
- *   - username: User's login username
- *   - name: User's display name
- *   - email: User's email address
- *   - roles: Array of role strings (e.g., ["ROLE_USER", "ROLE_ADMIN"])
- *   - banned: Boolean flag indicating if user is banned
- *   - profilePhoto: URL to user's profile picture
- *   - etc.
- *
- * @throws HttpError with:
- *   - status 401: No valid session (user not logged in)
- *   - status 500+: Server error
- *
- * @example
- * try {
- *   const user = await reqIsLogged();
- *   console.log(`Welcome ${user.name}!`); // User is logged in
- * } catch (error) {
- *   if (error.status === 401) {
- *     console.log('No active session'); // User needs to log in
- *   }
- * }
+ * @throws HttpError 401 if user not authenticated (expected behavior)
  */
 export async function reqIsLogged(): Promise<UserDTO> {
   return await api.get<UserDTO>("/v1/users/me");

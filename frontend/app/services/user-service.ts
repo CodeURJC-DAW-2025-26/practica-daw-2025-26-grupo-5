@@ -95,6 +95,9 @@ import type UserDTO from "~/dto/UserDTO";
  * const dashboardData = await getUserDashboardStats();
  * console.log(dashboardData.formattedTotalRevenue); // "1,250.50 EUR"
  */
+// Called by: user dashboard page on load
+// Returns: Revenue chart data, balance, sales list
+// MODIFY: If backend dashboard structure changes, update return type here
 export async function getUserDashboardStats() {
     try {
         return await api.get("/v1/users/me/dashboard");
@@ -219,6 +222,10 @@ export async function updateUserSettings(formData: FormData): Promise<UserDTO> {
  *   logoutUser(); // Also clear auth state
  * }
  */
-export async function deleteUser(){
+
+// Called by: user-settings.tsx delete account button
+// Cascades: Deletes user → products → transactions → interactions → account
+// MODIFY: Add confirmation step if backend adds verification email
+export async function deleteUser() {
     return await api.delete<UserDTO>("/v1/users/me");
 }

@@ -28,6 +28,9 @@ export const getAdminUsers = async (
   });
 };
 
+// Called by: admin users page
+// Effect: When user banned, ALL their products auto-banned (backend cascade)
+// MODIFY: Add suspend (temporary ban) if backend adds new user status
 export const banUser = async (
   userId: number,
   ban: boolean
