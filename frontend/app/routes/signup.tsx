@@ -205,7 +205,7 @@ export default function Signup({ }: Route.ComponentProps) {
         <main className="flex-grow-1 d-flex align-items-center justify-content-center py-5">
           <Container>
             <Row className="justify-content-center px-2">
-              <Col xs={12} style={{ maxWidth: '750px' }}> {/* Un pelín más ancho para que respire */}
+              <Col xs={12} style={{ maxWidth: '750px' }}> 
                 <Card className="clay-card border-0 shadow-sm" style={{ borderRadius: '28px' }}>
                   <Card.Body className="p-4 p-md-5">
 
@@ -216,7 +216,7 @@ export default function Signup({ }: Route.ComponentProps) {
 
                     <Form onSubmit={handleSubmit}>
 
-                      {/* Avatar Upload - Centrado */}
+                      {/* Avatar Upload  */}
                       <div className="text-center mb-4">
                         <div className="mx-auto rounded-circle border d-flex align-items-center justify-content-center bg-white shadow-sm"
                           style={{ position: 'relative', overflow: 'hidden', width: '75px', height: '75px' }}>
@@ -234,10 +234,8 @@ export default function Signup({ }: Route.ComponentProps) {
                         </label>
                       </div>
 
-                      {/* Grid de dos columnas para que no se alargue hacia abajo */}
                       <Row className="g-4 mb-4">
 
-                        {/* Columna Izquierda: Identidad */}
                         <Col md={6}>
                           <Form.Group className="mb-3">
                             <Form.Label className="fw-700 x-small mb-1 text-muted ms-3">Full Name</Form.Label>
@@ -272,7 +270,6 @@ export default function Signup({ }: Route.ComponentProps) {
                           </Form.Group>
                         </Col>
 
-                        {/* Columna Derecha: Seguridad */}
                         <Col md={6}>
                           <Form.Group className="mb-3">
                             <Form.Label className="fw-700 x-small mb-1 text-muted ms-3">Password</Form.Label>
@@ -310,7 +307,6 @@ export default function Signup({ }: Route.ComponentProps) {
                         </Col>
                       </Row>
 
-                      {/* Botón de envío - El "Héroe" de la página */}
                       <div className="text-center mt-2">
                         <Button
                           type="submit"
@@ -321,6 +317,7 @@ export default function Signup({ }: Route.ComponentProps) {
                           {isLoading ? 'Creating Account...' : 'Create Account'}
                         </Button>
                       </div>
+                      
                       {/* Back to Marketplace Link */}
                       <div className="text-center">
                         <Link to="/" className="text-muted small text-decoration-none fw-700">
