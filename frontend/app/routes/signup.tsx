@@ -45,12 +45,12 @@
  */
 
 import { useNavigate, Link } from 'react-router';
-import { Container, Form, Alert, Row, Col, Card, Button, Image } from 'react-bootstrap';
+import { Container, Form, Navbar, Nav, Row, Col, Card, Button, Image } from 'react-bootstrap';
 import type { Route } from './+types/signup';
 import React, { useState } from 'react';
 import { signUp } from '~/services/login-service'; // MVC: Delegate to service
 import logo from "../assets/logo.png";
-import Footer from '~/components/footer';
+import Footer from '~/components/Footer';
 import Loader from '~/components/Loader';
 
 /**
@@ -70,6 +70,14 @@ export default function Signup({ }: Route.ComponentProps) {
     username: '',
     password: '',
     confirmPassword: '',
+  });
+
+  //Only for validations
+  const [errors, setErrors] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
   });
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
 
@@ -92,6 +100,12 @@ export default function Signup({ }: Route.ComponentProps) {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (name === 'username') validateUsername(value);
+    if (name === 'email') validateEmail(value);
+
+    if (name === 'password') validatePasswords(value, formData.confirmPassword);
+    if (name === 'confirmPassword') validatePasswords(formData.password, value);
   };
 
   /**
@@ -125,7 +139,7 @@ export default function Signup({ }: Route.ComponentProps) {
 
       // Call service instead of fetch directly
       await signUp(formDataToSend);
-      
+
       // Success: wait briefly then redirect to login
       await new Promise((resolve) => setTimeout(resolve, 2500));
       navigate('/login');
@@ -137,163 +151,188 @@ export default function Signup({ }: Route.ComponentProps) {
     }
   };
 
+  /**
+ * Performs minimal client-side validation.
+ * Ensures that the required fields are not empty before proceeding with the action.
+ * * @param value - The input string to be validated.
+ * @returns {boolean} True if the value is present and not empty, false otherwise.
+ */
+  const validateUsername = (value: string) => {
+    let error = value.trim().length < 3 ? "Name is too short (min. 3 chars)." : "";
+    setErrors(prev => ({ ...prev, username: error }));
+  };
+
+  const validateEmail = (value: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let error = !emailRegex.test(value) ? "Invalid email address." : "";
+    setErrors(prev => ({ ...prev, email: error }));
+  };
+
+  const validatePasswords = (pass: string, confirm: string) => {
+    let passError = pass.length < 8 ? "Password must be at least 8 characters." : "";
+    let matchError = pass !== confirm ? "Passwords do not match." : "";
+
+    setErrors(prev => ({
+      ...prev,
+      password: passError,
+      confirmPassword: matchError
+    }));
+  };
+
   return (
     <>
       {isLoading && <Loader />}
+
       <div className="auth-page min-vh-100 d-flex flex-column bg-light">
 
-        <header className="navbar container-fluid px-lg-5 py-2 bg-white header-border-line">
-          <div className="logo-wrapper">
-            <Link to="/" className="text-decoration-none d-flex align-items-center gap-2">
-              <Image src={logo} alt="Stilnovo" className="logo-img" width="30" />
-              <span className="brand">Stilnovo</span>
-            </Link>
-          </div>
-          <nav className="nav-actions ms-auto">
-            <span className="text-muted d-none d-sm-inline">Already a member?</span>
-            <Link to="/login" className="link-login ms-2">Log in</Link>
-          </nav>
-        </header>
+        {/* HEADER: React-Bootstrap Navbar implementation */}
+        <Navbar className="px-lg-5 py-3 header-border-line bg-white" expand={false}>
+          <Container fluid>
+            {/* Logo linked to home */}
+            <Navbar.Brand as={Link} to="/" className="d-flex align-items-center gap-2">
+              <Image src={logo} alt="Stilnovo" className="logo-img" width="35" />
+              <span className="brand mb-0">Stilnovo</span>
+            </Navbar.Brand>
 
-        <main className="flex-grow-1 d-flex align-items-center justify-content-center py-3">
-          <Container className="d-flex align-items-center justify-content-center">
+            {/* Right-aligned navigation actions */}
+            <Nav className="ms-auto flex-row align-items-center">
+              <span className="text-muted d-none d-sm-inline me-2 fw-600">Already a member?</span>
+              <Link to="/login" className="link-login">Log in</Link>
+            </Nav>
+          </Container>
+        </Navbar>
 
-            <Card className="auth-card clay-card border-0 shadow-sm w-100" style={{ maxWidth: '500px' }}>
-              <Card.Body className="p-4">
+        <main className="flex-grow-1 d-flex align-items-center justify-content-center py-5">
+          <Container>
+            <Row className="justify-content-center px-2">
+              <Col xs={12} style={{ maxWidth: '750px' }}> {/* Un pelín más ancho para que respire */}
+                <Card className="clay-card border-0 shadow-sm" style={{ borderRadius: '28px' }}>
+                  <Card.Body className="p-4 p-md-5">
 
-                <div className="text-center mb-3">
-                  <h2 className="fw-800 mb-1 fs-3">Join Us</h2>
-                  <p className="hero-subtitle small text-primary mb-0">Create your profile to start trading</p>
-                </div>
-
-                {signupError && (
-                  <Alert variant="danger" className="py-2 small fw-700 rounded-3 mb-3 text-center">
-                    <i className="fa-solid fa-triangle-exclamation me-2"></i> {signupError}
-                  </Alert>
-                )}
-
-                <Form onSubmit={handleSubmit}>
-
-                  <div className="text-center mb-3">
-                    <div
-                      className="profile-upload-container mx-auto rounded-circle border d-flex align-items-center justify-content-center bg-white shadow-sm"
-                      style={{ position: 'relative', overflow: 'hidden', width: '75px', height: '75px' }}
-                    >
-                      {!previewUrl && <i className="fa-solid fa-user-plus text-secondary fs-4"></i>}
-                      {previewUrl && <Image src={previewUrl} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute' }} />}
-
-                      <Form.Control
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange as any}
-                        disabled={isLoading}
-                        style={{ position: 'absolute', width: '100%', height: '100%', opacity: 0, cursor: 'pointer' }}
-                      />
+                    <div className="text-center mb-4">
+                      <h2 className="fw-800 mb-1">Join Us</h2>
+                      <p className="text-muted small fw-600">Create your profile to start trading</p>
                     </div>
-                    <Form.Label className="fw-700 x-small mt-2 d-block cursor-pointer text-primary" style={{ pointerEvents: 'none' }}>
-                      Upload Avatar
-                    </Form.Label>
-                  </div>
 
-                  <Row className="g-3 mb-3">
+                    <Form onSubmit={handleSubmit}>
 
-                    <Col xs={12}>
-                      <Form.Group>
-                        <Form.Label className="fw-700 x-small mb-1 text-muted">Full Name</Form.Label>
-                        <div className="search-box w-100 py-2 bg-light rounded-pill">
-                          <i className="fa-solid fa-id-card small text-muted px-3"></i>
+                      {/* Avatar Upload - Centrado */}
+                      <div className="text-center mb-4">
+                        <div className="mx-auto rounded-circle border d-flex align-items-center justify-content-center bg-white shadow-sm"
+                          style={{ position: 'relative', overflow: 'hidden', width: '75px', height: '75px' }}>
+                          {!previewUrl ? <i className="fa-solid fa-camera text-secondary fs-4"></i> :
+                            <Image src={previewUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
                           <Form.Control
-                            type="text"
-                            name="username"
-                            placeholder="Your name"
-                            value={formData.username}
-                            onChange={handleInputChange}
-                            disabled={isLoading}
-                            required
-                            className="border-0 shadow-none bg-transparent p-0 flex-grow-1"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange as any}
+                            style={{ position: 'absolute', opacity: 0, cursor: 'pointer', inset: 0 }}
                           />
                         </div>
-                      </Form.Group>
-                    </Col>
+                        <label className="fw-700 x-small mt-2 text-primary" style={{ letterSpacing: '0.5px' }}>
+                          Upload Photo
+                        </label>
+                      </div>
 
-                    <Col xs={12}>
-                      <Form.Group>
-                        <Form.Label className="fw-700 x-small mb-1 text-muted">Email Address</Form.Label>
-                        <div className="search-box w-100 py-2 bg-light rounded-pill">
-                          <i className="fa-solid fa-envelope small text-muted px-3"></i>
-                          <Form.Control
-                            type="email"
-                            name="email"
-                            placeholder="email@stilnovo.com"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            disabled={isLoading}
-                            required
-                            className="border-0 shadow-none bg-transparent p-0 flex-grow-1"
-                          />
-                        </div>
-                      </Form.Group>
-                    </Col>
+                      {/* Grid de dos columnas para que no se alargue hacia abajo */}
+                      <Row className="g-4 mb-4">
 
-                    <Col md={6}>
-                      <Form.Group>
-                        <Form.Label className="fw-700 x-small mb-1 text-muted">Password</Form.Label>
-                        <div className="search-box w-100 py-2 bg-light rounded-pill">
-                          <i className="fa-solid fa-lock small text-muted px-3"></i>
-                          <Form.Control
-                            type="password"
-                            name="password"
-                            placeholder="••••••"
-                            value={formData.password}
-                            onChange={handleInputChange}
-                            disabled={isLoading}
-                            required
-                            className="border-0 shadow-none bg-transparent p-0 flex-grow-1"
-                          />
-                        </div>
-                      </Form.Group>
-                    </Col>
+                        {/* Columna Izquierda: Identidad */}
+                        <Col md={6}>
+                          <Form.Group className="mb-3">
+                            <Form.Label className="fw-700 x-small mb-1 text-muted ms-3">Full Name</Form.Label>
+                            <div className={`search-box d-flex align-items-center w-100 py-2 bg-light rounded-pill border-2 ${errors.username ? 'border-danger' : 'border-transparent'}`} style={{ minHeight: '52px' }}>
+                              <i className="fa-solid fa-user small text-muted px-3"></i>
+                              <Form.Control
+                                name="username"
+                                placeholder="Your name"
+                                value={formData.username}
+                                onChange={handleInputChange}
+                                isInvalid={!!errors.username}
+                                className="border-0 shadow-none bg-transparent p-0 flex-grow-1 small fw-600 w-100"
+                              />
+                            </div>
+                            {errors.username && <div className="text-danger x-small fw-700 mt-1 ms-3">{errors.username}</div>}
+                          </Form.Group>
 
-                    <Col md={6}>
-                      <Form.Group>
-                        <Form.Label className="fw-700 x-small mb-1 text-muted">Confirm</Form.Label>
-                        <div className="search-box w-100 py-2 bg-light rounded-pill">
-                          <i className="fa-solid fa-check-double small text-muted px-3"></i>
-                          <Form.Control
-                            type="password"
-                            name="confirmPassword"
-                            placeholder="••••••"
-                            value={formData.confirmPassword}
-                            onChange={handleInputChange}
-                            disabled={isLoading}
-                            required
-                            className="border-0 shadow-none bg-transparent p-0 flex-grow-1"
-                          />
-                        </div>
-                      </Form.Group>
-                    </Col>
+                          <Form.Group>
+                            <Form.Label className="fw-700 x-small mb-1 text-muted ms-3">Email Address</Form.Label>
+                            <div className={`search-box d-flex align-items-center w-100 py-2 bg-light rounded-pill border-2 ${errors.email ? 'border-danger' : 'border-transparent'}`} style={{ minHeight: '52px' }}>
+                              <i className="fa-solid fa-envelope small text-muted px-3"></i>
+                              <Form.Control
+                                name="email"
+                                placeholder="email@stilnovo.com"
+                                value={formData.email}
+                                onChange={handleInputChange}
+                                isInvalid={!!errors.email}
+                                className="border-0 shadow-none bg-transparent p-0 flex-grow-1 small fw-600 w-100"
+                              />
+                            </div>
+                            {errors.email && <div className="text-danger x-small fw-700 mt-1 ms-3">{errors.email}</div>}
+                          </Form.Group>
+                        </Col>
 
-                  </Row>
+                        {/* Columna Derecha: Seguridad */}
+                        <Col md={6}>
+                          <Form.Group className="mb-3">
+                            <Form.Label className="fw-700 x-small mb-1 text-muted ms-3">Password</Form.Label>
+                            <div className={`search-box d-flex align-items-center w-100 py-2 bg-light rounded-pill border-2 ${errors.password ? 'border-danger' : 'border-transparent'}`} style={{ minHeight: '52px' }}>
+                              <i className="fa-solid fa-lock small text-muted px-3"></i>
+                              <Form.Control
+                                type="password"
+                                name="password"
+                                placeholder="••••••"
+                                value={formData.password}
+                                onChange={handleInputChange}
+                                isInvalid={!!errors.password}
+                                className="border-0 shadow-none bg-transparent p-0 flex-grow-1 small fw-600 w-100"
+                              />
+                            </div>
+                            {errors.password && <div className="text-danger x-small fw-700 mt-1 ms-3">{errors.password}</div>}
+                          </Form.Group>
 
-                  <div className="text-center mt-2">
-                    <Button
-                      type="submit"
-                      className="btn-sell w-100 py-2 mb-3 border-0 shadow-sm rounded-pill"
-                      disabled={isLoading}
-                      style={{ fontSize: '1rem', fontWeight: 800 }}
-                    >
-                      {isLoading ? 'Processing...' : 'Create Account'}
-                    </Button>
+                          <Form.Group>
+                            <Form.Label className="fw-700 x-small mb-1 text-muted ms-3">Confirm Password</Form.Label>
+                            <div className={`search-box d-flex align-items-center w-100 py-2 bg-light rounded-pill border-2 ${errors.confirmPassword ? 'border-danger' : 'border-transparent'}`} style={{ minHeight: '52px' }}>
+                              <i className="fa-solid fa-shield-check small text-muted px-3"></i>
+                              <Form.Control
+                                type="password"
+                                name="confirmPassword"
+                                placeholder="••••••"
+                                value={formData.confirmPassword}
+                                onChange={handleInputChange}
+                                isInvalid={!!errors.confirmPassword}
+                                className="border-0 shadow-none bg-transparent p-0 flex-grow-1 small fw-600 w-100"
+                              />
+                            </div>
+                            {errors.confirmPassword && <div className="text-danger x-small fw-700 mt-1 ms-3">{errors.confirmPassword}</div>}
+                          </Form.Group>
+                        </Col>
+                      </Row>
 
-                    <Link to="/" className="text-muted small text-decoration-none fw-700 d-inline-block">
-                      <i className="fa-solid fa-arrow-left me-2"></i>Back to Marketplace
-                    </Link>
-                  </div>
+                      {/* Botón de envío - El "Héroe" de la página */}
+                      <div className="text-center mt-2">
+                        <Button
+                          type="submit"
+                          className="btn-sell w-100 py-3 mb-3 border-0 shadow-sm rounded-pill fw-800 fs-5"
+                          disabled={isLoading || Object.values(errors).some(e => e !== '')}
+                          style={{ transition: 'transform 0.2s' }}
+                        >
+                          {isLoading ? 'Creating Account...' : 'Create Account'}
+                        </Button>
+                      </div>
+                      {/* Back to Marketplace Link */}
+                      <div className="text-center">
+                        <Link to="/" className="text-muted small text-decoration-none fw-700">
+                          <i className="fa-solid fa-arrow-left me-2"></i>Back to Marketplace
+                        </Link>
+                      </div>
 
-                </Form>
-              </Card.Body>
-            </Card>
-
+                    </Form>
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
           </Container>
         </main>
 

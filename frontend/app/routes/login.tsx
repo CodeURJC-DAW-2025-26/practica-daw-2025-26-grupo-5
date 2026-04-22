@@ -26,13 +26,13 @@ import { Container, Alert, Card, Form, Button, Image, Navbar, Nav } from 'react-
 import { useUserStore } from '~/stores/useUserStore';
 import type { Route } from './+types/login';
 import logo from "../assets/logo.png";
-import Footer from '~/components/footer';
+import Footer from '~/components/Footer';
 import Loader from '~/components/Loader';
 
 export default function Login({ }: Route.ComponentProps) {
   // Authentication functions and state mapped from Zustand global store
   const { loginUser, loginError, user } = useUserStore();
-  
+
   // React Router hooks for navigation and accessing previous location
   const navigate = useNavigate();
   const location = useLocation();
@@ -40,7 +40,11 @@ export default function Login({ }: Route.ComponentProps) {
   // Local state for form fields and UI feedback
   const [isLoading, setIsLoading] = useState(false);
   const [username, setUsername] = useState('');
+  const [usernameError, setUsernameError] = useState("");
+
   const [password, setPassword] = useState('');
+  const [passwordError, setPasswordError] = useState("");
+
 
   /**
    * Effect: Auto-redirect authenticated users
@@ -51,11 +55,11 @@ export default function Login({ }: Route.ComponentProps) {
    */
   useEffect(() => {
     if (user && !isLoading) {
-      if (user.banned) { 
-        navigate('/banned'); 
-        return; 
+      if (user.banned) {
+        navigate('/banned');
+        return;
       }
-      
+
       const redirectTo = location.state?.from?.pathname || '/';
       navigate(redirectTo);
     }
@@ -69,7 +73,7 @@ export default function Login({ }: Route.ComponentProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
       // Execute login and artificial UI delay in parallel for better UX
       await Promise.all([
@@ -81,6 +85,32 @@ export default function Login({ }: Route.ComponentProps) {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  /**
+ * Performs minimal client-side validation.
+ * Ensures that the required fields are not empty before proceeding with the action.
+ * * @param value - The input string to be validated.
+ * @returns {boolean} True if the value is present and not empty, false otherwise.
+ */
+  const validatePassword = (value: string) => {
+    let errorMessage = "";
+
+    if (value.length === 0) {
+      errorMessage = "Password cannot be empty.";
+    }
+
+    setPasswordError(errorMessage);
+  };
+
+  const validateUsername = (value: string) => {
+    let errorMessage = "";
+
+    if (value.length === 0) {
+      errorMessage = "Username cannot be empty.";
+    }
+
+    setUsernameError(errorMessage);
   };
 
   return (
@@ -110,10 +140,10 @@ export default function Login({ }: Route.ComponentProps) {
         {/* MAIN CONTENT: Layout using React-Bootstrap Containers and Cards */}
         <div className="hero-wrapper auth-background flex-grow-1 d-flex">
           <Container as="main" className="d-flex align-items-center justify-content-center flex-grow-1 py-5">
-            
+
             <Card className="auth-card clay-card p-4 p-md-5 border-0" style={{ maxWidth: '480px', width: '100%' }}>
               <Card.Body className="p-0">
-                
+
                 {/* Form Header */}
                 <div className="text-center mb-5">
                   <h2 className="fw-800">Welcome Back</h2>
@@ -140,7 +170,14 @@ export default function Login({ }: Route.ComponentProps) {
                         name="username"
                         placeholder="Enter your username"
                         value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+
+                        onChange={(e) => {
+                          const username_val = e.target.value;
+                          setUsername(e.target.value);
+                          validateUsername(username_val);
+                        }}
+                        isInvalid={!!usernameError}
+
                         disabled={isLoading}
                         required
                         className="border-0 bg-transparent shadow-none py-1"
@@ -158,7 +195,14 @@ export default function Login({ }: Route.ComponentProps) {
                         name="password"
                         placeholder="Enter your password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+
+                        onChange={(e) => {
+                          const pass_val = e.target.value;
+                          setPassword(e.target.value);
+                          validatePassword(pass_val);
+                        }}
+                        isInvalid={!!passwordError}
+
                         disabled={isLoading}
                         required
                         className="border-0 bg-transparent shadow-none py-1"
@@ -193,7 +237,7 @@ export default function Login({ }: Route.ComponentProps) {
 
         {/* FOOTER */}
         <Footer />
-        
+
       </div>
     </>
   );
