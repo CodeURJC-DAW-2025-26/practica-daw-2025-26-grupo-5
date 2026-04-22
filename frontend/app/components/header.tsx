@@ -37,7 +37,7 @@ export default function Header() {
 
   const isHome = location.pathname === "/";
   const [searchInput, setSearchInput] = useState("");
-
+  const [searchInputErrors, setSearchInputErrors] = useState("")
   /**
    * Load current user session on mount
    * Checks if user is logged in from localStorage
@@ -52,15 +52,25 @@ export default function Header() {
    * Handle search form submission with URL encoding
    */
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); 
+    e.preventDefault();
 
-    if (searchInput.trim()) {
-      navigate(`/?query=${encodeURIComponent(searchInput)}#featured-treasures`);
-    } else {
-      navigate(`/#featured-treasures`);
+    if (!searchInputErrors) {
+      if (searchInput.trim()) {
+        navigate(`/?query=${encodeURIComponent(searchInput)}#featured-treasures`);
+      } else {
+        navigate(`/#featured-treasures`);
+      }
     }
-    
+        
     setSearchInput("");
+    setSearchInputErrors("");
+  };
+
+  const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+  const validateSearchInput = (val: string) => {
+    let error = "";
+    if (htmlRegex.test(val)) error = "HTML tags are not allowed. Be careful.";
+    setSearchInputErrors(error);
   };
 
   return (
@@ -87,16 +97,42 @@ export default function Header() {
 
         {/* CENTER SECTION: Search Box (Home only) */}
         {isHome && (
-          <form onSubmit={handleSearch} className="search-box d-none d-md-flex mx-auto">
+          <form
+            onSubmit={handleSearch}
+            className="search-box d-none d-md-flex mx-auto position-relative"
+            style={{ overflow: 'hidden' }} 
+          >
             <i className="fa-solid fa-magnifying-glass"></i>
             <input
               type="text"
               name="query"
               placeholder="Search for treasures..."
               value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
+              onChange={(e) => {
+                const searchNeeds = e.target.value;
+                setSearchInput(searchNeeds);
+                validateSearchInput(searchNeeds);
+              }}
+
+              style={{ paddingRight: searchInputErrors ? '180px' : 'inherit' }}
             />
             <button type="submit" className="d-none"></button>
+
+            {searchInputErrors && (
+              <div
+                className="text-danger fw-800 position-absolute d-flex align-items-center h-100"
+                style={{
+                  right: '20px',       
+                  top: 0,              
+                  fontSize: '14px',
+                  pointerEvents: 'none',
+                  backgroundColor: 'transparent' 
+                }}
+              >
+                <i className="fa-solid fa-triangle-exclamation me-1"></i>
+                {searchInputErrors}
+              </div>
+            )}
           </form>
         )}
 

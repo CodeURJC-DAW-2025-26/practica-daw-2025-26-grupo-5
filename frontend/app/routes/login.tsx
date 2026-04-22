@@ -183,7 +183,9 @@ export default function Login({ }: Route.ComponentProps) {
                         className="border-0 bg-transparent shadow-none py-1"
                       />
                     </div>
+                    {usernameError && <div className="text-danger x-small fw-700 mt-1 ms-3">{usernameError}</div>}
                   </Form.Group>
+
 
                   {/* PASSWORD FIELD */}
                   <Form.Group className="mb-5" controlId="loginPassword">
@@ -208,14 +210,16 @@ export default function Login({ }: Route.ComponentProps) {
                         className="border-0 bg-transparent shadow-none py-1"
                       />
                     </div>
+                    {passwordError && <div className="text-danger x-small fw-700 mt-1 ms-3">{passwordError}</div>}
                   </Form.Group>
+
 
                   {/* SUBMIT BUTTON */}
                   <Button
                     type="submit"
                     variant="primary" // Bootstrap default variant, overridden by custom class
                     className="btn-sell w-100 py-3 fw-800 mb-4 border-0 rounded-pill d-flex justify-content-center align-items-center"
-                    disabled={isLoading}
+                    disabled={isLoading || !!passwordError || !!usernameError}
                   >
                     {isLoading ? 'Logging in...' : 'Login to My Account'}
                   </Button>

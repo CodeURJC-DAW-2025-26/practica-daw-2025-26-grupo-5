@@ -98,7 +98,7 @@ export async function clientLoader({ params }: { params: { id: string } }) {
   try {
     const numericId = Number(params.id);
     if (isNaN(numericId)) {
-      throw new Error('Invalid ID format'); 
+      throw new Error('Invalid ID format');
     }
     return await getCheckoutDetails(numericId);
   } catch (error: any) {
@@ -121,15 +121,15 @@ interface PaymentPageProps {
  * Displays checkout form and product summary.
  * Handles payment submission and transaction creation.
  */
+// ... (mismos imports)
+
 const PaymentPage = ({ loaderData }: PaymentPageProps) => {
   const navigate = useNavigate();
   const { user } = useUserStore();
-  
-  // Payment processing state
+
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Payment form state
   const [paymentForm, setPaymentForm] = useState({
     cardHolder: '',
     cardNumber: '',
@@ -137,44 +137,51 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
     cvv: ''
   });
 
-  // Extract checkout data
+  // Estado para capturar errores de seguridad XSS
+  const [fieldErrors, setFieldErrors] = useState({
+    cardHolder: '',
+    cardNumber: '',
+    expiry: '',
+    cvv: ''
+  });
+
+  const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+
   const checkoutData = loaderData;
   const { product, buyer } = checkoutData || {};
   const productId = checkoutData?.product?.id;
 
   /**
-   * Handle Payment Form Input Changes
-   * Updates form state as user types
+   * Función de validación XSS
    */
+  const validateXSS = (name: string, value: string) => {
+    const isMalicious = htmlRegex.test(value);
+    setFieldErrors(prev => ({ 
+      ...prev, 
+      [name]: isMalicious ? "Security alert: HTML tags not allowed. Be careful." : "" 
+    }));
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setPaymentForm(prev => ({ ...prev, [name]: value }));
+    validateXSS(name, value); 
   };
 
-  /**
-   * Handle Payment Form Submission
-   * 
-   * Process:
-   * 1. Prevent default form submission
-   * 2. Validate product ID exists
-   * 3. Set processing state (disable submit button)
-   * 4. Call createTransaction() API
-   * 5. On success:
-   *    - Set 'justPurchased' flag in localStorage
-   *    - Redirect to sales orders page
-   * 6. On error: Display error message
-   */
   const handlePaymentSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (Object.values(fieldErrors).some(err => err !== "")) return;
+
     setProcessing(true);
     setError(null);
-    
+
     if (!productId) {
       setError("Product ID is missing.");
       setProcessing(false);
       return;
     }
-    
+
     try {
       await createTransaction(parseInt(productId.toString(), 10));
       localStorage.setItem('justPurchased', 'true');
@@ -184,20 +191,6 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
       setProcessing(false);
     }
   };
-
-  /**
-   * Show Error Alert if Error Occurs
-   */
-  if (error && !processing) {
-    return (
-      <Container className="mt-5 text-center">
-        <Alert variant="danger" className="rounded-4 shadow-sm">{error}</Alert>
-        <Button variant="outline-primary" className="mt-3 rounded-pill fw-700 px-4" onClick={() => navigate('/')}>
-          Return to home
-        </Button>
-      </Container>
-    );
-  }
 
   return (
     <div className="bg-light pb-5 pt-4">
@@ -209,7 +202,7 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
                 <Card.Body className="p-4 p-md-5">
                   <Row className="align-items-center g-4">
                     
-                    {/* Left Column: Product Info */}
+                    {/* Left Column: Product Info (Mantenido igual) */}
                     {product && (
                       <Col lg={5} className="text-center border-end-lg pe-lg-4">
                         <div className="position-relative mb-4 clay-card p-3" style={{ backgroundColor: '#f8fafc', borderRadius: '16px' }}>
@@ -250,14 +243,14 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
                       </Col>
                     )}
 
-                    {/* Right Column: Checkout Form & User Info */}
+                    {/* Right Column: Checkout Form */}
                     <Col lg={7} className="ps-lg-5">
                       <h4 className="fw-800 mb-3 text-dark">
                         <i className="fa-regular fa-credit-card me-2 text-primary"></i>
                         Secure Payment
                       </h4>
 
-                      {/* Security Info */}
+                      {/* Security Info (Mantenido igual) */}
                       <Alert variant="success" className="d-flex align-items-center gap-3 mb-4 py-2 border-0" style={{ borderRadius: '12px', backgroundColor: '#ecfdf5' }}>
                         <i className="fa-solid fa-shield-halved text-success fs-4 ms-2" />
                         <div>
@@ -275,11 +268,13 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
                             name="cardHolder"
                             value={paymentForm.cardHolder}
                             onChange={handleInputChange}
+                            isInvalid={!!fieldErrors.cardHolder}
                             placeholder="Raul Oliveira"
                             className="py-3 px-4 bg-light border-0 shadow-none"
                             style={{ borderRadius: '12px', fontSize: '15px' }}
                             required
                           />
+                          {fieldErrors.cardHolder && <div className="text-danger x-small fw-700 mt-1 ms-2">{fieldErrors.cardHolder}</div>}
                         </Form.Group>
 
                         <Form.Group className="mb-3">
@@ -289,24 +284,21 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
                               type="text"
                               name="cardNumber"
                               value={paymentForm.cardNumber}
+                              isInvalid={!!fieldErrors.cardNumber}
                               onChange={(e) => {
                                 let value = e.target.value.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim();
                                 if (value.length > 19) value = value.slice(0, 19);
                                 setPaymentForm(prev => ({ ...prev, cardNumber: value }));
+                                validateXSS('cardNumber', value);
                               }}
                               placeholder="1234 5678 9012 3456"
                               className="py-3 px-4 bg-light border-0 shadow-none"
                               style={{ borderRadius: '12px', fontSize: '15px', letterSpacing: '2px' }}
                               required
                             />
-                            <i className="fa-brands fa-cc-visa position-absolute" style={{ 
-                              right: '16px', 
-                              top: '50%', 
-                              transform: 'translateY(-50%)', 
-                              fontSize: '24px', 
-                              color: '#94a3b8'
-                            }} />
+                            {!fieldErrors.cardNumber && <i className="fa-brands fa-cc-visa position-absolute" style={{ right: '16px', top: '50%', transform: 'translateY(-50%)', fontSize: '24px', color: '#94a3b8' }} />}
                           </div>
+                          {fieldErrors.cardNumber && <div className="text-danger x-small fw-700 mt-1 ms-2">{fieldErrors.cardNumber}</div>}
                         </Form.Group>
 
                         <Row className="g-3 mb-4">
@@ -317,18 +309,21 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
                                 type="text"
                                 name="expiry"
                                 value={paymentForm.expiry}
+                                isInvalid={!!fieldErrors.expiry}
                                 onChange={(e) => {
                                   let value = e.target.value.replace(/\D/g, '');
                                   if (value.length >= 2) {
                                     value = value.slice(0, 2) + '/' + value.slice(2, 4);
                                   }
                                   setPaymentForm(prev => ({ ...prev, expiry: value }));
+                                  validateXSS('expiry', value);
                                 }}
                                 placeholder="MM/YY"
                                 className="py-3 text-center bg-light border-0 shadow-none"
                                 style={{ borderRadius: '12px', fontSize: '15px', fontWeight: 'bold', letterSpacing: '2px' }}
                                 required
                               />
+                              {fieldErrors.expiry && <div className="text-danger x-small fw-700 mt-1">{fieldErrors.expiry}</div>}
                             </Form.Group>
                           </Col>
                           <Col xs={6}>
@@ -338,16 +333,19 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
                                 type="password"
                                 name="cvv"
                                 value={paymentForm.cvv}
+                                isInvalid={!!fieldErrors.cvv}
                                 onChange={(e) => {
                                   let value = e.target.value.replace(/\D/g, '');
                                   if (value.length > 4) value = value.slice(0, 4);
                                   setPaymentForm(prev => ({ ...prev, cvv: value }));
+                                  validateXSS('cvv', value);
                                 }}
                                 placeholder="•••"
                                 className="py-3 text-center bg-light border-0 shadow-none"
                                 style={{ borderRadius: '12px', fontSize: '15px', fontWeight: 'bold', letterSpacing: '2px' }}
                                 required
                               />
+                              {fieldErrors.cvv && <div className="text-danger x-small fw-700 mt-1">{fieldErrors.cvv}</div>}
                             </Form.Group>
                           </Col>
                         </Row>
@@ -355,7 +353,7 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
                         <Button
                           variant="dark"
                           type="submit"
-                          disabled={processing}
+                          disabled={processing || Object.values(fieldErrors).some(err => err !== "")}
                           className="w-100 py-3 fw-800 rounded-pill border-0 shadow-sm"
                           style={{ fontSize: '16px' }}
                         >

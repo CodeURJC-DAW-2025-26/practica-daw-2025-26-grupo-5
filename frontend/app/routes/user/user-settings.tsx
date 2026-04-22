@@ -120,6 +120,16 @@ export default function UserSettings() {
   const [isPendingDelete, setPendingDelete] = useState(false);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
+  // To avoid XSS
+  const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+  const [fieldErrors, setFieldErrors] = useState({
+    email: '',
+    description: '',
+    cardNumber: '',
+    expiry: '',
+    cvv: ''
+  });
+
   /**
    * Handle Profile Photo Selection
    */
@@ -216,6 +226,31 @@ export default function UserSettings() {
     }
   };
 
+  const validateEmail = (val: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let error = "";
+    if (!val) error = "Email is required.";
+    else if (!emailRegex.test(val)) error = "Invalid email format.";
+    else if (htmlRegex.test(val)) error = "Malicious characters detected.";
+    setFieldErrors(prev => ({ ...prev, email: error }));
+  };
+
+  const validateDescription = (val: string) => {
+    let error = "";
+    if (val.length > 500) error = "Description is too long (max 500 chars).";
+    else if (htmlRegex.test(val)) error = "HTML tags are not allowed.";
+    setFieldErrors(prev => ({ ...prev, description: error }));
+  };
+
+  const validateBilling = (name: string, val: string) => {
+    let error = "";
+    if (name === 'cardNumber' && val.length > 0 && val.length < 16) error = "Card number must be 16 digits.";
+    if (name === 'expiry' && val.length > 0 && !/^\d{2}\/\d{2}$/.test(val)) error = "Use MM/YY format.";
+    if (name === 'cvv' && val.length > 0 && val.length < 3) error = "CVV must be 3 digits.";
+
+    setFieldErrors(prev => ({ ...prev, [name]: error }));
+  };
+
   const isAdmin = user?.roles?.includes('ROLE_ADMIN');
   return (
     <>
@@ -284,82 +319,110 @@ export default function UserSettings() {
                     </div>
                   </div>
 
+                  {/* EMAIL ADDRESS */}
                   <div className="mb-4">
                     <label className="label-categories mb-2 d-block">EMAIL ADDRESS</label>
-                    <div className="search-box w-100 py-2">
+                    <div className={`search-box w-100 py-2 ${fieldErrors.email ? 'border border-danger' : ''}`}>
                       <i className="fa-solid fa-envelope small"></i>
                       <input
                         type="email"
                         name="newEmail"
+                        className={`form-control border-0 bg-transparent shadow-none p-0 ${fieldErrors.email ? 'is-invalid' : ''}`}
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          validateEmail(e.target.value);
+                        }}
                         required
                         disabled={loading}
                       />
                     </div>
+                    {fieldErrors.email && <div className="text-danger x-small fw-700 mt-1 ms-2">{fieldErrors.email}</div>}
                   </div>
 
+                  {/* PROFILE DESCRIPTION */}
                   <div className="mb-4">
                     <label className="label-categories mb-2 d-block">PROFILE DESCRIPTION</label>
                     <textarea
                       name="newDescription"
-                      className="search-box w-100 description-box"
-                      placeholder="Tell the community about your collection history..."
+                      className={`search-box w-100 description-box ${fieldErrors.description ? 'is-invalid border border-danger' : ''}`}
+                      placeholder="Tell the community..."
                       value={description}
-                      onChange={(e) => setDescription(e.target.value)}
+                      onChange={(e) => {
+                        setDescription(e.target.value);
+                        validateDescription(e.target.value);
+                      }}
                       disabled={loading}
                       rows={4}
                     />
+                    {fieldErrors.description && <div className="text-danger x-small fw-700 mt-1 ms-2">{fieldErrors.description}</div>}
                   </div>
 
-                  <hr className="my-4 opacity-10" />
-
-                  <p className="label-categories mb-3 opacity-50 fw-800 x-small text-primary text-uppercase">Billing Information</p>
-
+                  {/* CARD NUMBER */}
                   <div className="mb-3">
                     <label className="label-categories mb-2 d-block">CARD NUMBER</label>
-                    <div className="search-box w-100 py-2">
+                    <div className={`search-box w-100 py-2 ${fieldErrors.cardNumber ? 'border border-danger' : ''}`}>
                       <i className="fa-solid fa-credit-card small"></i>
                       <input
                         type="text"
                         name="newCardNumber"
+                        className={`form-control border-0 bg-transparent shadow-none p-0 ${fieldErrors.cardNumber ? 'is-invalid' : ''}`}
                         value={cardNumber}
-                        onChange={(e) => setCardNumber(e.target.value)}
+                        onChange={(e) => {
+                          const val = e.target.value.replace(/\D/g, '');
+                          setCardNumber(val);
+                          validateBilling('cardNumber', val);
+                        }}
                         maxLength={16}
                         disabled={loading}
                       />
                     </div>
+                    {fieldErrors.cardNumber && <div className="text-danger x-small fw-700 mt-1 ms-2">{fieldErrors.cardNumber}</div>}
                   </div>
 
                   <div className="row g-3 mb-4">
+                    {/* EXPIRING DATE */}
                     <div className="col-sm-7">
                       <label className="label-categories mb-2 d-block">EXPIRING DATE</label>
-                      <div className="search-box w-100 py-2">
+                      <div className={`search-box w-100 py-2 ${fieldErrors.expiry ? 'border border-danger' : ''}`}>
                         <i className="fa-solid fa-calendar-days small"></i>
                         <input
                           type="text"
                           name="newCardExpiringDate"
+                          className={`form-control border-0 bg-transparent shadow-none p-0 ${fieldErrors.expiry ? 'is-invalid' : ''}`}
                           value={expiry}
-                          onChange={(e) => setExpiry(e.target.value)}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/[^\d/]/g, '');
+                            setExpiry(val);
+                            validateBilling('expiry', val);
+                          }}
                           placeholder="MM/YY"
                           maxLength={5}
                           disabled={loading}
                         />
                       </div>
+                      {fieldErrors.expiry && <div className="text-danger x-small fw-700 mt-1 ms-2">{fieldErrors.expiry}</div>}
                     </div>
+
+                    {/* CVV */}
                     <div className="col-sm-5">
                       <label className="label-categories mb-2 d-block">CVV</label>
-                      <div className="search-box w-100 py-2 cvv-wrapper">
+                      <div className={`search-box w-100 py-2 cvv-wrapper ${fieldErrors.cvv ? 'border border-danger' : ''}`}>
                         <i className="fa-solid fa-lock small"></i>
                         <input
                           type={showCvv ? "text" : "password"}
                           name="newCardCvv"
                           id="cardCvv"
+                          className={`form-control border-0 bg-transparent shadow-none p-0 ${fieldErrors.cvv ? 'is-invalid' : ''}`}
                           value={cvv}
-                          onChange={(e) => setCvv(e.target.value)}
+                          onChange={(e) => {
+                            const val = e.target.value.replace(/\D/g, '');
+                            setCvv(val);
+                            validateBilling('cvv', val);
+                          }}
                           maxLength={3}
                           disabled={loading}
-                          style={{ flex: 1, border: 'none', outline: 'none', background: 'transparent' }}
+                          style={{ flex: 1, outline: 'none', background: 'transparent' }}
                         />
                         <i
                           className={`fa-solid ${showCvv ? 'fa-eye-slash' : 'fa-eye'} toggle-password`}
@@ -368,10 +431,15 @@ export default function UserSettings() {
                           style={{ cursor: 'pointer' }}
                         ></i>
                       </div>
+                      {fieldErrors.cvv && <div className="text-danger x-small fw-700 mt-1 ms-2">{fieldErrors.cvv}</div>}
                     </div>
                   </div>
 
-                  <button type="submit" className="btn-sell w-100 justify-content-center mb-5" disabled={loading}>
+                  <button
+                    type="submit"
+                    className="btn-sell w-100 justify-content-center mb-5"
+                    disabled={loading || Object.values(fieldErrors).some(err => err !== '')}
+                  >
                     {loading ? <Spinner animation="border" size="sm" className="me-2" /> : null}
                     Save All Changes
                   </button>

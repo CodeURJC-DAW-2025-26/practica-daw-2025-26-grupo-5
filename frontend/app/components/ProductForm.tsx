@@ -113,7 +113,13 @@ export default function ProductForm({
    * Submitted to server when form is submitted.
    */
   const [name, setName] = useState(product?.name || "");
+  const [nameErrors, setNameErrors] = useState("")
+
   const [description, setDescription] = useState(product?.description || "");
+  const [descriptionErrors, setDescriptionErrors] = useState("");
+
+  const [location, setLocation] = useState(product?.location || "");
+  const [locationErrors, setLocationErrors] = useState("");
 
   /**
    * Image Preview State
@@ -141,6 +147,7 @@ export default function ProductForm({
   useEffect(() => {
     if (product?.name) setName(product.name);
     if (product?.description) setDescription(product.description);
+    if (product?.location) setLocation(product.location);
 
     // Load existing product image for edit mode
     // Cache bust with Date.now() to ensure fresh image
@@ -187,6 +194,56 @@ export default function ProductForm({
       const improvedText = await onImproveWithAI(name, description);
       if (improvedText) setDescription(improvedText);
     }
+  };
+
+  /**
+ * Performs minimal client-side validation.
+ * Ensures that the required fields are not empty before proceeding with the action.
+ * * @param value - The input string to be validated.
+ * @returns {boolean} True if the value is present and not empty, false otherwise.
+ */
+  const validateName = (value: string) => {
+    let error = "";
+    const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+
+    if (value.trim().length < 3) {
+      error = "Name is to short (min. 3 chars)."
+    } else if (value.trim().length > 10) {
+      error = "Name is to long (max. 10 chars)."
+    } else if (htmlRegex.test(value)) {
+      error = "HTML tags are not allowed for security reasons. Be careful.";
+    }
+
+    setNameErrors(error);
+  };
+
+  const validateDescription = (value: string) => {
+    let error = "";
+    const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+
+    if (value.trim().length < 10) {
+      error = "Description is too short (min. 10 chars)."
+    } else if (value.trim().length > 150) {
+      error = "Description is too long (max. 150 chars)."
+    } else if (htmlRegex.test(value)) {
+      error = "HTML tags are not allowed for security reasons. Be careful.";
+    }
+    setDescriptionErrors(error);
+  };
+
+  const validateLocation = (value: string) => {
+    let error = "";
+    const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+
+    if (value.trim().length < 4) {
+      error = "Location is too short (min. 4 chars).";
+    } else if (value.trim().length > 50) {
+      error = "Location is too long (max. 50 chars).";
+    } else if (htmlRegex.test(value)) {
+      error = "HTML tags are not allowed for security reasons. Be careful.";
+    }
+
+    setLocationErrors(error);
   };
 
   return (
@@ -314,13 +371,21 @@ export default function ProductForm({
                         type="text"
                         name="name"
                         value={name}
-                        onChange={(e) => setName(e.target.value)}
+
+                        onChange={(e) => {
+                          const name_val = e.target.value;
+                          setName(name_val);
+                          validateName(name_val);
+                        }}
+                        isInvalid={!!nameErrors}
+
                         placeholder="e.g. Vintage Eames Chair"
                         className="w-100 border-0 fw-600 bg-transparent shadow-none p-0"
                         required
                         disabled={isPending}
                       />
                     </div>
+                    {nameErrors && <div className="text-danger x-small fw-700 mt-1 ms-2">{nameErrors}</div>}
                   </Col>
 
                   {/* CATEGORY DROPDOWN */}
@@ -363,7 +428,7 @@ export default function ProductForm({
                       />
                     </div>
                   </Col>
-                  
+
                   {/* LOCATION INPUT */}
                   <Col md={12}>
                     <Form.Label className="label-categories x-small mb-1">
@@ -378,9 +443,18 @@ export default function ProductForm({
                         placeholder="e.g. Madrid, Spain"
                         className="w-100 border-0 fw-600 bg-transparent shadow-none p-0"
                         required
+
+                        onChange={(e) => {
+                          const location_val = e.target.value;
+                          setLocation(location_val);
+                          validateLocation(location_val);
+                        }}
+                        isInvalid={!!locationErrors}
+
                         disabled={isPending}
                       />
                     </div>
+                    {locationErrors && <div className="text-danger x-small fw-700 mt-1 ms-2">{locationErrors}</div>}
                   </Col>
 
                   {/* DESCRIPTION TEXTAREA WITH AI ENHANCEMENT */}
@@ -394,7 +468,7 @@ export default function ProductForm({
                         variant="outline-primary"
                         size="sm"
                         onClick={handleAIImprovement}
-                        disabled={aiState?.loading || isPending || !name}
+                        disabled={!!descriptionErrors}
                         className="btn-ai-sparkle border-0 py-0 px-2"
                         style={{ height: '24px' }}
                       >
@@ -417,22 +491,30 @@ export default function ProductForm({
                       as="textarea"
                       name="description"
                       value={description}
-                      onChange={(e) => setDescription(e.target.value)}
                       rows={5}
                       className="border bg-light p-3 fw-600 small rounded-4 shadow-none"
                       style={{ resize: "none" }}
                       required
+
+                      onChange={(e) => {
+                          const description_val = e.target.value;
+                          setDescription(description_val);
+                          validateDescription(description_val);
+                        }}
+                        isInvalid={!!descriptionErrors}
+
                       disabled={isPending}
                     />
                   </Col>
+                  {descriptionErrors && <div className="text-danger x-small fw-700 mt-1 ms-2">{descriptionErrors}</div>}
                 </Row>
 
-                {/* FORM ACTIONS: Submit Button */}
+                {/* FORM ACTIONS: Submit Button only if no errors */}
                 <div className="mt-4 pt-3 border-top d-flex justify-content-end">
                   <Button
                     type="submit"
                     className="btn-sell px-5 py-2 shadow-lg rounded-pill border-0 fw-800"
-                    disabled={isPending}
+                    disabled={isPending || !!nameErrors || !!descriptionErrors || !!locationErrors}
                   >
                     {isPending ? (
                       <>

@@ -157,19 +157,42 @@ export default function Signup({ }: Route.ComponentProps) {
  * * @param value - The input string to be validated.
  * @returns {boolean} True if the value is present and not empty, false otherwise.
  */
+  const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+
   const validateUsername = (value: string) => {
-    let error = value.trim().length < 3 ? "Name is too short (min. 3 chars)." : "";
+    let error = "";
+
+    if (value.trim().length < 3) {
+      error = "Name is too short (min. 3 chars).";
+    } else if (htmlRegex.test(value)) {
+      error = "HTML tags are not allowed for security reasons.  Be careful.";
+    }
+
     setErrors(prev => ({ ...prev, username: error }));
   };
 
   const validateEmail = (value: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    let error = !emailRegex.test(value) ? "Invalid email address." : "";
+    let error = "";
+
+    if (!emailRegex.test(value)) {
+      error = "Invalid email address.";
+    } else if (htmlRegex.test(value)) {
+      error = "Malicious characters detected. Be careful.";
+    }
+
     setErrors(prev => ({ ...prev, email: error }));
   };
 
   const validatePasswords = (pass: string, confirm: string) => {
-    let passError = pass.length < 8 ? "Password must be at least 8 characters." : "";
+    let passError = "";
+
+    if (pass.length < 8) {
+      passError = "Password must be at least 8 characters.";
+    } else if (htmlRegex.test(pass)) {
+      passError = "HTML tags are not allowed in passwords. Be careful.";
+    }
+
     let matchError = pass !== confirm ? "Passwords do not match." : "";
 
     setErrors(prev => ({
@@ -205,7 +228,7 @@ export default function Signup({ }: Route.ComponentProps) {
         <main className="flex-grow-1 d-flex align-items-center justify-content-center py-5">
           <Container>
             <Row className="justify-content-center px-2">
-              <Col xs={12} style={{ maxWidth: '750px' }}> 
+              <Col xs={12} style={{ maxWidth: '750px' }}>
                 <Card className="clay-card border-0 shadow-sm" style={{ borderRadius: '28px' }}>
                   <Card.Body className="p-4 p-md-5">
 
@@ -261,8 +284,10 @@ export default function Signup({ }: Route.ComponentProps) {
                                 name="email"
                                 placeholder="email@stilnovo.com"
                                 value={formData.email}
+
                                 onChange={handleInputChange}
                                 isInvalid={!!errors.email}
+
                                 className="border-0 shadow-none bg-transparent p-0 flex-grow-1 small fw-600 w-100"
                               />
                             </div>
@@ -280,8 +305,10 @@ export default function Signup({ }: Route.ComponentProps) {
                                 name="password"
                                 placeholder="••••••"
                                 value={formData.password}
+
                                 onChange={handleInputChange}
                                 isInvalid={!!errors.password}
+
                                 className="border-0 shadow-none bg-transparent p-0 flex-grow-1 small fw-600 w-100"
                               />
                             </div>
@@ -297,8 +324,10 @@ export default function Signup({ }: Route.ComponentProps) {
                                 name="confirmPassword"
                                 placeholder="••••••"
                                 value={formData.confirmPassword}
+
                                 onChange={handleInputChange}
                                 isInvalid={!!errors.confirmPassword}
+
                                 className="border-0 shadow-none bg-transparent p-0 flex-grow-1 small fw-600 w-100"
                               />
                             </div>
@@ -311,13 +340,13 @@ export default function Signup({ }: Route.ComponentProps) {
                         <Button
                           type="submit"
                           className="btn-sell w-100 py-3 mb-3 border-0 shadow-sm rounded-pill fw-800 fs-5"
-                          disabled={isLoading || Object.values(errors).some(e => e !== '')}
+                          disabled={isLoading || !!errors.username || !!errors.email || !!errors.confirmPassword || !!errors.password || !!Object.values(errors).some(e => e !== '')}
                           style={{ transition: 'transform 0.2s' }}
                         >
                           {isLoading ? 'Creating Account...' : 'Create Account'}
                         </Button>
                       </div>
-                      
+
                       {/* Back to Marketplace Link */}
                       <div className="text-center">
                         <Link to="/" className="text-muted small text-decoration-none fw-700">

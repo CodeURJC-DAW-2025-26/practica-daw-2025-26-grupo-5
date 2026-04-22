@@ -75,7 +75,9 @@ interface ValorationModalProps {
 export default function ValorationModal({ show, onHide, transaction, onSubmit, isProcessing, initialData }: ValorationModalProps) {
     const [rating, setRating] = useState(5);
     const [hover, setHover] = useState(0);
+
     const [comment, setComment] = useState("");
+    const [commentErrors, setCommentErrors] = useState("");
 
     const MIN_CHARS = 15;
 
@@ -97,6 +99,21 @@ export default function ValorationModal({ show, onHide, transaction, onSubmit, i
         await onSubmit(rating, comment);
         // We don't reset here manually if the parent handles closing/unmounting, 
         // but it doesn't hurt.
+    };
+
+    const validateComment = (value: string) => {
+        let error = "";
+        const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+
+        if (value.trim().length < 15) {
+            error = "";
+        } else if (value.trim().length > 400) {
+            error = "Valoration is too long (max. 400 chars).";
+        } else if (htmlRegex.test(value)) {
+            error = "HTML tags are not allowed for security reasons. Be careful.";
+        }
+
+        setCommentErrors(error);
     };
 
     const getEditorialTip = () => {
@@ -121,9 +138,9 @@ export default function ValorationModal({ show, onHide, transaction, onSubmit, i
                     <h3 className="fw-800 h5 mb-1 text-dark">Submit Experience</h3>
                     <p className="small text-muted fw-600 mb-0">
                         {/* FIX: Added fallback (0) before toFixed to prevent 
-                          "Cannot read properties of undefined" error 
+                            "Cannot read properties of undefined" error 
                         */}
-                        {transaction.product?.name || 'Product'} &bull; { (transaction.finalPrice ?? 0).toFixed(2) }€
+                        {transaction.product?.name || 'Product'} &bull; {(transaction.finalPrice ?? 0).toFixed(2)}€
                     </p>
                 </header>
 
@@ -172,7 +189,14 @@ export default function ValorationModal({ show, onHide, transaction, onSubmit, i
                             rows={3}
                             placeholder="State your opinion about the transaction..."
                             value={comment}
-                            onChange={(e) => setComment(e.target.value)}
+
+                            onChange={(e) => {
+                                const comment_val = e.target.value;
+                                setComment(comment_val);
+                                validateComment(comment_val);
+                            }}
+                            isInvalid={!!commentErrors}
+
                             className="border-0 p-3 small fw-600 shadow-none"
                             style={{ backgroundColor: '#F8FAFC', borderRadius: '16px', resize: 'none', border: '1px solid #E2E8F0' }}
                             required
@@ -183,6 +207,8 @@ export default function ValorationModal({ show, onHide, transaction, onSubmit, i
                                 {getEditorialTip()}
                             </p>
                         </div>
+                        {commentErrors && <div className="text-danger x-small fw-700 mt-1 ms-2">{commentErrors}</div>}
+
                     </Form.Group>
 
                     <Stack direction="horizontal" gap={3}>
@@ -196,7 +222,7 @@ export default function ValorationModal({ show, onHide, transaction, onSubmit, i
                         <Button
                             type="submit"
                             className="btn-sell w-100 py-3 shadow-sm border-0 rounded-pill fw-800"
-                            disabled={isProcessing || comment.length < MIN_CHARS}
+                            disabled={isProcessing || !!commentErrors || comment.length < MIN_CHARS}
                             style={{ fontSize: '13px' }}
                         >
                             {isProcessing ? <Spinner size="sm" animation="border" /> : (initialData ? "Update Review" : "Post Review")}
