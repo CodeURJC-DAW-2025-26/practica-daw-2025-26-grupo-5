@@ -68,8 +68,8 @@
 import { useState, useEffect } from 'react';
 import {useRevalidator } from 'react-router';
 import { useUserStore } from '~/stores/useUserStore';
-import { updateUserSettings } from '~/services/user-service';
-import { Spinner, Alert } from 'react-bootstrap';
+import { updateUserSettings, deleteUser } from '~/services/user-service';
+import { Spinner, Alert, Modal, Button } from 'react-bootstrap';
 
 /**
  * User Settings Component Implementation
@@ -94,6 +94,13 @@ export default function UserSettings() {
   const [success, setSuccess] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
+
+  // Delete Account Modal States
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmUsername, setDeleteConfirmUsername] = useState('');
+  const [deleteConfirmEmail, setDeleteConfirmEmail] = useState('');
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   /**
    * Initialize Form with Current User Data
@@ -183,6 +190,57 @@ export default function UserSettings() {
    * For security: CVV hidden by default
    */
   const toggleCvv = () => setShowCvv(!showCvv);
+
+  /**
+   * Handle Delete Account
+   * 
+   * Security Checks:
+   * 1. Verify username matches
+   * 2. Verify email matches
+   * 3. Call deleteUser() from backend
+   * 4. Logout and redirect on success
+   */
+  const handleDeleteAccount = async () => {
+    // Validation: Check if confirmations match
+    if (deleteConfirmUsername !== user?.name) {
+      setDeleteError('Username does not match. Please check and try again.');
+      return;
+    }
+
+    if (deleteConfirmEmail !== user?.email) {
+      setDeleteError('Email does not match. Please check and try again.');
+      return;
+    }
+
+    setDeleteLoading(true);
+    setDeleteError(null);
+
+    try {
+      await deleteUser();
+      
+      // Success: Clear auth state and redirect
+      const { logoutUser } = useUserStore.getState();
+      logoutUser();
+      
+      // Redirect to /new/
+      window.location.href = '/new/';
+    } catch (err: any) {
+      console.error('Delete account error:', err);
+      const errorMsg = err.response?.data?.message || err.message || 'Failed to delete account. Please try again.';
+      setDeleteError(errorMsg);
+      setDeleteLoading(false);
+    }
+  };
+
+  /**
+   * Reset delete modal state when closing
+   */
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setDeleteConfirmUsername('');
+    setDeleteConfirmEmail('');
+    setDeleteError(null);
+  };
 
   /**
    * Redirect to Login if Not Authenticated
@@ -369,7 +427,11 @@ export default function UserSettings() {
                   </div>
                 ) : (
                   <div className="text-center">
-                    <button type="button" className="btn btn-danger-custom w-100 py-3 small shadow-sm" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                    <button 
+                      type="button" 
+                      className="btn btn-danger-custom w-100 py-3 small shadow-sm"
+                      onClick={() => setShowDeleteModal(true)}
+                    >
                       <i className="fa-solid fa-user-slash me-2"></i>Permanently Delete Account
                     </button>
                   </div>
@@ -449,40 +511,135 @@ export default function UserSettings() {
       </main>
 
       {/* DELETE ACCOUNT MODAL */}
-      <div className="modal fade" id="deleteAccountModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="clay-card modal-content p-4 border-0 shadow-lg">
-            <div className="text-center mb-4">
-              <div className="bg-danger bg-opacity-10 p-3 rounded-circle d-inline-block mb-3">
-                <i className="fa-solid fa-triangle-exclamation text-danger fa-2x"></i>
-              </div>
-              <h3 className="fw-800 h5 mb-2 text-danger">Confirm Account Deletion</h3>
-              <p className="small text-muted">Hi {user.name}, are you sure you want to leave us? This action will permanently remove all your products and history.</p>
+      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal} centered backdrop={deleteLoading ? "static" : true} keyboard={!deleteLoading}>
+        <Modal.Header closeButton={!deleteLoading} className="border-0 bg-danger-subtle">
+          <div className="d-flex align-items-center gap-3 w-100">
+            <div className="bg-danger bg-opacity-25 p-3 rounded-circle d-inline-flex align-items-center justify-content-center">
+              <i className="fa-solid fa-triangle-exclamation text-danger fa-lg"></i>
+            </div>
+            <div>
+              <Modal.Title className="fw-800 h6 text-danger mb-0">Permanently Delete Account</Modal.Title>
+              <p className="x-small text-muted mb-0">This action cannot be undone</p>
+            </div>
+          </div>
+        </Modal.Header>
+
+        <Modal.Body className="pt-4">
+          {/* Warning Section */}
+          <div className="alert alert-warning d-flex gap-3 mb-4" style={{ backgroundColor: '#fef3c7', borderColor: '#fbbf24' }}>
+            <i className="fa-solid fa-exclamation-circle text-warning mt-1" style={{ fontSize: '1.2rem' }}></i>
+            <div>
+              <h6 className="fw-800 mb-2">Warning: Irreversible Action</h6>
+              <ul className="small mb-0 ps-3">
+                <li>All your products will be permanently removed</li>
+                <li>Your seller profile will be deleted</li>
+                <li>Transaction history will be archived (not deleted)</li>
+                <li>This cannot be reversed</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Error Display */}
+          {deleteError && (
+            <Alert variant="danger" className="mb-4 d-flex align-items-center gap-2 small">
+              <i className="fa-solid fa-exclamation-circle"></i>
+              <span>{deleteError}</span>
+            </Alert>
+          )}
+
+          {/* Confirmation Section */}
+          <div className="bg-light p-4 rounded-4 mb-4">
+            <p className="small fw-700 text-uppercase text-muted mb-3">
+              <i className="fa-solid fa-lock-open me-2"></i>Confirm Your Identity
+            </p>
+            
+            <div className="mb-3">
+              <label className="small fw-700 d-block mb-2 text-dark">Enter your username exactly:</label>
+              <input
+                type="text"
+                placeholder={user?.name || 'Your username'}
+                value={deleteConfirmUsername}
+                onChange={(e) => setDeleteConfirmUsername(e.target.value)}
+                disabled={deleteLoading}
+                className="form-control form-control-sm border rounded-3"
+              />
+              {deleteConfirmUsername && deleteConfirmUsername === user?.name && (
+                <small className="text-success d-block mt-1">
+                  <i className="fa-solid fa-check me-1"></i>Username matches
+                </small>
+              )}
+              {deleteConfirmUsername && deleteConfirmUsername !== user?.name && (
+                <small className="text-danger d-block mt-1">
+                  <i className="fa-solid fa-x me-1"></i>Username does not match
+                </small>
+              )}
             </div>
 
-            <form action="/user-settings/delete" method="post">
-              <div className="mb-4">
-                <div className="p-3 bg-light rounded-4">
-                  <div className="d-flex align-items-center gap-2 mb-2">
-                    <i className="fa-solid fa-check-circle text-success small"></i>
-                    <span className="x-small fw-700 text-uppercase">Cascading Deletion Active</span>
-                  </div>
-                  <p className="x-small text-muted mb-0">All linked items in your collection will be automatically removed from the marketplace.</p>
-                </div>
-              </div>
-
-              <div className="d-flex flex-column gap-2">
-                <button type="submit" className="modal-delete-danger btn-sell w-100 py-3 border-0 text-white shadow-sm">
-                  Confirm and Delete
-                </button>
-                <button type="button" className="btn btn-link text-muted fw-700 text-decoration-none small mt-2" data-bs-dismiss="modal">
-                  Cancel, I want to stay
-                </button>
-              </div>
-            </form>
+            <div className="mb-3">
+              <label className="small fw-700 d-block mb-2 text-dark">Enter your email exactly:</label>
+              <input
+                type="email"
+                placeholder={user?.email || 'Your email'}
+                value={deleteConfirmEmail}
+                onChange={(e) => setDeleteConfirmEmail(e.target.value)}
+                disabled={deleteLoading}
+                className="form-control form-control-sm border rounded-3"
+              />
+              {deleteConfirmEmail && deleteConfirmEmail === user?.email && (
+                <small className="text-success d-block mt-1">
+                  <i className="fa-solid fa-check me-1"></i>Email matches
+                </small>
+              )}
+              {deleteConfirmEmail && deleteConfirmEmail !== user?.email && (
+                <small className="text-danger d-block mt-1">
+                  <i className="fa-solid fa-x me-1"></i>Email does not match
+                </small>
+              )}
+            </div>
           </div>
-        </div>
-      </div>
+
+          {/* Additional info */}
+          <div className="p-3 bg-light-subtle rounded-4 mb-4">
+            <p className="x-small text-muted mb-0">
+              <i className="fa-solid fa-info-circle me-2"></i>
+              We will send a confirmation email to <strong>{user?.email}</strong> after deletion.
+            </p>
+          </div>
+        </Modal.Body>
+
+        <Modal.Footer className="border-0 pt-0">
+          <Button 
+            variant="light" 
+            className="fw-700 rounded-pill px-4"
+            onClick={handleCloseDeleteModal}
+            disabled={deleteLoading}
+          >
+            Cancel
+          </Button>
+          <Button 
+            variant="danger" 
+            className="fw-700 rounded-pill px-4"
+            onClick={handleDeleteAccount}
+            disabled={
+              deleteLoading || 
+              deleteConfirmUsername !== user?.name || 
+              deleteConfirmEmail !== user?.email
+            }
+          >
+            {deleteLoading ? (
+              <>
+                <Spinner animation="border" size="sm" className="me-2" />
+                Deleting...
+              </>
+            ) : (
+              <>
+                <i className="fa-solid fa-user-slash me-2"></i>
+                Permanently Delete
+              </>
+            )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }

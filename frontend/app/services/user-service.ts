@@ -1,19 +1,73 @@
 /**
- * User Service
- *
- * This service module handles all user-related API communication with the Stilnovo backend.
- * It provides functions to fetch user profiles, dashboard data, and manage user settings.
- * All requests are made through the centralized api client which handles authentication tokens.
- *
- * Key Responsibilities:
- * - Retrieve user dashboard statistics (sales data, revenue, charts)
- * - Fetch seller public profiles for marketplace visibility
- * - Download user profile photos
- * - Update user settings (profile info, email, payment methods, etc.)
- * - Handle user deletion requests
- *
- * Data Flow:
- * Component → UserService → API Client → Backend → UserService → Component
+ * User Service - Central API Gateway for User Operations
+ * 
+ * ============================================================================
+ * ARCHITECTURE & RELATIONSHIPS
+ * ============================================================================
+ * 
+ * This service module acts as a **facade** between React components and the 
+ * backend REST API, abstracting HTTP communication and error handling.
+ * 
+ * COMPONENT HIERARCHY:
+ *   UserSettings Component
+ *     ├── Imports: deleteUser(), updateUserSettings() from UserService
+ *     ├── Manages: Form state, Delete Modal state, Loading states
+ *     └── Uses: Zustand store (useUserStore) for auth state
+ * 
+ * DATA FLOW DIAGRAM:
+ *   
+ *   User Action (Component)
+ *         ↓
+ *   UserService Function (API Client)
+ *         ↓
+ *   API Client (api.ts) - Adds Auth Token
+ *         ↓
+ *   Backend REST Endpoint (/v1/users/me/*)
+ *         ↓
+ *   Backend Service (UserService.java)
+ *         ↓
+ *   Database (User, Product, Transaction tables)
+ *         ↓
+ *   Response DTO (UserDTO)
+ *         ↓
+ *   Component State Update → UI Re-render
+ * 
+ * KEY ENTITIES & RELATIONSHIPS:
+ * 
+ *   User Entity (Backend):
+ *     ├── Has Many: Products (1:N relationship)
+ *     ├── Has Many: Transactions as Seller (1:N)
+ *     ├── Has Many: Transactions as Buyer (1:N)
+ *     ├── Has Many: Valorations (reviews) (1:N)
+ *     └── Properties: id, name, email, roles[], balance, description, cardInfo
+ * 
+ *   UserDTO (Frontend):
+ *     └── Serialized representation of User from backend
+ *         (Used for type-safe API responses)
+ * 
+ *   Cascade Delete Logic (When User Deleted):
+ *     1. All User's Products → set to Deleted status
+ *     2. All related Inquiries → deleted
+ *     3. All related Interactions (likes/bookmarks) → deleted
+ *     4. All Transactions (as buyer/seller) → soft-deleted (archived)
+ *     5. All Valorations (reviews) → deleted
+ *     6. User record → deleted from database
+ * 
+ * ERROR HANDLING STRATEGY:
+ *   - HTTP 401: User not authenticated → redirect to login
+ *   - HTTP 403: User not authorized → show permission error
+ *   - HTTP 404: Resource not found → show resource not found error
+ *   - HTTP 400: Validation error → show validation details
+ *   - HTTP 500: Server error → show generic error message
+ *   - Network error: No connection → show connectivity error
+ * 
+ * AUTHENTICATION:
+ *   All requests automatically include:
+ *     - Authorization header with JWT token
+ *     - User context extracted from token (Principal)
+ *     - Token validated by backend @EnableWebSecurity
+ * 
+ * ============================================================================
  */
 
 import api from "./api";
@@ -166,5 +220,5 @@ export async function updateUserSettings(formData: FormData): Promise<UserDTO> {
  * }
  */
 export async function deleteUser(){
-    return await api.post<UserDTO>("/v1/users/me")
+    return await api.delete<UserDTO>("/v1/users/me");
 }
