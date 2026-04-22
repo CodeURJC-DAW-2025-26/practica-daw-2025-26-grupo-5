@@ -279,7 +279,7 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
 
         <Row xs={1} md={2} lg={4} className="g-4">
           {displayProducts.map((product: ProductDTO) => (
-            <Col key={`cat-${product.id}`}> {/* Prefisso cat- per evitare conflitti di chiavi */}
+            <Col key={`cat-${product.id}`}>
               <Link to={`/product/${product.id}`} className="text-decoration-none text-dark">
                 <div className="clay-card">
                   <div className="img-container">

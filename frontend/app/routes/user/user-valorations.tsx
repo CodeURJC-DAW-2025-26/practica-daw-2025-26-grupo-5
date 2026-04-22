@@ -153,8 +153,6 @@ export default function UserValorations() {
     navigate('.', { replace: true });
   };
 
-  // --- ACTIONS ---
-
   const handleRateClick = (transaction: any) => {
     setActiveTransaction(transaction);
     setSelectedValoration(null);
@@ -222,7 +220,6 @@ export default function UserValorations() {
     }
   };
 
-  // --- CALCULATIONS ---
   const completedCount = valorations.length;
   const pendingCount = pendingTransactions.length;
   const averageRating = completedCount > 0 

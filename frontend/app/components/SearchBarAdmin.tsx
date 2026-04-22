@@ -6,16 +6,13 @@ interface SearchBarProps {
     onSubmit: (e: React.FormEvent) => void;
     onClear: () => void;
 
-    // Prop para definir si es el buscador simple o el de transacciones/valoraciones
     variant: 'simple' | 'advanced';
 
-    // Props para la variante 'simple'
     simpleLabel?: string;
     simplePlaceholder?: string;
     simpleValue?: string;
     onSimpleChange?: (val: string) => void;
 
-    // Props para la variante 'advanced'
     advancedMode?: 'id' | 'users';
     onAdvancedModeChange?: (mode: 'id' | 'users') => void;
     idLabel?: string;
@@ -123,7 +120,7 @@ export default function SearchBar({
                             </>
                         )}
 
-                        {/* BOTONES COMUNES (Si es simple se alinean en la misma fila, si es avanzado pueden ir abajo) */}
+                        {/* COMMON BUTTONS */}
                         {variant === 'simple' && (
                             <Col md={3}>
                                 <Stack direction="horizontal" gap={2} className="justify-content-end">
