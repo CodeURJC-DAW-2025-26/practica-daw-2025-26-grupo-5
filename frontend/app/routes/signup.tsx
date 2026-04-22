@@ -48,6 +48,7 @@ import { useNavigate, Link } from 'react-router';
 import { Container, Form, Alert, Row, Col, Card, Button, Image } from 'react-bootstrap';
 import type { Route } from './+types/signup';
 import React, { useState } from 'react';
+import { signUp } from '~/services/login-service'; // MVC: Delegate to service
 import logo from "../assets/logo.png";
 import Footer from '~/components/footer';
 import Loader from '~/components/Loader';
@@ -113,36 +114,25 @@ export default function Signup({ }: Route.ComponentProps) {
     }
 
     setIsLoading(true);
-    const data = new FormData();
-    if (profilePicture) data.append('profilePicture', profilePicture);
-    data.append('username', formData.username);
-    data.append('email', formData.email);
-    data.append('password', formData.password);
-    data.append('confirmPassword', formData.confirmPassword);
-
+    // MVC: Service builds FormData & delegates to API client
     try {
-      const [response] = await Promise.all([
-        fetch(`${window.location.origin}/api/v1/users`, {
-          method: 'POST',
-          body: data,
-          credentials: 'include'
-        }),
-        new Promise((resolve) => setTimeout(resolve, 2500))
-      ]);
+      const formDataToSend = new FormData();
+      if (profilePicture) formDataToSend.append('profilePicture', profilePicture);
+      formDataToSend.append('username', formData.username);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('password', formData.password);
+      formDataToSend.append('confirmPassword', formData.confirmPassword);
 
-      if (response.ok) {
-        navigate('/login');
-      } else {
-        try {
-          const errorData = await response.json();
-          setSignupError(errorData.error || 'Registration failed. Please try again.');
-        } catch (parseError) {
-          setSignupError('Registration failed. Please try again.');
-        }
-      }
-    } catch (error) {
-      setSignupError('An error occurred during signup.');
-    } finally {
+      // Call service instead of fetch directly
+      await signUp(formDataToSend);
+      
+      // Success: wait briefly then redirect to login
+      await new Promise((resolve) => setTimeout(resolve, 2500));
+      navigate('/login');
+    } catch (error: any) {
+      // Service/API client parses and provides error message
+      const errorMsg = error.message || 'Registration failed. Please try again.';
+      setSignupError(errorMsg);
       setIsLoading(false);
     }
   };

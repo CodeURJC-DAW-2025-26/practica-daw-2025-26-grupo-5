@@ -45,13 +45,9 @@ export async function getProducts(): Promise<ProductDTO[]> {
   return pagedResponse.content || [];
 }
 
-/**
- * Retrieves products owned by the currently logged-in user (seller dashboard)
- * Flow: Backend validates JWT token and returns ONLY that user's products
- * Security: Backend enforces ownership - users cannot retrieve other users' products
- * @returns Array of products owned by current user (empty if no products)
- */
 export async function getMyProducts(): Promise<ProductDTO[]> {
+  // Key: /me endpoint is JWT-scoped (backend reads Principal from token to identify user)
+  // Security: Backend enforces ownership-no way to access other users' products
   return await api.get<ProductDTO[]>("/v1/products/me");
 }
 
@@ -61,15 +57,18 @@ export async function deleteProduct(id: number): Promise<void> {
 
 /**
  * Get a single product by ID
- * Backend returns ProductDetailsDTO, extract product
+ * Note: Returns ProductDetailsDTO (includes product + seller info + reviews)
+ * Component extracts .product to get ProductDTO type
  */
 export async function getProductById(id: number): Promise<ProductDTO> {
   const detailsDTO = await api.get<ProductDetailsDTO>(`/v1/products/${id}`);
-  return detailsDTO.product;
+  return detailsDTO.product; // Unwrap product from details envelope
 }
 
 /**
  * Create a new product
+ * Interesting: FormData required because file upload is multipart/form-data
+ * api.ts detects FormData and SKIPS Content-Type header (browser sets it with boundary)
  */
 export async function addProduct(
   product: ProductWriteRequestDTO
@@ -77,7 +76,7 @@ export async function addProduct(
   const formData = new FormData();
   
   if (product.file) {
-    formData.append("file", product.file); 
+    formData.append("file", product.file); // File object (image)
   }
   formData.append("name", product.name);
   formData.append("category", product.category);

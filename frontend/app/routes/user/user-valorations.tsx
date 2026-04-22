@@ -87,6 +87,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useUserStore } from '~/stores/useUserStore';
+import { getValorationsDashboard } from '~/services/valorations-service'; // MVC: All API calls delegated to service
 import type ValorationDTO from '~/dto/ValorationDTO';
 import type TransactionDTO from '~/dto/TransactionDTO';
 import { Row, Col, Card, Alert, Image, Stack, Button, Spinner } from 'react-bootstrap';
@@ -131,57 +132,25 @@ export default function UserValorations() {
    *    - Endpoint: /api/v1/users/me/valorations
    *    - Includes: rating, comment, buyer info, product info
    * 3. Fetch all user transactions (purchases)
-   *    - Endpoint: /api/v1/users/me/transactions
-   *    - Includes: buyer, product, transaction details
-   * 4. Find pending transactions:
-   *    - Extract transaction IDs already in valorations
-   *    - Filter transactions to exclude already-rated ones
-   * 5. Update state with combined data
-   * 6. Handle errors with 401 session expiration check
+  /**
+   * Fetch User Reviews and Pending Ratings
    * 
+   * Uses MVC pattern: Service layer handles all API communication
+   * - getValorationsDashboard() from valorations-service
+   * - Combines valorations + pending transactions in one call
+   * - Service manages auth headers & error responses
    */
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const valoResponse = await fetch('/api/v1/users/me/valorations?page=0&size=100', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-
-        const transResponse = await fetch('/api/v1/users/me/transactions', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-
-        if (!valoResponse.ok || !transResponse.ok) {
-          if (valoResponse.status === 401 || transResponse.status === 401) {
-            throw new Error("Session expired.");
-          }
-          throw new Error("Could not load data.");
-        }
-
-        const valoData = await valoResponse.json();
-        const transData = await transResponse.json();
-
-        setValorations(valoData.content || []);
-        
-        const purchasesWithValorations = new Set(
-          (valoData.content || []).map((v: any) => v.transactionId)
-        );
-        const pendingPurchases = (transData.orders || []).filter(
-          (order: any) => !purchasesWithValorations.has(order.transactionId)
-        );
-        
-        setTransactions(pendingPurchases);
+        // Service delegates to API client → handles token injection automatically
+        const { valorations: valoData, pendingTransactions } = await getValorationsDashboard();
+        setValorations(valoData);
+        setTransactions(pendingTransactions);
         setLoading(false);
       } catch (err: any) {
-        setError(err.message);
+        const errorMsg = err.message || 'Failed to load reviews. Please try again.';
+        setError(errorMsg);
         setLoading(false);
       }
     };

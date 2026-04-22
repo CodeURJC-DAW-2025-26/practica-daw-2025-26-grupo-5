@@ -89,6 +89,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { Container, Row, Col, Card, Badge, Button, Image, Spinner, Stack, Alert } from 'react-bootstrap';
 import { useUserStore } from '~/stores/useUserStore';
+import { getUserTransactions } from '~/services/transaction-service'; // MVC: Delegate to service
 import ValorationModal from "~/components/valoration-modal";
 
 import type TransactionDTO from '~/dto/TransactionDTO';
@@ -118,31 +119,19 @@ const UserSalesOrders = () => {
     const navigate = useNavigate();
 
     /**
-     * Fetch User Transactions
-     * 
-     * Gets all user's sales and purchases from backend.
-     * Separates them into two arrays for tab display.
-     * Handles authentication and error cases.
+     * Fetch transactions via service (MVC pattern)
+     * Service handles auth headers and data transformation
      */
     useEffect(() => {
         const fetchAllTransactions = async () => {
             try {
-                const response = await fetch('/api/v1/users/me/transactions', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
-                if (!response.ok) {
-                    if (response.status === 401) throw new Error("Session expired.");
-                    throw new Error("Could not load transactions.");
-                }
-                const data = await response.json();
+                // Service delegates to API client → handles token injection automatically
+                const data = await getUserTransactions();
                 setSales(data.sales || []);
                 setPurchases(data.orders || []);
             } catch (err: any) {
-                setError(err.message);
+                const errorMsg = err.message || 'Failed to load transactions. Please try again.';
+                setError(errorMsg);
             } finally {
                 setLoading(false);
             }

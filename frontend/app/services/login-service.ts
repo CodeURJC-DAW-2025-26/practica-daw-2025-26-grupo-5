@@ -160,9 +160,15 @@ export async function logIn(username: string, password: string): Promise<UserDTO
     });
   */
 
+  // Interesting: Backend returns token OR jwt property based on API version
+  // Component must handle both response.token && response.jwt
   const response = await api.post("/v1/auth/login", { username, password });
   const token = response.token || response.jwt;
+  
+  // Store token in localStorage for subsequent requests (api.ts reads this)
   if (token) localStorage.setItem('token', token);
+  
+  // Return either dedicated user object or entire response as fallback
   return response.user || response;
 }
 
@@ -223,4 +229,42 @@ export async function logOut(): Promise<void> {
     // Always remove the token from the browser, even if the server request fails
     localStorage.removeItem('token');
   }
+}
+
+/**
+ * Register New User Account
+ * 
+ * Creates a new user account with profile photo, username, email, and password.
+ * Validates unique username/email and encrypts password on backend.
+ * Returns HTTP 200 on success (user must then login separately).
+ * 
+ * Registration Flow:
+ * 1. Collect form data: username, email, password, profile photo
+ * 2. Client validates: password confirmation matches
+ * 3. Build FormData for multipart submission (file upload)
+ * 4. POST to /v1/users endpoint (public, no auth required)
+ * 5. Backend validates uniqueness, encrypts password, stores account
+ * 6. Return 200 on success or 400/409 on validation errors
+ * 
+ * MVC Pattern:
+ * - signup.tsx calls this function instead of fetch()
+ * - Service handles: FormData construction, error parsing
+ * - API client adds: Content-Type headers, error wrapping
+ * 
+ * @param data FormData containing:
+ *   - username: unique login name
+ *   - email: unique email address
+ *   - password: encrypted on backend with bcrypt
+ *   - confirmPassword: client validates before sending
+ *   - profilePicture: optional image file
+ * 
+ * @returns Promise<UserDTO> Created user (user must login to get token)
+ * 
+ * @throws HttpError with:
+ *   - status 400: Validation failed (missing fields, weak password)
+ *   - status 409: Username/email already exists
+ *   - status 500+: Server error
+ */
+export async function signUp(data: FormData): Promise<UserDTO> {
+  return await api.post<UserDTO>("/v1/users", data);
 }

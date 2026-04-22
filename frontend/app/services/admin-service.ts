@@ -32,6 +32,8 @@ export const banUser = async (
   userId: number,
   ban: boolean
 ): Promise<UserDTO> => {
+  // Relationship: When user banned, ALL their products automatically banned too
+  // Backend cascade: User.banned=true → Products[].banned=true (enforced via JPA)
   return await api.put<UserDTO>(`/v1/admin/users/ban/${userId}`, { banned: ban });
 };
 
@@ -98,6 +100,9 @@ export const getAdminTransactions = async (
 };
 
 export const deleteTransaction = async (transactionId: number): Promise<void> => {
+  // Interesting cascade: Delete transaction → product status back to PUBLISHED
+  // Backend updates: Transaction.deleted=true → Product.status=PUBLISHED (available to sell again)
+  // Frontend refresh updates UI immediately to show product as available
   await api.delete(`/v1/admin/transactions/${transactionId}`);
 };
 

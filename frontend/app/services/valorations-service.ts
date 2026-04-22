@@ -1,5 +1,48 @@
 import api from "./api";
 import type ValorationDTO from "~/dto/ValorationDTO";
+import type TransactionDTO from "~/dto/TransactionDTO";
+
+/**
+ * VALORATIONS SERVICE
+ * Centralized API gateway for all valoration (review) operations
+ * 
+ * Responsibilities:
+ * - Manage user valorations (reviews) lifecycle
+ * - Track pending reviews needing submission
+ * - Create, update, delete valorations
+ * - Fetch paginated valoration data
+ */
+
+/**
+ * Fetches both received valorations and pending transactions needing review
+ * 
+ * Returns:
+ * - valorations: Reviews already submitted
+ * - pendingTransactions: Purchases not yet rated
+ * 
+ * Used by: user-valorations.tsx
+ */
+export async function getValorationsDashboard(): Promise<{ 
+  valorations: ValorationDTO[]; 
+  pendingTransactions: TransactionDTO[] 
+}> {
+  // Fetch valorations and transactions in parallel (better performance)
+  const [valoResponse, transResponse] = await Promise.all([
+    api.get<any>("/v1/users/me/valorations?page=0&size=100"),
+    api.get<any>("/v1/users/me/transactions")
+  ]);
+
+  // Extract received reviews and pending purchases
+  const valorations = valoResponse.content || [];
+  const purchasesWithReviews = new Set(
+    valorations.map((v: any) => v.transactionId)
+  );
+  const pendingTransactions = (transResponse.orders || []).filter(
+    (order: any) => !purchasesWithReviews.has(order.transactionId)
+  );
+
+  return { valorations, pendingTransactions };
+}
 
 /**
  * Fetches all valorations submitted by the current authenticated user
