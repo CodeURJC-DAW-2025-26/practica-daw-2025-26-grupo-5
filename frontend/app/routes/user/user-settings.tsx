@@ -64,67 +64,64 @@
  * @component
  * @returns React component for user settings management
  */
-
-import { useState, useEffect } from 'react';
-import {useRevalidator } from 'react-router';
+import { useState } from 'react';
+import { useNavigate, useRevalidator, redirect } from 'react-router';
 import { useUserStore } from '~/stores/useUserStore';
 import { updateUserSettings, deleteUser } from '~/services/user-service';
-import { Spinner, Alert, Modal, Button } from 'react-bootstrap';
+import { Spinner, Alert, Modal } from 'react-bootstrap';
+
+/**
+ * Client-side loader function
+ * Acts purely as a route guard. Prevents rendering if not authenticated.
+ */
+export async function clientLoader() {
+  const currentUser = useUserStore.getState().user;
+
+  if (!currentUser) {
+    throw redirect('/login');
+  }
+
+  // No data fetching needed, user data is already in Zustand store
+  return null;
+}
 
 /**
  * User Settings Component Implementation
- * 
  * Manages user profile and payment information updates.
  */
 export default function UserSettings() {
   const { user, setUser } = useUserStore();
   const revalidator = useRevalidator();
+  const navigate = useNavigate();
+
+  // TYPE GUARD: TypeScript now knows 'user' is 100% NOT null after this line
+  if (!user) return null;
 
   // Form field state (controlled inputs)
-  const [description, setDescription] = useState(user?.description || '');
-  const [email, setEmail] = useState(user?.email || '');
-  const [cardNumber, setCardNumber] = useState(user?.cardNumber || '');
-  const [expiry, setExpiry] = useState(user?.cardExpiringDate || '');
-  const [cvv, setCvv] = useState(user?.cardCvv || '');
+  // We can safely use user! because the loader guarantees user exists
+  const [description, setDescription] = useState(user!.description || '');
+  const [email, setEmail] = useState(user!.email || '');
+  const [cardNumber, setCardNumber] = useState(user!.cardNumber || '');
+  const [expiry, setExpiry] = useState(user!.cardExpiringDate || '');
+  const [cvv, setCvv] = useState(user!.cardCvv || '');
   const [showCvv, setShowCvv] = useState(false);
 
   // UI state management
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string>('');
+
+  // Initialize previewUrl directly if user exists
+  const [previewUrl, setPreviewUrl] = useState<string>(`/api/v1/users/me/profile-photo?t=${Date.now()}`);
   const [selectedPhoto, setSelectedPhoto] = useState<File | null>(null);
 
-  // Delete Account Modal States
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleteConfirmUsername, setDeleteConfirmUsername] = useState('');
-  const [deleteConfirmEmail, setDeleteConfirmEmail] = useState('');
-  const [deleteLoading, setDeleteLoading] = useState(false);
+  // Delete operation state
   const [deleteError, setDeleteError] = useState<string | null>(null);
-
-  /**
-   * Initialize Form with Current User Data
-   * Called when user data is loaded
-   */
-  useEffect(() => {
-    if (user) {
-      setEmail(user.email || '');
-      setDescription(user.description || '');
-      setCardNumber(user.cardNumber || '');
-      setExpiry(user.cardExpiringDate || '');
-      setCvv(user.cardCvv || '');
-      setPreviewUrl(`/api/v1/users/me/profile-photo?t=${Date.now()}`);
-    }
-  }, [user]);
+  const [isPendingDelete, setPendingDelete] = useState(false);
+  const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   /**
    * Handle Profile Photo Selection
-   * 
-   * Process:
-   * 1. Get selected file from input
-   * 2. Store in selectedPhoto state
-   * 3. Create preview URL using FileReader
-   * 4. Display preview in UI
    */
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -140,15 +137,6 @@ export default function UserSettings() {
 
   /**
    * Handle Form Submission
-   * 
-   * Process:
-   * 1. Clear previous errors/success messages
-   * 2. Build FormData with all fields
-   * 3. Include photo if one was selected
-   * 4. Submit to API via updateUserSettings()
-   * 5. Update Zustand store with response
-   * 6. Show success message
-   * 7. Handle and display errors
    */
   const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -187,77 +175,50 @@ export default function UserSettings() {
 
   /**
    * Toggle CVV Field Visibility
-   * For security: CVV hidden by default
    */
   const toggleCvv = () => setShowCvv(!showCvv);
 
   /**
-   * Handle Delete Account
-   * 
-   * Security Checks:
-   * 1. Verify username matches
-   * 2. Verify email matches
-   * 3. Call deleteUser() from backend
-   * 4. Logout and redirect on success
+   * User Deletion Handlers
    */
-  const handleDeleteAccount = async () => {
-    // Validation: Check if confirmations match
-    if (deleteConfirmUsername !== user?.name) {
-      setDeleteError('Username does not match. Please check and try again.');
-      return;
-    }
+  const handleOpenDeleteDialog = () => setDeleteDialogOpen(true);
 
-    if (deleteConfirmEmail !== user?.email) {
-      setDeleteError('Email does not match. Please check and try again.');
-      return;
+  const handleCloseDeleteDialog = () => {
+    if (!isPendingDelete) {
+      setDeleteDialogOpen(false);
+      setDeleteError(null);
     }
+  };
 
-    setDeleteLoading(true);
+  const handleDelete = async () => {
+    if (!user?.id) return;
+
+    setPendingDelete(true);
     setDeleteError(null);
-
     try {
       await deleteUser();
-      
-      // Success: Clear auth state and redirect
-      const { logoutUser } = useUserStore.getState();
-      logoutUser();
-      
-      // Redirect to /new/
-      window.location.href = '/new/';
-    } catch (err: any) {
-      console.error('Delete account error:', err);
-      const errorMsg = err.response?.data?.message || err.message || 'Failed to delete account. Please try again.';
-      setDeleteError(errorMsg);
-      setDeleteLoading(false);
+
+      // Clean up local session and redirect
+      setUser(null);
+
+      localStorage.clear();
+      sessionStorage.clear();
+      document.cookie.split(";").forEach((cookie) => {
+        const eqPos = cookie.indexOf("=");
+        const name = eqPos > -1 ? cookie.substring(0, eqPos) : cookie;
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+      });
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      setDeleteError("Error deleting account. Please try again.");
+      setPendingDelete(false);
     }
   };
 
-  /**
-   * Reset delete modal state when closing
-   */
-  const handleCloseDeleteModal = () => {
-    setShowDeleteModal(false);
-    setDeleteConfirmUsername('');
-    setDeleteConfirmEmail('');
-    setDeleteError(null);
-  };
-
-  /**
-   * Redirect to Login if Not Authenticated
-   */
-  if (!user) {
-    return (
-      <div className="d-flex justify-content-center align-items-center py-5 w-100">
-        <Spinner animation="border" variant="primary" />
-      </div>
-    );
-  }
-
   const isAdmin = user?.roles?.includes('ROLE_ADMIN');
-
   return (
     <>
-      {/* We remove the fixed-width container and use container-fluid to adapt to the sidebar */}
       <main className="settings-page-container pb-4 w-100">
         <div className="container-fluid px-4 py-4">
 
@@ -275,10 +236,9 @@ export default function UserSettings() {
             </Alert>
           )}
 
-          {/* We use g-4 spacing to reduce gap between elements for better visual hierarchy */}
           <div className="row g-4">
 
-            {/* LEFT COLUMN: EDIT PROFILE FORM - Takes col-xxl-7 (70%) to give form more space, col-xl-6 (60%) on xl, full width on lg */}
+            {/* LEFT COLUMN: EDIT PROFILE FORM */}
             <div className="col-xxl-7 col-xl-6 col-lg-12">
               <div className="clay-card p-4 p-md-5 settings-card h-100">
                 <h2 className="fw-800 mb-4">Edit Profile</h2>
@@ -427,10 +387,11 @@ export default function UserSettings() {
                   </div>
                 ) : (
                   <div className="text-center">
-                    <button 
-                      type="button" 
+                    {/* Botón actualizado para abrir el Modal de React */}
+                    <button
+                      type="button"
                       className="btn btn-danger-custom w-100 py-3 small shadow-sm"
-                      onClick={() => setShowDeleteModal(true)}
+                      onClick={handleOpenDeleteDialog}
                     >
                       <i className="fa-solid fa-user-slash me-2"></i>Permanently Delete Account
                     </button>
@@ -441,9 +402,6 @@ export default function UserSettings() {
 
             {/* RIGHT COLUMN: DIGITAL SELLER CARD */}
             <div className="col-xxl-5 col-xl-6 col-lg-12">
-              {/* Add position-sticky and style={{ top: '6rem' }}
-                (The top of 6rem ensures it doesn't overlap with the top navbar)
-              */}
               <div
                 className="sticky-card-column position-sticky d-flex flex-column align-items-center"
                 style={{ top: '6rem' }}
@@ -510,135 +468,68 @@ export default function UserSettings() {
         </div>
       </main>
 
-      {/* DELETE ACCOUNT MODAL */}
-      <Modal show={showDeleteModal} onHide={handleCloseDeleteModal} centered backdrop={deleteLoading ? "static" : true} keyboard={!deleteLoading}>
-        <Modal.Header closeButton={!deleteLoading} className="border-0 bg-danger-subtle">
-          <div className="d-flex align-items-center gap-3 w-100">
-            <div className="bg-danger bg-opacity-25 p-3 rounded-circle d-inline-flex align-items-center justify-content-center">
-              <i className="fa-solid fa-triangle-exclamation text-danger fa-lg"></i>
-            </div>
-            <div>
-              <Modal.Title className="fw-800 h6 text-danger mb-0">Permanently Delete Account</Modal.Title>
-              <p className="x-small text-muted mb-0">This action cannot be undone</p>
-            </div>
-          </div>
-        </Modal.Header>
-
-        <Modal.Body className="pt-4">
-          {/* Warning Section */}
-          <div className="alert alert-warning d-flex gap-3 mb-4" style={{ backgroundColor: '#fef3c7', borderColor: '#fbbf24' }}>
-            <i className="fa-solid fa-exclamation-circle text-warning mt-1" style={{ fontSize: '1.2rem' }}></i>
-            <div>
-              <h6 className="fw-800 mb-2">Warning: Irreversible Action</h6>
-              <ul className="small mb-0 ps-3">
-                <li>All your products will be permanently removed</li>
-                <li>Your seller profile will be deleted</li>
-                <li>Transaction history will be archived (not deleted)</li>
-                <li>This cannot be reversed</li>
-              </ul>
-            </div>
+      {/* REACT-BOOTSTRAP DELETE ACCOUNT MODAL */}
+      <Modal
+        show={isDeleteDialogOpen}
+        onHide={handleCloseDeleteDialog}
+        centered
+        contentClassName="clay-card border-0 shadow-lg text-center bg-white"
+        style={{ '--bs-modal-border-radius': '24px' } as React.CSSProperties}
+      >
+        <Modal.Body className="p-4 p-md-5">
+          <div
+            className="bg-danger-subtle text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-3 mx-auto"
+            style={{ width: '60px', height: '60px' }}
+          >
+            <i className="fa-solid fa-triangle-exclamation fa-2x"></i>
           </div>
 
-          {/* Error Display */}
+          <h3 className="fw-800 h5 mb-2 text-danger">Confirm Account Deletion</h3>
+
+          <p className="small text-muted fw-700 mb-4 px-3">
+            Hi {user.name}, are you sure you want to leave us? This action will permanently remove all your products and history.
+          </p>
+
           {deleteError && (
-            <Alert variant="danger" className="mb-4 d-flex align-items-center gap-2 small">
-              <i className="fa-solid fa-exclamation-circle"></i>
-              <span>{deleteError}</span>
+            <Alert variant="danger" className="mb-4 small fw-600 rounded-4 text-start">
+              {deleteError}
             </Alert>
           )}
 
-          {/* Confirmation Section */}
-          <div className="bg-light p-4 rounded-4 mb-4">
-            <p className="small fw-700 text-uppercase text-muted mb-3">
-              <i className="fa-solid fa-lock-open me-2"></i>Confirm Your Identity
-            </p>
-            
-            <div className="mb-3">
-              <label className="small fw-700 d-block mb-2 text-dark">Enter your username exactly:</label>
-              <input
-                type="text"
-                placeholder={user?.name || 'Your username'}
-                value={deleteConfirmUsername}
-                onChange={(e) => setDeleteConfirmUsername(e.target.value)}
-                disabled={deleteLoading}
-                className="form-control form-control-sm border rounded-3"
-              />
-              {deleteConfirmUsername && deleteConfirmUsername === user?.name && (
-                <small className="text-success d-block mt-1">
-                  <i className="fa-solid fa-check me-1"></i>Username matches
-                </small>
-              )}
-              {deleteConfirmUsername && deleteConfirmUsername !== user?.name && (
-                <small className="text-danger d-block mt-1">
-                  <i className="fa-solid fa-x me-1"></i>Username does not match
-                </small>
-              )}
-            </div>
-
-            <div className="mb-3">
-              <label className="small fw-700 d-block mb-2 text-dark">Enter your email exactly:</label>
-              <input
-                type="email"
-                placeholder={user?.email || 'Your email'}
-                value={deleteConfirmEmail}
-                onChange={(e) => setDeleteConfirmEmail(e.target.value)}
-                disabled={deleteLoading}
-                className="form-control form-control-sm border rounded-3"
-              />
-              {deleteConfirmEmail && deleteConfirmEmail === user?.email && (
-                <small className="text-success d-block mt-1">
-                  <i className="fa-solid fa-check me-1"></i>Email matches
-                </small>
-              )}
-              {deleteConfirmEmail && deleteConfirmEmail !== user?.email && (
-                <small className="text-danger d-block mt-1">
-                  <i className="fa-solid fa-x me-1"></i>Email does not match
-                </small>
-              )}
+          <div className="mb-4 text-start">
+            <div className="p-3 bg-light rounded-4">
+              <div className="d-flex align-items-center gap-2 mb-2">
+                <i className="fa-solid fa-check-circle text-success small"></i>
+                <span className="x-small fw-700 text-uppercase">Cascading Deletion Active</span>
+              </div>
+              <p className="x-small text-muted mb-0">All linked items in your collection will be automatically removed from the marketplace.</p>
             </div>
           </div>
 
-          {/* Additional info */}
-          <div className="p-3 bg-light-subtle rounded-4 mb-4">
-            <p className="x-small text-muted mb-0">
-              <i className="fa-solid fa-info-circle me-2"></i>
-              We will send a confirmation email to <strong>{user?.email}</strong> after deletion.
-            </p>
+          <div className="d-grid gap-2">
+            <button
+              type="button"
+              className="btn btn-danger w-100 py-3 rounded-pill fw-800 border-0 shadow-sm"
+              onClick={handleDelete}
+              disabled={isPendingDelete}
+            >
+              {isPendingDelete ? (
+                <><i className="fa-solid fa-spinner fa-spin me-2"></i>Deleting...</>
+              ) : (
+                "Confirm and Delete"
+              )}
+            </button>
+
+            <button
+              type="button"
+              className="btn btn-light w-100 py-3 rounded-pill fw-800 border-0"
+              onClick={handleCloseDeleteDialog}
+              disabled={isPendingDelete}
+            >
+              Cancel, I want to stay
+            </button>
           </div>
         </Modal.Body>
-
-        <Modal.Footer className="border-0 pt-0">
-          <Button 
-            variant="light" 
-            className="fw-700 rounded-pill px-4"
-            onClick={handleCloseDeleteModal}
-            disabled={deleteLoading}
-          >
-            Cancel
-          </Button>
-          <Button 
-            variant="danger" 
-            className="fw-700 rounded-pill px-4"
-            onClick={handleDeleteAccount}
-            disabled={
-              deleteLoading || 
-              deleteConfirmUsername !== user?.name || 
-              deleteConfirmEmail !== user?.email
-            }
-          >
-            {deleteLoading ? (
-              <>
-                <Spinner animation="border" size="sm" className="me-2" />
-                Deleting...
-              </>
-            ) : (
-              <>
-                <i className="fa-solid fa-user-slash me-2"></i>
-                Permanently Delete
-              </>
-            )}
-          </Button>
-        </Modal.Footer>
       </Modal>
     </>
   );

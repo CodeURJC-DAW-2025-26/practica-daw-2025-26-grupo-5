@@ -73,7 +73,7 @@
  * @returns React component for product editing
  */
 
-import { useNavigate } from "react-router";
+import { redirect, useNavigate } from "react-router";
 import { useActionState, useState } from "react";
 import type { Route } from "./+types/product-edit";
 import ProductForm from "~/components/ProductForm";
@@ -83,8 +83,8 @@ import {
   updateProduct,
   replaceImage,
 } from "~/services/products-service";
-// Importing the same service used in ProductNew to ensure consistency
 import { improveDescription } from "~/services/AI/ai-service"; 
+import { useUserStore } from "~/stores/useUserStore";
 
 /**
  * Client-side loader: Fetch current product data
@@ -96,7 +96,38 @@ import { improveDescription } from "~/services/AI/ai-service";
  * @returns Product data from backend
  */
 export async function clientLoader({ params }: Route.ClientLoaderArgs) {
-  return await getProductById(Number(params.id!));
+  try {
+    // 1. Obtain product by id 
+    const product = await getProductById(Number(params.id!));
+    
+    // 2. Obtain actual session by Zustand
+    const currentUser = useUserStore.getState().user;
+
+    // 3. Verify if logged
+    if (!currentUser) {
+      throw redirect('/login');
+    }
+
+    // 4. Check permissions
+    const isOwner = currentUser.id === product.seller?.id;
+    const isAdmin = currentUser.roles?.includes('ROLE_ADMIN') || currentUser.roles?.includes('ADMIN');
+
+    if (!isOwner && !isAdmin) {
+      // If not my product, redirect to product detail (public)
+      throw redirect(`/product/${product.id}`);
+    }
+
+    // All correct  
+    return product;
+    
+  } catch (error: any) {
+
+    if (error.status === 302) throw error;
+    
+    // If ID do not exists
+    console.error("Error loading product:", error);
+    throw redirect('/');
+  }
 }
 
 /**
@@ -105,6 +136,7 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
  * Manages product editing form with AI enhancement and image management.
  */
 export default function ProductEdit({ loaderData }: Route.ComponentProps) {
+
   const product = loaderData;
   const navigate = useNavigate();
 

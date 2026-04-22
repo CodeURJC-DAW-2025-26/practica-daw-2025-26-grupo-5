@@ -44,11 +44,9 @@ export async function getValorationsDashboard(): Promise<{
   return { valorations, pendingTransactions };
 }
 
-/**
- * Fetches all valorations submitted by the current authenticated user
- */
-export async function getUserValorations(): Promise<ValorationDTO[]> {
-    return await api.get<ValorationDTO[]>("/v1/users/me/valorations");
+
+export async function getUserValorations() {
+    return await api.get("/v1/users/me/valorations?page=0&size=100");
 }
 
 /**

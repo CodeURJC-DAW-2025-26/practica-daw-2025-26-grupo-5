@@ -222,10 +222,27 @@ export async function updateUserSettings(formData: FormData): Promise<UserDTO> {
  *   logoutUser(); // Also clear auth state
  * }
  */
+export async function deleteUser(){
+    return await api.delete<UserDTO>("/v1/users/me")
+}
 
-// Called by: user-settings.tsx delete account button
-// Cascades: Deletes user → products → transactions → interactions → account
-// MODIFY: Add confirmation step if backend adds verification email
-export async function deleteUser() {
-    return await api.delete<UserDTO>("/v1/users/me");
+/**
+ * Fetches the user's statistics report as a PDF document.
+ * @returns {Promise<Blob>} The PDF file as a binary Blob.
+ */
+export async function downloadStatisticsReport(): Promise<Blob> {
+    const response = await fetch('/api/v1/users/me/statistics-report', {
+        method: 'GET',
+        headers: {
+            // Asegúrate de usar el método que tengas implementado para obtener tu token
+            'Authorization': `Bearer ${localStorage.getItem('token')}` 
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to download PDF report from the server.');
+    }
+
+    // Devolvemos los datos binarios del archivo
+    return await response.blob();
 }

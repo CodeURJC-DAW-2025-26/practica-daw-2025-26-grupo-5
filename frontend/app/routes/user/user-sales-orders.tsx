@@ -53,9 +53,10 @@
  * - activeTransaction: Transaction being rated
  *
  * HTTP Requests:
- * - Fetches transactions via getUserTransactions() service (MVC pattern)
- * - Service delegates to API client which adds Bearer token automatically
- * - No manual headers needed (api.ts handles auth)
+ * - Fetches transactions from /api/v1/users/me/transactions
+ * - Uses Bearer token from localStorage
+ * - Manual fetch (not using api service) with direct headers
+ * - Token auto-included in Authorization header
  *
  * Valoration (Rating):
  * - Users can rate completed transactions
@@ -84,63 +85,70 @@
  * @returns React component for transaction history and rating
  */
 
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { useState, useEffect } from 'react';
+import { useLoaderData, redirect, Link, useNavigate } from 'react-router';
 import { Container, Row, Col, Card, Badge, Button, Image, Spinner, Stack, Alert } from 'react-bootstrap';
 import { useUserStore } from '~/stores/useUserStore';
-import { getUserTransactions } from '~/services/transaction-service'; // MVC: Delegate to service
 import ValorationModal from "~/components/valoration-modal";
 
 import type TransactionDTO from '~/dto/TransactionDTO';
 import { createValoration } from '~/services/valorations-service';
+import { getTransactions } from '~/services/transaction-service';
+import type { Route } from "./+types/user-sales-orders"; 
 
+interface TransactionsResponse {
+    sales: TransactionDTO[];
+    orders: TransactionDTO[];
+}
+
+export async function clientLoader() {
+    const currentUser = useUserStore.getState().user;
+    if (!currentUser) {
+        throw redirect('/login');
+    }
+
+    try {
+        // Fetch products from the backend using API REST
+        const transactions = (await getTransactions()) as TransactionsResponse;
+        return { transactions };
+
+    } catch (error: any) {
+        // Handle unauthorized responses from the backend API
+        if (error.status === 401 || error.response?.status === 401) {
+            useUserStore.getState().setUser(null);
+            throw redirect('/login');
+        }
+        console.error("Error loading transactions in loader:", error);
+        throw error; // Or redirect to an error page
+    }
+}
 /**
  * User Sales Orders Component
  * 
  * Displays user's transaction history and manages product ratings.
  */
 const UserSalesOrders = () => {
-    // State management
-    const [sales, setSales] = useState<TransactionDTO[]>([]);
-    const [purchases, setPurchases] = useState<TransactionDTO[]>([]);
-    const [selectedTransactionId, setSelectedTransactionId] = useState<number | null>(null);
 
-    // UI state
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [isProcessing, setIsProcessing] = useState(false);
+    const loaderData = useLoaderData() as { transactions: TransactionsResponse };
 
-    // Modal control
-    const [showModal, setShowModal] = useState(false);
-    const [activeTransaction, setActiveTransaction] = useState<TransactionDTO | null>(null);
-
+    // Global State
     const { user } = useUserStore();
     const navigate = useNavigate();
 
-    /**
-     * Fetch transactions via service (MVC pattern)
-     * Service handles auth headers and data transformation
-     */
-    useEffect(() => {
-        const fetchAllTransactions = async () => {
-            try {
-                // Service delegates to API client → handles token injection automatically
-                const data = await getUserTransactions();
-                setSales(data.sales || []);
-                setPurchases(data.orders || []);
-            } catch (err: any) {
-                const errorMsg = err.message || 'Failed to load transactions. Please try again.';
-                setError(errorMsg);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const [sales, setSales] = useState<TransactionDTO[]>(loaderData.transactions?.sales || []);
+    const [purchases, setPurchases] = useState<TransactionDTO[]>(loaderData.transactions?.orders || []);
+    
+    const [selectedTransactionId, setSelectedTransactionId] = useState<number | null>(null);
 
-        if (user) fetchAllTransactions();
-        else navigate('/login');
-    }, [user, navigate]);
+    //  UI State
+    const [error, setError] = useState<string | null>(null);
+    const [isProcessing, setIsProcessing] = useState(false);
 
-    // 3. Handlers
+    //  Modal control
+    const [showModal, setShowModal] = useState(false);
+    const [activeTransaction, setActiveTransaction] = useState<TransactionDTO | null>(null);
+
+    //  Handlers
     const handleShowModal = (transaction: TransactionDTO) => {
         setActiveTransaction(transaction);
         setShowModal(true);
@@ -170,12 +178,6 @@ const UserSalesOrders = () => {
     };
 
     const selectedTransaction = [...sales, ...purchases].find(t => t.transactionId === selectedTransactionId);
-
-    if (loading) return (
-        <div className="d-flex justify-content-center align-items-center vh-100 w-100">
-            <Spinner animation="border" role="status" />
-        </div>
-    );
 
     return (
         <Container fluid className="py-4 py-md-5">

@@ -43,8 +43,8 @@
  *
  * @example
  * // In component (incorrect - avoid this):
- * // ❌ DON'T: import { logIn } from '~/services/login-service'
- * // ✅ DO: use useUserStore hook instead
+ * //  DON'T: import { logIn } from '~/services/login-service'
+ * //  DO: use useUserStore hook instead
  * const { loginUser } = useUserStore();
  */
 

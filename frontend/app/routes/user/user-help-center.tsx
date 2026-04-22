@@ -95,6 +95,20 @@
 import { useState, useRef, useEffect } from 'react';
 import { Alert, Row, Col, Card, Form, Button, InputGroup, Spinner } from 'react-bootstrap';
 import { chatBotHelper } from "~/services/AI/ai-service";
+import { useUserStore } from "~/stores/useUserStore";
+import { redirect } from "react-router";
+
+
+export async function clientLoader() {
+  const currentUser = useUserStore.getState().user;
+  if (!currentUser) {
+    throw redirect('/login');
+  }
+
+  // React Router expects the loader to return data. 
+  // If there's no data to fetch, explicitly return null.
+  return null;
+}
 
 /**
  * Chat Message Type Definition
@@ -118,13 +132,13 @@ export default function UserHelpCenter() {
   const [messages, setMessages] = useState<Message[]>([
     { text: "Hello. How can I help you today?", isBot: true }
   ]);
-  
+
   // Current input field value
   const [input, setInput] = useState("");
-  
+
   // Loading state while waiting for AI response
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Reference to chat container for auto-scrolling
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
@@ -172,16 +186,16 @@ export default function UserHelpCenter() {
     try {
       const response = await chatBotHelper(userText);
       let botMsg: Message = { text: response, isBot: true };
-      
+
       if (userText.toLowerCase().includes("photo")) {
-        botMsg.img = `/api/v1/users/search/profile-photo?name=user1`; 
+        botMsg.img = `/api/v1/users/search/profile-photo?name=user1`;
       }
 
       setMessages(prev => [...prev, botMsg]);
     } catch (err) {
-      setMessages(prev => [...prev, { 
-        text: "Service temporarily unavailable. Please try again later.", 
-        isBot: true 
+      setMessages(prev => [...prev, {
+        text: "Service temporarily unavailable. Please try again later.",
+        isBot: true
       }]);
     } finally {
       setIsLoading(false);
@@ -193,6 +207,7 @@ export default function UserHelpCenter() {
       <header className="mb-5">
         <h1 className="fw-800 h2 text-dark mb-2">Help Center</h1>
         <p className="text-muted small fw-600 mb-0">Everything you need to know about Stilnovo.</p>
+      
       </header>
 
       {/* Information cards section - displays FAQ categories with icons and descriptions */}
@@ -230,7 +245,7 @@ export default function UserHelpCenter() {
       <Card className="clay-card border-0 p-3 p-md-4 mb-5 bg-white shadow-sm rounded-4">
         <Card.Body>
           <div className="d-flex align-items-center gap-2 mb-3">
-            <div className="bg-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style={{width: '35px', height: '35px'}}>
+            <div className="bg-primary rounded-circle p-2 d-flex align-items-center justify-content-center" style={{ width: '35px', height: '35px' }}>
               <i className="fa-solid fa-robot text-white small"></i>
             </div>
             <h5 className="fw-bold text-dark mb-0">
@@ -238,8 +253,8 @@ export default function UserHelpCenter() {
             </h5>
           </div>
 
-          <div 
-            className="chat-container mb-2 p-3 rounded-4" 
+          <div
+            className="chat-container mb-2 p-3 rounded-4"
             ref={chatContainerRef}
             style={{ height: '220px', overflowY: 'auto', backgroundColor: '#f8fafc', border: '1px solid #edf2f7' }}
           >
@@ -248,10 +263,10 @@ export default function UserHelpCenter() {
                 <div className={`p-3 rounded-4 shadow-sm ${msg.isBot ? 'bg-white text-dark border' : 'bg-primary text-white'}`} style={{ maxWidth: '85%', fontSize: '0.9rem' }}>
                   <p className="mb-0 fw-500">{msg.text}</p>
                   {msg.img && (
-                    <img 
-                      src={msg.img} 
-                      alt="Preview" 
-                      className="mt-2 rounded-3 d-block shadow-sm" 
+                    <img
+                      src={msg.img}
+                      alt="Preview"
+                      className="mt-2 rounded-3 d-block shadow-sm"
                       style={{ width: '100px', height: '100px', objectFit: 'cover' }}
                     />
                   )}

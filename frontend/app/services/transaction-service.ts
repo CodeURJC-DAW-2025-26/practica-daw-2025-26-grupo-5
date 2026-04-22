@@ -5,29 +5,14 @@ import type CheckoutDTO from "~/dto/CheckoutDTO";
 import type TransactionDTO from "~/dto/TransactionDTO";
 
 /**
- * TRANSACTION SERVICE
- * Centralized API gateway for transaction/payment operations
- * 
- * Responsibilities:
- * - Checkout & payment processing
- * - Transaction history retrieval
- * - Sales & purchase management
+ * Represents the structured response from the backend API for user transactions.
+ * Groups the data into two distinct categories: items the user has sold and items the user has purchased.
+ * * @property {TransactionDTO[]} sales - List of transactions where the current user acted as the seller.
+ * @property {TransactionDTO[]} orders - List of transactions where the current user acted as the buyer.
  */
-
-/**
- * Fetches all user transactions (sales & purchases combined)
- * 
- * Returns:
- * - sales: Transactions where user is seller
- * - orders: Transactions where user is buyer
- * 
- * Used by: user-sales-orders.tsx component
- */
-export async function getUserTransactions(): Promise<{ 
-  sales: TransactionDTO[]; 
-  orders: TransactionDTO[] 
-}> {
-  return await api.get("/v1/users/me/transactions");
+export interface TransactionsResponse {
+    sales: TransactionDTO[];
+    orders: TransactionDTO[]; 
 }
 
 /**
@@ -57,4 +42,12 @@ export const getCheckoutDetails = async (productId: number): Promise<CheckoutDTO
  */
 export async function createTransaction(productId: number): Promise<any> {
     return await api.post("/v1/transactions", { productId });
+}
+
+/**
+ * Fetches the transactions of the user
+ * @returns transactions of current user
+ */
+export async function getTransactions(){
+    return await api.get<TransactionsResponse>("/v1/users/me/transactions");
 }

@@ -26,10 +26,9 @@
  * @component
  * @returns React component with seller dashboard and analytics
  */
-
 import { useEffect, useRef } from "react";
 import { Row, Col, Table, Badge, Card, Stack, Image } from "react-bootstrap";
-import { Link } from "react-router";
+import { useNavigate, Link, redirect } from "react-router";
 import { useUserStore } from "~/stores/useUserStore";
 import type { Route } from "./+types/user-page";
 import { getUserDashboardStats } from "~/services/user-service";
@@ -37,36 +36,48 @@ import Chart from "chart.js/auto";
 
 /**
  * Client-side loader function
- * Fetches dashboard statistics for the currently logged-in seller
- * 
- * Process:
- * 1. Calls getUserDashboardStats() to get data from backend
- * 2. Formats revenue and balance to 2 decimal places
- * 3. Prepares chart data (labels and values)
- * 4. Formats current date in GB locale
- * 
- * @returns Object containing formatted stats for dashboard display
+ * Fetches dashboard statistics for the currently logged-in seller.
+ * * Process:
+ * 1. Checks for an active user session directly in the Zustand store.
+ * 2. Redirects to login instantly if unauthorized (prevents UI flickering).
+ * 3. Fetches dashboard data via REST API using clientLoader (Project requirement).
+ * 4. Formats currency and dates for UI display.
  */
 export async function clientLoader() {
-    const stats = await getUserDashboardStats();
-    const apiData = stats || {};
-    return {
-        userSales: apiData.salesCount || [],
-        revenueLabels: apiData.chartLabels || [],
-        revenueValues: apiData.chartValues || [],
-        formattedTotalRevenue: apiData.totalRevenue?.toFixed(2) || "0.00",
-        formattedBalance: apiData.balance?.toFixed(2) || "0.00",
-        date: new Date().toLocaleDateString('en-GB', {
+    // Instant authentication check to prevent component rendering if not logged in
+    const currentUser = useUserStore.getState().user;
+    if (!currentUser) {
+        throw redirect('/login');
+    }
+
+    try {
+        // Fetch data from REST API using clientLoader
+        const stats = await getUserDashboardStats();
+        const apiData = stats || {};
+        
+        return {
+            userSales: apiData.salesCount || [],
+            revenueLabels: apiData.chartLabels || [],
+            revenueValues: apiData.chartValues || [],
+            formattedTotalRevenue: apiData.totalRevenue || "0.00",
+            formattedBalance: apiData.balance || "0.00",
+            date: new Date().toLocaleDateString('en-GB', {
             day: 'numeric', month: 'short', year: 'numeric'
-        })
-    };
+            })
+        };
+    } catch (error: any) {
+        // Handle unauthorized responses from the backend API
+        if (error.status === 401 || error.response?.status === 401) {
+            throw redirect('/login');
+        }
+        throw error;
+    }
 }
 
 /**
  * User Dashboard Component
- * 
- * Main component for displaying seller analytics and performance metrics.
- * Renders header with user greeting, KPI cards, charts, and sales table.
+ * * Main component for displaying seller analytics and performance metrics.
+ * Renders header with user greeting, KPI cards, interactive charts, and a recent sales table.
  */
 export default function UserPage({ loaderData }: Route.ComponentProps) {
     const { user } = useUserStore();
@@ -74,14 +85,11 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
     const categoryChartRef = useRef<HTMLCanvasElement>(null);
 
     /**
-     * Initialize Chart.js Charts
-     * 
-     * Effect runs when loaderData changes (component mount or data refresh).
-     * Creates two interactive charts:
-     * 1. Line chart: Revenue trend over time (monthly data)
-     * 2. Doughnut chart: Sales distribution by category
-     * 
-     * Cleanup: Destroys charts on unmount to prevent memory leaks
+     * Initialize Chart.js Instances
+     * * Effect runs when loaderData changes. Creates two interactive charts:
+     * 1. Line chart: Revenue trend over time.
+     * 2. Doughnut chart: Sales distribution by category.
+     * * Cleanup mechanism destroys charts on unmount to prevent canvas memory leaks.
      */
     useEffect(() => {
         if (!revenueChartRef.current || !categoryChartRef.current) return;
@@ -117,7 +125,10 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
             options: { plugins: { legend: { position: 'bottom' } } }
         });
 
-        return () => { chart1.destroy(); chart2.destroy(); };
+        return () => { 
+            chart1.destroy(); 
+            chart2.destroy(); 
+        };
     }, [loaderData]);
 
     return (
@@ -157,7 +168,7 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
                 <Col md={6}>
                     <Card className="clay-card border-0 p-3 h-100">
                         <Card.Body>
-                            <p className="text-muted small fw-700 mb-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Total Revenue</p>
+                            <p className="text-muted small fw-700 mb-2" style={{ letterSpacing: '0.5px' }}>Total Revenue</p>
                             <h2 className="fw-800 text-primary mb-1">{loaderData.formattedTotalRevenue} €</h2>
                             <span className="text-success fw-700 small">Keep going!</span>
                         </Card.Body>
@@ -166,7 +177,7 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
                 <Col md={6}>
                     <Card className="clay-card border-0 p-3 h-100">
                         <Card.Body>
-                            <p className="text-muted small fw-700 mb-2 text-uppercase" style={{ letterSpacing: '0.5px' }}>Current Balance</p>
+                            <p className="text-muted small fw-700 mb-2" style={{ letterSpacing: '0.5px' }}>Current Balance</p>
                             <h2 className="fw-800 text-dark mb-1">{loaderData.formattedBalance} €</h2>
                             <span className="text-primary fw-700 small">Wow!</span>
                         </Card.Body>

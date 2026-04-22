@@ -141,7 +141,7 @@ export default function ProductForm({
   useEffect(() => {
     if (product?.name) setName(product.name);
     if (product?.description) setDescription(product.description);
-    
+
     // Load existing product image for edit mode
     // Cache bust with Date.now() to ensure fresh image
     if (product?.id && !previewUrl) {
@@ -205,9 +205,9 @@ export default function ProductForm({
                 Capture and share your design treasure.
               </p>
             </div>
-            <Button 
-              variant="light" 
-              className="btn-about py-1 px-3 small border" 
+            <Button
+              variant="light"
+              className="btn-about py-1 px-3 small border"
               onClick={onCancel}
             >
               <i className="fa-solid fa-xmark me-2"></i>Cancel
@@ -216,8 +216,8 @@ export default function ProductForm({
 
           {/* ERROR ALERT */}
           {state?.error && (
-            <Alert 
-              variant="danger" 
+            <Alert
+              variant="danger"
               className="py-2 rounded-4 fw-700 small mb-3"
             >
               {state.error}
@@ -228,7 +228,7 @@ export default function ProductForm({
           <Form action={formAction}>
             {/* Hidden field for product ID (edit mode only) */}
             {isEditing && <input type="hidden" name="id" value={product?.id} />}
-            
+
             {/* FORM CONTENT: 2-COLUMN LAYOUT */}
             <Row className="g-4">
 
@@ -240,33 +240,33 @@ export default function ProductForm({
 
                 {/* IMAGE UPLOAD ZONE */}
                 <div className="position-relative mb-3">
-                  <div 
+                  <div
                     className="image-upload-zone rounded-4 d-flex flex-column align-items-center justify-content-center shadow-sm"
-                    style={{ 
-                      height: "260px", 
-                      backgroundColor: "#f8f9fa", 
-                      border: "2px dashed #dee2e6", 
-                      overflow: "hidden", 
-                      position: "relative" 
+                    style={{
+                      height: "260px",
+                      backgroundColor: "#f8f9fa",
+                      border: "2px dashed #dee2e6",
+                      overflow: "hidden",
+                      position: "relative"
                     }}
                   >
                     {/* CONDITIONAL RENDERING: Image or Placeholder */}
                     {previewUrl ? (
                       // Image preview - scaled to fill entire zone
-                      <Image 
-                        src={previewUrl} 
-                        style={{ 
-                          width: "100%", 
-                          height: "100%", 
-                          objectFit: "cover" 
-                        }} 
-                        alt="Preview" 
+                      <Image
+                        src={previewUrl}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover"
+                        }}
+                        alt="Preview"
                       />
                     ) : (
                       // No image - show upload prompt
                       <div className="text-center p-3">
-                        <div 
-                          className="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center mb-2 mx-auto" 
+                        <div
+                          className="bg-white rounded-circle shadow-sm d-flex align-items-center justify-content-center mb-2 mx-auto"
                           style={{ width: "50px", height: "50px" }}
                         >
                           <i className="fa-solid fa-camera fa-lg text-primary"></i>
@@ -276,14 +276,14 @@ export default function ProductForm({
                     )}
 
                     {/* INVISIBLE FILE INPUT */}
-                    <Form.Control 
-                      type="file" 
-                      name="image" 
-                      accept="image/*" 
+                    <Form.Control
+                      type="file"
+                      name="image"
+                      accept="image/*"
                       onChange={handleImageChange}
-                      className="position-absolute top-0 start-0 w-100 h-100 opacity-0" 
-                      style={{ cursor: "pointer" }} 
-                      disabled={isPending} 
+                      className="position-absolute top-0 start-0 w-100 h-100 opacity-0"
+                      style={{ cursor: "pointer" }}
+                      disabled={isPending}
                     />
                   </div>
                 </div>
@@ -310,15 +310,15 @@ export default function ProductForm({
                       PRODUCT NAME
                     </Form.Label>
                     <div className="search-box py-2 px-3 bg-light rounded-3 border">
-                      <Form.Control 
-                        type="text" 
-                        name="name" 
-                        value={name} 
+                      <Form.Control
+                        type="text"
+                        name="name"
+                        value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="e.g. Vintage Eames Chair" 
-                        className="w-100 border-0 fw-600 bg-transparent shadow-none p-0" 
-                        required 
-                        disabled={isPending} 
+                        placeholder="e.g. Vintage Eames Chair"
+                        className="w-100 border-0 fw-600 bg-transparent shadow-none p-0"
+                        required
+                        disabled={isPending}
                       />
                     </div>
                   </Col>
@@ -328,11 +328,11 @@ export default function ProductForm({
                     <Form.Label className="label-categories x-small mb-1">
                       CATEGORY
                     </Form.Label>
-                    <Form.Select 
-                      name="category" 
+                    <Form.Select
+                      name="category"
                       defaultValue={product?.category || ""}
-                      className="border bg-light py-2 fw-700 small rounded-3 shadow-none px-3" 
-                      required 
+                      className="border bg-light py-2 fw-700 small rounded-3 shadow-none px-3"
+                      required
                       disabled={isPending}
                     >
                       <option disabled value="">Choose...</option>
@@ -348,20 +348,22 @@ export default function ProductForm({
                     <Form.Label className="label-categories x-small mb-1">
                       PRICE (EUR)
                     </Form.Label>
-                    <div className="search-box py-2 px-3 bg-light rounded-3 border d-flex align-items-center">
-                      <span className="me-2 fw-800 opacity-25">€</span>
-                      <Form.Control 
-                        type="number" 
-                        name="price" 
-                        step="0.01" 
+                    <div className="border bg-light py-2 px-3 rounded-3 d-flex align-items-center shadow-none" style={{ width: 'fit-content', minWidth: '150px' }}>
+                      <span className="me-2 fw-700 small opacity-50">€</span>
+                      <Form.Control
+                        type="number"
+                        name="price"
+                        step="0.01"
                         defaultValue={product?.price || ""}
-                        className="w-100 border-0 fw-700 bg-transparent shadow-none p-0" 
-                        required 
-                        disabled={isPending} 
+                        className="border-0 bg-transparent p-0 fw-700 small shadow-none custom-number-input"
+                        style={{ width: '80px' }}
+                        placeholder="0.00"
+                        required
+                        disabled={isPending}
                       />
                     </div>
                   </Col>
-
+                  
                   {/* LOCATION INPUT */}
                   <Col md={12}>
                     <Form.Label className="label-categories x-small mb-1">
@@ -369,14 +371,14 @@ export default function ProductForm({
                     </Form.Label>
                     <div className="search-box py-2 px-3 bg-light rounded-3 border d-flex align-items-center">
                       <i className="fa-solid fa-location-dot me-2 opacity-25"></i>
-                      <Form.Control 
-                        type="text" 
-                        name="location" 
+                      <Form.Control
+                        type="text"
+                        name="location"
                         defaultValue={product?.location || ""}
-                        placeholder="e.g. Madrid, Spain" 
-                        className="w-100 border-0 fw-600 bg-transparent shadow-none p-0" 
-                        required 
-                        disabled={isPending} 
+                        placeholder="e.g. Madrid, Spain"
+                        className="w-100 border-0 fw-600 bg-transparent shadow-none p-0"
+                        required
+                        disabled={isPending}
                       />
                     </div>
                   </Col>
@@ -388,12 +390,12 @@ export default function ProductForm({
                         DESCRIPTION
                       </Form.Label>
                       {/* AI Enhancement Button */}
-                      <Button 
-                        variant="outline-primary" 
-                        size="sm" 
+                      <Button
+                        variant="outline-primary"
+                        size="sm"
                         onClick={handleAIImprovement}
-                        disabled={aiState?.loading || isPending || !name} 
-                        className="btn-ai-sparkle border-0 py-0 px-2" 
+                        disabled={aiState?.loading || isPending || !name}
+                        className="btn-ai-sparkle border-0 py-0 px-2"
                         style={{ height: '24px' }}
                       >
                         {aiState?.loading ? (
@@ -401,8 +403,8 @@ export default function ProductForm({
                         ) : (
                           <i className="fa-solid fa-wand-magic-sparkles"></i>
                         )}
-                        <span 
-                          className="ms-1 fw-800 x-small" 
+                        <span
+                          className="ms-1 fw-800 x-small"
                           style={{ fontSize: '10px' }}
                         >
                           Improve with AI
@@ -411,25 +413,25 @@ export default function ProductForm({
                     </div>
 
                     {/* Description Textarea */}
-                    <Form.Control 
-                      as="textarea" 
-                      name="description" 
-                      value={description} 
+                    <Form.Control
+                      as="textarea"
+                      name="description"
+                      value={description}
                       onChange={(e) => setDescription(e.target.value)}
-                      rows={5} 
-                      className="border bg-light p-3 fw-600 small rounded-4 shadow-none" 
-                      style={{ resize: "none" }} 
-                      required 
-                      disabled={isPending} 
+                      rows={5}
+                      className="border bg-light p-3 fw-600 small rounded-4 shadow-none"
+                      style={{ resize: "none" }}
+                      required
+                      disabled={isPending}
                     />
                   </Col>
                 </Row>
 
                 {/* FORM ACTIONS: Submit Button */}
                 <div className="mt-4 pt-3 border-top d-flex justify-content-end">
-                  <Button 
-                    type="submit" 
-                    className="btn-sell px-5 py-2 shadow-lg rounded-pill border-0 fw-800" 
+                  <Button
+                    type="submit"
+                    className="btn-sell px-5 py-2 shadow-lg rounded-pill border-0 fw-800"
                     disabled={isPending}
                   >
                     {isPending ? (

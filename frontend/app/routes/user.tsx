@@ -11,7 +11,7 @@ import { useUserStore } from '~/stores/useUserStore';
 export default function UserRoute({ }: Route.ComponentProps) {
     const { user } = useUserStore();
     const location = useLocation();
-
+    
     // Global protection: Check if the user is logged, and if he is not redirect him to login page
     if (!user) {
         return <Navigate to="/login" state={{ from: location }} replace />;

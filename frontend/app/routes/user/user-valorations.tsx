@@ -84,91 +84,76 @@
  * @returns Page displaying received reviews and pending ratings
  */
 
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { useState } from 'react';
+import { redirect, Link, useNavigate, useLoaderData } from 'react-router';
 import { useUserStore } from '~/stores/useUserStore';
-import { getValorationsDashboard } from '~/services/valorations-service'; // MVC: All API calls delegated to service
+import { getUserValorations } from '~/services/valorations-service';
+import { getTransactions } from '~/services/transaction-service';
+import { Alert, Row, Col, Card, Badge, Button, Image, Stack, Spinner } from 'react-bootstrap';
 import type ValorationDTO from '~/dto/ValorationDTO';
 import type TransactionDTO from '~/dto/TransactionDTO';
-import { Row, Col, Card, Alert, Image, Stack, Button, Spinner } from 'react-bootstrap';
+
+/**
+ * Client-side loader: Fetch and Format User Valorations and Pending Transactions
+ * * Process:
+ * 1. Validate session.
+ * 2. Fetch valorations and transactions in parallel.
+ * 3. Filter transactions to find only those awaiting a rating.
+ * 4. Calculate stats (averages and counts).
+ */
+export async function clientLoader() {
+  const currentUser = useUserStore.getState().user;
+  if (!currentUser) throw redirect('/login');
+
+  try {
+    // 1. Parallel fetching for better performance
+    const [valoData, transData] = await Promise.all([
+      getUserValorations(),
+      getTransactions()
+    ]);
+
+    const valorations = valoData.content || [];
+
+    // 2. Identify pending ratings
+    // Logic: Transactions in 'orders' that don't have a matching ID in valorations
+    const ratedTransactionIds = new Set(valorations.map((v: any) => v.transactionId));
+    const pendingTransactions = (transData.orders || []).filter(
+      (order: any) => !ratedTransactionIds.has(order.transactionId)
+    );
+
+    // 3. Calculate statistics
+    const averageRating = valorations.length > 0
+      ? (valorations.reduce((sum: number, v: any) => sum + (v.rating || 0), 0) / valorations.length).toFixed(1)
+      : '0.0';
+
+    return {
+      valorations,
+      pendingTransactions,
+      averageRating,
+      completedCount: valorations.length,
+      pendingCount: pendingTransactions.length,
+      date: Date.now()
+    };
+  } catch (error: any) {
+    if (error.status === 401 || error.response?.status === 401) {
+      useUserStore.getState().setUser(null);
+      throw redirect('/login');
+    }
+    console.error("Error in Valorations Loader:", error);
+    throw error;
+  }
+}
 
 /**
  * User Valorations Component Implementation
- * 
- * Displays reviews received and pending ratings to submit.
+ * * Displays reviews submitted by the user and identifies pending purchases to rate.
  */
 export default function UserValorations() {
-  // All reviews/ratings received by current user (as seller)
-  const [valorations, setValorations] = useState<ValorationDTO[]>([]);
-  
-  // Purchases awaiting user's rating
-  const [transactions, setTransactions] = useState<TransactionDTO[]>([]);
-  
-  // Loading state while fetching data
-  const [loading, setLoading] = useState(true);
-  
-  // Error message if API call fails
-  const [error, setError] = useState<string | null>(null);
-
+  const loaderData = useLoaderData() as any;
   const { user } = useUserStore();
-  const navigate = useNavigate();
 
-  /**
-   * Check Authentication
-   * 
-   * Redirects to login if user not logged in.
-   * Ensures only authenticated users access this page.
-   */
-  useEffect(() => {
-    if (!user) navigate('/login');
-  }, [user, navigate]);
-
-  /**
-   * Fetch User Reviews and Pending Ratings
-   * 
-   * Process:
-   * 1. Check if user is authenticated (skip if not)
-   * 2. Fetch all received valorations (reviews)
-   *    - Endpoint: /api/v1/users/me/valorations
-   *    - Includes: rating, comment, buyer info, product info
-   * 3. Fetch all user transactions (purchases)
-  /**
-   * Fetch User Reviews and Pending Ratings
-   * 
-   * Uses MVC pattern: Service layer handles all API communication
-   * - getValorationsDashboard() from valorations-service
-   * - Combines valorations + pending transactions in one call
-   * - Service manages auth headers & error responses
-   */
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Service delegates to API client → handles token injection automatically
-        const { valorations: valoData, pendingTransactions } = await getValorationsDashboard();
-        setValorations(valoData);
-        setTransactions(pendingTransactions);
-        setLoading(false);
-      } catch (err: any) {
-        const errorMsg = err.message || 'Failed to load reviews. Please try again.';
-        setError(errorMsg);
-        setLoading(false);
-      }
-    };
-
-    if (user) fetchData();
-  }, [user]);
-
-  if (loading) return (
-    <div className="d-flex justify-content-center align-items-center py-5 w-100">
-      <Spinner animation="border" variant="primary" />
-    </div>
-  );
-
-  const completedCount = valorations.length;
-  const pendingCount = transactions.length;
-  const averageRating = valorations.length > 0
-    ? (valorations.reduce((sum: number, v: any) => sum + (v.rating || 0), 0) / valorations.length).toFixed(1)
-    : '0.0';
+  // Note: Local state 'loading' and 'useEffect' are removed as data is now provided by loaderData.
+  const { valorations, pendingTransactions, averageRating, completedCount, pendingCount } = loaderData;
 
   return (
     <>
@@ -181,7 +166,7 @@ export default function UserValorations() {
         {user && (
           <Link to="/user/settings">
             <Image
-              src={`/api/v1/users/me/profile-photo?t=${Date.now()}`}
+              src={`/api/v1/users/me/profile-photo?t=${loaderData.date}`}
               className="rounded-circle border border-2 shadow-sm"
               width={48}
               height={48}
@@ -192,13 +177,11 @@ export default function UserValorations() {
         )}
       </header>
 
-      {error && <Alert variant="danger" className="clay-card border-0 fw-700">{error}</Alert>}
-
       {/* KPI Cards */}
       <Row className="g-4 mb-5">
         <Col md={6} lg={4}>
-          <Card className="clay-card border-0 h-100 p-3">
-            <Card.Body  style={{textAlign: 'center'}}>
+          <Card className="clay-card border-0 h-100 p-3 shadow-sm">
+            <Card.Body style={{ textAlign: 'center' }}>
               <p className="text-muted small fw-700 mb-2" style={{ letterSpacing: '0.5px' }}>Completed Reviews</p>
               <h2 className="fw-800 text-success mb-1">Total: {completedCount}</h2>
               <span className="text-muted fw-600 small">Feedback submitted</span>
@@ -206,8 +189,8 @@ export default function UserValorations() {
           </Card>
         </Col>
         <Col md={6} lg={4}>
-          <Card className="clay-card border-0 h-100 p-3">
-            <Card.Body  style={{textAlign: 'center'}}>
+          <Card className="clay-card border-0 h-100 p-3 shadow-sm">
+            <Card.Body style={{ textAlign: 'center' }}>
               <p className="text-muted small fw-700 mb-2" style={{ letterSpacing: '0.5px' }}>Pending for Rating</p>
               <h2 className="fw-800 text-warning mb-1">Waiting: {pendingCount}</h2>
               <span className="text-muted fw-600 small">Purchases to review</span>
@@ -215,8 +198,8 @@ export default function UserValorations() {
           </Card>
         </Col>
         <Col md={6} lg={4}>
-          <Card className="clay-card border-0 h-100 p-3">
-            <Card.Body style={{textAlign: 'center'}}>
+          <Card className="clay-card border-0 h-100 p-3 shadow-sm">
+            <Card.Body style={{ textAlign: 'center' }}>
               <p className="text-muted small fw-700 mb-2" style={{ letterSpacing: '0.5px' }}>Average Rating Given</p>
               <h2 className="fw-800 text-info mb-1">{averageRating}</h2>
               <span className="text-muted fw-600 small">Your feedback score</span>
@@ -227,10 +210,12 @@ export default function UserValorations() {
 
       {/* Pending Valorations Section */}
       {pendingCount > 0 ? (
-        <Card className="clay-card border-0 mb-5 p-3">
+        <Card className="clay-card border-0 mb-5 p-3 shadow-sm">
           <Card.Body>
             <Stack direction="horizontal" gap={3} className="align-items-center mb-4">
-              <i className="fa-solid fa-hourglass-end fa-2x text-warning"></i>
+              <div className="bg-warning-light p-3 rounded-circle">
+                <i className="fa-solid fa-hourglass-end fa-xl text-warning"></i>
+              </div>
               <div>
                 <h5 className="fw-800 mb-1 text-dark">Pending for Rating</h5>
                 <p className="text-muted small mb-0 fw-600">
@@ -238,10 +223,10 @@ export default function UserValorations() {
                 </p>
               </div>
             </Stack>
-            
+
             <Stack gap={3}>
-              {transactions.map((transaction: any) => (
-                <Card key={transaction.transactionId} className="bg-light border-0">
+              {pendingTransactions.map((transaction: any) => (
+                <Card key={transaction.transactionId} className="bg-light border-0 rounded-4">
                   <Card.Body className="d-flex justify-content-between align-items-center p-3">
                     <div>
                       <h6 className="fw-800 mb-1 text-dark">{transaction.product?.name}</h6>
@@ -250,25 +235,14 @@ export default function UserValorations() {
                       </p>
                     </div>
                     <Link to="/user/sales-orders" className="text-decoration-none">
-                      <Button 
-                        className="fw-800 rounded-3 border-0 px-4 py-2 d-flex align-items-center gap-2"
-                        style={{
-                          background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
-                          color: 'white',
-                          fontSize: '14px',
-                          boxShadow: '0 4px 15px rgba(245, 158, 11, 0.35)',
-                          transition: 'all 0.3s ease'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-2px)';
-                          e.currentTarget.style.boxShadow = '0 6px 20px rgba(245, 158, 11, 0.45)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = 'translateY(0)';
-                          e.currentTarget.style.boxShadow = '0 4px 15px rgba(245, 158, 11, 0.35)';
+                      <Button
+                        className="btn-stilnovo-rate d-flex align-items-center gap-2 fw-800 rounded-pill px-4 py-2 shadow-sm"
+                        style={{ fontSize: '14px', whiteSpace: 'nowrap' }}
+                        onClick={(e) => {
+                          e.stopPropagation();
                         }}
                       >
-                        <i className="fa-solid fa-star"></i> Rate Now
+                        <i className="fa-solid fa-star" style={{ color: '#F59E0B' }} /> Rate Now
                       </Button>
                     </Link>
                   </Card.Body>
@@ -278,7 +252,7 @@ export default function UserValorations() {
           </Card.Body>
         </Card>
       ) : (
-        <Alert variant="success" className="clay-card border-0 d-flex align-items-center gap-3 mb-5 p-4">
+        <Alert variant="success" className="clay-card border-0 d-flex align-items-center gap-3 mb-5 p-4 shadow-sm rounded-4">
           <i className="fa-solid fa-check-circle fa-2x text-success"></i>
           <div>
             <h6 className="fw-800 mb-1 text-dark">All Caught Up!</h6>
@@ -288,14 +262,14 @@ export default function UserValorations() {
       )}
 
       {/* Completed Valorations Section */}
-      <Card className="clay-card border-0 p-3">
+      <Card className="clay-card border-0 p-3 shadow-sm">
         <Card.Body>
           <h5 className="fw-800 text-dark mb-4">Feedback for Sellers</h5>
-          
+
           {completedCount > 0 ? (
             <Stack gap={3}>
               {valorations.map((valoration: any) => (
-                <Card key={valoration.id} className="bg-light border-0">
+                <Card key={valoration.id} className="bg-light border-0 rounded-4">
                   <Card.Body className="p-4">
                     <Row className="align-items-start">
                       <Col xs={12} sm={8}>
@@ -303,7 +277,7 @@ export default function UserValorations() {
                         <p className="text-muted small mb-3">
                           Seller: <span className="fw-700">{valoration.sellerName}</span>
                         </p>
-                        <div className="bg-white p-3 rounded-3 border-start border-4" style={{ borderColor: '#2f6ced' }}>
+                        <div className="bg-white p-3 rounded-4 border-start border-4 shadow-sm" style={{ borderColor: '#2f6ced' }}>
                           <p className="mb-0 small fw-600 fst-italic text-dark">"{valoration.comment}"</p>
                         </div>
                       </Col>
@@ -312,12 +286,14 @@ export default function UserValorations() {
                           {[...new Array(5)].map((_, i) => (
                             <i
                               key={`star-${valoration.id}-${i}`}
-                              className={`fa-solid fa-star ${i < (valoration.rating || 0) ? 'text-warning' : 'text-muted'}`}
+                              className={`fa-solid fa-star ${i < (valoration.rating || 0) ? 'text-warning' : 'text-muted-light'}`}
                               style={{ fontSize: '1rem', marginRight: '4px' }}
                             />
                           ))}
                         </div>
-                        <span className="badge bg-white text-dark border fw-800 px-3 py-2 rounded-pill shadow-sm">{valoration.rating}/5</span>
+                        <Badge bg="white" text="dark" className="border fw-800 px-3 py-2 rounded-pill shadow-sm">
+                          {valoration.rating}/5
+                        </Badge>
                       </Col>
                     </Row>
                   </Card.Body>
@@ -327,7 +303,7 @@ export default function UserValorations() {
           ) : (
             <div className="text-center py-5 opacity-50">
               <i className="fa-solid fa-comment-dots fa-3x mb-3 text-muted"></i>
-              <p className="fw-700 text-dark mb-0">No valorations yet. Complete a purchase and share your feedback!</p>
+              <p className="fw-700 text-dark mb-0">No valorations yet. Complete a purchase to share your feedback!</p>
             </div>
           )}
         </Card.Body>

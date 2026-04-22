@@ -340,7 +340,6 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
             Are you sure you want to remove <strong>{product.name}</strong>?
           </p>
 
-          {/* Manejo de errores de React */}
           {deleteError && (
             <Alert variant="danger" className="mb-4 small fw-600 rounded-4">
               {deleteError}

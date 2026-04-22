@@ -45,23 +45,54 @@
  * @returns React component for managing seller inventory
  */
 
-import { useEffect, useState } from "react";
-import { Link } from "react-router";
-import { Button, Badge, Image, Stack, Card, Row, Col, Spinner } from "react-bootstrap";
+import { useState } from "react";
+import { redirect, Link } from "react-router";
+import { useUserStore } from '~/stores/useUserStore';
+import { Button, Badge, Image, Stack, Card, Row, Col } from "react-bootstrap";
 import { getMyProducts, deleteProduct } from "~/services/products-service";
 import ConfirmModal from "~/components/confirm-modal";
 import type ProductDTO from "~/dto/ProductDTO";
+import type { Route } from "./+types/user-products"; 
+
+/**
+ * Client-side loader function
+ * Fetches user's products via REST API before the component renders.
+ * * Process:
+ * 1. Verifies active session; redirects to login if unauthorized.
+ * 2. Fetches the list of products owned by the user.
+ * 3. Catches and handles API errors (e.g., expired token).
+ */
+export async function clientLoader() {
+    const currentUser = useUserStore.getState().user;
+    if (!currentUser) {
+        throw redirect('/login');
+    }
+
+    try {
+        // Fetch products from the backend using API REST
+        const products = await getMyProducts();
+        return { products };
+    } catch (error: any) {
+        // Handle unauthorized responses from the backend API
+        if (error.status === 401 || error.response?.status === 401) {
+            useUserStore.getState().setUser(null);
+            throw redirect('/login');
+        }
+        console.error("Error loading products in loader:", error);
+        throw error; // Or redirect to an error page
+    }
+}
 
 /**
  * My Products Component Implementation
- * 
- * Manages seller's product inventory with CRUD operations.
- * Fetches initial products and handles edit/delete operations.
+ * * Manages seller's product inventory with CRUD operations.
+ * Displays products fetched by the clientLoader and handles delete operations.
  */
-export default function MyProducts() {
-    // State management for products and modals
-    const [products, setProducts] = useState<ProductDTO[]>([]);
-    const [loading, setLoading] = useState(true);
+export default function MyProducts({ loaderData }: Route.ComponentProps) {
+    // State management initialized with data from the loader
+    const [products, setProducts] = useState<ProductDTO[]>(loaderData.products);
+    
+    // Modal state
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [idToDelete, setIdToDelete] = useState<number | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
@@ -69,7 +100,6 @@ export default function MyProducts() {
     /**
      * Price Formatter
      * Uses German locale (€) for European marketplace
-     * Min: 0 decimals, Max: 2 decimals
      */
     const priceFormatter = new Intl.NumberFormat('de-DE', {
         minimumFractionDigits: 0,
@@ -77,35 +107,9 @@ export default function MyProducts() {
     });
 
     /**
-     * Fetch Products on Component Mount
-     * Called once when component loads
-     */
-    useEffect(() => {
-        fetchProducts();
-    }, []);
-
-    /**
-     * Fetch User's Products from API
-     * 
-     * Calls getMyProducts() service to retrieve all products owned by current user.
-     * Handles errors gracefully and clears loading state.
-     */
-    const fetchProducts = async () => {
-        try {
-            const data = await getMyProducts();
-            setProducts(data);
-        } catch (error) {
-            console.error("Error fetching inventory:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    /**
      * Initiate Delete Process
      * Opens confirmation modal before actual deletion
-     * 
-     * @param id - Product ID to delete
+     * * @param id - Product ID to delete
      */
     const handleDeleteClick = (id: number) => {
         setIdToDelete(id);
@@ -114,22 +118,21 @@ export default function MyProducts() {
 
     /**
      * Confirm and Execute Delete
-     * 
-     * Process:
+     * * Process:
      * 1. Set deleting state to show spinner
-     * 2. Artificial 1-second delay for UX
-     * 3. Call deleteProduct() API
-     * 4. Remove product from local state
-     * 5. Close modal
-     * 6. Handle errors (e.g., product in active transaction)
+     * 2. Call deleteProduct() API
+     * 3. Update local state to remove the product instantly
+     * 4. Close modal
      */
     const handleConfirmDelete = async () => {
         if (idToDelete === null) return;
         setIsDeleting(true);
         try {
-            await new Promise(resolve => setTimeout(resolve, 1000));
             await deleteProduct(idToDelete);
+            
+            // Remove the deleted product from local state
             setProducts(prev => prev.filter(p => p.id !== idToDelete));
+            
             setShowDeleteModal(false);
         } catch (err) {
             console.error("Delete failed:", err);
@@ -139,15 +142,6 @@ export default function MyProducts() {
             setIdToDelete(null);
         }
     };
-
-    /**
-     * Show Loading Spinner During Initial Fetch
-     */
-    if (loading) return (
-        <div className="d-flex justify-content-center align-items-center py-5 w-100">
-            <Spinner animation="border" variant="primary" />
-        </div>
-    );
 
     return (
         <>
@@ -163,7 +157,6 @@ export default function MyProducts() {
                         <i className="fa-solid fa-plus me-2"></i>Add Product
                     </Button>
                 </Link>
-
             </header>
 
             {/* Product List */}
@@ -206,9 +199,10 @@ export default function MyProducts() {
                                                     <i className="fa-solid fa-pen-to-square text-secondary"></i>
                                                 </Button>
                                             </Link>
-                                            <Button variant="outline-danger" size="sm" className="d-flex align-items-center justify-content-center border-0" style={{ width: '40px', height: '40px', padding: '0', borderRadius: '8px', backgroundColor: '#fef2f2' 
-                                                }} onClick={() => handleDeleteClick(product.id)} title="Delete product">
-                                                    <i className="fa-solid fa-trash-can text-danger"></i>
+                                            <Button variant="outline-danger" size="sm" className="d-flex align-items-center justify-content-center border-0" style={{
+                                                width: '40px', height: '40px', padding: '0', borderRadius: '8px', backgroundColor: '#fef2f2'
+                                            }} onClick={() => handleDeleteClick(product.id)} title="Delete product">
+                                                <i className="fa-solid fa-trash-can text-danger"></i>
                                             </Button>
                                         </Stack>
                                     </Col>
