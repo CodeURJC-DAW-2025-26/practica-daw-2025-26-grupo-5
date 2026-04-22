@@ -3,7 +3,10 @@ package es.stilnovo.library.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Pageable;
 
 import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
@@ -47,4 +50,11 @@ public interface UserInteractionRepository extends JpaRepository<UserInteraction
      * Deletes a specific interaction for a user and product.
      */
     void deleteByUserAndProductAndType(User user, Product product, UserInteraction.InteractionType type);
+
+    /**
+     * Find the most interacted product categories for a user, ordered by interaction count
+     */
+    @Query("SELECT p.category FROM UserInteraction ui JOIN ui.product p WHERE ui.user.userId = :userId GROUP BY p.category ORDER BY COUNT(ui) DESC")
+    List<String> findMostInteractedCategoriesByUserId(@Param("userId") Long userId, Pageable pageable);
+
 }

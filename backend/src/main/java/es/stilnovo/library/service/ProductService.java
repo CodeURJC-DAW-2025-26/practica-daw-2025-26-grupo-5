@@ -133,8 +133,8 @@ public class ProductService {
                     .limit(limit)
                     .toList();
         }
-        // Step 1: Find the most purchased category
-        List<String> topCategories = transactionRepository.findMostPurchasedCategoriesByUserId(
+        // Step 1: Find the most interacted category (Views, Likes, Purchases)
+        List<String> topCategories = userInteractionRepository.findMostInteractedCategoriesByUserId(
             user.getUserId(), 
             PageRequest.of(0, 1)
         );
