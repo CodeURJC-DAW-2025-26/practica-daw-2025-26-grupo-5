@@ -387,7 +387,6 @@ export default function UserSettings() {
                   </div>
                 ) : (
                   <div className="text-center">
-                    {/* Botón actualizado para abrir el Modal de React */}
                     <button
                       type="button"
                       className="btn btn-danger-custom w-100 py-3 small shadow-sm"
