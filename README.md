@@ -1488,6 +1488,10 @@ Mi contribución se ha centrado en la mejora y consolidación de la capa REST de
    ```bash
     http://localhost:5173/new/
    ```
+   
+> ℹ **Nota**  
+> Para más detalles sobre la configuración avanzada del entorno de desarrollo, consulta el archivo  
+> [`advanced-react-spa-setup.md`](./advanced-react-spa-setup.md).
 
 ### Diagrama de Arquitectura y Componentes de la SPA
 
