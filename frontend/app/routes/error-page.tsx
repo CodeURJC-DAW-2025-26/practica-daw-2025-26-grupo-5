@@ -57,30 +57,31 @@ import { useNavigate, useRouteError, isRouteErrorResponse } from "react-router";
 import { Container, Row, Col, Button, Stack, Image, Card } from "react-bootstrap";
 import logo from "../assets/logo.png";
 
-/**
- * Error Page Component Implementation
- * 
- * Renders error message based on route error status.
- */
 export default function ErrorPage() {
   const navigate = useNavigate();
   const error = useRouteError();
+  
+  // Default values for unexpected cases
   let status = 500;
   let title = "Server Error";
   let message = "Something went wrong on our end. Our tech treasures are being polished.";
 
-  /**
-   * Detect Error Type and Set Messages
-   * 
-   * Checks if error is a route response to determine status code.
-   * Shows specific messages for common errors (404).
-   */
+  // LOGIC REFINEMENT:
   if (isRouteErrorResponse(error)) {
+    // Standard React Router errors (404, 401, etc.)
     status = error.status;
     if (status === 404) {
       title = "Not Found";
-      message = "We couldn't find the treasure you were looking for, but the marketplace is still full of history.";
+      message = "We couldn't find the treasure you were looking for.";
     }
+  } else if (error === null || (typeof error === 'object' && Object.keys(error as object).length === 0)) {
+    // If error is null but we are in ErrorPage, it's likely a 404 Route Not Found
+    status = 404;
+    title = "Not Found";
+    message = "The page you are looking for does not exist in our records.";
+  } else if (error instanceof Error) {
+    // JavaScript execution errors
+    message = error.message;
   }
 
   return (
@@ -88,7 +89,7 @@ export default function ErrorPage() {
       <Container>
         <Row className="justify-content-center">
           <Col xs={12} md={8} lg={6}>
-            <Card className="clay-card border-0 p-5 text-center">
+            <Card className="clay-card border-0 p-5 text-center shadow-sm">
               <Card.Body>
                 <div className="mb-5 d-flex justify-content-center">
                   <div className="d-flex align-items-center justify-content-center bg-light shadow-sm rounded-4" style={{ width: '100px', height: '100px' }}>
@@ -96,12 +97,15 @@ export default function ErrorPage() {
                   </div>
                 </div>
 
-                <h1 className="fw-800 text-danger mb-2" style={{ fontSize: '72px', letterSpacing: '-2px' }}>{status}</h1>
+                {/* Now showing the REAL status */}
+                <h1 className="fw-800 text-danger mb-2" style={{ fontSize: '72px', letterSpacing: '-2px' }}>
+                    {status}
+                </h1>
                 <h2 className="fw-800 text-dark mb-4" style={{ fontSize: '32px' }}>{title}</h2>
                 <p className="text-muted fw-600 mb-5 px-md-4" style={{ lineHeight: '1.6' }}>{message}</p>
 
                 <Stack direction="horizontal" gap={3} className="justify-content-center flex-wrap">
-                  <Button variant="primary" className="fw-700 px-4 py-3 rounded-pill shadow-sm" style={{ backgroundColor: '#2f6ced', border: 'none' }} onClick={() => navigate("/")}>
+                  <Button variant="primary" className="fw-700 px-4 py-3 rounded-pill shadow-sm border-0" style={{ backgroundColor: '#2f6ced' }} onClick={() => navigate("/")}>
                     <i className="fa-solid fa-house me-2"></i> Back to Homepage
                   </Button>
                   <Button variant="outline-secondary" className="fw-700 px-4 py-3 rounded-pill border-2" onClick={() => navigate(-1)}>

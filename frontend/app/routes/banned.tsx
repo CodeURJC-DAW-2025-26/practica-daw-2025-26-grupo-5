@@ -48,7 +48,7 @@
 
 import { Link, useNavigate } from 'react-router';
 import { useEffect } from 'react';
-import { Container, Card, Button, Alert, Stack, Image } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Image, Stack, Alert } from 'react-bootstrap';
 import logo from "../assets/logo.png";
 import { useUserStore } from '~/stores/useUserStore';
 
@@ -108,60 +108,74 @@ export default function Banned() {
         </Link>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-grow-1 d-flex align-items-center justify-content-center py-5">
-        <Container style={{ maxWidth: '520px' }}>
-          <Card className="clay-card border-0 p-3">
+      {/* Main Content - Ensanchado para evitar scroll vertical innecesario */}
+      <main className="flex-grow-1 d-flex align-items-center justify-content-center py-4">
+        <Container style={{ maxWidth: '720px' }}> {/* Aumentado de 520px a 720px */}
+          <Card className="clay-card border-0 shadow-sm overflow-hidden" style={{ borderRadius: '24px' }}>
             <Card.Body className="p-4 p-md-5">
-              
-              {/* Icon Circle */}
+
+              {/* Icon Circle & Title */}
               <div className="text-center mb-4">
                 <div
-                  className="mx-auto mb-4 d-flex align-items-center justify-content-center"
+                  className="mx-auto mb-4 d-flex align-items-center justify-content-center shadow-sm"
                   style={{ width: '100px', height: '100px', borderRadius: '50%', backgroundColor: '#fee2e2' }}
                 >
                   <i className="fa-solid fa-ban" style={{ fontSize: '3rem', color: '#dc2626' }} />
                 </div>
-                <h1 className="fw-800 mb-3 text-dark" style={{ fontSize: '28px' }}>Account Suspended</h1>
-                <p className="text-muted fw-600 mb-4" style={{ fontSize: '15px', lineHeight: '1.6' }}>
-                  Your account has been temporarily suspended. We take community guidelines seriously to maintain a safe and respectful marketplace for all users.
+                <h1 className="fw-800 mb-2 text-dark" style={{ fontSize: '32px', letterSpacing: '-0.5px' }}>
+                  Account Suspended
+                </h1>
+                <p className="text-muted fw-600 mb-0" style={{ fontSize: '16px' }}>
+                  Your access to the Stilnovo marketplace has been restricted.
                 </p>
               </div>
 
-              {/* Info Box */}
-              <Alert variant="danger" className="border-0 rounded-4 p-4 mb-4" style={{ backgroundColor: '#fef2f2' }}>
-                <p className="mb-2 fw-800 text-danger">
-                  <i className="fa-solid fa-circle-info me-2" />
-                  Why was my account suspended?
-                </p>
-                <p className="mb-0 small fw-600 text-danger opacity-75" style={{ lineHeight: '1.5' }}>
-                  Your account was suspended due to activity that violates our Terms of Service or Community Guidelines. If you believe this was a mistake, our support team is here to help.
-                </p>
-              </Alert>
+              <hr className="my-4 opacity-10" />
 
-              {/* User Info */}
-              <Card className="bg-light border-0 mb-4 rounded-4">
-                <Card.Body className="text-center p-3">
-                  <p className="small fw-700 text-muted text-uppercase mb-1" style={{ letterSpacing: '0.5px' }}>Suspended User</p>
-                  <p className="fw-800 text-dark mb-0 fs-5">{user.name}</p>
-                  <p className="small fw-600 text-muted mb-0">{user.email}</p>
-                </Card.Body>
-              </Card>
+              {/* Layout de dos columnas para Info y User (Solo en desktop para aprovechar el ancho) */}
+              <div className="row g-4 mb-4">
+                <div className="col-lg-7">
+                  <Alert variant="danger" className="border-0 rounded-4 h-100 p-4 mb-0" style={{ backgroundColor: '#fef2f2' }}>
+                    <p className="mb-2 fw-800 text-danger">
+                      <i className="fa-solid fa-circle-info me-2" />
+                      Policy Violation
+                    </p>
+                    <p className="mb-0 small fw-600 text-danger opacity-75" style={{ lineHeight: '1.5' }}>
+                      To maintain a safe community, we suspend accounts that violate our Terms of Service. If you believe this is an error, please appeal below.
+                    </p>
+                  </Alert>
+                </div>
 
-              {/* Actions */}
-              <Stack gap={3} className="mb-4">
-                <Button variant="danger" className="fw-700 rounded-pill py-3 shadow-sm" onClick={handleLogout}>
+                <div className="col-lg-5">
+                  <Card className="bg-light border-0 h-100 rounded-4 d-flex align-items-center justify-content-center">
+                    <Card.Body className="text-center p-3">
+                      <p className="x-small fw-700 text-muted text-uppercase mb-2" style={{ letterSpacing: '1px' }}>Profile</p>
+                      <p className="fw-800 text-dark mb-0 text-truncate" style={{ maxWidth: '180px' }}>{user.name}</p>
+                      <p className="small fw-600 text-muted mb-0 text-truncate" style={{ maxWidth: '180px' }}>{user.email}</p>
+                    </Card.Body>
+                  </Card>
+                </div>
+              </div>
+
+              {/* Actions - Horizontal Stack para ahorrar espacio vertical */}
+              <div className="d-flex flex-column flex-md-row gap-3 mb-4">
+                <Button variant="danger" className="w-100 fw-700 rounded-pill py-3 shadow-sm border-0" onClick={handleLogout}>
                   <i className="fa-solid fa-sign-out-alt me-2" /> Logout
                 </Button>
 
-                <Button variant="outline-secondary" className="fw-700 rounded-pill py-3" href="mailto:stilnovo.noreply@gmail.com" as="a">
+                <Button
+                  variant="outline-secondary"
+                  className="w-100 fw-700 rounded-pill py-3 border-2"
+                  href="mailto:stilnovo.support@gmail.com"
+                  as="a"
+                >
                   <i className="fa-solid fa-envelope me-2" /> Appeal Suspension
                 </Button>
-              </Stack>
+              </div>
 
               {/* Footer Message */}
               <p className="text-center small fw-600 text-muted mb-0">
-                Questions? Email us at <strong className="text-dark">stilnovo.noreply@gmail.com</strong>
+                Need help? Contact <strong className="text-dark">stilnovo.support@gmail.com</strong>
               </p>
             </Card.Body>
           </Card>
