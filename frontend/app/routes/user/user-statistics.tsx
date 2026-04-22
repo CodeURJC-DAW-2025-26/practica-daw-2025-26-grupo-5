@@ -276,7 +276,7 @@ export default function UserStatistics() {
         </Stack>
       </header>
 
-      {/* KPI Cards - USANDO LOS NOMBRES DEL JSON */}
+      {/* KPI Cards*/}
       <Row className="g-4 mb-4">
         <Col md={6} lg={3}>
           <Card className="clay-card border-0 h-100 p-3 shadow-sm">
@@ -328,7 +328,7 @@ export default function UserStatistics() {
         </Col>
       </Row>
 
-      {/* Sales Table - MAPEADO A salesCount */}
+      {/* Sales Table */}
       <Card className="clay-card border-0 shadow-sm overflow-hidden mb-5">
         <div className="bg-white p-4 border-bottom">
           <h5 className="fw-800 text-dark mb-0">Recent Transactions</h5>

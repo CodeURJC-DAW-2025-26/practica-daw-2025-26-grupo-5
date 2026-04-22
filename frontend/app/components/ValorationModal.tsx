@@ -75,7 +75,7 @@ export default function ValorationModal({ show, onHide, transaction, onSubmit, i
     const [hover, setHover] = useState(0);
     const [comment, setComment] = useState("");
     
-    const MIN_CHARS = 15; // Mínimo profesional de caracteres
+    const MIN_CHARS = 15;
 
     if (!transaction) return null;
 
