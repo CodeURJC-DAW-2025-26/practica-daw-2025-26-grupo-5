@@ -50,7 +50,7 @@ import type { Route } from './+types/signup';
 import React, { useState } from 'react';
 import { signUp } from '~/services/login-service'; // MVC: Delegate to service
 import logo from "../assets/logo.png";
-import Footer from '~/components/Footer';
+import Footer from '~/components/footer';
 import Loader from '~/components/Loader';
 
 /**

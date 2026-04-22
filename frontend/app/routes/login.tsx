@@ -26,7 +26,7 @@ import { Container, Alert, Card, Form, Button, Image, Navbar, Nav } from 'react-
 import { useUserStore } from '~/stores/useUserStore';
 import type { Route } from './+types/login';
 import logo from "../assets/logo.png";
-import Footer from '~/components/Footer';
+import Footer from '~/components/footer';
 import Loader from '~/components/Loader';
 
 export default function Login({ }: Route.ComponentProps) {

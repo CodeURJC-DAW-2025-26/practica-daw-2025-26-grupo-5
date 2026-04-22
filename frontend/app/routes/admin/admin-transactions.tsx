@@ -244,7 +244,7 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
   return (
     <>
       <AdminHeader title="Financial Overview" subtitle="Overview of all historical financial movements." />
-      
+
 
       <Card className="border-0 p-4 mb-4 shadow-sm" style={{ backgroundColor: '#192b56', borderRadius: '16px' }}>
         <Card.Body className="p-0">
@@ -391,12 +391,8 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
                         €{transaction.finalPrice?.toFixed(2)}
                       </td>
                       <td>
-                        <Badge
-                          bg={transaction.transactionStatus === 'COMPLETED' ? 'success' : 'warning'}
-                          text={transaction.transactionStatus === 'COMPLETED' ? 'white' : 'dark'}
-                          className="fw-700 px-3 py-2 rounded-pill"
-                        >
-                          {transaction.transactionStatus === 'COMPLETED' ? '✓ COMPLETED' : 'PENDING'}
+                        <Badge bg="success" className="rounded-pill px-3 py-2 fw-700">
+                          COMPLETED
                         </Badge>
                       </td>
                       <td>
