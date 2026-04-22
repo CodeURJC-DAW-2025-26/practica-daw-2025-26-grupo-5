@@ -58,14 +58,10 @@
  * @param {ValorationModalProps} props - Modal configuration
  * @returns React component for rating modal
  */
-
 import { useState } from 'react';
-import { Modal, Form, Button } from 'react-bootstrap';
+import { Modal, Form, Button, Stack, Spinner } from 'react-bootstrap';
 import type TransactionDTO from '~/dto/TransactionDTO';
 
-/**
- * Props Interface for Valoration Modal
- */
 interface ValorationModalProps {
     show: boolean;
     onHide: () => void;
@@ -74,97 +70,125 @@ interface ValorationModalProps {
     isProcessing: boolean;
 }
 
-/**
- * Valoration Modal Component Implementation
- * 
- * Renders form for submitting transaction ratings and reviews.
- */
 export default function ValorationModal({ show, onHide, transaction, onSubmit, isProcessing }: ValorationModalProps) {
     const [rating, setRating] = useState(5);
+    const [hover, setHover] = useState(0);
     const [comment, setComment] = useState("");
+    
+    const MIN_CHARS = 15; // Mínimo profesional de caracteres
 
-    /**
-     * Return null if transaction not provided
-     * Prevents rendering without required data
-     */
     if (!transaction) return null;
 
-    /**
-     * Handle Form Submission
-     * 
-     * Process:
-     * 1. Prevent default form submission
-     * 2. Call onSubmit callback with rating and comment
-     * 3. Reset form fields to defaults
-     * 4. Parent component closes modal via onHide
-     */
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (comment.length < MIN_CHARS) return;
         await onSubmit(rating, comment);
-        // Reset local state after submission
         setRating(5);
         setComment("");
     };
 
-    return (
-        <Modal show={show} onHide={onHide} centered>
-            <div className="clay-card p-4 border-0 shadow-lg" style={{ borderRadius: '20px', backgroundColor: 'white' }}>
-                <div className="text-center mb-4">
-                    <h3 className="fw-800 h5 mb-1 text-primary">Rate your experience</h3>
-                    <p className="small text-muted fw-700">
-                        {transaction.product.name} &bull; <span className="text-dark">{transaction.finalPrice.toFixed(2)}€</span>
-                    </p>
-                    <hr className="opacity-10" />
-                </div>
+    const getEditorialTip = () => {
+        if (comment.length === 0) return "Describe product quality and seller communication.";
+        if (comment.length < MIN_CHARS) return `Minimum ${MIN_CHARS - comment.length} more characters required.`;
+        if (comment.length < 40) return "Add details about shipping speed for a better review.";
+        return "Excellent. This detailed feedback strengthens our community.";
+    };
 
-                {/* Seller Info Branding */}
-                <div className="d-flex align-items-center gap-3 p-3 bg-light rounded-4 mb-4">
-                    <img 
-                        src={`/api/v1/users/${transaction.seller.id}/profile-photo?t=${Date.now()}`} 
-                        className="rounded-circle border border-2 border-white shadow-sm" 
-                        width="55" height="55" 
-                        style={{ objectFit: 'cover' }} 
-                        onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')} 
-                        alt="Seller" 
-                    />
-                    <div>
-                        <p className="small fw-800 mb-0">{transaction.seller.name}</p>
-                        <div className="d-flex align-items-center gap-1 text-warning small">
-                            <i className="fa-solid fa-star"></i>
-                            <span className="fw-700 text-dark">{transaction.seller.rating}</span>
-                        </div>
-                    </div>
-                </div>
+    return (
+        <Modal 
+            show={show} 
+            onHide={onHide} 
+            centered 
+            contentClassName="border-0 bg-transparent shadow-none"
+        >
+            <div className="p-4" style={{ borderRadius: '24px', backgroundColor: '#ffffff', border: '1px solid #e2e8f0', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
+                <header className="text-center mb-4">
+                    <span className="badge rounded-pill bg-light text-primary fw-800 px-3 py-2 mb-3" style={{ fontSize: '10px', letterSpacing: '0.8px' }}>
+                        VALORATION SYSTEM
+                    </span>
+                    <h3 className="fw-800 h5 mb-1 text-dark">Submit Experience</h3>
+                    <p className="small text-muted fw-600 mb-0">
+                        {transaction.product.name} &bull; {transaction.finalPrice.toFixed(2)}€
+                    </p>
+                </header>
 
                 <Form onSubmit={handleSubmit}>
-                    <Form.Group className="mb-3 text-center">
-                        <Form.Label className="label-categories mb-3 d-block text-uppercase fw-800">Score (1-5)</Form.Label>
-                        <Form.Control 
-                            type="number" 
-                            min="1" max="5" 
-                            value={rating}
-                            onChange={(e) => setRating(Number(e.target.value))}
-                            className="rounded-pill bg-light border-0 text-center fw-800"
-                            required 
-                        />
+                    {/* STAR RATING SYSTEM - Fixed "weird squares" and filling logic */}
+                    <Form.Group className="mb-4 text-center">
+                        <div className="d-flex justify-content-center gap-2 mb-2">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                                <button
+                                    key={star}
+                                    type="button"
+                                    className="btn p-0 border-0 shadow-none" // Quitamos estilos de botón por defecto
+                                    onClick={() => setRating(star)}
+                                    onMouseEnter={() => setHover(star)}
+                                    onMouseLeave={() => setHover(0)}
+                                    style={{ background: 'none', outline: 'none' }}
+                                >
+                                    <i 
+                                        className={`${star <= (hover || rating) ? 'fa-solid' : 'fa-regular'} fa-star fa-2xl`}
+                                        style={{ 
+                                            color: star <= (hover || rating) ? '#F59E0B' : '#CBD5E1',
+                                            transition: 'transform 0.1s ease, color 0.1s ease',
+                                            transform: star <= hover ? 'scale(1.15)' : 'scale(1)',
+                                            WebkitTapHighlightColor: 'transparent' // Evita cuadrado azul en móviles
+                                        }}
+                                    />
+                                </button>
+                            ))}
+                        </div>
+                        <p className="fw-800 text-primary x-small text-uppercase mt-2" style={{ letterSpacing: '0.5px' }}>
+                            {hover === 1 || (hover === 0 && rating === 1) ? 'Poor' : 
+                             hover === 2 || (hover === 0 && rating === 2) ? 'Fair' : 
+                             hover === 3 || (hover === 0 && rating === 3) ? 'Average' : 
+                             hover === 4 || (hover === 0 && rating === 4) ? 'Very Good' : 'Excellent'}
+                        </p>
                     </Form.Group>
 
+                    {/* REVIEW COMMENTARY - With character count logic */}
                     <Form.Group className="mb-4">
-                        <Form.Label className="label-categories mb-2 text-uppercase fw-800">Commentary</Form.Label>
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                            <Form.Label className="x-small text-uppercase fw-800 text-muted mb-0">Commentary</Form.Label>
+                            <span className={`fw-800 ${comment.length < MIN_CHARS ? 'text-danger' : 'text-success'}`} style={{ fontSize: '10px' }}>
+                                {comment.length} / {MIN_CHARS} MIN
+                            </span>
+                        </div>
                         <Form.Control 
                             as="textarea" 
                             rows={3} 
-                            placeholder="How was the item and the shipping?" 
+                            placeholder="State your opinion about the transaction..." 
                             value={comment}
                             onChange={(e) => setComment(e.target.value)}
-                            className="rounded-4 bg-light border-0 p-3 small"
+                            className="border-0 p-3 small fw-600 shadow-none"
+                            style={{ backgroundColor: '#F8FAFC', borderRadius: '16px', resize: 'none', border: '1px solid #E2E8F0' }}
                             required
                         />
+                        <div className="mt-2 d-flex align-items-start gap-2">
+                            <i className="fa-solid fa-circle-info text-primary mt-1" style={{ fontSize: '10px' }}></i>
+                            <p className="x-small mb-0 fw-700 text-muted" style={{ fontStyle: 'italic', lineHeight: '1.4' }}>
+                                {getEditorialTip()}
+                            </p>
+                        </div>
                     </Form.Group>
 
-                    <Button type="submit" className="btn-sell w-100 py-3 shadow-sm border-0" disabled={isProcessing}>
-                        {isProcessing ? "Submitting..." : "SUBMIT VALORATION"}
-                    </Button>
+                    <Stack direction="horizontal" gap={3}>
+                        <Button 
+                            variant="link" 
+                            onClick={onHide} 
+                            className="w-100 text-muted text-decoration-none fw-800 small py-2"
+                        >
+                            DISCARD
+                        </Button>
+                        <Button 
+                            type="submit" 
+                            className="btn-sell w-100 py-3 shadow-sm border-0 rounded-pill fw-800" 
+                            disabled={isProcessing || comment.length < MIN_CHARS}
+                            style={{ fontSize: '13px' }}
+                        >
+                            {isProcessing ? <Spinner size="sm" animation="border" /> : "POST REVIEW"}
+                        </Button>
+                    </Stack>
                 </Form>
             </div>
         </Modal>
