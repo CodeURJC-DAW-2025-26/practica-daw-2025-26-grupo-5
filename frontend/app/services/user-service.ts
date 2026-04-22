@@ -234,7 +234,6 @@ export async function downloadStatisticsReport(): Promise<Blob> {
     const response = await fetch('/api/v1/users/me/statistics-report', {
         method: 'GET',
         headers: {
-            // Asegúrate de usar el método que tengas implementado para obtener tu token
             'Authorization': `Bearer ${localStorage.getItem('token')}` 
         }
     });
@@ -243,6 +242,5 @@ export async function downloadStatisticsReport(): Promise<Blob> {
         throw new Error('Failed to download PDF report from the server.');
     }
 
-    // Devolvemos los datos binarios del archivo
     return await response.blob();
 }

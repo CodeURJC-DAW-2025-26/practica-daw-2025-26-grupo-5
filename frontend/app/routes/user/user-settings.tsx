@@ -94,7 +94,7 @@ export default function UserSettings() {
   const revalidator = useRevalidator();
   const navigate = useNavigate();
 
-  // TYPE GUARD: TypeScript now knows 'user' is 100% NOT null after this line
+  // TypeScript knows user is not null
   if (!user) return null;
 
   // Form field state (controlled inputs)

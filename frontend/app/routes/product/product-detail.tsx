@@ -326,10 +326,9 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
         onHide={handleCloseDeleteDialog}
         centered
         contentClassName="clay-card border-0 shadow-lg text-center bg-white"
-        style={{ '--bs-modal-border-radius': '24px' } as React.CSSProperties} // Fuerza el radio curvo en Bootstrap 5
+        style={{ '--bs-modal-border-radius': '24px' } as React.CSSProperties} 
       >
         <Modal.Body className="p-4 p-md-5">
-          {/* Icono de advertencia */}
           <div
             className="bg-danger-subtle text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-3 mx-auto"
             style={{ width: '60px', height: '60px' }}

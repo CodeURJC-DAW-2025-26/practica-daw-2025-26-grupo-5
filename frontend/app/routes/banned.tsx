@@ -108,7 +108,7 @@ export default function Banned() {
         </Link>
       </header>
 
-      {/* Main Content - Ensanchado para evitar scroll vertical innecesario */}
+      {/* Main Content */}
       <main className="flex-grow-1 d-flex align-items-center justify-content-center py-4">
         <Container style={{ maxWidth: '720px' }}> {/* Aumentado de 520px a 720px */}
           <Card className="clay-card border-0 shadow-sm overflow-hidden" style={{ borderRadius: '24px' }}>
@@ -132,7 +132,6 @@ export default function Banned() {
 
               <hr className="my-4 opacity-10" />
 
-              {/* Layout de dos columnas para Info y User (Solo en desktop para aprovechar el ancho) */}
               <div className="row g-4 mb-4">
                 <div className="col-lg-7">
                   <Alert variant="danger" className="border-0 rounded-4 h-100 p-4 mb-0" style={{ backgroundColor: '#fef2f2' }}>
@@ -157,7 +156,7 @@ export default function Banned() {
                 </div>
               </div>
 
-              {/* Actions - Horizontal Stack para ahorrar espacio vertical */}
+              {/* Actions */}
               <div className="d-flex flex-column flex-md-row gap-3 mb-4">
                 <Button variant="danger" className="w-100 fw-700 rounded-pill py-3 shadow-sm border-0" onClick={handleLogout}>
                   <i className="fa-solid fa-sign-out-alt me-2" /> Logout
