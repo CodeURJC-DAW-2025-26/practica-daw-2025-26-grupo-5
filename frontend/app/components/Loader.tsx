@@ -1,36 +1,22 @@
 /**
- * Page Loading Spinner Overlay Component
- *
- * Displays a full-page loading overlay with spinning animation.
- * Used as a fallback during page transitions and data loading.
- *
- * Features:
- * - Full-page overlay (covers entire viewport)
- * - Custom spinner animation (CSS-based)
- * - Centered positioning
- * - Semi-transparent background
- * - Prevents interaction while loading
- *
- * Usage:
- * - Fallback UI for route loaders
- * - Displayed while page is loading
- * - Should be brief (typically <1 second)
- *
- * Styling:
- * - Class: page-spinner-overlay (full screen overlay)
- * - Class: custom-loader (animated spinner)
- * - CSS defined in global styles
- *
- * @component
- * @returns Loading spinner overlay element
- */
-
-import React from 'react';
-
-/**
- * Loader Component Implementation
- * 
- * Renders minimal loading indicator.
+ * Unified Page Loading Spinner Component
+ * * High-order overlay component that handles both global app initialization 
+ * and standard route transition states.
+ * * Features:
+ * - Full-page viewport coverage with semi-transparent backdrop.
+ * - Prevents background interaction (pointer-events) during active states.
+ * - Adaptive rendering: Can display as a minimal spinner or a branded loading screen.
+ * - Optimized CSS-only animation for maximum performance.
+ * * Props:
+ * @param {boolean} [isInitPage=false] - When true, displays the "Loading Stilnovo..." 
+ * text fragment. Ideal for cold starts and initial authentication checks.
+ * * CSS Dependencies:
+ * - .page-spinner-overlay: Handles the fixed positioning and backdrop.
+ * - .custom-loader: The core CSS animation for the spinner.
+ * * Usage:
+ * - Standard: <Loader /> (Minimal spinner)
+ * - App Init: <Loader isInitPage={true} /> (With branding text)
+ * * @component
  */
 interface LoaderProps {
     isInitPage?: boolean;
