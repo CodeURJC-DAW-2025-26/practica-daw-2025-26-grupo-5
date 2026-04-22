@@ -81,7 +81,7 @@ El sistema no se limita a mostrar datos, sino que procesa la actividad del usuar
 ### **Diagrama de Navegación**
 Diagrama que muestra cómo se navega entre las diferentes páginas de la aplicación:
 
-![Diagrama de Navegación](Readme-Images/Preparation2/Stilnovo-Diagrama-Navegacion.png)
+![Diagrama de Navegación](readme-images/Preparation2/Stilnovo-Diagrama-Navegacion.png)
 
 **Descripción del flujo de navegación:**  
 Mapa visual que organiza la navegación por colores (Azul: Todos los Usuarios, Amarillo: Usuario Registrado, Verde: Administrador) y utiliza las miniaturas de las capturas de la siguiente sección como nodos del sistema.
@@ -89,37 +89,37 @@ Mapa visual que organiza la navegación por colores (Azul: Todos los Usuarios, A
 ### **Capturas de Pantalla y Descripción de Páginas**
 
 #### **1. Página Principal / Home**
-![Página Principal](Readme-Images/Preparation2/main-photo.png)
+![Página Principal](readme-images/Preparation2/main-photo.png)
 
 **Descripción:**
 Punto de entrada principal que presenta la propuesta de valor y permite la navegación hacia el catálogo y los formularios de acceso.
 
 #### **2. Catálogo Público (Featured Treasures) / Home**
-![Página Principal](Readme-Images/Preparation2/main-photo-2.png)
+![Página Principal](readme-images/Preparation2/main-photo-2.png)
 
 **Descripción:**
 Visualización de la entidad Producto con datos de ejemplo representativos, permitiendo al usuario anónimo consultar el stock disponible.
 
 #### **3. Detalle de Producto**
-![Detalle de Producto](Readme-Images/Preparation2/user-moreInfo-product-1.png)
+![Detalle de Producto](readme-images/Preparation2/user-moreInfo-product-1.png)
 
 **Descripción:**
 Vista completa de la entidad con especificaciones técnicas, precio y acceso a la tecnología de contacto por email.
 
 #### **4. Detalle Técnico y Motor de Recomendaciones**
-![Detalle Técnico y Motor de Recomendaciones](Readme-Images/Preparation2/user-moreInfo-pro-2.png)
+![Detalle Técnico y Motor de Recomendaciones](readme-images/Preparation2/user-moreInfo-pro-2.png)
 
 **Descripción:**
 Parte inferior de la ficha de producto que muestra las especificaciones y la descripción del vendedor. Destaca la sección "You may also like", que es la representación visual del Algoritmo Avanzado: el sistema consulta la base de datos para sugerir dinámicamente artículos de categorías afines o complementarias al producto actual.
 
 #### **5. Interfaz de Autenticación**
-![Interfaz de Autentificacion](Readme-Images/Preparation2/user-login.png)
+![Interfaz de Autentificacion](readme-images/Preparation2/user-login.png)
 
 **Descripción:**
 Formulario de acceso gestionado por roles para discriminar entre el panel de usuario y el panel de administración.
 
 #### **6. Registro de Usuarios**
-![Interfaz de Autentificacion](Readme-Images/Preparation2/user-signup.png)
+![Interfaz de Autentificacion](readme-images/Preparation2/user-signup.png)
 
 **Descripción:**
 Interfaz que permite la creación de nuevas cuentas en la base de datos para interactuar con el marketplace.
@@ -127,81 +127,81 @@ Interfaz que permite la creación de nuevas cuentas en la base de datos para int
 #### **Área Privada (Usuario Registrado)**
 
 #### **7. Panel de Actividad (Analytics Overview)**
-![Panel de Actividad](Readme-Images/Preparation2/user-dashboard.png)
+![Panel de Actividad](readme-images/Preparation2/user-dashboard.png)
 
 **Descripción:**
 Vista personalizada que utiliza gráficos para monitorizar los ingresos y las ventas del usuario.
 
 #### **8. Gestión de Inventario Propio**
-![Inventario Propio](Readme-Images/Preparation2/user-myproducts.png)
+![Inventario Propio](readme-images/Preparation2/user-myproducts.png)
 
 **Descripción:**
 Listado de la entidad Producto donde el dueño puede visualizar sus anuncios y acceder a las opciones de borrado o edición.
 
 #### **9. Formulario de Publicación**
-![Formulario de Publicación](Readme-Images/Preparation2/user-create-product.png)
+![Formulario de Publicación](readme-images/Preparation2/user-create-product.png)
 
 **Descripción:**
 Interfaz para la creación de nuevos elementos en la base de datos, incluyendo la subida de imágenes.
 
 #### **10. Formulario de Edición**
-![Formulario de Edición](Readme-Images/Preparation2/user-edit.png)
+![Formulario de Edición](readme-images/Preparation2/user-edit.png)
 
 **Descripción:**
 Interfaz para la edición de elementos en la base de datos, incluyendo la cambio de imágenes.
 
 #### **11. Productos Favoritos**
-![Productos Favoritos](Readme-Images/Preparation2/user-favs.png)
+![Productos Favoritos](readme-images/Preparation2/user-favs.png)
 
 **Descripción:**
 Listado de la entidad Producto donde el dueño podrá visualizar productos agregados como "Favoritos".
 
 #### **12. Historial de Transacciones**
-![Historial de Transacciones](Readme-Images/Preparation2/user-sales-orders.png)
+![Historial de Transacciones](readme-images/Preparation2/user-sales-orders.png)
 
 **Descripción:**
 Registro de compras y ventas que integra la Tecnología Complementaria de generación de facturas en PDF.
 
 
 #### **13. Análisis de Datos G1 y G2**
-![Análisis de Datos G1 y G2](Readme-Images/Preparation2/user-statistics.png)
+![Análisis de Datos G1 y G2](readme-images/Preparation2/user-statistics.png)
 
 **Descripción:**
 Implementación de gráficos de líneas y tarta para visualizar la evolución de ingresos y ventas por categoría.
 
 #### **14. Gráfico de Interés G3**
-![Gráfico de Interés G3](Readme-Images/Preparation2/user-statistics-2.png)
+![Gráfico de Interés G3](readme-images/Preparation2/user-statistics-2.png)
 
 **Descripción:**
 Gráfico de barras avanzado que compara visitas frente a interacciones reales por categoría de producto.
 
 #### **15. Perfil y Verificación**
-![Perfil y Verificación](Readme-Images/Preparation2/user-setting-1.png)
+![Perfil y Verificación](readme-images/Preparation2/user-setting-1.png)
 
 **Descripción:**
 Gestión de datos personales y visualización de la Digital Seller Card para transacciones seguras.
 
 #### **Administrador**
 #### **16. Monitor Global de la Plataforma**
-![Monitor Global de la Plataforma](Readme-Images/Preparation2/admin-dashboars.png)
+![Monitor Global de la Plataforma](readme-images/Preparation2/admin-dashboars.png)
 
 **Descripción:**
 Dashboard exclusivo con KPIs de sistema, usuarios reportados y volumen total de anuncios.
 
 #### **17. Gestión de Usuarios**
-![Gestión de Usuarios](Readme-Images/Preparation2/admin-user-managme.png)
+![Gestión de Usuarios](readme-images/Preparation2/admin-user-managme.png)
 
 **Descripción:**
 Herramienta de moderación que permite al administrador realizar acciones de baneo o purga de datos sobre cualquier perfil.
 
 #### **18. Inventario Global**
-![Inventario Global](Readme-Images/Preparation2/admin-global-invento.png)
+![Inventario Global](readme-images/Preparation2/admin-global-invento.png)
 
 **Descripción:**
 Registro maestro de todos los productos del marketplace, con permisos para editar o eliminar cualquier anuncio fraudulento.
 
 #### **19. Auditoría Financiera**
-![Auditoría Financiera](Readme-Images/Preparation2/admin-transactions.png)
+![Auditoría Financiera](readme-images/Preparation2/admin-transactions.png)
 
 **Descripción:**
 Vista de la entidad Transacción a nivel global para gestionar disputas y reembolsos.
@@ -219,7 +219,7 @@ Vista de la entidad Transacción a nivel global para gestionar disputas y reembo
 #### **Diagrama de Navegación**
 Diagrama actualizado que muestra cómo se navega entre las diferentes páginas de la aplicación:
 
-![Diagrama de Navegación](Readme-Images/Practice1/Stilnovo-Diagrama-Navegacion-2.png)
+![Diagrama de Navegación](readme-images/Practice1/Stilnovo-Diagrama-Navegacion-2.png)
 
 **Descripción del flujo de navegación:**  
 Mapa visual que organiza la navegación por colores (Azul: Todos los Usuarios, Amarillo: Usuario Registrado, Verde: Administrador) y utiliza las miniaturas de las capturas de la siguiente sección como nodos del sistema.
@@ -229,85 +229,85 @@ Mapa visual que organiza la navegación por colores (Azul: Todos los Usuarios, A
 #### **Área Privada (Usuario Registrado)**
 
 #### **1. Panel de Actividad (Dashboard)**
-![Panel de Actividad](Readme-Images/Practice1/DashboardP1.png)
+![Panel de Actividad](readme-images/Practice1/DashboardP1.png)
 
 **Descripción:**
 Vista personalizada del usuario que muestra estadísticas financieras en tiempo real, incluyendo balance actual, ingresos totales, y resumen de ventas. Permite al usuario monitorizar su rendimiento comercial en la plataforma.
 
 #### **2. Gestión de Inventario Propio (My Products)**
-![Inventario Propio](Readme-Images/Practice1/MyProductsP1.png)
+![Inventario Propio](readme-images/Practice1/MyProductsP1.png)
 
 **Descripción:**
 Listado completo de productos publicados por el usuario, con opciones de edición, eliminación y gestión del estado de cada artículo. Visualización de la entidad Producto donde el dueño tiene control total sobre sus anuncios.
 
 #### **3. Formulario de Publicación de Producto (New Product)**
-![Formulario de Publicación](Readme-Images/Practice1/NewProductP1.png)
+![Formulario de Publicación](readme-images/Practice1/NewProductP1.png)
 
 **Descripción:**
 Interfaz para la creación de nuevos artículos en el marketplace, incluyendo nombre, categoría, precio, ubicación, descripción detallada y subida de imágenes. Validación de campos obligatorios antes del envío.
 
 #### **4. Formulario de Edición de Producto (Edit Product)**
-![Formulario de Edición](Readme-Images/Practice1/EditProductP1.png)
+![Formulario de Edición](readme-images/Practice1/EditProductP1.png)
 
 **Descripción:**
 Interfaz de modificación de productos existentes con todos los campos editables, incluyendo la posibilidad de cambiar las imágenes asociadas. Mantiene la integridad de los datos del producto.
 
 #### **5. Historial de Ventas y Pedidos (Sales & Orders)**
-![Historial de Transacciones](Readme-Images/Practice1/SalesOrdersP1.png)
+![Historial de Transacciones](readme-images/Practice1/SalesOrdersP1.png)
 
 **Descripción:**
 Registro completo de compras y ventas realizadas por el usuario. Incluye detalles de transacciones, fechas, importes y estado de cada operación. Integra la Tecnología Complementaria de generación de facturas en PDF descargables.
 
 #### **6. Análisis de Ventas por Categoría y Evolución de Ingresos (Statistics)**
-![Análisis de Datos G1 y G2](Readme-Images/Practice1/StatisticsP1.png)
+![Análisis de Datos G1 y G2](readme-images/Practice1/StatisticsP1.png)
 
 **Descripción:**
 Implementación de gráficos avanzados (Gráfico 1: Donut Chart de distribución por categoría y Gráfico 2: Line Chart de evolución temporal) para visualizar el rendimiento comercial del usuario a través de datos históricos.
 
 #### **7. Gráfico de Interés y Visitas (Statistics - Bar Chart)**
-![Gráfico de Interés G3](Readme-Images/Practice1/Statistics2P1.png)
+![Gráfico de Interés G3](readme-images/Practice1/Statistics2P1.png)
 
 **Descripción:**
 Gráfico de barras comparativo (Gráfico 3) que mide el tráfico recibido versus las interacciones reales (favoritos/compras) por cada categoría de producto, permitiendo identificar patrones de comportamiento del usuario.
 
 #### **8. Configuración de Perfil de Usuario (Edit Profile)**
-![Perfil y Verificación](Readme-Images/Practice1/EditProfileP1.png)
+![Perfil y Verificación](readme-images/Practice1/EditProfileP1.png)
 
 **Descripción:**
 Gestión completa de datos personales del usuario, incluyendo nombre de usuario, correo electrónico, avatar, biografía, información de tarjeta de crédito y visualización de la Digital Seller Card con código QR para verificación de identidad.
 
 #### **9. Mis Valoraciones Enviadas y Pendientes (My Valorations)**
-![Mis Valoraciones](Readme-Images/Practice1/MyValorationsP1.png)
+![Mis Valoraciones](readme-images/Practice1/MyValorationsP1.png)
 
 **Descripción:**
 Vista de todas las valoraciones enviadas por el usuario como comprador. Muestra la puntuación en estrellas, comentarios de compradore y producto valorado además de las valoraciones en estado pendiente de valorar, permitiendo gestionar la reputación en la plataforma.
 
 #### **10. Valoración en Sales & Orders (Sales & Orders Valoration)**
-![Valoración](Readme-Images/Practice1/valoration-in-sales.png)
+![Valoración](readme-images/Practice1/valoration-in-sales.png)
 
 **Descripción:**
 Interfaz que muestra una valoración pendiente en Sales & Orders.
 
 #### **11. Editar Valoración (Edit Valoration)**
-![Editar Valoración](Readme-Images/Practice1/EditValorationP1.png)
+![Editar Valoración](readme-images/Practice1/EditValorationP1.png)
 
 **Descripción:**
 Interfaz para modificar una valoración previamente emitida, permitiendo actualizar la puntuación en estrellas y el comentario asociado a una transacción completada. Mantiene la trazabilidad de las reviews.
 
 #### **12. Área de ayuda al usuario (Help Center)**
-![Ayuda Usuario](Readme-Images/Practice1/HelpCenter.png)
+![Ayuda Usuario](readme-images/Practice1/HelpCenter.png)
 
 **Descripción:**
 Interfaz de preguntas frecuentes y acceso a información de contacto a Stilnovo.
 
 #### **13. Perfil del Vendedor (Seller Profile)**
-![Perfil Vendedor](Readme-Images/Practice1/seller-profile.png)
+![Perfil Vendedor](readme-images/Practice1/seller-profile.png)
 
 **Descripción:**
 Interfaz de donde se muestra la información de un vendedor, esta información es; valoración media, número de valoraciones recibidas, nombre, su descripción y sus productos.
 
 #### **14. Valoraciones del Vendedor (Seller Valorations)**
-![Valoración Vendedor](Readme-Images/Practice1/seller-valorations.png)
+![Valoración Vendedor](readme-images/Practice1/seller-valorations.png)
 
 **Descripción:**
 Interfaz de donde se muestra las valoraciones recibidas de un vendedor; se muestra una lista de las valoraciones a ese vendedor por parte de otros usuarios que compraron un producto de este vendedor. Esto ayuda a los usuarios a saber que reputaciñon tiene dicho vendedor. 
@@ -315,50 +315,50 @@ Interfaz de donde se muestra las valoraciones recibidas de un vendedor; se muest
 #### **Área de Administración**
 
 #### **15. Monitor Global de la Plataforma (Admin Dashboard)**
-![Monitor Global de la Plataforma](Readme-Images/Practice1/AdminDashboardP1.png)
+![Monitor Global de la Plataforma](readme-images/Practice1/AdminDashboardP1.png)
 
 **Descripción:**
 Dashboard exclusivo del administrador con KPIs de sistema: total de usuarios registrados, productos activos, transacciones realizadas, ingresos globales y alertas de moderación. Vista centralizada para la supervisión de la plataforma.
 
 #### **16. Gestión Global de Usuarios (Admin User Management)**
-![Gestión de Usuarios](Readme-Images/Practice1/AdminUserManagP1.png)
+![Gestión de Usuarios](readme-images/Practice1/AdminUserManagP1.png)
 
 **Descripción:**
 Herramienta de moderación que permite al administrador visualizar todos los usuarios registrados, sus datos de contacto, estado de la cuenta y realizar acciones administrativas como baneos, desbaneos o eliminación de perfiles.
 
 #### **17. Inventario Global de Productos (Admin Global Inventory)**
-![Inventario Global](Readme-Images/Practice1/AdminGlobalInvetP1.png)
+![Inventario Global](readme-images/Practice1/AdminGlobalInvetP1.png)
 
 **Descripción:**
 Registro maestro de todos los productos publicados en el marketplace, con información detallada del vendedor, categoría, precio y estado. Permite al administrador editar o eliminar cualquier anuncio que infrinja las normas de la plataforma.
 
 #### **18. Auditoría Financiera Global (Admin Global Transactions)**
-![Auditoría Financiera](Readme-Images/Practice1/AdminGlobalTransP1.png)
+![Auditoría Financiera](readme-images/Practice1/AdminGlobalTransP1.png)
 
 **Descripción:**
 Vista completa de todas las transacciones realizadas en la plataforma, incluyendo comprador, vendedor, producto, fecha, importe y estado. Herramienta para auditoría financiera, gestión de disputas y análisis de volumen de negocio.
 
 #### **19. Gestión Global de Valoraciones (Admin Global Valorations)**
-![Gestión de Valoraciones](Readme-Images/Practice1/AdminGlobalValorationsP1.png)
+![Gestión de Valoraciones](readme-images/Practice1/AdminGlobalValorationsP1.png)
 
 **Descripción:**
 Panel administrativo para supervisar todas las valoraciones realizadas en la plataforma. Permite identificar reviews fraudulentas, gestionar reportes y mantener la integridad del sistema de reputación de vendedores.
 
 #### **20. Baneo de un Usuario (User Ban)**
-![Usuario baneado](Readme-Images/Practice1/UserBanned.png)
+![Usuario baneado](readme-images/Practice1/UserBanned.png)
 
 **Descripción:**
 Cuando el administrador bloquee a un usuario en **Stilnovo**, si este intenta iniciar sesión, el sistema le mostrará una página informativa indicando que su cuenta ha sido suspendida de la plataforma.
 
 
 #### **21. Footer**
-![Editar Valoración](Readme-Images/Practice1/new-footer.png)
+![Editar Valoración](readme-images/Practice1/new-footer.png)
 
 **Descripción:**
 Interfaz de donde se muestra el nuevo diseño del pie de página de Stilnovo, este incluye modales informativos, enlaces a redes sociales y la posibilidad de crear una cuenta nueva.
 
 #### **22. Usuario Baneado (Banned User)**
-![Modal Footer](Readme-Images/Practice1/modal-footer.png)
+![Modal Footer](readme-images/Practice1/modal-footer.png)
 
 **Descripción:**
 Aqui se muestra un ejemplo de modal del footer.
@@ -418,7 +418,7 @@ Solo un recordatorio: como la aplicación usa HTTPS en el puerto 8443, la primer
 
 Diagrama mostrando las entidades, sus campos y relaciones:
 
-![Diagrama Entidad-Relación](Readme-Images/Practice1/ERsql.png)
+![Diagrama Entidad-Relación](readme-images/Practice1/ERsql.png)
 
 > **Descripción del Diagrama:**
 > 
@@ -440,7 +440,7 @@ Diagrama mostrando las entidades, sus campos y relaciones:
 
 Diagrama de clases de la aplicación con diferenciación por colores o secciones:
 
-![Diagrama de Clases](Readme-Images/Practice1/Diagrama-Clases-Silnovo.jpg)
+![Diagrama de Clases](readme-images/Practice1/Diagrama-Clases-Silnovo.jpg)
 
 > Este diagrama detalla la arquitectura lógica de **Stilnovo**, estructurada en un modelo de capas que garantiza la separación de responsabilidades y la escalabilidad del sistema.
 > 
@@ -548,7 +548,7 @@ Nota: Para probar los endpoints POST/PUT que requieren imágenes en Postman, por
 
 Diagrama actualizado incluyendo los @RestController y su relación con los @Service compartidos:
 
-![Diagrama de Clases Actualizado](Readme-Images/Practice2/Stilnovo-Diagrama-Clases-2.jpg)
+![Diagrama de Clases Actualizado](readme-images/Practice2/Stilnovo-Diagrama-Clases-2.jpg)
 
 Este diagrama detalla la arquitectura lógica de **Stilnovo**, estructurada en un modelo de capas que garantiza la separación de responsabilidades y la escalabilidad del sistema.
 > 
@@ -805,7 +805,7 @@ Mi contribución se ha centrado en la mejora y consolidación de la capa REST de
 
 A continuación se presenta el diagrama estructural de nuestra Single Page Application (SPA), detallando la jerarquía de componentes React, el enrutamiento, los servicios y su intercomunicación:
 
-![Diagrama de Arquitectura React](Readme-Images/Practice3/SPA-diagram.jpg)
+![Diagrama de Arquitectura React](readme-images/Practice3/SPA-diagram.jpg)
 
 #### Arquitectura SPA (React Frontend)
 El diagrama ilustra el diseño modular y el flujo de datos de nuestra aplicación:
@@ -919,6 +919,3 @@ Por otro lado, he liderado gran parte del diseño y desarrollo de la interfaz gr
 |3| [Descripción commit 3](URL_commit_3)  | [Archivo3](URL_archivo_3)   |
 |4| [Descripción commit 4](URL_commit_4)  | [Archivo4](URL_archivo_4)   |
 |5| [Descripción commit 5](URL_commit_5)  | [Archivo5](URL_archivo_5)   |
-
-
-
