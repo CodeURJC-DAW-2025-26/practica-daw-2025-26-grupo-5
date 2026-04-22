@@ -234,22 +234,22 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
 
   };
 
-  const currentlyRecommendedIds = new Set(filledRecommendations.map(p => p.id));
-  const allFilteredProducts = products.filter(p => !currentlyRecommendedIds.has(p.id));
+  const showRecommendations = filledRecommendations.length > 0 && !homeData.searching;
 
-  const displayProductsLimit = Math.max(0, products.length - filledRecommendations.length);
-  const displayProducts = allFilteredProducts.slice(0, displayProductsLimit);
+  const currentlyRecommendedIds = new Set(showRecommendations ? filledRecommendations.map(p => p.id) : []);
+
+  const displayProducts = products.filter(p => !currentlyRecommendedIds.has(p.id));
 
   return (
     <Container className="pt-5">
       
       {/* NEW SECTION: Recommended Products */}
-      {filledRecommendations.length > 0 && (
+      {showRecommendations && (
         <div className="mb-5 pb-4 border-bottom">
           <h2 className="fw-800 mb-5 text-center text-primary">Recommended for You</h2>
           <Row xs={1} md={2} lg={4} className="g-4">
             {filledRecommendations.map((product: ProductDTO) => (
-              <Col key={`rec-${product.id}`}> {/* Prefix cat- to avoid key conflicts */}
+              <Col key={`rec-${product.id}`}> {/* Prefix rec- to avoid key conflicts */}
                 <Link to={`/product/${product.id}`} className="text-decoration-none text-dark">
                   <div className="clay-card">
                     <div className="img-container">
