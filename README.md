@@ -1489,11 +1489,19 @@ Mi contribución se ha centrado en la mejora y consolidación de la capa REST de
     http://localhost:5173/new/
    ```
 
-### **Diagrama de Clases y Templates de la SPA**
+### Diagrama de Arquitectura y Componentes de la SPA
 
-Diagrama mostrando los componentes React, hooks personalizados, servicios y sus relaciones:
+A continuación se presenta el diagrama estructural de nuestra Single Page Application (SPA), detallando la jerarquía de componentes React, el enrutamiento, los servicios y su intercomunicación:
 
-![Diagrama de Componentes React](images/spa-classes-diagram.png)
+![Diagrama de Arquitectura React](Readme-Images/Practice3/SPA-diagram.png)
+
+#### Arquitectura SPA (React Frontend)
+El diagrama ilustra el diseño modular y el flujo de datos de nuestra aplicación:
+
+* **Entrada y Enrutamiento:** `main.tsx` y `root.tsx` actúan como núcleo principal, distribuyendo la navegación hacia las distintas vistas mediante *Outlets*.
+* **Capa de Seguridad:** El área gris (`protected-layout.tsx`) encapsula las rutas privadas (`user`, `admin`, ...), aislándolas de forma segura de las rutas públicas (`login`, `signup`).
+* **Módulos y UI:** Cada sección principal cuenta con sus propias sub-rutas anidadas y consume componentes de interfaz reutilizables (como *Headers*, *Footers* y *Sidebars*).
+* **Estado y Backend:** *Zustand* (`useUserStore.ts`) gestiona la sesión del usuario de forma global, mientras que la capa de *Services* centraliza la lógica HTTP, utilizando `api.ts` para conectar fluidamente con el backend REST de Spring Boot.
 
 ### **Integración con Gemini AI**
 
