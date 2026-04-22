@@ -18,9 +18,9 @@
  * Props:
  * - title (string): Title displayed in mobile header
  * - links (SidebarLink[]): Array of navigation links
- *    - to: Route path
- *    - label: Display text
- *    - icon: Font Awesome icon class (e.g., 'fa-users')
+ * - to: Route path
+ * - label: Display text
+ * - icon: Font Awesome icon class (e.g., 'fa-users')
  * - isAdmin (boolean): If true, shows ADMIN badge
  * - activePage (string): Optional page to highlight
  *
@@ -79,8 +79,7 @@ interface SidebarProps {
 
 /**
  * Sidebar Component Implementation
- * 
- * Renders responsive sidebar with desktop and mobile layouts.
+ * * Renders responsive sidebar with desktop and mobile layouts.
  * Provides primary navigation for dashboard pages.
  */
 export default function Sidebar({ title, links, isAdmin = false, activePage }: SidebarProps) {
@@ -90,8 +89,7 @@ export default function Sidebar({ title, links, isAdmin = false, activePage }: S
 
     /**
      * Sidebar Content (Shared between desktop and mobile)
-     * 
-     * Includes:
+     * * Includes:
      * - Logo header
      * - Navigation links with active highlighting
      * - Market browse button
@@ -100,6 +98,7 @@ export default function Sidebar({ title, links, isAdmin = false, activePage }: S
     const sidebarContent = (
         <div className="d-flex flex-column h-100">
 
+            {/* Logo Section - Centered using justify-content-center */}
             <div className="mb-5 pt-2">
                 <Link to="/" className="text-decoration-none d-flex align-items-center gap-2">
                     <img src="/logo.png" alt="Stilnovo" width="35" />
@@ -134,7 +133,8 @@ export default function Sidebar({ title, links, isAdmin = false, activePage }: S
                     <i className="fa-solid fa-shop" />
                     Browse Market
                 </Link>
-                <button onClick={() => logoutUser()} className="dropdown-item text-danger fw-700 small border-0 bg-transparent w-100 text-start">
+                {/* Logout Button - Centered using d-flex and justify-content-center */}
+                <button onClick={() => logoutUser()} className="dropdown-item text-danger fw-700 small border-0 bg-transparent w-100 d-flex justify-content-center align-items-center">
                     <i className="fa-solid fa-sign-out-alt me-2" /> Log out
                 </button>
             </div>
