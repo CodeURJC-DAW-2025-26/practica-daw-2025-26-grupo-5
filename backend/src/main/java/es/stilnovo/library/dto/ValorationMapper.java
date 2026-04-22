@@ -46,5 +46,6 @@ public interface ValorationMapper {
     @Mapping(target = "transaction", ignore = true)
     @Mapping(target = "seller", ignore = true)
     @Mapping(target = "buyer", ignore = true)
+    @Mapping(source = "rating", target = "stars")
     Valoration toEntity(ValorationDTO valorationDTO);
 }
