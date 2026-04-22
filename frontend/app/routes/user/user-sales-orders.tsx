@@ -89,7 +89,7 @@ import { useState, useEffect } from 'react';
 import { useLoaderData, redirect, Link, useNavigate } from 'react-router';
 import { Container, Row, Col, Card, Badge, Button, Image, Spinner, Stack, Alert } from 'react-bootstrap';
 import { useUserStore } from '~/stores/useUserStore';
-import ValorationModal from "~/components/valoration-modal";
+import ValorationModal from "~/components/ValorationModal";
 
 import type TransactionDTO from '~/dto/TransactionDTO';
 import { createValoration } from '~/services/valorations-service';

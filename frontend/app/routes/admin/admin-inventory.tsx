@@ -79,7 +79,7 @@ import type ProductDTO from '~/dto/ProductDTO';
 import type UserDTO from '~/dto/UserDTO';
 import type PagedResponse from '~/dto/PagedResponse';
 import AdminHeader from '~/components/admin/AdminHeader';
-import ConfirmModal from '~/components/confirm-modal';
+import ConfirmModal from '~/components/ConfirmModal';
 
 /**
  * KPI Card Props Interface

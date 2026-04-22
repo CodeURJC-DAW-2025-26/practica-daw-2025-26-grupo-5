@@ -50,7 +50,7 @@ import { redirect, Link } from "react-router";
 import { useUserStore } from '~/stores/useUserStore';
 import { Button, Badge, Image, Stack, Card, Row, Col } from "react-bootstrap";
 import { getMyProducts, deleteProduct } from "~/services/products-service";
-import ConfirmModal from "~/components/confirm-modal";
+import ConfirmModal from "~/components/ConfirmModal";
 import type ProductDTO from "~/dto/ProductDTO";
 import type { Route } from "./+types/user-products"; 
 
