@@ -1497,7 +1497,7 @@ Mi contribución se ha centrado en la mejora y consolidación de la capa REST de
 
 A continuación se presenta el diagrama estructural de nuestra Single Page Application (SPA), detallando la jerarquía de componentes React, el enrutamiento, los servicios y su intercomunicación:
 
-![Diagrama de Arquitectura React](Readme-Images/Practice3/SPA-diagram.png)
+![Diagrama de Arquitectura React](Readme-Images/Practice3/SPA-diagram.jpg)
 
 #### Arquitectura SPA (React Frontend)
 El diagrama ilustra el diseño modular y el flujo de datos de nuestra aplicación:
