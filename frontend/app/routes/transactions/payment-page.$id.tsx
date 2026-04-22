@@ -121,8 +121,6 @@ interface PaymentPageProps {
  * Displays checkout form and product summary.
  * Handles payment submission and transaction creation.
  */
-// ... (mismos imports)
-
 const PaymentPage = ({ loaderData }: PaymentPageProps) => {
   const navigate = useNavigate();
   const { user } = useUserStore();
@@ -137,7 +135,6 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
     cvv: ''
   });
 
-  // Estado para capturar errores de seguridad XSS
   const [fieldErrors, setFieldErrors] = useState({
     cardHolder: '',
     cardNumber: '',
@@ -152,7 +149,7 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
   const productId = checkoutData?.product?.id;
 
   /**
-   * Función de validación XSS
+   * XSS Validation
    */
   const validateXSS = (name: string, value: string) => {
     const isMalicious = htmlRegex.test(value);
@@ -250,7 +247,7 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
                         Secure Payment
                       </h4>
 
-                      {/* Security Info (Mantenido igual) */}
+                      {/* Security Info*/}
                       <Alert variant="success" className="d-flex align-items-center gap-3 mb-4 py-2 border-0" style={{ borderRadius: '12px', backgroundColor: '#ecfdf5' }}>
                         <i className="fa-solid fa-shield-halved text-success fs-4 ms-2" />
                         <div>
