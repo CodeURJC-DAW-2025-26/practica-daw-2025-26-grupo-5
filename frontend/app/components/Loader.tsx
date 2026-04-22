@@ -32,12 +32,22 @@ import React from 'react';
  * 
  * Renders minimal loading indicator.
  */
-const Loader = () => {
+interface LoaderProps {
+    isInitPage?: boolean;
+}
+
+const Loader = ({ isInitPage = false }: LoaderProps) => {
     return (
         <div className="page-spinner-overlay">
-            <div className="custom-loader" />
+            <div className="custom-loader mb-3" />
+
+            {isInitPage && (
+                <p className="fw-bold text-secondary" style={{ fontSize: '0.9rem' }}>
+                    Loading Stilnovo...
+                </p>
+            )}
         </div>
     );
-}
+};
 
 export default Loader;
