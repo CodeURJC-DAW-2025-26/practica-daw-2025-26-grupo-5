@@ -171,63 +171,55 @@ export default function UserStatistics() {
   const visitsChartInstance = useRef<Chart | null>(null);
 
   useEffect(() => {
-    if (!revenueChartRef.current || !categoryChartRef.current || !visitsChartRef.current) return;
+    // 1. Security check: Ensure canvas refs are available before initializing charts
+    if (!revenueChartRef.current || !categoryChartRef.current) return;
 
+    // 2. destroy existing chart instances to prevent memory leaks before creating new ones
     revenueChartInstance.current?.destroy();
     categoryChartInstance.current?.destroy();
-    visitsChartInstance.current?.destroy();
 
+    // 3. saving contexts for chart initialization
     const revCtx = revenueChartRef.current.getContext("2d");
     const catCtx = categoryChartRef.current.getContext("2d");
-    const visCtx = visitsChartRef.current.getContext("2d");
 
-    // 1. Revenue Chart
-    revenueChartInstance.current = new Chart(revCtx!, {
-      type: 'line',
-      data: {
-        labels: loaderData.revenueLabels.length > 0 ? loaderData.revenueLabels : ['Start'],
-        datasets: [{ 
-          label: 'Revenue €', 
-          data: loaderData.revenueValues.length > 0 ? loaderData.revenueValues : [0], 
-          borderColor: '#2f6ced', 
-          backgroundColor: 'rgba(47, 108, 237, 0.05)', 
-          fill: true, 
-          tension: 0.4 
-        }]
-      },
-      options: { responsive: true, plugins: { legend: { display: false } } }
-    });
+    // 4. initialize revenue chart with dynamic data and styling
+    if (revCtx) {
+      revenueChartInstance.current = new Chart(revCtx, {
+        type: 'line',
+        data: {
+          labels: loaderData.revenueLabels?.length > 0 ? loaderData.revenueLabels : ['Start'],
+          datasets: [{ 
+            label: 'Revenue €', 
+            data: loaderData.revenueValues?.length > 0 ? loaderData.revenueValues : [0], 
+            borderColor: '#2f6ced', 
+            backgroundColor: 'rgba(47, 108, 237, 0.05)', 
+            fill: true, 
+            tension: 0.4 
+          }]
+        },
+        options: { responsive: true, plugins: { legend: { display: false } } }
+      });
+    }
 
-    // 2. Categories Chart
-    categoryChartInstance.current = new Chart(catCtx!, {
-      type: 'doughnut',
-      data: {
-        labels: loaderData.barLabels,
-        datasets: [{ 
-          data: loaderData.visitsByCategory, 
-          backgroundColor: ['#2f6ced', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe'] 
-        }]
-      },
-      options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
-    });
+    // 5. initialize category chart with dynamic data and styling
+    if (catCtx) {
+      categoryChartInstance.current = new Chart(catCtx, {
+        type: 'doughnut',
+        data: {
+          labels: loaderData.barLabels || [],
+          datasets: [{ 
+            data: loaderData.visitsByCategory || [], 
+            backgroundColor: ['#2f6ced', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe'] 
+          }]
+        },
+        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+      });
+    }
 
-    // 3. Visits vs Interest Chart
-    visitsChartInstance.current = new Chart(visCtx!, {
-      type: 'bar',
-      data: {
-        labels: loaderData.barLabels,
-        datasets: [
-          { label: 'Visits', data: loaderData.visitsByCategory, backgroundColor: '#2f6ced' },
-          { label: 'Interest', data: loaderData.interestByCategory, backgroundColor: '#60a5fa' }
-        ]
-      },
-      options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
-    });
-
+    // 6. Cleanup on component destruction
     return () => {
       revenueChartInstance.current?.destroy();
       categoryChartInstance.current?.destroy();
-      visitsChartInstance.current?.destroy();
     };
   }, [loaderData]);
 
@@ -282,7 +274,7 @@ export default function UserStatistics() {
           <Card className="clay-card border-0 h-100 p-3 shadow-sm">
             <Card.Body className="text-center">
               <p className="text-muted small fw-700 mb-2">Total Revenue</p>
-              <h2 className="fw-800 text-success mb-1">€{loaderData.formattedTotalRevenue}</h2>
+              <h2 className="fw-800 text-success mb-1 text-nowrap">€{loaderData.formattedTotalRevenue}</h2>
             </Card.Body>
           </Card>
         </Col>
@@ -290,7 +282,7 @@ export default function UserStatistics() {
           <Card className="clay-card border-0 h-100 p-3 shadow-sm">
             <Card.Body className="text-center">
               <p className="text-muted small fw-700 mb-2">Items Sold</p>
-              <h2 className="fw-800 text-primary mb-1">{loaderData.userSales?.length || 0}</h2>
+              <h2 className="fw-800 text-primary mb-1 text-nowrap">{loaderData.userSales?.length || 0}</h2>
             </Card.Body>
           </Card>
         </Col>
@@ -298,7 +290,7 @@ export default function UserStatistics() {
           <Card className="clay-card border-0 h-100 p-3 shadow-sm">
             <Card.Body className="text-center">
               <p className="text-muted small fw-700 mb-2">Inventory Value</p>
-              <h2 className="fw-800 text-warning mb-1">€{loaderData.formattedInventoryValue}</h2>
+              <h2 className="fw-800 text-warning mb-1 text-nowrap">€{loaderData.formattedInventoryValue}</h2>
             </Card.Body>
           </Card>
         </Col>
@@ -306,7 +298,7 @@ export default function UserStatistics() {
           <Card className="clay-card border-0 h-100 p-3 shadow-sm">
             <Card.Body className="text-center">
               <p className="text-muted small fw-700 mb-2">Reputation</p>
-              <h2 className="fw-800 text-info mb-1">{user?.rating?.toFixed(1) || "0.0"}</h2>
+              <h2 className="fw-800 text-info mb-1 text-nowrap">{user?.rating?.toFixed(1) || "0.0"}</h2>
             </Card.Body>
           </Card>
         </Col>
@@ -317,13 +309,25 @@ export default function UserStatistics() {
         <Col lg={7}>
           <Card className="clay-card border-0 p-4 shadow-sm">
             <h5 className="fw-800 text-dark mb-4">Revenue Trend</h5>
-            <canvas ref={revenueChartRef}></canvas>
+            {loaderData.revenueValues?.length > 0 && loaderData.revenueValues[0] !== 0 ? (
+              <canvas ref={revenueChartRef}></canvas>
+            ) : (
+               <div className="text-center py-5 opacity-50">
+                 <p className="fw-600 text-dark mb-0">No revenue data available yet</p>
+               </div>
+            )}
           </Card>
         </Col>
         <Col lg={5}>
           <Card className="clay-card border-0 p-4 shadow-sm">
             <h5 className="fw-800 text-dark mb-4">Sales by Category</h5>
-            <canvas ref={categoryChartRef}></canvas>
+            {loaderData.userSales?.length > 0 ? (
+              <canvas ref={categoryChartRef}></canvas>
+            ) : (
+              <div className="text-center py-5 opacity-50">
+                <p className="fw-600 text-dark mb-0">You have no sales yet</p>
+              </div>
+            )}
           </Card>
         </Col>
       </Row>

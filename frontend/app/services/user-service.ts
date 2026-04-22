@@ -103,15 +103,15 @@ export async function getUserDashboardStats() {
         return await api.get("/v1/users/me/dashboard");
     } catch (error) {
         console.error("Error fetching dashboard stats:", error);
-        // Return safe default structure to prevent undefined errors in UI
         return {
-            revenueLabels: [],
-            revenueValues: [],
+            salesCount: [],
             chartLabels: [],
             chartValues: [],
-            userSales: [],
-            formattedTotalRevenue: "0.00",
-            formattedBalance: "0.00"
+            totalRevenue: 0,
+            balance: 0,
+            barLabels: [],
+            visitsByCategory: [],
+            interestByCategory: []
         };
     }
 }
