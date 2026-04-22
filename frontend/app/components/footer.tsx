@@ -57,7 +57,7 @@ import { chatBotHelper } from "~/services/AI/ai-service";
  */
 export default function Footer() {
   const navigate = useNavigate();
-  
+
   // Modal visibility states
   const [showHelp, setShowHelp] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
@@ -70,6 +70,7 @@ export default function Footer() {
   const [aiAnswer, setAiAnswer] = useState<string | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
 
+  const iconStyle = { color: 'white' };
   /**
    * Navigate to Help Center
    * If user is logged in: redirect to /user/help
@@ -184,8 +185,8 @@ export default function Footer() {
                         value={aiQuestion}
                         onChange={(e) => setAiQuestion(e.target.value)}
                         style={{
-                          backgroundColor: '#ffffff', 
-                          color: '#1e293b',         
+                          backgroundColor: '#ffffff',
+                          color: '#1e293b',
                           fontSize: '0.9rem',
                           outline: 'none',
                           boxShadow: 'none'
@@ -220,7 +221,7 @@ export default function Footer() {
             <div className="col-lg-2 offset-lg-1">
               <h6>PLATFORM</h6>
               <ul className="list-unstyled d-flex flex-column gap-3">
-                <li><Link to="/about-page" className="footer-link">About Us</Link></li>
+                <li><Link to="/about" className="footer-link">About Us</Link></li>
                 <li><span className="footer-link cursor-pointer" onClick={toggleTerms}>Terms of Service</span></li>
                 <li><span className="footer-link cursor-pointer" onClick={toggleSafety}>Safety Rules</span></li>
               </ul>
@@ -288,89 +289,95 @@ export default function Footer() {
       </footer>
 
       {/* Privacy, Safety and Cookie modals follow same logic... */}
-
       {/* --- MODALS --- */}
 
       {/* Help Modal */}
-      <Modal show={showHelp} onHide={toggleHelp} centered contentClassName="stn-modal-content p-4">
-        <Modal.Header closeButton className="border-0 pb-0 btn-close-white">
-          <Modal.Title className="stn-modal-title w-100 text-center">Need Assistance?</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="stn-modal-body text-center">
-          <p>To access our official support and FAQs, please follow this path:</p>
-          <div className="stn-path-box my-3">
+      <Modal show={showHelp} onHide={toggleHelp} centered contentClassName="bg-primary text-white p-4 rounded-4 border-0 shadow-lg">
+        <Modal.Header closeButton closeVariant="white" className="border-0 pb-0" />
+        <Modal.Body className="text-center pt-0">
+          <i className="fa-solid fa-circle-question fs-1 mb-3"></i>
+          <h3 className="fw-800 h4 mb-3 text-center w-100">Need Assistance?</h3>
+          <p className="opacity-90 fw-500">To access our official support and FAQs, please follow this path:</p>
+          <div className="bg-white text-primary rounded-3 py-2 px-3 my-3 fw-800 d-inline-block shadow-sm">
             My Account <i className="fa-solid fa-chevron-right mx-2 fs-small"></i> Help Center
           </div>
-          <p className="text-danger small fw-bold">
-            <i className="fa-solid fa-lock me-1"></i> You must be logged in to view this section.
+          <p className="text-white-50 small fw-bold mt-2">
+            <i className="fa-solid fa-lock me-1"></i> Authentication required to view this section.
           </p>
-          <button className="btn-about" onClick={toggleHelp}>UNDERSTOOD</button>
+          <button className="btn btn-light text-primary fw-800 rounded-pill px-5 py-2 mt-3 shadow-sm border-0" onClick={toggleHelp}>
+            UNDERSTOOD
+          </button>
         </Modal.Body>
       </Modal>
 
       {/* Terms Modal */}
-      <Modal show={showTerms} onHide={toggleTerms} centered size="lg" contentClassName="stn-modal-content p-4">
-        <Modal.Header closeButton className="border-0 pb-0 btn-close-white">
-          <Modal.Title className="stn-modal-title">Terms of Service</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="stn-modal-body">
-          <p>
-            By using Stilnovo, you agree to our community guidelines. We provide a platform for circular fashion.
-            All users must maintain integrity in transactions and respect intellectual property rights.
-            We are not liable for direct disputes between users but provide tools to facilitate safe trading.
-          </p>
-          <button className="btn-about" onClick={toggleTerms}>I accept the terms</button>
+      <Modal show={showTerms} onHide={toggleTerms} centered size="lg" contentClassName="bg-primary text-white p-4 rounded-4 border-0 shadow-lg">
+        <Modal.Header closeButton closeVariant="white" className="border-0 pb-0" />
+        <Modal.Body className="text-center pt-0">
+          <i className="fa-solid fa-file-contract fs-1 mb-3"></i>
+          <h3 className="fw-800 h4 mb-3 text-center w-100">Terms of Service</h3>
+          <div className="text-start opacity-90 fw-500 mb-4 px-md-4">
+            <p>By using Stilnovo, you agree to our community guidelines. We provide a platform for circular fashion.</p>
+            <p>All users must maintain integrity in transactions and respect intellectual property rights. We are not liable for direct disputes between users but provide tools to facilitate safe trading.</p>
+          </div>
+          <button className="btn btn-light text-primary fw-800 rounded-pill px-5 py-2 shadow-sm border-0" onClick={toggleTerms}>
+            I ACCEPT THE TERMS
+          </button>
         </Modal.Body>
       </Modal>
 
       {/* Privacy Modal */}
-      <Modal show={showPrivacy} onHide={togglePrivacy} centered contentClassName="stn-modal-content p-4">
-        <Modal.Header closeButton className="border-0 pb-0 btn-close-white">
-          <Modal.Title className="stn-modal-title">Privacy Policy</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="stn-modal-body">
-          <p>
+      <Modal show={showPrivacy} onHide={togglePrivacy} centered contentClassName="bg-primary text-white p-4 rounded-4 border-0 shadow-lg">
+        <Modal.Header closeButton closeVariant="white" className="border-0 pb-0" />
+        <Modal.Body className="text-center pt-0">
+          <i className="fa-solid fa-user-shield fs-1 mb-3"></i>
+          <h3 className="fw-800 h4 mb-3 text-center w-100">Privacy Policy</h3>
+          <p className="opacity-90 fw-500 mb-4">
             Your data is safe with us. We use industry-standard encryption to protect your personal information
             and transaction history. We never sell your data to third parties.
           </p>
-          <button className="btn-about" onClick={togglePrivacy}>Close</button>
+          <button className="btn btn-light text-primary fw-800 rounded-pill px-5 py-2 shadow-sm border-0" onClick={togglePrivacy}>
+            CLOSE
+          </button>
         </Modal.Body>
       </Modal>
 
       {/* Safety Modal */}
-      <Modal show={showSafety} onHide={toggleSafety} centered contentClassName="stn-modal-content p-4">
-        <Modal.Header closeButton className="border-0 pb-0 btn-close-white">
-          <Modal.Title className="stn-modal-title">Safety Rules</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="stn-modal-body">
-          <ul className="list-unstyled text-start">
-            <li className="mb-3">
-              <i className="fa-solid fa-shield-check text-primary me-2"></i> Only trade through Stilnovo's platform.
+      <Modal show={showSafety} onHide={toggleSafety} centered contentClassName="bg-primary text-white p-4 rounded-4 border-0 shadow-lg">
+        <Modal.Header closeButton closeVariant="white" className="border-0 pb-0" />
+        <Modal.Body className="text-center pt-0">
+          <i className="fa-solid fa-shield-halved fs-1 mb-3"></i>
+          <h3 className="fw-800 h4 mb-4 text-center w-100">Safety Rules</h3>
+          <ul className="list-unstyled text-start mb-4 px-md-4 opacity-90 fw-600">
+            <li className="mb-3 d-flex align-items-center">
+              <i className="fa-solid fa-check-circle me-3"></i> Only trade through Stilnovo's platform.
             </li>
-            <li className="mb-3">
-              <i className="fa-solid fa-shield-check text-primary me-2"></i> Verify item authenticity before shipping.
+            <li className="mb-3 d-flex align-items-center">
+              <i className="fa-solid fa-check-circle me-3"></i> Verify item authenticity before shipping.
             </li>
-            <li>
-              <i className="fa-solid fa-shield-check text-primary me-2"></i> Report suspicious behavior immediately.
+            <li className="d-flex align-items-center">
+              <i className="fa-solid fa-check-circle me-3"></i> Report suspicious behavior immediately.
             </li>
           </ul>
-          <div className="text-center mt-3">
-            <button className="btn-about" onClick={toggleSafety}>Stay safe</button>
-          </div>
+          <button className="btn btn-light text-primary fw-800 rounded-pill px-5 py-2 shadow-sm border-0" onClick={toggleSafety}>
+            STAY SAFE
+          </button>
         </Modal.Body>
       </Modal>
 
       {/* Cookie Modal */}
-      <Modal show={showCookie} onHide={toggleCookie} centered contentClassName="stn-modal-content p-4">
-        <Modal.Header closeButton className="border-0 pb-0 btn-close-white" />
-        <Modal.Body className="stn-modal-body text-center">
-          <i className="fa-solid fa-cookie-bite text-primary fs-1 mb-3"></i>
-          <h5 className="stn-modal-title mb-3">Cookie Policy</h5>
-          <p>
+      <Modal show={showCookie} onHide={toggleCookie} centered contentClassName="bg-primary text-white p-4 rounded-4 border-0 shadow-lg">
+        <Modal.Header closeButton closeVariant="white" className="border-0 pb-0" />
+        <Modal.Body className="text-center pt-0">
+          <i className="fa-solid fa-cookie-bite fs-1 mb-3"></i>
+          <h3 className="fw-800 h4 mb-3 text-center w-100">Cookie Policy</h3>
+          <p className="opacity-90 fw-500 mb-4">
             We use cookies to personalize your experience and analyze our traffic.
             By continuing to use our site, you accept our cookie usage.
           </p>
-          <button className="btn-about" onClick={toggleCookie}>Accept all</button>
+          <button className="btn btn-light text-primary fw-800 rounded-pill px-5 py-2 shadow-sm border-0" onClick={toggleCookie}>
+            ACCEPT ALL
+          </button>
         </Modal.Body>
       </Modal>
     </>
