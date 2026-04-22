@@ -53,10 +53,9 @@
  * - activeTransaction: Transaction being rated
  *
  * HTTP Requests:
- * - Fetches transactions from /api/v1/users/me/transactions
- * - Uses Bearer token from localStorage
- * - Manual fetch (not using api service) with direct headers
- * - Token auto-included in Authorization header
+ * - Fetches transactions via getUserTransactions() service (MVC pattern)
+ * - Service delegates to API client which adds Bearer token automatically
+ * - No manual headers needed (api.ts handles auth)
  *
  * Valoration (Rating):
  * - Users can rate completed transactions
