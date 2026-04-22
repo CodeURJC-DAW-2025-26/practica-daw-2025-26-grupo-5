@@ -234,6 +234,8 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
                       <i className="fa-solid fa-lock"></i> This is your product
                     </div>
                   )}
+                  
+                  {!isSelfProduct && (
                   <Link
                     to={`../product/contact/${product.id}`}
                     state={{ productName: product.name, productId: product.id }}
@@ -241,7 +243,8 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
                     style={{ fontSize: '1.1rem' }}
                   >
                     <i className="fa-regular fa-comment-dots fa-lg"></i> Send Message to Seller
-                  </Link>
+                  </Link>)}
+
                 </div>
               ) : (
                 <div className="alert alert-danger rounded-4 py-4 mb-5 text-center shadow-sm border-0 bg-white">
