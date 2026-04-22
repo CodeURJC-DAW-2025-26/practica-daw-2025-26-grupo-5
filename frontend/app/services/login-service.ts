@@ -154,10 +154,16 @@ export async function reqIsLogged(): Promise<UserDTO> {
  * }
  */
 export async function logIn(username: string, password: string): Promise<UserDTO> {
-  return await api.post<UserDTO>("/v1/auth/login", {
-    username,
-    password,
-  });
+  /**  return await api.post<UserDTO>("/v1/auth/login", {
+      username,
+      password,
+    });
+  */
+
+  const response = await api.post("/v1/auth/login", { username, password });
+  const token = response.token || response.jwt;
+  if (token) localStorage.setItem('token', token);
+  return response.user || response;
 }
 
 /**
