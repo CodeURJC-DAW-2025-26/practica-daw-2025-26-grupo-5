@@ -208,8 +208,8 @@ export default function ProductForm({
 
     if (value.trim().length < 3) {
       error = "Name is to short (min. 3 chars)."
-    } else if (value.trim().length > 10) {
-      error = "Name is to long (max. 10 chars)."
+    } else if (value.trim().length > 20) {
+      error = "Name is to long (max. 20 chars)."
     } else if (htmlRegex.test(value)) {
       error = "HTML tags are not allowed for security reasons. Be careful.";
     }
