@@ -93,10 +93,11 @@
  */
 
 import { useState, useRef, useEffect } from 'react';
-import { Alert, Row, Col, Card, Form, Button, InputGroup, Spinner } from 'react-bootstrap';
+import { Alert, Row, Stack, Image, Col, Card, Form, Button, InputGroup, Spinner } from 'react-bootstrap';
 import { chatBotHelper } from "~/services/AI/ai-service";
 import { useUserStore } from "~/stores/useUserStore";
-import { redirect } from "react-router";
+import { redirect, Link } from "react-router";
+import { useStore } from 'zustand';
 
 
 export async function clientLoader() {
@@ -128,6 +129,7 @@ interface Message {
  * Renders FAQ section and AI chatbot for customer support.
  */
 export default function UserHelpCenter() {
+  const { user } = useUserStore();
   // Chat history state: Array of user and bot messages
   const [messages, setMessages] = useState<Message[]>([
     { text: "Hello. How can I help you today?", isBot: true }
@@ -204,10 +206,24 @@ export default function UserHelpCenter() {
 
   return (
     <>
-      <header className="mb-5">
-        <h1 className="fw-800 h2 text-dark mb-2">Help Center</h1>
-        <p className="text-muted small fw-600 mb-0">Everything you need to know about Stilnovo.</p>
-      
+      <header className="d-flex justify-content-between align-items-center mb-5">
+        <div>
+          <h1 className="fw-800 h2 text-dark">Help Center</h1>
+          <p className="text-muted small fw-600 mb-0">Everything you need to know about Stilnovo.</p>
+        </div>
+        <Stack direction="horizontal" gap={3}>
+          {user && (
+            <Link to="/user/settings">
+              <Image
+                src={`/api/v1/users/me/profile-photo?t=${Date.now()}`}
+                className="rounded-circle border border-2 shadow-sm"
+                width="48" height="48"
+                style={{ objectFit: 'cover' }}
+                onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')}
+              />
+            </Link>
+          )}
+        </Stack>
       </header>
 
       {/* Information cards section - displays FAQ categories with icons and descriptions */}

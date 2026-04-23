@@ -91,6 +91,7 @@ export async function clientLoader() {
 export default function MyProducts({ loaderData }: Route.ComponentProps) {
     // State management initialized with data from the loader
     const [products, setProducts] = useState<ProductDTO[]>(loaderData.products);
+    const { user } = useUserStore();
 
     // Modal state
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -152,11 +153,26 @@ export default function MyProducts({ loaderData }: Route.ComponentProps) {
                     <p className="text-muted small fw-600 mb-0">Manage your design inventory and track performance.</p>
                 </div>
 
-                <Link to="/product/new" className="text-decoration-none">
-                    <Button variant="primary" className="btn-sell py-2 px-4 shadow-sm text-decoration-none d-flex align-items-center" style={{ backgroundColor: '#2f6ced', border: 'none' }}>
-                        <i className="fa-solid fa-plus me-2"></i>Add Product
-                    </Button>
-                </Link>
+                <div className="d-flex align-items-center gap-3">
+                    <Link to="/product/new" className="text-decoration-none">
+                        <button className="btn-sell py-2 px-3 small">
+                            <i className="fa-solid fa-plus me-2"></i>
+                            Add Product
+                        </button>
+                    </Link>
+
+                    {user && (
+                        <Link to="/user/settings">
+                            <Image
+                                src={`/api/v1/users/me/profile-photo?t=${Date.now()}`}
+                                className="rounded-circle border border-2 shadow-sm"
+                                width="48" height="48"
+                                style={{ objectFit: 'cover' }}
+                                onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')}
+                            />
+                        </Link>
+                    )}
+                </div>
             </header>
 
             {/* Product List */}

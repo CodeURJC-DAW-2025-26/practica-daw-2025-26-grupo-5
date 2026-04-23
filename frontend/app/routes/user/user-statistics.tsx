@@ -200,8 +200,8 @@ export default function UserStatistics() {
               <Image
                 src={`/api/v1/users/me/profile-photo?t=${Date.now()}`}
                 className="rounded-circle border border-2 shadow-sm"
-                width="48"
-                height="48"
+                width="48" height="48"
+                style={{ objectFit: 'cover' }}
                 onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')}
               />
             </Link>

@@ -85,16 +85,16 @@
  * @returns React component for transaction history and rating
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useLoaderData, redirect, Link, useNavigate } from 'react-router';
-import { Container, Row, Col, Card, Badge, Button, Image, Spinner, Stack, Alert } from 'react-bootstrap';
+import { Row, Col, Card, Badge, Button, Image, Stack, Alert } from 'react-bootstrap';
 import { useUserStore } from '~/stores/useUserStore';
 import ValorationModal from "~/components/ValorationModal";
 
 import type TransactionDTO from '~/dto/TransactionDTO';
 import { createValoration } from '~/services/valorations-service';
 import { getTransactions } from '~/services/transaction-service';
-import type { Route } from "./+types/user-sales-orders"; 
+import type { Route } from "./+types/user-sales-orders";
 
 interface TransactionsResponse {
     sales: TransactionDTO[];
@@ -137,7 +137,7 @@ const UserSalesOrders = () => {
 
     const [sales, setSales] = useState<TransactionDTO[]>(loaderData.transactions?.sales || []);
     const [purchases, setPurchases] = useState<TransactionDTO[]>(loaderData.transactions?.orders || []);
-    
+
     const [selectedTransactionId, setSelectedTransactionId] = useState<number | null>(null);
 
     //  UI State
@@ -180,7 +180,7 @@ const UserSalesOrders = () => {
     const selectedTransaction = [...sales, ...purchases].find(t => t.transactionId === selectedTransactionId);
 
     return (
-        <Container fluid className="py-4 py-md-5">
+        <>
             <Stack direction="horizontal" gap={3} className="justify-content-between align-items-start mb-5">
                 <div>
                     <h1 className="fw-800 h2">Sales & Orders</h1>
@@ -191,9 +191,8 @@ const UserSalesOrders = () => {
                         <Image
                             src={`/api/v1/users/me/profile-photo?t=${Date.now()}`}
                             className="rounded-circle border border-2 shadow-sm"
-                            width={48}
-                            height={48}
-                            alt="Profile"
+                            width="48" height="48"
+                            style={{ objectFit: 'cover' }}
                             onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')}
                         />
                     </Link>
@@ -364,7 +363,7 @@ const UserSalesOrders = () => {
                 onSubmit={handleValorationSubmit}
                 isProcessing={isProcessing}
             />
-        </Container>
+        </>
     );
 };
 

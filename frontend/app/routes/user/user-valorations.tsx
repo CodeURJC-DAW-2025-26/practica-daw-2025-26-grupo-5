@@ -87,11 +87,11 @@
 import { useState, useEffect } from 'react';
 import { redirect, Link, useLoaderData, useNavigate } from 'react-router';
 import { useUserStore } from '~/stores/useUserStore';
-import { 
-  getUserValorations, 
-  deleteValoration, 
-  updateValoration, 
-  createValoration 
+import {
+  getUserValorations,
+  deleteValoration,
+  updateValoration,
+  createValoration
 } from '~/services/valorations-service';
 import { getTransactions } from '~/services/transaction-service';
 import { Alert, Row, Col, Card, Badge, Button, Image, Stack } from 'react-bootstrap';
@@ -222,8 +222,8 @@ export default function UserValorations() {
 
   const completedCount = valorations.length;
   const pendingCount = pendingTransactions.length;
-  const averageRating = completedCount > 0 
-    ? (valorations.reduce((acc, v) => acc + (v.rating || 0), 0) / completedCount).toFixed(1) 
+  const averageRating = completedCount > 0
+    ? (valorations.reduce((acc, v) => acc + (v.rating || 0), 0) / completedCount).toFixed(1)
     : "0.0";
 
   return (
@@ -236,9 +236,10 @@ export default function UserValorations() {
         {user && (
           <Link to="/user/settings">
             <Image
-              src={`/api/v1/users/me/profile-photo?t=${loaderData.date}`}
+              src={`/api/v1/users/me/profile-photo?t=${Date.now()}`}
               className="rounded-circle border border-2 shadow-sm"
-              width={48} height={48}
+              width="48" height="48"
+              style={{ objectFit: 'cover' }}
               onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')}
             />
           </Link>
@@ -276,8 +277,8 @@ export default function UserValorations() {
                       <h6 className="fw-800 mb-0 text-dark">{t.product?.name || `Order #${t.transactionId}`}</h6>
                       <small className="text-muted fw-600">Seller: {t.seller?.name}</small>
                     </div>
-                    <Button 
-                      className="btn-stilnovo-rate rounded-pill px-4 fw-800 shadow-sm border-0" 
+                    <Button
+                      className="btn-stilnovo-rate rounded-pill px-4 fw-800 shadow-sm border-0"
                       onClick={() => handleRateClick(t)}
                     >
                       <i className="fa-solid fa-star me-2 text-warning"></i> RATE NOW
@@ -314,21 +315,21 @@ export default function UserValorations() {
                           ))}
                         </div>
                         <Badge bg="white" text="dark" className="border fw-800 px-3 py-2 rounded-pill shadow-sm mb-3">{v.rating}/5</Badge>
-                        
+
                         {/* SQUARE ACTION BUTTONS */}
                         <Stack direction="horizontal" gap={2} className="justify-content-end">
-                          <Button 
-                            variant="outline-secondary" size="sm" 
-                            className="d-flex align-items-center justify-content-center border-0 bg-light shadow-sm" 
-                            style={{ width: '40px', height: '40px', borderRadius: '8px' }} 
+                          <Button
+                            variant="outline-secondary" size="sm"
+                            className="d-flex align-items-center justify-content-center border-0 bg-light shadow-sm"
+                            style={{ width: '40px', height: '40px', borderRadius: '8px' }}
                             onClick={() => handleEditClick(v)}
                           >
                             <i className="fa-solid fa-pen-to-square text-secondary"></i>
                           </Button>
-                          <Button 
-                            variant="outline-danger" size="sm" 
-                            className="d-flex align-items-center justify-content-center border-0 shadow-sm" 
-                            style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: '#fef2f2' }} 
+                          <Button
+                            variant="outline-danger" size="sm"
+                            className="d-flex align-items-center justify-content-center border-0 shadow-sm"
+                            style={{ width: '40px', height: '40px', borderRadius: '8px', backgroundColor: '#fef2f2' }}
                             onClick={() => handleDeleteClick(v.id)}
                           >
                             <i className="fa-solid fa-trash-can text-danger"></i>
@@ -350,13 +351,13 @@ export default function UserValorations() {
 
       {/* Edit/Create Valoration Modal */}
       {activeTransaction && (
-        <ValorationModal 
+        <ValorationModal
           show={showModal}
           onHide={() => { setShowModal(false); setActiveTransaction(null); }}
-          transaction={activeTransaction} 
+          transaction={activeTransaction}
           onSubmit={handleModalSubmit}
           isProcessing={isProcessing}
-          initialData={selectedValoration} 
+          initialData={selectedValoration}
         />
       )}
 
