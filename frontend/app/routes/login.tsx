@@ -93,11 +93,15 @@ export default function Login({ }: Route.ComponentProps) {
  * * @param value - The input string to be validated.
  * @returns {boolean} True if the value is present and not empty, false otherwise.
  */
+  const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+
   const validatePassword = (value: string) => {
     let errorMessage = "";
 
     if (value.length === 0) {
       errorMessage = "Password cannot be empty.";
+    } else if (htmlRegex.test(value)) {
+      errorMessage = "Malicious characters detected. Be careful.";
     }
 
     setPasswordError(errorMessage);
@@ -108,6 +112,8 @@ export default function Login({ }: Route.ComponentProps) {
 
     if (value.length === 0) {
       errorMessage = "Username cannot be empty.";
+    }else if (htmlRegex.test(value)) {
+      errorMessage = "Malicious characters detected. Be careful.";
     }
 
     setUsernameError(errorMessage);
