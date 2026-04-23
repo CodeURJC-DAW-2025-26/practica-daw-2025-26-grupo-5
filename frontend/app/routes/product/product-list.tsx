@@ -10,12 +10,12 @@
  * - Filter by category (Fashion, Tech, Cars, Home)
  * - Pagination with "Load More" button
  * - Product cards with:
- *    - Product image
- *    - Product name
- *    - Price
- *    - Seller info
- *    - Status indicator
- *    - Link to product detail
+ * - Product image
+ * - Product name
+ * - Price
+ * - Seller info
+ * - Status indicator
+ * - Link to product detail
  * - Empty state when no products found
  * - Loading spinner during fetch
  * - Cache optimization to prevent reload on back navigation
@@ -26,10 +26,10 @@
  * 2. clientLoader fetches initial catalog data
  * 3. Component displays product grid
  * 4. User can:
- *    - Search by query parameter (?query=...)
- *    - Filter by category (?category=...)
- *    - Click product to view details
- *    - Click "Load More" to fetch more products
+ * - Search by query parameter (?query=...)
+ * - Filter by category (?category=...)
+ * - Click product to view details
+ * - Click "Load More" to fetch more products
  * 5. Navigate back: List stays cached (no reload)
  * 6. After purchase: List revalidates to show updated products
  *
@@ -91,17 +91,15 @@ import type { Route } from "./+types/product-list";
 import { getCatalog, getMoreProducts, getProductImageUrl } from "~/services/products-service"; 
 import type ProductDTO from "~/dto/ProductDTO";
 import type HomePageDTO from "~/dto/HomePageDTO"; 
-import { Container, Row, Col, Button, Spinner } from "react-bootstrap";
+import { Container, Row, Col, Button, Spinner, Card } from "react-bootstrap";
 import { useUserStore } from "~/stores/useUserStore";
 
 /**
  * Determine if Component Should Revalidate
- * 
- * Optimization: Prevent list reload when navigating back from product detail.
+ * * Optimization: Prevent list reload when navigating back from product detail.
  * Cache the product list for better UX.
  * EXCEPTION: Revalidate after purchase to show updated stock.
- * 
- * @param currentUrl - Current URL
+ * * @param currentUrl - Current URL
  * @param nextUrl - Next URL to navigate to
  * @returns True if should revalidate, false to use cache
  */
@@ -109,26 +107,24 @@ export function shouldRevalidate({currentUrl, nextUrl }: any) {
   if (currentUrl.search !== nextUrl.search) {
     return true;
   }
-  // Check if a purchase was just completed
+  // Intercepts navigation after a purchase to force fresh data retrieval
   const justPurchased = localStorage.getItem('justPurchased');
   if (justPurchased === 'true') {
     localStorage.removeItem('justPurchased');
-    return true; // Revalidate to fetch updated products
+    return true; 
   }
-  return false; // Don't revalidate for normal navigation
+  return false; 
 }
 
 /**
  * Client-side loader: Fetch product catalog
- * 
- * Process:
+ * * Process:
  * 1. Extract query and category from URL search params
  * 2. Call getCatalog() with filters
  * 3. Return catalog data (products, recommendations)
  * 4. Handle errors by returning empty list
  * 5. No artificial delay for fast loading
- * 
- * @param request - Route request with URL
+ * * @param request - Route request with URL
  * @returns Catalog data with products
  */
 export async function clientLoader({ request }: Route.ClientLoaderArgs) {
@@ -150,20 +146,19 @@ export async function clientLoader({ request }: Route.ClientLoaderArgs) {
 
 /**
  * Product List Component Implementation
- * 
- * Displays searchable product catalog with pagination.
+ * * Displays searchable product catalog with pagination.
  */
 export default function ProductsList({ loaderData }: Route.ComponentProps) {
   const homeData = loaderData as HomePageDTO;
   const { user } = useUserStore();
   const [searchParams] = useSearchParams();
 
-  // Filter out products from banned sellers
+  // Excludes listings tied to restricted or banned user accounts
   const activeProducts = homeData.products?.filter(p => !p.seller?.banned) || [];
   const activeRecommendations = homeData.recommendedProducts?.filter(p => !p.seller?.banned) || [];
   const [products, setProducts] = useState<ProductDTO[]>(activeProducts);
 
-  // Pageable handled
+  // Manages pagination state for infinite scroll behavior
   const [page, setPage] = useState(1); 
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(() => {
@@ -184,7 +179,7 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
     }
   }, [homeData]);
 
-  // Fill recommended products to always show 4 (or available)
+  // Adjusts recommended product list to maintain consistent layout counts
   const recommendedCount = activeRecommendations.length;
   const filledRecommendations = [...activeRecommendations];
   
@@ -195,7 +190,7 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
     filledRecommendations.push(...fillers.slice(0, needed));
   }
   
-  // handleLoadMore function adapted to Paged Response
+  // Fetches subsequent pages of the catalog based on current active filters
   const handleLoadMore = async () => {
     setIsLoading(true);
     try {
@@ -243,26 +238,27 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
   return (
     <Container className="pt-5">
       
-      {/* NEW SECTION: Recommended Products */}
+      {/* Dynamic Recommendation Layout Section */}
       {showRecommendations && (
         <div className="mb-5 pb-4 border-bottom">
           <h2 className="fw-800 mb-5 text-center text-primary">Recommended for You</h2>
           <Row xs={1} md={2} lg={4} className="g-4">
             {filledRecommendations.map((product: ProductDTO) => (
-              <Col key={`rec-${product.id}`}> {/* Prefix rec- to avoid key conflicts */}
+              <Col key={`rec-${product.id}`}>
                 <Link to={`/product/${product.id}`} className="text-decoration-none text-dark">
-                  <div className="clay-card">
+                  <Card className="clay-card border-0 h-100">
                     <div className="img-container">
-                      <img 
+                      <Card.Img 
+                        variant="top"
                         src={getProductImageUrl(product.id)}
                         alt={product.name} 
                       />
                     </div>
-                    <div className="product-details">
-                      <h3>{product.name}</h3>
-                      <p className="price">{product.price.toFixed(2)}&euro;</p>
-                    </div>
-                  </div>
+                    <Card.Body className="product-details">
+                      <Card.Title as="h3">{product.name}</Card.Title>
+                      <Card.Text className="price">{product.price.toFixed(2)}&euro;</Card.Text>
+                    </Card.Body>
+                  </Card>
                 </Link>
               </Col>
             ))}
@@ -270,9 +266,8 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
         </div>
       )}
 
-      {/* EXISTING SECTION: Standard Catalog */}
+      {/* Main Catalog View Section */}
       <div className="product-grid-container">
-        {/* Show a different title if the user is searching */}
         <h2 className="fw-800 mb-5 text-center">
           {homeData.searching ? "Search Results" : "Featured Treasures"}
         </h2>
@@ -281,25 +276,26 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
           {displayProducts.map((product: ProductDTO) => (
             <Col key={`cat-${product.id}`}>
               <Link to={`/product/${product.id}`} className="text-decoration-none text-dark">
-                <div className="clay-card">
+                <Card className="clay-card border-0 h-100">
                   <div className="img-container">
-                    <img 
+                    <Card.Img 
+                      variant="top"
                       src={getProductImageUrl(product.id)}
                       alt={product.name} 
                     />
                   </div>
-                  <div className="product-details">
-                    <h3>{product.name}</h3>
-                    <p className="price">{product.price.toFixed(2)}&euro;</p>
-                  </div>
-                </div>
+                  <Card.Body className="product-details">
+                    <Card.Title as="h3">{product.name}</Card.Title>
+                    <Card.Text className="price">{product.price.toFixed(2)}&euro;</Card.Text>
+                  </Card.Body>
+                </Card>
               </Link>
             </Col>
           ))}
         </Row>
       </div>
 
-      {/* LOAD MORE BUTTON */}
+      {/* Pagination Controls */}
         <div className="text-center mt-5 mb-5">
           {hasMore ? (
             <Button 

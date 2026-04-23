@@ -8,9 +8,9 @@
  * - Authentication check (redirects to login if not logged in)
  * - Product information display (name, price, seller)
  * - Inquiry form with fields:
- *    - Type (Question, Offer, Shipping inquiry, etc.)
- *    - Phone number
- *    - Message body
+ * - Type (Question, Offer, Shipping inquiry, etc.)
+ * - Phone number
+ * - Message body
  * - Client-side form validation
  * - Loading state while submitting
  * - Success confirmation after submission
@@ -20,10 +20,10 @@
  * Data Flow:
  * 1. User clicks "Contact Seller" from product detail page
  * 2. Passes product data via location.state:
- *    - productId (from URL params)
- *    - productName (from location state)
- *    - productPrice (from location state)
- *    - sellerName (from location state)
+ * - productId (from URL params)
+ * - productName (from location state)
+ * - productPrice (from location state)
+ * - sellerName (from location state)
  * 3. Check if user logged in (if not, redirect to login)
  * 4. Display inquiry form with product context
  * 5. User fills form and submits
@@ -66,9 +66,9 @@
 
 import { useNavigate, useLocation, useParams, Navigate } from "react-router";
 import { useActionState } from "react"; 
-import { sendInquiry } from "~/services/products-service";
+import { sendInquiry, getProductImageUrl } from "~/services/products-service";
 import { useUserStore } from "~/stores/useUserStore";
-import { Alert, Button, Container, Row, Col } from "react-bootstrap";
+import { Alert, Button, Container, Row, Col, Form, InputGroup, Card, Badge, Image } from "react-bootstrap";
 
 /**
  * Contact Seller Page Component
@@ -82,14 +82,17 @@ export default function ContactSellerPage() {
     const location = useLocation();
     const { user } = useUserStore(); 
 
-    const productName = location.state?.productName || "Producto";
+    const productName = location.state?.productName || "Product";
     const productPrice = location.state?.price || "0.00 €";
-    const sellerName = location.state?.sellerName || "Vendedor";
+    const sellerName = location.state?.sellerName || "Seller";
 
-    // Global protection: Check if the user is logged, and if he is not redirect him to login page
+    // Validates authentication status, redirecting unauthorized users to the login screen
     if (!user) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
+
+    const productImageUrl = getProductImageUrl(Number(id));
+
     async function contactAction(
         prevState: { success: boolean; error: string | null } | null,
         formData: FormData
@@ -100,8 +103,7 @@ export default function ContactSellerPage() {
 
         try {
             await sendInquiry({
-            productId: 
-                Number(id),
+                productId: Number(id),
                 phone,
                 type,
                 message,
@@ -111,9 +113,10 @@ export default function ContactSellerPage() {
             return { success: false, error: "Failed to send message. Please try again." };
         }
     }
+
     const [state, formAction, isPending] = useActionState(contactAction, null);
 
-    // If the delivery has succeced, show confirmation
+    // Renders the confirmation state upon successful message submission
     if (state?.success) {
         return (
             <Container className="py-5 text-center">
@@ -136,42 +139,45 @@ export default function ContactSellerPage() {
     return (
         <div className="min-vh-100 bg-light py-5">
             <Container>
-                {/* Navbar / Back Button */}
+                {/* Navigation Header */}
                 <div className="d-flex align-items-center mb-4">
-                    <button className="btn btn-link text-decoration-none text-dark p-0" onClick={() => navigate(-1)}>
+                    <Button variant="link" className="text-decoration-none text-dark p-0" onClick={() => navigate(-1)}>
                         <i className="fa-solid fa-chevron-left me-2"></i> Back
-                    </button>
+                    </Button>
                     <div className="mx-auto">
-                        <img src="/logo-owl.png" alt="Logo" style={{ height: "40px" }} />
+                        <Image src="/logo.png" alt="Logo" style={{ height: "40px" }} />
                     </div>
                 </div>
 
-                {/* Main Card */}
-                <div className="bg-white rounded-5 shadow-sm overflow-hidden mx-auto" style={{ maxWidth: "1000px" }}>
+                {/* Inquiry Interface */}
+                <Card className="border-0 rounded-5 shadow-sm overflow-hidden mx-auto" style={{ maxWidth: "1000px" }}>
                     <Row className="g-0">
-                        {/* Left Column: Product Info */}
+                        {/* Product Context Panel */}
                         <Col md={5} className="p-5 border-end bg-white">
-                            <span className="badge bg-primary-subtle text-primary rounded-pill px-3 mb-3">New Inquiry</span>
+                            <Badge bg="primary-subtle" text="primary" className="rounded-pill px-3 mb-3">New Inquiry</Badge>
                             <div className="mb-4">
-                                <img 
-                                    src="/car-placeholder.png" 
+                                <Image 
+                                    src={productImageUrl}
                                     alt="Product" 
-                                    className="img-fluid rounded-4 mb-3 w-100"
-                                    style={{ objectFit: "cover", height: "200px" }}
+                                    fluid
+                                    className="rounded-4 mb-3 w-100"
+                                    style={{ objectFit: "cover", aspectRatio: "4/3", maxHeight: "250px" }}
                                 />
                                 <h2 className="fw-bold h4 mb-1">{productName}</h2>
                                 <p className="text-primary fw-bold h5">{productPrice}</p>
                             </div>
 
-                            <div className="d-flex align-items-center p-3 bg-light rounded-4 mb-4">
-                                <div className="bg-white rounded-circle p-2 me-3 shadow-sm">
-                                    <i className="fa-solid fa-user-ninja text-muted"></i>
-                                </div>
-                                <div>
-                                    <small className="text-muted d-block small">Seller</small>
-                                    <span className="fw-bold">{sellerName}</span>
-                                </div>
-                            </div>
+                            <Card className="bg-light border-0 rounded-4 mb-4">
+                                <Card.Body className="d-flex align-items-center p-3">
+                                    <div className="bg-white rounded-circle p-2 me-3 shadow-sm">
+                                        <i className="fa-solid fa-user-ninja text-muted"></i>
+                                    </div>
+                                    <div>
+                                        <small className="text-muted d-block small">Seller</small>
+                                        <span className="fw-bold">{sellerName}</span>
+                                    </div>
+                                </Card.Body>
+                            </Card>
 
                             <div className="small text-muted">
                                 <p className="mb-1"><i className="fa-solid fa-circle-check text-success me-2"></i> Your message will be sent via email</p>
@@ -179,54 +185,56 @@ export default function ContactSellerPage() {
                             </div>
                         </Col>
 
-                        {/* Right Column: Form */}
+                        {/* Input Form Panel */}
                         <Col md={7} className="p-5">
                             <div className="d-flex justify-content-between align-items-center mb-4">
                                 <h3 className="fw-bold h4 m-0">Complete your Inquiry</h3>
                                 <small className="text-muted"><i className="fa-solid fa-lock me-1"></i> Secure Form</small>
                             </div>
 
-                            <form action={formAction}>
+                            <Form action={formAction as unknown as string}>
                                 <Row className="mb-3">
-                                    <Col md={6}>
-                                        <label className="form-label small fw-bold text-muted text-uppercase">Phone</label>
-                                        <div className="input-group">
-                                            <span className="input-group-text bg-light border-0"><i className="fa-solid fa-phone text-muted"></i></span>
-                                            <input type="tel" name="phone" className="form-control bg-light border-0 py-2" placeholder="+34 600 000 000" required />
-                                        </div>
-                                    </Col>
-                                    <Col md={6}>
-                                        <label className="form-label small fw-bold text-muted text-uppercase">Inquiry Type</label>
-                                        <div className="input-group">
-                                            <span className="input-group-text bg-light border-0"><i className="fa-solid fa-tag text-muted"></i></span>
-                                            <select name="type" className="form-select bg-light border-0 py-2" required>
+                                    <Form.Group as={Col} md={6} controlId="formPhone">
+                                        <Form.Label className="small fw-bold text-muted text-uppercase">Phone</Form.Label>
+                                        <InputGroup>
+                                            <InputGroup.Text className="bg-light border-0"><i className="fa-solid fa-phone text-muted"></i></InputGroup.Text>
+                                            <Form.Control type="tel" name="phone" className="bg-light border-0 py-2" placeholder="+34 600 000 000" required />
+                                        </InputGroup>
+                                    </Form.Group>
+                                    <Form.Group as={Col} md={6} controlId="formType">
+                                        <Form.Label className="small fw-bold text-muted text-uppercase">Inquiry Type</Form.Label>
+                                        <InputGroup>
+                                            <InputGroup.Text className="bg-light border-0"><i className="fa-solid fa-tag text-muted"></i></InputGroup.Text>
+                                            <Form.Select name="type" className="bg-light border-0 py-2" required>
                                                 <option value="GENERAL">General Question</option>
                                                 <option value="INFO">Request Info</option>
                                                 <option value="PRICE">Negotiate</option>
-                                            </select>
-                                        </div>
-                                    </Col>
+                                            </Form.Select>
+                                        </InputGroup>
+                                    </Form.Group>
                                 </Row>
 
-                                <div className="mb-4">
-                                    <label className="form-label small fw-bold text-muted text-uppercase">Message</label>
+                                <Form.Group className="mb-4" controlId="formMessage">
+                                    <Form.Label className="small fw-bold text-muted text-uppercase">Message</Form.Label>
                                     <div className="position-relative">
                                         <i className="fa-solid fa-comment position-absolute text-muted" style={{ left: '12px', top: '15px' }}></i>
-                                        <textarea 
+                                        <Form.Control 
+                                            as="textarea"
                                             name="message" 
-                                            className="form-control bg-light border-0 ps-5 py-3" 
+                                            className="bg-light border-0 ps-5 py-3" 
                                             rows={4} 
                                             placeholder={`Hi Mario, is this still available?`}
                                             required
                                         />
                                     </div>
-                                </div>
+                                </Form.Group>
 
                                 {state?.error && <Alert variant="danger">{state.error}</Alert>}
 
-                                <button 
+                                <Button 
                                     type="submit" 
-                                    className="btn btn-primary w-100 py-3 rounded-3 fw-bold shadow-sm d-flex align-items-center justify-content-center"
+                                    variant="primary"
+                                    className="w-100 py-3 rounded-3 fw-bold shadow-sm d-flex align-items-center justify-content-center"
                                     disabled={isPending}
                                 >
                                     {isPending ? (
@@ -234,11 +242,11 @@ export default function ContactSellerPage() {
                                     ) : (
                                         <><i className="fa-solid fa-paper-plane me-2"></i> Send Email Inquiry</>
                                     )}
-                                </button>
-                            </form>
+                                </Button>
+                            </Form>
                         </Col>
                     </Row>
-                </div>
+                </Card>
             </Container>
         </div>
     );

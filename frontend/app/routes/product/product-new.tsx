@@ -7,18 +7,18 @@
  * Features:
  * - Product form component (reused from ProductForm.tsx)
  * - Form fields:
- *    - Name (required)
- *    - Category (dropdown)
- *    - Price (currency field)
- *    - Location (seller's location)
- *    - Description (long text)
- *    - Image upload (required, must have photo)
+ * - Name (required)
+ * - Category (dropdown)
+ * - Price (currency field)
+ * - Location (seller's location)
+ * - Description (long text)
+ * - Image upload (required, must have photo)
  * - AI Description Enhancement:
- *    - Improves/enriches product description
- *    - Validates product name first
- *    - Shows loading state during AI processing
- *    - Handles errors gracefully
- *    - Returns enhanced text or original if error
+ * - Improves/enriches product description
+ * - Validates product name first
+ * - Shows loading state during AI processing
+ * - Handles errors gracefully
+ * - Returns enhanced text or original if error
  * - Server action saves product to backend
  * - Auto-navigates to product detail on success
  * - Redirects to inventory on cancel
@@ -27,16 +27,16 @@
  * Data Flow:
  * 1. User fills form (name, category, price, location, description, image)
  * 2. Optional: Click AI button to enhance description
- *    - Sends product name + current description to backend AI
- *    - Returns enhanced version
- *    - Updates description field
+ * - Sends product name + current description to backend AI
+ * - Returns enhanced version
+ * - Updates description field
  * 3. Submit form
  * 4. Server action processes:
- *    - Validates required fields (especially image)
- *    - Calls addProduct() API
- *    - Uploads image via uploadProductImage()
- *    - On success: Redirect to product detail
- *    - On error: Show error message
+ * - Validates required fields (especially image)
+ * - Calls addProduct() API
+ * - Uploads image via uploadProductImage()
+ * - On success: Redirect to product detail
+ * - On error: Show error message
  *
  * AI Enhancement:
  * - Only available if product name is filled (min 3 chars)
@@ -46,7 +46,7 @@
  * - Shows loading spinner during processing
  *
  * Form Validation:
- * - Image is required (error message in Spanish)
+ * - Image is required
  * - Name is required for AI enhancement
  * - All other fields recommended but technically optional
  * - Backend validates again server-side
@@ -69,8 +69,7 @@ import { improveDescription } from "~/services/AI/ai-service";
 
 /**
  * Product Creation Page Component
- * 
- * Manages new product form with AI enhancement capability.
+ * * Manages new product form with AI enhancement capability.
  */
 export default function ProductNew() {
   const navigate = useNavigate();
@@ -81,15 +80,13 @@ export default function ProductNew() {
 
   /**
    * Handle AI Description Enhancement
-   * 
-   * Process:
+   * * Process:
    * 1. Validate product name (min 3 chars required)
    * 2. Set loading state
    * 3. Call improveDescription() from AI service
    * 4. Return enhanced text or original on error
    * 5. Handle and display errors
-   * 
-   * @param name - Product name (used for AI context)
+   * * @param name - Product name (used for AI context)
    * @param currentDesc - Current product description
    * @returns Enhanced description from AI or original on error
    */
@@ -115,8 +112,7 @@ export default function ProductNew() {
 
   /**
    * Server Action: Save Product
-   * 
-   * Process:
+   * * Process:
    * 1. Extract form data fields
    * 2. Validate image file is provided and not empty
    * 3. Call addProduct() to create product
@@ -133,7 +129,7 @@ export default function ProductNew() {
     formData: FormData
   ) {
 
-    // Extract form data
+    // Extracts structural details required for backend product schema
     const name = formData.get("name") as string;
     const category = formData.get("category") as string;
     const price = parseFloat(formData.get("price") as string);
@@ -142,16 +138,14 @@ export default function ProductNew() {
     const file = formData.get("image") as File; 
 
     /**
-     * Validate Image Upload
-     * Image is required for product creation
+     * Ensures an asset is uploaded as it is enforced by marketplace rules
      */
     if (!file || file.size === 0) {
-      return { success: false, error: "La foto es obligatoria para vender en Stilnovo." };
+      return { success: false, error: "A photo is required to list a product on Stilnovo." };
     }
 
     try {
-
-      //ProductRestController.java/addProduct have this form request
+      // Commits product context to the database service
       const newProduct = await addProduct({
         name,
         category,
@@ -168,7 +162,7 @@ export default function ProductNew() {
       console.error(error);
       return {
         success: false,
-        error: "Error al guardar el producto. Asegúrate de haber subido una imagen.",
+        error: "Failed to save the product. Please ensure an image was uploaded successfully.",
       };
     }
   }

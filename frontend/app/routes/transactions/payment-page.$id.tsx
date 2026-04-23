@@ -6,17 +6,17 @@
  *
  * Features:
  * - Product information display:
- *    - Product image
- *    - Product name
- *    - Seller location
- *    - Price
+ * - Product image
+ * - Product name
+ * - Seller location
+ * - Price
  * - Shipping information (secure door-to-door delivery)
  * - Buyer protection status
  * - Payment form fields:
- *    - Cardholder name
- *    - Card number
- *    - Expiry date
- *    - CVV (security code)
+ * - Cardholder name
+ * - Card number
+ * - Expiry date
+ * - CVV (security code)
  * - Security badge (Stripe powered)
  * - Error handling and display
  * - Loading state during payment processing
@@ -80,18 +80,16 @@ import { getCheckoutDetails, createTransaction } from '~/services/transaction-se
 
 /**
  * Client-side loader: Fetch checkout details
- * 
- * Process:
+ * * Process:
  * 1. Extract product ID from route params
  * 2. Validate ID format (must be numeric)
  * 3. Call getCheckoutDetails() API
  * 4. Handle errors:
- *    - 401: Redirect to login (not authenticated)
- *    - 404: Throw "Product not found" error
- *    - Other: Throw "Failed to load checkout" error
+ * - 401: Redirect to login (not authenticated)
+ * - 404: Throw "Product not found" error
+ * - Other: Throw "Failed to load checkout" error
  * 5. Return checkout data to component
- * 
- * @param params - Route parameters including product ID
+ * * @param params - Route parameters including product ID
  * @returns Checkout data or redirect/error
  */
 export async function clientLoader({ params }: { params: { id: string } }) {
@@ -117,8 +115,7 @@ interface PaymentPageProps {
 
 /**
  * Payment Page Component Implementation
- * 
- * Displays checkout form and product summary.
+ * * Displays checkout form and product summary.
  * Handles payment submission and transaction creation.
  */
 const PaymentPage = ({ loaderData }: PaymentPageProps) => {
@@ -149,7 +146,7 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
   const productId = checkoutData?.product?.id;
 
   /**
-   * XSS Validation
+   * Validates input against basic XSS patterns
    */
   const validateXSS = (name: string, value: string) => {
     const isMalicious = htmlRegex.test(value);
@@ -168,6 +165,7 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
   const handlePaymentSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // Prevent submission if field errors exist
     if (Object.values(fieldErrors).some(err => err !== "")) return;
 
     setProcessing(true);
@@ -181,6 +179,7 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
 
     try {
       await createTransaction(parseInt(productId.toString(), 10));
+      // Flag used to trigger list revalidation on the main catalog upon successful return
       localStorage.setItem('justPurchased', 'true');
       navigate(`../../user/sales-orders`);
     } catch (err: any) {
@@ -199,7 +198,7 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
                 <Card.Body className="p-4 p-md-5">
                   <Row className="align-items-center g-4">
                     
-                    {/* Left Column: Product Info (Mantenido igual) */}
+                    {/* Left Column: Product Info */}
                     {product && (
                       <Col lg={5} className="text-center border-end-lg pe-lg-4">
                         <div className="position-relative mb-4 clay-card p-3" style={{ backgroundColor: '#f8fafc', borderRadius: '16px' }}>
@@ -247,7 +246,7 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
                         Secure Payment
                       </h4>
 
-                      {/* Security Info*/}
+                      {/* Security Information Panel */}
                       <Alert variant="success" className="d-flex align-items-center gap-3 mb-4 py-2 border-0" style={{ borderRadius: '12px', backgroundColor: '#ecfdf5' }}>
                         <i className="fa-solid fa-shield-halved text-success fs-4 ms-2" />
                         <div>
@@ -256,7 +255,12 @@ const PaymentPage = ({ loaderData }: PaymentPageProps) => {
                         </div>
                       </Alert>
 
-                      {/* Payment Form */}
+                      {error && (
+                        <Alert variant="danger" className="border-0 mb-4" style={{ borderRadius: '12px' }}>
+                          {error}
+                        </Alert>
+                      )}
+
                       <Form onSubmit={handlePaymentSubmit}>
                         <Form.Group className="mb-3">
                           <Form.Label className="fw-800 mb-2 small text-uppercase text-muted">Cardholder Name</Form.Label>
@@ -391,7 +395,7 @@ export default PaymentPage;
 export function ErrorBoundary({ error }: { readonly error: Error }) {
   return (
     <Container className="mt-5 text-center">
-      <Alert variant="danger" className="border-0 shadow-sm" style={{ borderRadius: '16px' }}>
+      <Alert variant="danger" className="border-0 shadow-sm" style={{ borderRadius: '16px', maxWidth: '600px', margin: '0 auto' }}>
         <Alert.Heading className="fw-800"><i className="fa-solid fa-triangle-exclamation me-2"></i>Error Loading Checkout</Alert.Heading>
         <p className="fw-700 text-muted">{error instanceof Error ? error.message : 'An unexpected error occurred'}</p>
         <Button variant="outline-danger" className="mt-3 rounded-pill fw-700 px-4" onClick={() => (globalThis.location.href = '/')}>
