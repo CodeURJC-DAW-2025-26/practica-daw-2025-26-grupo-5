@@ -229,7 +229,7 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
 
   };
 
-  const showRecommendations = activeRecommendations.length > 0 && !homeData.searching;
+  const showRecommendations = user && activeRecommendations.length > 0 && !homeData.searching;
 
   const currentlyRecommendedIds = new Set(showRecommendations ? activeRecommendations.map(p => p.id) : []);
 
