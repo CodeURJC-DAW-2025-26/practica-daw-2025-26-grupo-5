@@ -186,7 +186,7 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
                                         <tr key={sale.id}>
                                             <td className="fw-700 text-dark">{sale.product?.name}</td>
                                             <td className="text-muted fw-600 small">{sale.product?.category}</td>
-                                            <td className="text-primary fw-800">{sale.product?.formattedPrice} €</td>
+                                            <td className="text-primary fw-800">{sale.product?.price} €</td>
                                             <td>
                                                 <Badge pill bg="success-subtle" className="text-success px-3 py-2 fw-700">
                                                     {sale.product?.status}
