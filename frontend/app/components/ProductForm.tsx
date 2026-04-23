@@ -223,8 +223,8 @@ export default function ProductForm({
 
     if (value.trim().length < 10) {
       error = "Description is too short (min. 10 chars)."
-    } else if (value.trim().length > 150) {
-      error = "Description is too long (max. 150 chars)."
+    } else if (value.trim().length > 1000) {
+      error = "Description is too long (max. 1000 chars)."
     } else if (htmlRegex.test(value)) {
       error = "HTML tags are not allowed for security reasons. Be careful.";
     }
