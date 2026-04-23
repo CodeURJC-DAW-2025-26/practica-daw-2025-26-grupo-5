@@ -1,5 +1,5 @@
 import { useNavigate, useLocation, useParams, Navigate } from "react-router";
-import { useActionState, useState } from "react"; 
+import { useActionState, useState } from "react";
 import { Alert, Button, Container, Row, Col, Card, Image } from "react-bootstrap";
 import { sendInquiry, getProductImageUrl } from "~/services/products-service";
 import { useUserStore } from "~/stores/useUserStore";
@@ -8,7 +8,9 @@ export default function ContactSellerPage() {
     const { id } = useParams();
     const navigate = useNavigate();
     const location = useLocation();
-    const { user } = useUserStore(); 
+    const { user } = useUserStore();
+    const [state, formAction, isPending] = useActionState(contactAction, null);
+
 
     const productId = Number(id);
     const productName = location.state?.productName || "Product";
@@ -18,9 +20,51 @@ export default function ContactSellerPage() {
 
     const [logoSrc, setLogoSrc] = useState('/images/logo.png');
 
+    const [messageError, setMessageError] = useState("");
+    const [phoneError, setPhoneError] = useState("");
+
+    const sellerId = location.state?.sellerId;
+
+    // SECURITY GUARD: Redirect unauthenticated users to the login page.
+    // IMPORTANT: This early return MUST remain strictly AFTER all React Hooks 
+    // (useState, useActionState, etc.) to prevent "Rendered fewer hooks than expected" errors.
     if (!user) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
+
+    // SECURITY GUARD 2: Prevent the owner from contacting themselves
+    // SECURITY GUARD 3: Handle manual URL entry with empty state
+    if (user.id === sellerId || !location.state) {
+        return <Navigate to={`/product/${id}`} replace />;
+    }
+
+    const validateMessage = (value: string) => {
+        const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+        if (value.trim().length < 20) {
+            setMessageError("Message is too short (min. 20 chars).");
+        } else if (value.trim().length > 150) {
+            setMessageError("Message is too long (max. 150 chars).");
+        } else if (htmlRegex.test(value)) {
+            setMessageError("HTML tags are not allowed.");
+        } else {
+            setMessageError("");
+        }
+    };
+
+    const validatePhone = (value: string) => {
+        const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+        const phoneRegex = /^(\d[\s-]*){9}$/;
+
+        if (value.trim().length === 0) {
+            setPhoneError("Phone number is required.");
+        } else if (!phoneRegex.test(value)) {
+            setPhoneError("Please enter 9 digits.");
+        } else if (htmlRegex.test(value)) {
+            setPhoneError("HTML tags are not allowed.");
+        } else {
+            setPhoneError("");
+        }
+    };
 
     async function contactAction(
         prevState: { success: boolean; error: string | null } | null,
@@ -29,6 +73,10 @@ export default function ContactSellerPage() {
         const phone = formData.get("phone") as string;
         const type = formData.get("type") as string;
         const message = formData.get("message") as string;
+
+        if (messageError || phoneError || !phone || !message) {
+            return { success: false, error: "Please fix the errors in the form before sending." };
+        }
 
         try {
             await sendInquiry({
@@ -43,32 +91,32 @@ export default function ContactSellerPage() {
         }
     }
 
-    const [state, formAction, isPending] = useActionState(contactAction, null);
-
     if (state?.success) {
         return (
-            <Container className="py-5 text-center">
-                <i className="fa-solid fa-circle-check fa-4x text-success mb-4"></i>
-                <h2 className="fw-800 mb-2">Message Sent!</h2>
-                <p className="text-muted fw-600 mb-4">
-                    The seller will get back to you soon.
-                </p>
-                <Button
-                    variant="primary"
-                    className="rounded-pill px-5 fw-700"
-                    onClick={() => navigate(`/product/${id}`)}
-                >
-                    Back to product
-                </Button>
-            </Container>
+            <div className="bg-light d-flex align-items-center justify-content-center w-100" style={{ minHeight: 'calc(100vh - 80px)' }}>
+                <Container className="text-center">
+                    <div className="bg-white p-5 rounded-4 shadow-sm mx-auto d-flex flex-column align-items-center justify-content-center" style={{ maxWidth: '500px' }}>
+                        <i className="fa-solid fa-circle-check fa-4x text-success mb-4"></i>
+                        <h2 className="fw-800 mb-2">Message Sent!</h2>
+                        <p className="text-muted fw-600 mb-4">
+                            The seller will get back to you soon.
+                        </p>
+                        <Button
+                            variant="primary"
+                            className="rounded-pill px-5 py-2 fw-700 shadow-sm"
+                            onClick={() => navigate(`/product/${id}`)}
+                        >
+                            Back to product
+                        </Button>
+                    </div>
+                </Container>
+            </div>
         );
     }
 
     return (
         <div className="min-vh-100 bg-light py-4 py-md-5">
             <Container>
-
-                {/* ❌ HEADER ELIMINADO COMPLETAMENTE */}
 
                 <Card className="clay-card border-0 shadow-sm overflow-hidden mx-auto" style={{ maxWidth: "1100px" }}>
                     <Card.Body className="p-0">
@@ -138,11 +186,14 @@ export default function ContactSellerPage() {
                                                 <input
                                                     type="tel"
                                                     name="phone"
-                                                    className="form-control bg-light border-0 py-2"
-                                                    placeholder="+34 600 000 000"
+                                                    className={`form-control bg-light border-0 py-2 ${phoneError ? 'is-invalid' : ''}`}
+                                                    placeholder="665 767 877"
+                                                    onChange={(e) => validatePhone(e.target.value)}
                                                     required
                                                 />
                                             </div>
+                                            {/* Mensaje de error (Añadido) */}
+                                            {phoneError && <div className="text-danger small mt-1">{phoneError}</div>}
                                         </Col>
                                         <Col md={6}>
                                             <label className="form-label small fw-bold text-muted text-uppercase">Inquiry Type</label>
@@ -165,12 +216,15 @@ export default function ContactSellerPage() {
                                             <i className="fa-solid fa-comment position-absolute text-muted" style={{ left: '12px', top: '15px' }}></i>
                                             <textarea
                                                 name="message"
-                                                className="form-control bg-light border-0 ps-5 py-3"
+                                                className={`form-control bg-light border-0 ps-5 py-3 ${messageError ? 'is-invalid' : ''}`}
                                                 rows={5}
                                                 placeholder={`Hi ${sellerName}, is this still available?`}
+                                                onChange={(e) => validateMessage(e.target.value)}
                                                 required
                                             />
                                         </div>
+                                        {/* Mensaje de error (Añadido) */}
+                                        {messageError && <div className="text-danger small mt-1">{messageError}</div>}
                                     </div>
 
                                     {state?.error && <Alert variant="danger" className="mb-4">{state.error}</Alert>}
@@ -189,7 +243,7 @@ export default function ContactSellerPage() {
                                             type="submit"
                                             variant="primary"
                                             className="rounded-pill px-4 fw-700"
-                                            disabled={isPending}
+                                            disabled={isPending || !!phoneError || !!messageError} /* Desactiva si hay errores */
                                         >
                                             {isPending ? (
                                                 <>
