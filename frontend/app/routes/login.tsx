@@ -44,7 +44,7 @@ export default function Login({ }: Route.ComponentProps) {
 
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState("");
-
+  const [showPassword, setShowPassword] = useState(false);
 
   /**
    * Effect: Auto-redirect authenticated users
@@ -86,6 +86,8 @@ export default function Login({ }: Route.ComponentProps) {
       setIsLoading(false);
     }
   };
+
+  const togglePassword = () => setShowPassword(!showPassword);
 
   /**
  * Performs minimal client-side validation.
@@ -199,7 +201,7 @@ export default function Login({ }: Route.ComponentProps) {
                     <div className="search-box w-100 py-2 d-flex align-items-center">
                       <i className="fa-solid fa-lock small ms-3 text-muted"></i>
                       <Form.Control
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         name="password"
                         placeholder="Enter your password"
                         value={password}
@@ -215,6 +217,12 @@ export default function Login({ }: Route.ComponentProps) {
                         required
                         className="border-0 bg-transparent shadow-none py-1"
                       />
+                      <i
+                          className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'} toggle-password`}
+                          id="toggleCvv"
+                          onClick={togglePassword}
+                          style={{ cursor: 'pointer' }}
+                        ></i>
                     </div>
                     {passwordError && <div className="text-danger x-small fw-700 mt-1 ms-3">{passwordError}</div>}
                   </Form.Group>

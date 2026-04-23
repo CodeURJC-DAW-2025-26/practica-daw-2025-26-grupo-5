@@ -71,6 +71,9 @@ export default function Signup({ }: Route.ComponentProps) {
     password: '',
     confirmPassword: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
 
   //Only for validations
   const [errors, setErrors] = useState({
@@ -150,6 +153,10 @@ export default function Signup({ }: Route.ComponentProps) {
       setIsLoading(false);
     }
   };
+
+  const togglePassword = () => setShowPassword(!showPassword);
+  const toggleConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
+
 
   /**
  * Performs minimal client-side validation.
@@ -301,7 +308,7 @@ export default function Signup({ }: Route.ComponentProps) {
                             <div className={`search-box d-flex align-items-center w-100 py-2 bg-light rounded-pill border-2 ${errors.password ? 'border-danger' : 'border-transparent'}`} style={{ minHeight: '52px' }}>
                               <i className="fa-solid fa-lock small text-muted px-3"></i>
                               <Form.Control
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 name="password"
                                 placeholder="••••••"
                                 value={formData.password}
@@ -311,6 +318,12 @@ export default function Signup({ }: Route.ComponentProps) {
 
                                 className="border-0 shadow-none bg-transparent p-0 flex-grow-1 small fw-600 w-100"
                               />
+                              <i
+                                className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'} toggle-password`}
+                                id="togglePassword"
+                                onClick={togglePassword}
+                                style={{ cursor: 'pointer' }}
+                              ></i>
                             </div>
                             {errors.password && <div className="text-danger x-small fw-700 mt-1 ms-3">{errors.password}</div>}
                           </Form.Group>
@@ -320,7 +333,7 @@ export default function Signup({ }: Route.ComponentProps) {
                             <div className={`search-box d-flex align-items-center w-100 py-2 bg-light rounded-pill border-2 ${errors.confirmPassword ? 'border-danger' : 'border-transparent'}`} style={{ minHeight: '52px' }}>
                               <i className="fa-solid fa-shield-check small text-muted px-3"></i>
                               <Form.Control
-                                type="password"
+                                type={showConfirmPassword ? "text" : "password"}
                                 name="confirmPassword"
                                 placeholder="••••••"
                                 value={formData.confirmPassword}
@@ -330,6 +343,12 @@ export default function Signup({ }: Route.ComponentProps) {
 
                                 className="border-0 shadow-none bg-transparent p-0 flex-grow-1 small fw-600 w-100"
                               />
+                              <i
+                                className={`fa-solid ${showConfirmPassword ? 'fa-eye-slash' : 'fa-eye'} toggle-password`}
+                                id="toggleConfirmPassword"
+                                onClick={toggleConfirmPassword}
+                                style={{ cursor: 'pointer' }}
+                              ></i>
                             </div>
                             {errors.confirmPassword && <div className="text-danger x-small fw-700 mt-1 ms-3">{errors.confirmPassword}</div>}
                           </Form.Group>
