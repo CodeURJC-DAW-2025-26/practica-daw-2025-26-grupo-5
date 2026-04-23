@@ -59,6 +59,10 @@ import {
   Col,
   Modal,
   Accordion,
+  Container,
+  Badge,
+  Card,
+  Image
 } from "react-bootstrap";
 import { useUserStore } from "~/stores/useUserStore";
 import { useState } from "react";
@@ -67,8 +71,7 @@ import { isSelfPurchase } from "~/services/transaction-service";
 
 /**
  * Client-side loader: Fetches product details
- * 
- * Process:
+ * * Process:
  * 1. Receives product ID from URL params
  * 2. Calls getProductById() to fetch from backend
  * 3. Adds artificial delay for better UX
@@ -76,21 +79,18 @@ import { isSelfPurchase } from "~/services/transaction-service";
  */
 export async function clientLoader({ params }: { params: any }) {
   await new Promise((resolve) => setTimeout(resolve, 2000));
-
   return await getProductById(params.id!);
 }
 
 /**
  * Product Detail Component Implementation
- * 
- * Main component showing all product information, seller details, and purchase options.
+ * * Main component showing all product information, seller details, and purchase options.
  */
 export default function ProductDetail({ loaderData }: { loaderData: any }) {
   const { user } = useUserStore();
   const product = loaderData;
   const navigate = useNavigate();
 
-  // Delete operation state
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [isPendingDelete, setPendingDelete] = useState(false);
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -101,9 +101,6 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
    */
   const isActive = product.status?.toLowerCase() === "active" || product.active === true;
 
-  /**
-   * Open Delete Confirmation Modal
-   */
   const handleOpenDeleteDialog = () => setDeleteDialogOpen(true);
 
   /**
@@ -119,8 +116,7 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
 
   /**
    * Execute Product Deletion
-   * 
-   * Process:
+   * * Process:
    * 1. Set deleting state
    * 2. Call deleteProduct() API
    * 3. Redirect to homepage on success
@@ -147,7 +143,7 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
 
   return (
     <>
-      <main className="container py-5">
+      <Container as="main" className="py-5">
         <Row className="g-5 align-items-start">
 
           {/* LEFT COLUMN: Image & Technical Specs */}
@@ -156,22 +152,23 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
 
               {!isActive && (
                 <div className="position-absolute top-50 start-50 translate-middle w-100 text-center" style={{ zIndex: 10, pointerEvents: 'none' }}>
-                  <span className="badge rounded-pill bg-danger px-5 py-3 shadow-lg fw-800 border border-white border-4"
+                  <Badge bg="danger" className="rounded-pill px-5 py-3 shadow-lg fw-800 border border-white border-4"
                     style={{ fontSize: '2rem', transform: 'rotate(-15deg)', display: 'inline-block' }}>
                     SOLD OUT
-                  </span>
+                  </Badge>
                 </div>
               )}
 
-              <img
+              <Image
                 src={getProductImageUrl(product.id)}
                 alt={product.name}
-                className={`main-product-image img-fluid rounded-4 ${!isActive ? 'opacity-25 grayscale' : ''}`}
+                fluid
+                className={`main-product-image rounded-4 ${!isActive ? 'opacity-25 grayscale' : ''}`}
                 style={{ maxHeight: '500px', objectFit: 'contain' }}
               />
             </div>
 
-            <div className="clay-card p-4 bg-white mt-4">
+            <Card className="clay-card border-0 p-4 bg-white mt-4">
               <h4 className="fw-800 h5 mb-4">Technical Specifications</h4>
               <Row className="g-3">
                 <Col xs={6} md={4}>
@@ -189,13 +186,12 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
                   <p className="small fw-700">ST-{product.id}</p>
                 </Col>
               </Row>
-            </div>
+            </Card>
           </Col>
 
           {/* RIGHT COLUMN: Price, Actions & Seller */}
           <Col lg={5} className="sticky-lg-top" style={{ top: '100px', zIndex: 1 }}>
-            <div className={`clay-card p-4 p-md-5 ${isActive ? 'bg-white' : 'bg-danger-subtle border border-danger'} shadow-sm`}>
-
+            <Card className={`clay-card border-0 p-4 p-md-5 ${isActive ? 'bg-white' : 'bg-danger-subtle border border-danger'} shadow-sm`}>
               <h1 className="fw-800 h3 mb-3 lh-sm">{product.name}</h1>
 
               <div className="mb-4">
@@ -228,7 +224,7 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
                         fontSize: '1.1rem',
                         background: 'linear-gradient(135deg, #f50519 0%, #dc2626 100%)',
                         color: 'white',
-                        cursor: 'default' // Indicate that it's not clickable (seller viewing own product)
+                        cursor: 'default'
                       }}
                     >
                       <i className="fa-solid fa-lock"></i> This is your product
@@ -236,10 +232,16 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
                   )}
                   
                   {!isSelfProduct && (
-                  <Link
-                    to={`../product/contact/${product.id}`}
-                    state={{ productName: product.name, productId: product.id }}
-                    className="btn btn-outline-primary py-3 fw-800 rounded-pill border-2 d-flex align-items-center justify-content-center gap-2 text-decoration-none"
+                    <Link
+                      to={`../product/contact/${product.id}`}
+                      state={{
+                        productName: product.name,
+                        productId: product.id,
+                        price: product.price ? product.price.toFixed(2) + " €" : "0.00 €",
+                        sellerName: product.seller?.name || "Seller",
+                        productImage: getProductImageUrl(product.id)
+                      }}
+                      className="btn btn-outline-primary py-3 fw-800 rounded-pill border-2 d-flex align-items-center justify-content-center gap-2 text-decoration-none"
                     style={{ fontSize: '1.1rem' }}
                   >
                     <i className="fa-regular fa-comment-dots fa-lg"></i> Send Message to Seller
@@ -247,18 +249,18 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
 
                 </div>
               ) : (
-                <div className="alert alert-danger rounded-4 py-4 mb-5 text-center shadow-sm border-0 bg-white">
+                <Alert variant="danger" className="rounded-4 py-4 mb-5 text-center shadow-sm border-0 bg-white">
                   <i className="fa-solid fa-handshake-slash fa-2x mb-2 text-danger"></i>
                   <p className="fw-800 mb-0 text-dark">This item has been sold.</p>
-                </div>
+                </Alert>
               )}
 
               {/* Seller Card */}
               {product.seller && (
                 <Link to={`/seller/${product.seller.id}`} className="text-decoration-none">
-                  <div className="seller-card p-3 rounded-4 bg-light border d-flex align-items-center justify-content-between mb-4 shadow-sm">
+                  <Card className="seller-card p-3 rounded-4 bg-light border d-flex flex-row align-items-center justify-content-between mb-4 shadow-sm">
                     <div className="d-flex align-items-center gap-3">
-                      <img
+                      <Image
                         src={getUserProfilePhotoUrl(product.seller.id)}
                         className="rounded-circle border border-white shadow-sm"
                         width="55"
@@ -275,33 +277,33 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
                       </div>
                     </div>
                     <i className="fa-solid fa-chevron-right opacity-25 text-dark"></i>
-                  </div>
+                  </Card>
                 </Link>
               )}
 
               {/* Admin/Owner Actions */}
               {user && user.id === product.seller?.id && (
-                <div className="row g-3 mb-4">
-                  <div className="col-6">
-                    <button
-                      type="button"
-                      className="btn btn-danger-custom w-100 py-3 small fw-800 shadow-sm border-0 rounded-pill d-flex align-items-center justify-content-center gap-2"
+                <Row className="g-3 mb-4">
+                  <Col xs={6}>
+                    <Button
+                      variant="danger"
+                      className="w-100 py-3 small fw-800 shadow-sm border-0 rounded-pill d-flex align-items-center justify-content-center gap-2 custom-btn-danger"
                       onClick={handleOpenDeleteDialog}
                     >
                       <i className="fa-solid fa-trash-can"></i> Delete Product
-                    </button>
-                  </div>
-                  <div className="col-6">
-                    <button
-                      type="button"
+                    </Button>
+                  </Col>
+                  <Col xs={6}>
+                    <Button
+                      variant="primary"
                       className="btn-sell w-100 py-3 small fw-800 shadow-sm border-0 rounded-pill d-flex align-items-center justify-content-center gap-2"
                       style={{ height: 'auto' }}
                       onClick={() => navigate(`/product/${product.id}/edit`)}
                     >
                       <i className="fa-solid fa-pen-to-square"></i> Edit Details
-                    </button>
-                  </div>
-                </div>
+                    </Button>
+                  </Col>
+                </Row>
               )}
 
               <Accordion flush id="accordionDetails">
@@ -315,10 +317,10 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
                   </Accordion.Body>
                 </Accordion.Item>
               </Accordion>
-            </div>
+            </Card>
           </Col>
         </Row>
-      </main>
+      </Container>
 
       {/* DELETE MODAL */}
       <Modal
@@ -348,11 +350,10 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
             </Alert>
           )}
 
-          {/* Action buttons using d-grid to make them full-width and stack vertically on mobile */}
           <div className="d-grid gap-2">
-            <button
-              type="button"
-              className="btn btn-danger w-100 py-3 rounded-pill fw-800 border-0 shadow-sm"
+            <Button
+              variant="danger"
+              className="w-100 py-3 rounded-pill fw-800 border-0 shadow-sm"
               onClick={handleDelete}
               disabled={isPendingDelete}
             >
@@ -361,16 +362,16 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
               ) : (
                 "Delete Forever"
               )}
-            </button>
+            </Button>
 
-            <button
-              type="button"
-              className="btn btn-light w-100 py-3 rounded-pill fw-800 border-0"
+            <Button
+              variant="light"
+              className="w-100 py-3 rounded-pill fw-800 border-0"
               onClick={handleCloseDeleteDialog}
               disabled={isPendingDelete}
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </Modal.Body>
       </Modal>

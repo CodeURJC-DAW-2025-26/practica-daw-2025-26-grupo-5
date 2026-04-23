@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -26,6 +27,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.bind.annotation.RequestPart;
 
 import es.stilnovo.library.dto.ProductMapper;
+import es.stilnovo.library.dto.TransactionMapper;
 import es.stilnovo.library.dto.SellerProfileDTO;
 import es.stilnovo.library.dto.UserDTO;
 import es.stilnovo.library.dto.UserMapper;
@@ -83,6 +85,9 @@ public class UserWebRestController {
 
         @Autowired
         private ValorationMapper valorationMapper;
+
+        @Autowired
+        private TransactionMapper transactionMapper;
 
         /**
          * This section refers to the current (principal) user.
@@ -187,14 +192,29 @@ public class UserWebRestController {
         })
         public ResponseEntity<Map<String, Object>> getDashboardData(Principal principal) {
                 var dashboardData = userService.getUserDashboardData(principal.getName());
+                Map<String, Object> response = new HashMap<>();
 
-                return ResponseEntity.ok(Map.of(
-                                "user", userMapper.toDTO(dashboardData.user()),
-                                "totalRevenue", dashboardData.user().getTotalRevenue(),
-                                "balance", dashboardData.user().getBalance(),
-                                "chartLabels", dashboardData.chartLabels(),
-                                "chartValues", dashboardData.chartValues(),
-                                "salesCount", dashboardData.userSales()));
+                // 1. Safe basic data (converted to DTO)
+                response.put("user", userMapper.toDTO(dashboardData.user()));
+                response.put("totalRevenue", dashboardData.user().getTotalRevenue());
+                response.put("balance", dashboardData.user().getBalance());
+
+                // 2. Data arrays for the charts
+                response.put("chartLabels", dashboardData.chartLabels());
+                response.put("chartValues", dashboardData.chartValues());
+                response.put("revenueLabels", dashboardData.revenueLabels());
+                response.put("revenueValues", dashboardData.revenueValues());
+                response.put("barLabels", dashboardData.barLabels());
+                response.put("visitsByCategory", dashboardData.visitsData());
+                response.put("interestByCategory", dashboardData.interestData());
+
+                // 3. Converting transactions to DTOs
+                if (dashboardData.userSales() != null) {
+                        response.put("salesCount", transactionMapper.toDTOs(dashboardData.userSales()));
+                } else {
+                        response.put("salesCount", java.util.List.of());
+                }
+                return ResponseEntity.ok(response);
         }
 
         @GetMapping("/me/transactions")

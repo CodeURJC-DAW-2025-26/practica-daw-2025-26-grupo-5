@@ -44,7 +44,7 @@ export default function Login({ }: Route.ComponentProps) {
 
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState("");
-
+  const [showPassword, setShowPassword] = useState(false);
 
   /**
    * Effect: Auto-redirect authenticated users
@@ -87,17 +87,23 @@ export default function Login({ }: Route.ComponentProps) {
     }
   };
 
+  const togglePassword = () => setShowPassword(!showPassword);
+
   /**
  * Performs minimal client-side validation.
  * Ensures that the required fields are not empty before proceeding with the action.
  * * @param value - The input string to be validated.
  * @returns {boolean} True if the value is present and not empty, false otherwise.
  */
+  const htmlRegex = /<\/?[a-z][\s\S]*>/i;
+
   const validatePassword = (value: string) => {
     let errorMessage = "";
 
     if (value.length === 0) {
       errorMessage = "Password cannot be empty.";
+    } else if (htmlRegex.test(value)) {
+      errorMessage = "Malicious characters detected. Be careful.";
     }
 
     setPasswordError(errorMessage);
@@ -108,6 +114,8 @@ export default function Login({ }: Route.ComponentProps) {
 
     if (value.length === 0) {
       errorMessage = "Username cannot be empty.";
+    }else if (htmlRegex.test(value)) {
+      errorMessage = "Malicious characters detected. Be careful.";
     }
 
     setUsernameError(errorMessage);
@@ -193,7 +201,7 @@ export default function Login({ }: Route.ComponentProps) {
                     <div className="search-box w-100 py-2 d-flex align-items-center">
                       <i className="fa-solid fa-lock small ms-3 text-muted"></i>
                       <Form.Control
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         name="password"
                         placeholder="Enter your password"
                         value={password}
@@ -209,6 +217,12 @@ export default function Login({ }: Route.ComponentProps) {
                         required
                         className="border-0 bg-transparent shadow-none py-1"
                       />
+                      <i
+                          className={`fa-solid ${showPassword ? 'fa-eye-slash' : 'fa-eye'} toggle-password`}
+                          id="toggleCvv"
+                          onClick={togglePassword}
+                          style={{ cursor: 'pointer' }}
+                        ></i>
                     </div>
                     {passwordError && <div className="text-danger x-small fw-700 mt-1 ms-3">{passwordError}</div>}
                   </Form.Group>

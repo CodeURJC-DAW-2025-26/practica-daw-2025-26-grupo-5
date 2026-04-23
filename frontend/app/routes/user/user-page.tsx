@@ -26,14 +26,13 @@
  * @component
  * @returns React component with seller dashboard and analytics
  */
-import { useEffect, useRef } from "react";
 import { Row, Col, Table, Badge, Card, Stack, Image } from "react-bootstrap";
-import { useNavigate, Link, redirect } from "react-router";
+import { Link, redirect } from "react-router";
 import { useUserStore } from "~/stores/useUserStore";
 import type { Route } from "./+types/user-page";
 import { getUserDashboardStats } from "~/services/user-service";
-import Chart from "chart.js/auto";
-
+import RevenueChart from "~/components/RevenueChart";
+import SalesByCategoryChart from "~/components/SalesByCategoryChart";
 /**
  * Client-side loader function
  * Fetches dashboard statistics for the currently logged-in seller.
@@ -81,55 +80,6 @@ export async function clientLoader() {
  */
 export default function UserPage({ loaderData }: Route.ComponentProps) {
     const { user } = useUserStore();
-    const revenueChartRef = useRef<HTMLCanvasElement>(null);
-    const categoryChartRef = useRef<HTMLCanvasElement>(null);
-
-    /**
-     * Initialize Chart.js Instances
-     * * Effect runs when loaderData changes. Creates two interactive charts:
-     * 1. Line chart: Revenue trend over time.
-     * 2. Doughnut chart: Sales distribution by category.
-     * * Cleanup mechanism destroys charts on unmount to prevent canvas memory leaks.
-     */
-    useEffect(() => {
-        if (!revenueChartRef.current || !categoryChartRef.current) return;
-        const revCtx = revenueChartRef.current.getContext("2d");
-        const catCtx = categoryChartRef.current.getContext("2d");
-
-        const chart1 = new Chart(revCtx!, {
-            type: 'line',
-            data: {
-                labels: loaderData.revenueLabels,
-                datasets: [{
-                    label: 'Revenue',
-                    data: loaderData.revenueValues,
-                    borderColor: '#2f6ced',
-                    backgroundColor: 'rgba(47, 108, 237, 0.05)',
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: { plugins: { legend: { display: false } } }
-        });
-
-        const chart2 = new Chart(catCtx!, {
-            type: 'doughnut',
-            data: {
-                labels: loaderData.revenueLabels,
-                datasets: [{
-                    data: loaderData.revenueValues,
-                    backgroundColor: ['#1e3a8a', '#2f6ced', '#93c5fd', '#60a5fa'],
-                    borderWidth: 0
-                }]
-            },
-            options: { plugins: { legend: { position: 'bottom' } } }
-        });
-
-        return () => { 
-            chart1.destroy(); 
-            chart2.destroy(); 
-        };
-    }, [loaderData]);
 
     return (
         <>
@@ -191,7 +141,13 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
                     <Card className="clay-card border-0 p-3 h-100">
                         <Card.Body>
                             <h5 className="fw-800 text-dark mb-4">Monthly Revenue Trend</h5>
-                            <canvas ref={revenueChartRef}></canvas>
+                            {/* Wrapper height is important for responsive charts */}
+                            <div style={{ height: '300px' }}>
+                                <RevenueChart 
+                                    labels={loaderData.revenueLabels} 
+                                    values={loaderData.revenueValues} 
+                                />
+                            </div>
                         </Card.Body>
                     </Card>
                 </Col>
@@ -199,7 +155,12 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
                     <Card className="clay-card border-0 p-3 h-100">
                         <Card.Body>
                             <h5 className="fw-800 text-dark mb-4">Sales by Category</h5>
-                            <canvas ref={categoryChartRef}></canvas>
+                            <div style={{ height: '300px' }}>
+                                <SalesByCategoryChart 
+                                    chartLabels={loaderData.revenueLabels} 
+                                    chartValues={loaderData.revenueValues} 
+                                />
+                            </div>
                         </Card.Body>
                     </Card>
                 </Col>
@@ -225,7 +186,7 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
                                         <tr key={sale.id}>
                                             <td className="fw-700 text-dark">{sale.product?.name}</td>
                                             <td className="text-muted fw-600 small">{sale.product?.category}</td>
-                                            <td className="text-primary fw-800">{sale.product?.formattedPrice} €</td>
+                                            <td className="text-primary fw-800">{sale.product?.price} €</td>
                                             <td>
                                                 <Badge pill bg="success-subtle" className="text-success px-3 py-2 fw-700">
                                                     {sale.product?.status}

@@ -120,6 +120,9 @@ import { useUserStore } from '~/stores/useUserStore';
 import { getUserDashboardStats, downloadStatisticsReport } from '~/services/user-service';
 import Chart from 'chart.js/auto';
 import { Row, Col, Table, Badge, Card, Stack, Image } from 'react-bootstrap';
+import RevenueChart from "~/components/RevenueChart";
+import SalesByCategoryChart from "~/components/SalesByCategoryChart";
+import VisitsInterestChart from "~/components/VisitsInterestChart";
 
 /**
  * Client-side loader: Fetch and Format User Dashboard Statistics
@@ -131,11 +134,11 @@ export async function clientLoader() {
 
   try {
     const apiData = await getUserDashboardStats();
-    
+
     // MAPPING BASED ON YOUR JSON:
     return {
       // Your API calls it 'salesCount' for the list of transactions
-      userSales: apiData.salesCount || [], 
+      userSales: apiData.salesCount || [],
       revenueLabels: apiData.chartLabels || [],
       revenueValues: apiData.chartValues || [],
       // Total revenue and balance from root
@@ -160,68 +163,6 @@ export default function UserStatistics() {
   const loaderData = useLoaderData() as any;
   const { user } = useUserStore();
   const [isDownloading, setIsDownloading] = useState(false);
-
-  // Chart Refs
-  const revenueChartRef = useRef<HTMLCanvasElement>(null);
-  const categoryChartRef = useRef<HTMLCanvasElement>(null);
-  const visitsChartRef = useRef<HTMLCanvasElement>(null);
-
-  const revenueChartInstance = useRef<Chart | null>(null);
-  const categoryChartInstance = useRef<Chart | null>(null);
-  const visitsChartInstance = useRef<Chart | null>(null);
-
-  useEffect(() => {
-    // 1. Security check: Ensure canvas refs are available before initializing charts
-    if (!revenueChartRef.current || !categoryChartRef.current) return;
-
-    // 2. destroy existing chart instances to prevent memory leaks before creating new ones
-    revenueChartInstance.current?.destroy();
-    categoryChartInstance.current?.destroy();
-
-    // 3. saving contexts for chart initialization
-    const revCtx = revenueChartRef.current.getContext("2d");
-    const catCtx = categoryChartRef.current.getContext("2d");
-
-    // 4. initialize revenue chart with dynamic data and styling
-    if (revCtx) {
-      revenueChartInstance.current = new Chart(revCtx, {
-        type: 'line',
-        data: {
-          labels: loaderData.revenueLabels?.length > 0 ? loaderData.revenueLabels : ['Start'],
-          datasets: [{ 
-            label: 'Revenue €', 
-            data: loaderData.revenueValues?.length > 0 ? loaderData.revenueValues : [0], 
-            borderColor: '#2f6ced', 
-            backgroundColor: 'rgba(47, 108, 237, 0.05)', 
-            fill: true, 
-            tension: 0.4 
-          }]
-        },
-        options: { responsive: true, plugins: { legend: { display: false } } }
-      });
-    }
-
-    // 5. initialize category chart with dynamic data and styling
-    if (catCtx) {
-      categoryChartInstance.current = new Chart(catCtx, {
-        type: 'doughnut',
-        data: {
-          labels: loaderData.barLabels || [],
-          datasets: [{ 
-            data: loaderData.visitsByCategory || [], 
-            backgroundColor: ['#2f6ced', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe'] 
-          }]
-        },
-        options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
-      });
-    }
-
-    // 6. Cleanup on component destruction
-    return () => {
-      revenueChartInstance.current?.destroy();
-      categoryChartInstance.current?.destroy();
-    };
-  }, [loaderData]);
 
   const downloadStatisticsPDF = async () => {
     setIsDownloading(true);
@@ -259,8 +200,8 @@ export default function UserStatistics() {
               <Image
                 src={`/api/v1/users/me/profile-photo?t=${Date.now()}`}
                 className="rounded-circle border border-2 shadow-sm"
-                width="48"
-                height="48"
+                width="48" height="48"
+                style={{ objectFit: 'cover' }}
                 onError={(e) => (e.currentTarget.src = '/images/profile-photo.png')}
               />
             </Link>
@@ -309,25 +250,37 @@ export default function UserStatistics() {
         <Col lg={7}>
           <Card className="clay-card border-0 p-4 shadow-sm">
             <h5 className="fw-800 text-dark mb-4">Revenue Trend</h5>
-            {loaderData.revenueValues?.length > 0 && loaderData.revenueValues[0] !== 0 ? (
-              <canvas ref={revenueChartRef}></canvas>
-            ) : (
-               <div className="text-center py-5 opacity-50">
-                 <p className="fw-600 text-dark mb-0">No revenue data available yet</p>
-               </div>
-            )}
+            <div style={{ height: '300px' }}>
+              <RevenueChart
+                labels={loaderData.revenueLabels}
+                values={loaderData.revenueValues}
+              />
+            </div>
           </Card>
         </Col>
         <Col lg={5}>
           <Card className="clay-card border-0 p-4 shadow-sm">
             <h5 className="fw-800 text-dark mb-4">Sales by Category</h5>
-            {loaderData.userSales?.length > 0 ? (
-              <canvas ref={categoryChartRef}></canvas>
-            ) : (
-              <div className="text-center py-5 opacity-50">
-                <p className="fw-600 text-dark mb-0">You have no sales yet</p>
-              </div>
-            )}
+            <div style={{ height: '300px' }}>
+              <SalesByCategoryChart
+                chartLabels={loaderData.barLabels}
+                chartValues={loaderData.visitsByCategory}
+              />
+            </div>
+          </Card>
+        </Col>
+      </Row>
+      <Row className="g-4 mb-4">
+        <Col lg={12}>
+          <Card className="clay-card border-0 p-4 shadow-sm">
+            <h5 className="fw-800 text-dark mb-4">Visits & Interest</h5>
+            <div style={{ height: '300px' }}>
+              <VisitsInterestChart
+                labels={loaderData.barLabels}
+                visits={loaderData.visitsByCategory}
+                interest={loaderData.interestByCategory}
+              />
+            </div>
           </Card>
         </Col>
       </Row>

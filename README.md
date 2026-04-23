@@ -637,9 +637,7 @@ sudo docker compose up -d
 
 *La aplicación en producción estará disponible en `https://appweb05.dawgis.etsii.urjc.es:8443`.*
 
-> ℹ **Nota**  
-> Para más detalles sobre la configuración avanzada de docker, consulta el archivo  
-> [`advanced-docker.md`](./advanced-docker.md).
+> **Nota:** Para más detalles sobre la configuración avanzada de docker, consulta el archivo  [`advanced-docker.md`](./advanced-docker.md).
 
 ### **URL de la Aplicación Desplegada**
 
@@ -797,9 +795,7 @@ Mi contribución se ha centrado en la mejora y consolidación de la capa REST de
     http://localhost:5173/new/
    ```
    
-> ℹ **Nota**  
-> Para más detalles sobre la configuración avanzada del entorno de desarrollo, consulta el archivo  
-> [`advanced-react-spa-setup.md`](./advanced-react-spa-setup.md).
+> **Nota:** Para más detalles sobre la configuración avanzada del entorno de desarrollo, consulta el archivo [`advanced-react-spa-setup.md`](./advanced-react-spa-setup.md).
 
 ### Diagrama de Arquitectura y Componentes de la SPA
 
