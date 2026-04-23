@@ -52,7 +52,7 @@ import { Button, Badge, Image, Stack, Card, Row, Col } from "react-bootstrap";
 import { getMyProducts, deleteProduct } from "~/services/products-service";
 import ConfirmModal from "~/components/ConfirmModal";
 import type ProductDTO from "~/dto/ProductDTO";
-import type { Route } from "./+types/user-products"; 
+import type { Route } from "./+types/user-products";
 
 /**
  * Client-side loader function
@@ -91,7 +91,7 @@ export async function clientLoader() {
 export default function MyProducts({ loaderData }: Route.ComponentProps) {
     // State management initialized with data from the loader
     const [products, setProducts] = useState<ProductDTO[]>(loaderData.products);
-    
+
     // Modal state
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [idToDelete, setIdToDelete] = useState<number | null>(null);
@@ -129,10 +129,10 @@ export default function MyProducts({ loaderData }: Route.ComponentProps) {
         setIsDeleting(true);
         try {
             await deleteProduct(idToDelete);
-            
+
             // Remove the deleted product from local state
             setProducts(prev => prev.filter(p => p.id !== idToDelete));
-            
+
             setShowDeleteModal(false);
         } catch (err) {
             console.error("Delete failed:", err);
@@ -193,18 +193,52 @@ export default function MyProducts({ loaderData }: Route.ComponentProps) {
                                                 {priceFormatter.format(product.price)}€
                                             </h4>
                                         </div>
-                                        <Stack direction="horizontal" gap={2}>
-                                            <Link to={`/product/${product.id}/edit`} className="text-decoration-none">
-                                                <Button variant="outline-secondary" size="sm" className="d-flex align-items-center justify-content-center border-0 bg-light" style={{ width: '40px', height: '40px', padding: '0', borderRadius: '8px' }} title="Edit product">
-                                                    <i className="fa-solid fa-pen-to-square text-secondary"></i>
+                                        {product.status !== "Sold" ? (
+                                            <Stack direction="horizontal" gap={2}>
+                                                <Link to={`/product/${product.id}/edit`} className="text-decoration-none">
+                                                    <Button variant="outline-secondary" size="sm" className="d-flex align-items-center justify-content-center border-0 bg-light" style={{ width: '40px', height: '40px', padding: '0', borderRadius: '8px' }} title="Edit product">
+                                                        <i className="fa-solid fa-pen-to-square text-secondary"></i>
+                                                    </Button>
+                                                </Link>
+                                                <Button variant="outline-danger" size="sm" className="d-flex align-items-center justify-content-center border-0" style={{
+                                                    width: '40px', height: '40px', padding: '0', borderRadius: '8px', backgroundColor: '#fef2f2'
+                                                }} onClick={() => handleDeleteClick(product.id)} title="Delete product">
+                                                    <i className="fa-solid fa-trash-can text-danger"></i>
                                                 </Button>
-                                            </Link>
-                                            <Button variant="outline-danger" size="sm" className="d-flex align-items-center justify-content-center border-0" style={{
-                                                width: '40px', height: '40px', padding: '0', borderRadius: '8px', backgroundColor: '#fef2f2'
-                                            }} onClick={() => handleDeleteClick(product.id)} title="Delete product">
-                                                <i className="fa-solid fa-trash-can text-danger"></i>
-                                            </Button>
-                                        </Stack>
+                                            </Stack>) : (
+                                            <Stack direction="horizontal" gap={2} className="align-items-center">
+                                                <Link to="/product/new" className="text-decoration-none">
+                                                    <Button
+                                                        variant="outline-secondary"
+                                                        className="d-flex align-items-center justify-content-center border-0 bg-light"
+                                                        style={{
+                                                            width: '40px',
+                                                            height: '40px',
+                                                            borderRadius: '8px'
+                                                        }}
+                                                        title="Add product"
+                                                    >
+                                                        <i className="fa-solid fa-plus text-secondary"></i>
+                                                    </Button>
+                                                </Link>
+
+                                                <Link to="/" className="text-decoration-none">
+                                                    <Button
+                                                        className="d-flex align-items-center justify-content-center border-0 shadow-sm"
+                                                        style={{
+                                                            backgroundColor: '#2f6ced',
+                                                            width: '40px',
+                                                            height: '40px',
+                                                            borderRadius: '8px',
+                                                            color: 'white'
+                                                        }}
+                                                        title="Back to market"
+                                                    >
+                                                        <i className="fa-solid fa-shop me-2"></i>
+                                                    </Button>
+                                                </Link>
+                                            </Stack>
+                                        )}
                                     </Col>
                                 </Row>
                             </Card.Body>
