@@ -226,6 +226,11 @@ export default function UserSettings() {
     }
   };
 
+
+  /**
+   * Validations
+   * @param val the input string
+   */
   const validateEmail = (val: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     let error = "";
@@ -237,7 +242,7 @@ export default function UserSettings() {
 
   const validateDescription = (val: string) => {
     let error = "";
-    if (val.length > 500) error = "Description is too long (max 500 chars).";
+    if (val.length > 200) error = "Description is too long (max 200 chars).";
     else if (htmlRegex.test(val)) error = "HTML tags are not allowed.";
     setFieldErrors(prev => ({ ...prev, description: error }));
   };
