@@ -22,7 +22,6 @@ import es.stilnovo.library.model.Product;
 import es.stilnovo.library.model.User;
 import es.stilnovo.library.model.UserInteraction;
 import es.stilnovo.library.repository.ProductRepository;
-import es.stilnovo.library.repository.TransactionRepository;
 import es.stilnovo.library.repository.UserInteractionRepository;
 import es.stilnovo.library.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -55,9 +54,6 @@ public class ProductService {
 
     @Autowired
     private ImageService imageService;
-
-    @Autowired
-    private TransactionRepository transactionRepository;
 
     /** Checks if a product exists by ID */
     public boolean exist(long id) {

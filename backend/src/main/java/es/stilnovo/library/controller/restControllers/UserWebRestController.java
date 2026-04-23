@@ -30,7 +30,6 @@ import es.stilnovo.library.dto.ProductMapper;
 import es.stilnovo.library.dto.TransactionMapper;
 import es.stilnovo.library.dto.SellerProfileDTO;
 import es.stilnovo.library.dto.UserDTO;
-import es.stilnovo.library.dto.UserDashboardDataDTO;
 import es.stilnovo.library.dto.UserMapper;
 import es.stilnovo.library.dto.UserSettingsUpdateDTO;
 import es.stilnovo.library.dto.UserStatisticsDataDTO;
