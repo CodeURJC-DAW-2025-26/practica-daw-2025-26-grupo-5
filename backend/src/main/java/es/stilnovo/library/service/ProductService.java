@@ -119,37 +119,22 @@ public class ProductService {
      * Uses user interaction history (views, likes, purchases) to suggest relevant products.
      */
     public List<Product> getRecommendations(User user) {
-        int limit = 4; // Number of recommendations to return
+        int limit = 4; // Numero di raccomandazioni da restituire
 
-        // Fallback 1: anonymous user with no interaction history -> return most recent products (no personalization)
-        // IMPORTANT: Filter out "Sold" products, "Banned" products, and products from banned sellers
+        // if the user is null (not authenticated), we cannot provide personalized recommendations
         if (user == null) {
-            return productRepository.findAll(PageRequest.of(0, limit, Sort.by("id").descending()))
-                    .getContent()
-                    .stream()
-                    .filter(p -> !"Sold".equalsIgnoreCase(p.getStatus()))
-                    .filter(p -> !"Banned".equalsIgnoreCase(p.getStatus()))
-                    .filter(p -> !p.getSeller().isBanned())
-                    .limit(limit)
-                    .toList();
+            return Collections.emptyList();
         }
+
         // Step 1: Find the most interacted category (Views, Likes, Purchases)
         List<String> topCategories = userInteractionRepository.findMostInteractedCategoriesByUserId(
             user.getUserId(), 
             PageRequest.of(0, 1)
         );
 
-        // Fallback 2: user has no purchase history -> return most recent products (no personalization)
-        // IMPORTANT: Filter out "Sold" products, "Banned" products, and products from banned sellers
+        // if the user has no interaction history, return an empty list
         if (topCategories.isEmpty()) {
-            return productRepository.findAll(PageRequest.of(0, limit, Sort.by("id").descending()))
-                    .getContent()
-                    .stream()
-                    .filter(p -> !"Sold".equalsIgnoreCase(p.getStatus()))
-                    .filter(p -> !"Banned".equalsIgnoreCase(p.getStatus()))
-                    .filter(p -> !p.getSeller().isBanned())
-                    .limit(limit)
-                    .toList();
+            return Collections.emptyList();
         }
 
         String favoriteCategory = topCategories.get(0);
@@ -161,30 +146,11 @@ public class ProductService {
             PageRequest.of(0, limit)
         );
 
-        // Filter out products from banned sellers and banned products
+        // filter out banned products and products from banned sellers
         recommendations = new ArrayList<>(recommendations.stream()
                 .filter(p -> !"Banned".equalsIgnoreCase(p.getStatus()))
                 .filter(p -> !p.getSeller().isBanned())
                 .toList());
-
-        // Fallback 3: Fill any empty spaces if the main query returns fewer than 'limit' products
-        if (recommendations.size() < limit) {
-            int missing = limit - recommendations.size();
-            List<Product> fillers = new ArrayList<>(productRepository.findAll(PageRequest.of(0, limit + missing, Sort.by("id").descending()))
-                    .getContent()
-                    .stream()
-                    .filter(p -> !"Sold".equalsIgnoreCase(p.getStatus()))
-                    .filter(p -> !"Banned".equalsIgnoreCase(p.getStatus()))
-                    .filter(p -> !p.getSeller().isBanned())
-                    .toList());
-            
-            for (Product filler : fillers) {
-                if (recommendations.size() >= limit) break;
-                if (!recommendations.contains(filler)) { 
-                    recommendations.add(filler);
-                }
-            }
-        }
 
         return recommendations;
     }

@@ -142,4 +142,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("keyword") String keyword,
             Pageable pageable);
 
+    @Query("SELECT p FROM ProductTable p WHERE p.category = :category " +
+           "AND p.seller.id <> :userId " +
+           "AND p.seller.banned = false " +
+           "AND p.status = 'Available'")
+    List<Product> findByCategoryAndExcludeUser(@Param("category") String category, @Param("userId") Long userId);
 }

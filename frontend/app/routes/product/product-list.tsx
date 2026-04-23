@@ -184,16 +184,6 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
     }
   }, [homeData]);
 
-  // Fill recommended products to always show 4 (or available)
-  const recommendedCount = activeRecommendations.length;
-  const filledRecommendations = [...activeRecommendations];
-  
-  if (recommendedCount < 4 && activeProducts) {
-    const recommendedIds = new Set(filledRecommendations.map(p => p.id));
-    const fillers = activeProducts.filter(p => !recommendedIds.has(p.id));
-    const needed = 4 - recommendedCount;
-    filledRecommendations.push(...fillers.slice(0, needed));
-  }
   
   // handleLoadMore function adapted to Paged Response
   const handleLoadMore = async () => {
@@ -234,9 +224,9 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
 
   };
 
-  const showRecommendations = filledRecommendations.length > 0 && !homeData.searching;
+  const showRecommendations = activeRecommendations.length > 0 && !homeData.searching;
 
-  const currentlyRecommendedIds = new Set(showRecommendations ? filledRecommendations.map(p => p.id) : []);
+  const currentlyRecommendedIds = new Set(showRecommendations ? activeRecommendations.map(p => p.id) : []);
 
   const displayProducts = products.filter(p => !currentlyRecommendedIds.has(p.id));
 
@@ -248,7 +238,7 @@ export default function ProductsList({ loaderData }: Route.ComponentProps) {
         <div className="mb-5 pb-4 border-bottom">
           <h2 className="fw-800 mb-5 text-center text-primary">Recommended for You</h2>
           <Row xs={1} md={2} lg={4} className="g-4">
-            {filledRecommendations.map((product: ProductDTO) => (
+            {activeRecommendations.map((product: ProductDTO) => (
               <Col key={`rec-${product.id}`}> {/* Prefix rec- to avoid key conflicts */}
                 <Link to={`/product/${product.id}`} className="text-decoration-none text-dark">
                   <div className="clay-card">
