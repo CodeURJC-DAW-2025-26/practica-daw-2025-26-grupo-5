@@ -924,12 +924,14 @@ Por otro lado, he liderado gran parte del diseño y desarrollo de la interfaz gr
 
 #### **Alumno 5 - Ariel Rodriguez Lozano**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+He desarrollado la página de administrador para la gestión de transacciones de la aplicación, así como la página de administrador para la gestión de valoraciones. Además, he implementado en todas las páginas de administración un buscador funcional que permite localizar usuarios, productos, transacciones y valoraciones introduciendo texto o identificadores. En el caso de transacciones y valoraciones, también permite buscar por vendedor y comprador, o por uno solo de ellos.
+
+Por otro lado, he refactorizado el diseño de la página de inquiry / mail para que mantuviera una línea visual coherente con el resto de la aplicación, mejorando así la uniformidad estética del proyecto.
 
 | Nº    | Commits      | Files      |
 |:------------: |:------------:| :------------:|
-|1| [Descripción commit 1](URL_commit_1)  | [Archivo1](URL_archivo_1)   |
-|2| [Descripción commit 2](URL_commit_2)  | [Archivo2](URL_archivo_2)   |
-|3| [Descripción commit 3](URL_commit_3)  | [Archivo3](URL_archivo_3)   |
-|4| [Descripción commit 4](URL_commit_4)  | [Archivo4](URL_archivo_4)   |
-|5| [Descripción commit 5](URL_commit_5)  | [Archivo5](URL_archivo_5)   |
+|1| [feat(spa-admin): connect transactions delete and KPIs](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/fb0631d1c4da5115f348e8b8af1fd240fa845e37)  | [admin-service.ts](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/services/admin-service.ts)   |
+|2| [feat(admin): add search functionality for users and products in admin panel](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/10543a12765bcab4f28b6dc1c525fb7a2d7c32f9)  | [admin-transactions.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/routes/admin/admin-transactions.tsx)   |
+|3| [feat(spa-admin): align valorations table with DTO and fix KPIs](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/437de43f49dd6c1e09d34d874c1da3f809919484)  | [admin-valorations.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/routes/admin/admin-valorations.tsx)   |
+|4| [feat(admin): add transaction and valoration search filters](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/b5c92b7d98d57491cf4728cee61ee372c0fc2310)  | [admin-users.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/routes/admin/admin-users.tsx)   |
+|5| [fix: inquiry page cleanup](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/6602e2347c9b920b6d72bcc4e77125f592364227)  | [admin-inventory.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/routes/admin/admin-inventory.tsx)   |
