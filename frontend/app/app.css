@@ -2472,7 +2472,6 @@ main.overflow-auto {
     border-color: transparent;
 }
 
-/* Add this to your global stylesheet */
 .leaflet-popup-close-button {
     color: #ffffff !important;
     font-weight: bold;
@@ -2486,12 +2485,4 @@ main.overflow-auto {
 
 .leaflet-popup-close-button:hover {
     color: rgba(255, 255, 255, 0.7) !important;
-}
-
-.status-hidden { 
-    color: #856404; 
-    background-color: #fff3cd; 
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-weight: 700;
 }

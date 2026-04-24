@@ -426,9 +426,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
                       <td className="fw-800 text-success">€{product.price?.toFixed(2)}</td>
                       <td>
                         <td>
-                          <span className={`badge-status ${product.status === 'Banned' ? 'status-banned' :
-                              product.status === 'Hidden' ? 'status-hidden' : 'status-active'
-                            }`}>
+                          <span className={`badge-status ${product.status === 'Banned' ? 'status-banned' : 'status-active'}`}>
                             {product.status?.toUpperCase()}
                           </span>
                         </td>
@@ -515,7 +513,6 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
                   <Form.Label className="fw-700 small text-uppercase text-muted">Status</Form.Label>
                   <Form.Select name="status" value={productStatus} onChange={(e) => setProductStatus(e.target.value)} className="rounded-3 py-2 bg-light border-0" disabled={isLoading}>
                     <option value="Active">Active</option>
-                    <option value="Hidden">Hidden</option>
                     <option value="Banned">Banned</option>
                   </Form.Select>
                 </Form.Group>
