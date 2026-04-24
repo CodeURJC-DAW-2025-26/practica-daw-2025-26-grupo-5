@@ -1,6 +1,6 @@
 import { useNavigate, useLocation, useParams, Navigate } from "react-router";
 import { useActionState, useState } from "react";
-import { Alert, Button, Container, Row, Col, Card, Image } from "react-bootstrap";
+import { Alert, Button, Container, Row, Col, Image } from "react-bootstrap";
 import { sendInquiry, getProductImageUrl } from "~/services/products-service";
 import { useUserStore } from "~/stores/useUserStore";
 
@@ -11,33 +11,28 @@ export default function ContactSellerPage() {
     const { user } = useUserStore();
     const [state, formAction, isPending] = useActionState(contactAction, null);
 
-
     const productId = Number(id);
     const productName = location.state?.productName || "Product";
     const productPrice = location.state?.price ?? "0.00 €";
     const sellerName = location.state?.sellerName || "Seller";
     const productImageUrl = location.state?.productImageUrl || getProductImageUrl(productId);
 
-    const [logoSrc, setLogoSrc] = useState('/images/logo.png');
-
     const [messageError, setMessageError] = useState("");
     const [phoneError, setPhoneError] = useState("");
 
     const sellerId = location.state?.sellerId;
 
-    // SECURITY GUARD: Redirect unauthenticated users to the login page.
-    // IMPORTANT: This early return MUST remain strictly AFTER all React Hooks 
-    // (useState, useActionState, etc.) to prevent "Rendered fewer hooks than expected" errors.
+    // SECURITY GUARD 1: Redirect unauthenticated users
     if (!user) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    // SECURITY GUARD 2: Prevent the owner from contacting themselves
-    // SECURITY GUARD 3: Handle manual URL entry with empty state
+    // SECURITY GUARD 2 & 3: Prevent self-contact and handle empty state
     if (user.id === sellerId || !location.state) {
         return <Navigate to={`/product/${id}`} replace />;
     }
 
+    // Input validation
     const validateMessage = (value: string) => {
         const htmlRegex = /<\/?[a-z][\s\S]*>/i;
         if (value.trim().length < 20) {
@@ -66,6 +61,7 @@ export default function ContactSellerPage() {
         }
     };
 
+    // Server action logic
     async function contactAction(
         prevState: { success: boolean; error: string | null } | null,
         formData: FormData
@@ -91,6 +87,7 @@ export default function ContactSellerPage() {
         }
     }
 
+    // Success View
     if (state?.success) {
         return (
             <div className="bg-light d-flex align-items-center justify-content-center w-100" style={{ minHeight: 'calc(100vh - 80px)' }}>
@@ -114,153 +111,153 @@ export default function ContactSellerPage() {
         );
     }
 
+    // Main View
     return (
         <div className="min-vh-100 bg-light py-4 py-md-5">
             <Container>
+                {/* Main Container - Removed clay-card to avoid unwanted hover effects */}
+                <div className="bg-white border-0 shadow-lg overflow-hidden mx-auto rounded-4" style={{ maxWidth: "1100px" }}>
+                    <Row className="g-0">
+                        
+                        {/* LEFT COLUMN: Original Design Maintained exactly as requested */}
+                        <Col md={5} className="p-4 p-md-5 border-end bg-white">
+                            <span className="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 mb-3">
+                                New inquiry
+                            </span>
 
-                <Card className="clay-card border-0 shadow-sm overflow-hidden mx-auto" style={{ maxWidth: "1100px" }}>
-                    <Card.Body className="p-0">
-                        <Row className="g-0">
-                            <Col md={5} className="p-4 p-md-5 border-end bg-white">
-                                <span className="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 mb-3">
-                                    New inquiry
+                            <div className="mb-4">
+                                <Image
+                                    src={productImageUrl}
+                                    alt={productName}
+                                    className="img-fluid rounded-4 mb-3 w-100"
+                                    style={{
+                                        objectFit: "contain",
+                                        height: "240px",
+                                        backgroundColor: "#f8fafc",
+                                    }}
+                                    onError={(e) => {
+                                        (e.currentTarget as HTMLImageElement).src = '/images/no-product-image.png';
+                                    }}
+                                />
+                                <h2 className="fw-800 h4 mb-1">{productName}</h2>
+                                <p className="text-primary fw-800 h5 mb-0">
+                                    {typeof productPrice === "number"
+                                        ? `${productPrice.toFixed(2)} €`
+                                        : productPrice}
+                                </p>
+                            </div>
+
+                            <div className="d-flex align-items-center p-3 bg-light rounded-4 mb-4">
+                                <div className="bg-white rounded-circle p-2 me-3 shadow-sm d-flex align-items-center justify-content-center" style={{ width: '44px', height: '44px' }}>
+                                    <i className="fa-solid fa-user text-muted"></i>
+                                </div>
+                                <div>
+                                    <small className="text-muted d-block small text-uppercase">Seller</small>
+                                    <span className="fw-800">{sellerName}</span>
+                                </div>
+                            </div>
+
+                            <div className="small text-muted">
+                                <p className="mb-1"><i className="fa-solid fa-circle-check text-success me-2"></i> Your message will be sent through the platform.</p>
+                                <p className="mb-0"><i className="fa-solid fa-circle-check text-success me-2"></i> Response time: usually less than 24 hours.</p>
+                            </div>
+                        </Col>
+
+                        {/* RIGHT COLUMN: Intuitive Form Design */}
+                        <Col md={7} className="p-4 p-md-5 bg-white position-relative">
+                            
+                            <div className="d-flex justify-content-between align-items-start mb-5">
+                                <div>
+                                    <h3 className="fw-800 h3 m-0 text-dark">Contact Seller</h3>
+                                    <p className="text-muted fw-500 mt-1 mb-0">Complete the form below to send your inquiry.</p>
+                                </div>
+                                <span className="badge bg-dark text-white rounded-pill px-3 py-2 fw-700 d-none d-sm-inline-block shadow-sm">
+                                    <i className="fa-solid fa-lock me-2"></i> Secure form
                                 </span>
+                            </div>
 
-                                <div className="mb-4">
-                                    <Image
-                                        src={productImageUrl}
-                                        alt={productName}
-                                        className="img-fluid rounded-4 mb-3 w-100"
-                                        style={{
-                                            objectFit: "contain",
-                                            height: "240px",
-                                            backgroundColor: "#f8fafc",
-                                        }}
-                                        onError={(e) => {
-                                            (e.currentTarget as HTMLImageElement).src = '/images/no-product-image.png';
-                                        }}
-                                    />
-                                    <h2 className="fw-800 h4 mb-1">{productName}</h2>
-                                    <p className="text-primary fw-800 h5 mb-0">
-                                        {typeof productPrice === "number"
-                                            ? `${productPrice.toFixed(2)} €`
-                                            : productPrice}
-                                    </p>
-                                </div>
-
-                                <div className="d-flex align-items-center p-3 bg-light rounded-4 mb-4">
-                                    <div className="bg-white rounded-circle p-2 me-3 shadow-sm d-flex align-items-center justify-content-center" style={{ width: '44px', height: '44px' }}>
-                                        <i className="fa-solid fa-user text-muted"></i>
-                                    </div>
-                                    <div>
-                                        <small className="text-muted d-block small text-uppercase">Seller</small>
-                                        <span className="fw-800">{sellerName}</span>
-                                    </div>
-                                </div>
-
-                                <div className="small text-muted">
-                                    <p className="mb-1"><i className="fa-solid fa-circle-check text-success me-2"></i> Your message will be sent through the platform.</p>
-                                    <p className="mb-0"><i className="fa-solid fa-circle-check text-success me-2"></i> Response time: usually less than 24 hours.</p>
-                                </div>
-                            </Col>
-
-                            <Col md={7} className="p-4 p-md-5 bg-white">
-                                <div className="d-flex justify-content-between align-items-start mb-4">
-                                    <div>
-                                        <h3 className="fw-800 h4 m-0">Contact seller</h3>
-                                        <p className="text-muted mb-0">Complete the form below to send your inquiry.</p>
-                                    </div>
-                                    <span className="badge bg-dark rounded-pill px-3 py-2 fw-700">
-                                        <i className="fa-solid fa-lock me-2"></i> Secure form
-                                    </span>
-                                </div>
-
-                                <form action={formAction}>
-                                    <Row className="g-3 mb-3">
-                                        <Col md={6}>
-                                            <label className="form-label small fw-bold text-muted text-uppercase">Phone</label>
-                                            <div className="input-group">
-                                                <span className="input-group-text bg-light border-0">
-                                                    <i className="fa-solid fa-phone text-muted"></i>
-                                                </span>
-                                                <input
-                                                    type="tel"
-                                                    name="phone"
-                                                    className={`form-control bg-light border-0 py-2 ${phoneError ? 'is-invalid' : ''}`}
-                                                    placeholder="665 767 877"
-                                                    onChange={(e) => validatePhone(e.target.value)}
-                                                    required
-                                                />
-                                            </div>
-                                            {/* Mensaje de error (Añadido) */}
-                                            {phoneError && <div className="text-danger small mt-1">{phoneError}</div>}
-                                        </Col>
-                                        <Col md={6}>
-                                            <label className="form-label small fw-bold text-muted text-uppercase">Inquiry Type</label>
-                                            <div className="input-group">
-                                                <span className="input-group-text bg-light border-0">
-                                                    <i className="fa-solid fa-tag text-muted"></i>
-                                                </span>
-                                                <select name="type" className="form-select bg-light border-0 py-2" required>
-                                                    <option value="GENERAL">General question</option>
-                                                    <option value="INFO">Request info</option>
-                                                    <option value="PRICE">Negotiate</option>
-                                                </select>
-                                            </div>
-                                        </Col>
-                                    </Row>
-
-                                    <div className="mb-4">
-                                        <label className="form-label small fw-bold text-muted text-uppercase">Message</label>
-                                        <div className="position-relative">
-                                            <i className="fa-solid fa-comment position-absolute text-muted" style={{ left: '12px', top: '15px' }}></i>
-                                            <textarea
-                                                name="message"
-                                                className={`form-control bg-light border-0 ps-5 py-3 ${messageError ? 'is-invalid' : ''}`}
-                                                rows={5}
-                                                placeholder={`Hi ${sellerName}, is this still available?`}
-                                                onChange={(e) => validateMessage(e.target.value)}
+                            <form action={formAction}>
+                                <Row className="g-4 mb-4">
+                                    {/* Intuitive Input Fields with solid background and clear borders */}
+                                    <Col md={6}>
+                                        <label className="form-label fw-800 text-dark">Phone Number</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text bg-light border-light-subtle text-muted px-3">
+                                                <i className="fa-solid fa-phone"></i>
+                                            </span>
+                                            <input
+                                                type="tel"
+                                                name="phone"
+                                                className={`form-control bg-light border-start-0 py-3 fw-500 border-light-subtle ${phoneError ? 'is-invalid border-danger' : ''}`}
+                                                placeholder="665 767 877"
+                                                onChange={(e) => validatePhone(e.target.value)}
                                                 required
                                             />
                                         </div>
-                                        {/* Mensaje de error (Añadido) */}
-                                        {messageError && <div className="text-danger small mt-1">{messageError}</div>}
-                                    </div>
+                                        {phoneError && <div className="text-danger small mt-2 fw-600"><i className="fa-solid fa-circle-exclamation me-1"></i> {phoneError}</div>}
+                                    </Col>
 
-                                    {state?.error && <Alert variant="danger" className="mb-4">{state.error}</Alert>}
+                                    <Col md={6}>
+                                        <label className="form-label fw-800 text-dark">Inquiry Type</label>
+                                        <div className="input-group">
+                                            <span className="input-group-text bg-light border-light-subtle text-muted px-3">
+                                                <i className="fa-solid fa-tag"></i>
+                                            </span>
+                                            <select name="type" className="form-select bg-light border-start-0 py-3 fw-500 border-light-subtle text-dark" required>
+                                                <option value="GENERAL">General question</option>
+                                                <option value="INFO">Request info</option>
+                                                <option value="PRICE">Negotiate</option>
+                                            </select>
+                                        </div>
+                                    </Col>
+                                </Row>
 
-                                    <div className="d-flex gap-3 justify-content-end">
-                                        <Button
-                                            type="button"
-                                            variant="light"
-                                            className="rounded-pill px-4 fw-700"
-                                            onClick={() => navigate(-1)}
-                                            disabled={isPending}
-                                        >
-                                            Cancel
-                                        </Button>
-                                        <Button
-                                            type="submit"
-                                            variant="primary"
-                                            className="rounded-pill px-4 fw-700"
-                                            disabled={isPending || !!phoneError || !!messageError} /* Desactiva si hay errores */
-                                        >
-                                            {isPending ? (
-                                                <>
-                                                    <i className="fa-solid fa-spinner fa-spin me-2"></i> Sending...
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <i className="fa-solid fa-paper-plane me-2"></i> Send inquiry
-                                                </>
-                                            )}
-                                        </Button>
-                                    </div>
-                                </form>
-                            </Col>
-                        </Row>
-                    </Card.Body>
-                </Card>
+                                <div className="mb-5">
+                                    <label className="form-label fw-800 text-dark">Message</label>
+                                    <textarea
+                                        name="message"
+                                        className={`form-control bg-light border-light-subtle p-4 fw-500 ${messageError ? 'is-invalid border-danger' : ''}`}
+                                        rows={5}
+                                        placeholder={`Hi ${sellerName}, is this still available?`}
+                                        onChange={(e) => validateMessage(e.target.value)}
+                                        required
+                                    />
+                                    {messageError && <div className="text-danger small mt-2 fw-600"><i className="fa-solid fa-circle-exclamation me-1"></i> {messageError}</div>}
+                                </div>
+
+                                {state?.error && (
+                                    <Alert variant="danger" className="mb-4 rounded-3 border-0 fw-600">
+                                        <i className="fa-solid fa-triangle-exclamation me-2"></i>{state.error}
+                                    </Alert>
+                                )}
+
+                                <div className="d-flex flex-column flex-sm-row gap-3 justify-content-end mt-4 pt-3 border-top">
+                                    <Button
+                                        type="button"
+                                        variant="light"
+                                        className="rounded-pill px-5 py-3 fw-800 text-muted border border-light-subtle"
+                                        onClick={() => navigate(-1)}
+                                        disabled={isPending}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    
+                                    <Button
+                                        type="submit"
+                                        className="btn-sell rounded-pill px-5 py-3 fw-800 border-0 d-flex align-items-center justify-content-center gap-2"
+                                        disabled={isPending || !!phoneError || !!messageError}
+                                    >
+                                        {isPending ? (
+                                            <><i className="fa-solid fa-spinner fa-spin"></i> Sending...</>
+                                        ) : (
+                                            <><i className="fa-solid fa-paper-plane"></i> Send inquiry</>
+                                        )}
+                                    </Button>
+                                </div>
+                            </form>
+                        </Col>
+                    </Row>
+                </div>
             </Container>
         </div>
     );
