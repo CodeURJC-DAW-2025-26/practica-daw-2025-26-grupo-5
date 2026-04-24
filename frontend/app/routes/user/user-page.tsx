@@ -27,51 +27,15 @@
  * @returns React component with seller dashboard and analytics
  */
 import { Row, Col, Table, Badge, Card, Stack, Image } from "react-bootstrap";
-import { Link, redirect } from "react-router";
+import { Link } from "react-router";
 import { useUserStore } from "~/stores/useUserStore";
 import type { Route } from "./+types/user-page";
-import { getUserDashboardStats } from "~/services/user-service";
 import RevenueChart from "~/components/RevenueChart";
 import SalesByCategoryChart from "~/components/SalesByCategoryChart";
-/**
- * Client-side loader function
- * Fetches dashboard statistics for the currently logged-in seller.
- * * Process:
- * 1. Checks for an active user session directly in the Zustand store.
- * 2. Redirects to login instantly if unauthorized (prevents UI flickering).
- * 3. Fetches dashboard data via REST API using clientLoader (Project requirement).
- * 4. Formats currency and dates for UI display.
- */
-export async function clientLoader() {
-    const currentUser = useUserStore.getState().user;
-    if (!currentUser) {
-        throw redirect('/login');
-    }
+import { sharedDashboardLoader } from "~/utils/dashboardLoader";
+import VisitsInterestChart from "~/components/VisitsInterestChart";
 
-    try {
-        const stats = await getUserDashboardStats();
-        const apiData = stats || {};
-        
-        return {
-            userSales: apiData.salesCount || [],
-            chartLabels: apiData.chartLabels || [],       
-            chartValues: apiData.chartValues || [],       
-            revenueLabels: apiData.revenueLabels || [],   
-            revenueValues: apiData.revenueValues || [],   
-            
-            formattedTotalRevenue: apiData.totalRevenue || "0.00",
-            formattedBalance: apiData.balance || "0.00",
-            date: new Date().toLocaleDateString('en-GB', {
-                day: 'numeric', month: 'short', year: 'numeric'
-            })
-        };
-    } catch (error: any) {
-        if (error.status === 401 || error.response?.status === 401) {
-            throw redirect('/login');
-        }
-        throw error;
-    }
-}
+export const clientLoader = sharedDashboardLoader;
 
 /**
  * User Dashboard Component
@@ -159,6 +123,23 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
                                 <SalesByCategoryChart 
                                     chartLabels={loaderData.chartLabels} 
                                     chartValues={loaderData.chartValues} 
+                                />
+                            </div>
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
+            {/* Visits & Interest Chart (New Row) */}
+            <Row className="g-4 mb-4">
+                <Col lg={12}>
+                    <Card className="clay-card border-0 p-3 h-100">
+                        <Card.Body>
+                            <h5 className="fw-800 text-dark mb-4">Visits & Interest by Category</h5>
+                            <div style={{ height: '300px' }}>
+                                <VisitsInterestChart 
+                                    labels={loaderData.barLabels}
+                                    visits={loaderData.visitsByCategory}
+                                    interest={loaderData.interestByCategory}
                                 />
                             </div>
                         </Card.Body>

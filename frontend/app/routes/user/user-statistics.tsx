@@ -114,52 +114,17 @@
  * @returns Analytics dashboard with charts and KPI cards
  */
 
-import { useState, useEffect, useRef } from 'react';
-import { redirect, Link, useNavigate, useLoaderData } from 'react-router';
+import { useState } from 'react';
+import {  Link, useLoaderData } from 'react-router';
 import { useUserStore } from '~/stores/useUserStore';
-import { getUserDashboardStats, downloadStatisticsReport } from '~/services/user-service';
-import Chart from 'chart.js/auto';
+import {  downloadStatisticsReport } from '~/services/user-service';
 import { Row, Col, Table, Badge, Card, Stack, Image } from 'react-bootstrap';
 import RevenueChart from "~/components/RevenueChart";
 import SalesByCategoryChart from "~/components/SalesByCategoryChart";
 import VisitsInterestChart from "~/components/VisitsInterestChart";
+import { sharedDashboardLoader } from "~/utils/dashboardLoader";
 
-/**
- * Client-side loader: Fetch and Format User Dashboard Statistics
- * Strictly mapped to your API response.
- */
-export async function clientLoader() {
-  const currentUser = useUserStore.getState().user;
-  if (!currentUser) throw redirect('/login');
-
-  try {
-    const apiData = await getUserDashboardStats();
-    
-    return {
-      userSales: apiData.salesCount || [], 
-      // Doughnut
-      chartLabels: apiData.chartLabels || [],
-      chartValues: apiData.chartValues || [],
-      // Lines
-      revenueLabels: apiData.revenueLabels || [],
-      revenueValues: apiData.revenueValues || [],
-      // Bars
-      barLabels: apiData.barLabels || ["No Data"],
-      visitsByCategory: apiData.visitsByCategory || [0],
-      interestByCategory: apiData.interestByCategory || [0],
-      
-      formattedTotalRevenue: (apiData.totalRevenue || 0).toFixed(2),
-      formattedInventoryValue: (apiData.balance || 0).toFixed(2),
-      date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-    };
-  } catch (error: any) {
-    if (error.status === 401 || error.response?.status === 401) {
-      useUserStore.getState().setUser(null);
-      throw redirect('/login');
-    }
-    throw error;
-  }
-}
+export const clientLoader = sharedDashboardLoader;
 
 export default function UserStatistics() {
   const loaderData = useLoaderData() as any;
