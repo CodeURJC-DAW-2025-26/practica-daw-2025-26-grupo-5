@@ -66,6 +66,7 @@ import type { Route } from "./+types/product-new";
 import ProductForm from "~/components/ProductForm";
 import { addProduct, uploadProductImage } from "~/services/products-service";
 import { improveDescription } from "~/services/AI/ai-service";
+import { HttpError } from "~/services/api";
 
 /**
  * Product Creation Page Component
@@ -135,7 +136,7 @@ export default function ProductNew() {
     const price = parseFloat(formData.get("price") as string);
     const location = formData.get("location") as string;
     const description = formData.get("description") as string;
-    const file = formData.get("image") as File; 
+    const file = formData.get("image") as File;
 
     /**
      * Ensures an asset is uploaded as it is enforced by marketplace rules
@@ -159,14 +160,32 @@ export default function ProductNew() {
       navigate(`/product/${newProduct.id}`);
       return { success: true, error: null };
     } catch (error) {
-      console.error(error);
+      console.error("Creation failed:", error);
+
+      // Handle structured API errors
+      if (error instanceof HttpError) {
+        // 403: The user is banned or doesn't have permission to list items
+        if (error.status === 403) {
+          return {
+            success: false,
+            error: "Permission Denied: Your account is restricted from creating new listings."
+          };
+        }
+        // 401: Session expired
+        if (error.status === 401) {
+          return { success: false, error: "Session expired. Please log in again." };
+        }
+        // Other backend messages (validation, etc.)
+        return { success: false, error: error.message };
+      }
+
+      // Generic fallback for network issues
       return {
         success: false,
-        error: "Failed to save the product. Please ensure an image was uploaded successfully.",
+        error: "Failed to save the product. Please check your connection and try again.",
       };
     }
   }
-
   const [state, formAction, isPending] = useActionState(saveProductAction, null);
 
   return (

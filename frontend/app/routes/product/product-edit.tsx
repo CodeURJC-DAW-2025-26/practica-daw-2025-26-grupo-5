@@ -83,8 +83,9 @@ import {
   updateProduct,
   replaceImage,
 } from "~/services/products-service";
-import { improveDescription } from "~/services/AI/ai-service"; 
+import { improveDescription } from "~/services/AI/ai-service";
 import { useUserStore } from "~/stores/useUserStore";
+import { HttpError } from "~/services/api";
 
 /**
  * Client-side loader: Fetch current product data
@@ -97,7 +98,7 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
   try {
     // Fetches the target product by its identifier
     const product = await getProductById(Number(params.id!));
-    
+
     // Retrieves the current user session from the store
     const currentUser = useUserStore.getState().user;
 
@@ -117,11 +118,11 @@ export async function clientLoader({ params }: Route.ClientLoaderArgs) {
 
     // Returns validated product data
     return product;
-    
+
   } catch (error: any) {
 
     if (error.status === 302) throw error;
-    
+
     // Handles invalid product identifiers or network errors
     console.error("Error loading product:", error);
     throw redirect('/');
@@ -168,7 +169,7 @@ export default function ProductEdit({ loaderData }: Route.ComponentProps) {
       return enhancedText;
     } catch (err) {
       setAiError("AI service unavailable.");
-      return currentDesc; 
+      return currentDesc;
     } finally {
       setAiLoading(false);
     }
@@ -211,7 +212,7 @@ export default function ProductEdit({ loaderData }: Route.ComponentProps) {
       if (file && file.size > 0) {
         await replaceImage(id, file);
       }
-      
+
       // STEP 3: Handle image removal if the checkbox was selected
       else if (removeImage && product.image) {
         await deleteProductImage(product.id, product.image.id);
@@ -223,9 +224,24 @@ export default function ProductEdit({ loaderData }: Route.ComponentProps) {
 
     } catch (error) {
       console.error("Save action failed:", error);
+
+      // Check if the error is a centralized HttpError from our api.ts
+      if (error instanceof HttpError) {
+        // 403 is the specific code Spring Boot sends when ownership check fails
+        if (error.status === 403) {
+          return {
+            success: false,
+            error: "Access Denied: You are not the owner of this product."
+          };
+        }
+        // Return the actual error message from the backend if available
+        return { success: false, error: error.message };
+      }
+
+      // Fallback for network or unknown errors
       return {
         success: false,
-        error: "Failed to update product. Please check server connection.",
+        error: "Connection error. Please check your internet and try again.",
       };
     }
   }

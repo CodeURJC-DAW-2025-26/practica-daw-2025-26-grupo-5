@@ -17,6 +17,7 @@ import { useUserStore } from "~/stores/useUserStore";
 import { useState } from "react";
 import { Link } from "react-router";
 import { isSelfPurchase } from "~/services/transaction-service";
+import { HttpError } from "~/services/api";
 
 /**
  * Client-side loader: Fetches product details
@@ -54,8 +55,15 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
       await deleteProduct(product.id);
       navigate("/");
     } catch (err) {
-      console.error(err);
-      setDeleteError("Error deleting product");
+      console.error("Delete failed:", err);
+
+      // Ownership protection check
+      if (err instanceof HttpError && err.status === 403) {
+        setDeleteError("Access Denied: You can only delete products you own.");
+      } else {
+        setDeleteError("An error occurred while trying to remove the product.");
+      }
+
       setPendingDelete(false);
     }
   }
@@ -147,22 +155,22 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
                       <i className="fa-solid fa-lock"></i> This is your product
                     </div>
                   )}
-                  
+
                   {!isSelfProduct && (
-                  <Link
-                    to={`../product/contact/${product.id}`}
-                    state={{
-                      productName: product.name,
-                      productId: product.id,
-                      price: product.price,
-                      sellerName: product.seller?.name || 'Seller',
-                      productImageUrl: getProductImageUrl(product.id),
-                    }}
-                    className="btn btn-outline-primary py-3 fw-800 rounded-pill border-2 d-flex align-items-center justify-content-center gap-2 text-decoration-none"
-                    style={{ fontSize: '1.1rem' }}
-                  >
-                    <i className="fa-regular fa-comment-dots fa-lg"></i> Send Message to Seller
-                  </Link>)}
+                    <Link
+                      to={`../product/contact/${product.id}`}
+                      state={{
+                        productName: product.name,
+                        productId: product.id,
+                        price: product.price,
+                        sellerName: product.seller?.name || 'Seller',
+                        productImageUrl: getProductImageUrl(product.id),
+                      }}
+                      className="btn btn-outline-primary py-3 fw-800 rounded-pill border-2 d-flex align-items-center justify-content-center gap-2 text-decoration-none"
+                      style={{ fontSize: '1.1rem' }}
+                    >
+                      <i className="fa-regular fa-comment-dots fa-lg"></i> Send Message to Seller
+                    </Link>)}
                 </div>
               ) : (
                 <div className="alert alert-danger rounded-4 py-4 mb-5 text-center shadow-sm border-0 bg-white">
@@ -244,7 +252,7 @@ export default function ProductDetail({ loaderData }: { loaderData: any }) {
         onHide={handleCloseDeleteDialog}
         centered
         contentClassName="clay-card border-0 shadow-lg text-center bg-white"
-        style={{ '--bs-modal-border-radius': '24px' } as React.CSSProperties} 
+        style={{ '--bs-modal-border-radius': '24px' } as React.CSSProperties}
       >
         <Modal.Body className="p-4 p-md-5">
           <div
