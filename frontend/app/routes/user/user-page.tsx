@@ -43,29 +43,29 @@ import SalesByCategoryChart from "~/components/SalesByCategoryChart";
  * 4. Formats currency and dates for UI display.
  */
 export async function clientLoader() {
-    // Instant authentication check to prevent component rendering if not logged in
     const currentUser = useUserStore.getState().user;
     if (!currentUser) {
         throw redirect('/login');
     }
 
     try {
-        // Fetch data from REST API using clientLoader
         const stats = await getUserDashboardStats();
         const apiData = stats || {};
         
         return {
             userSales: apiData.salesCount || [],
-            revenueLabels: apiData.chartLabels || [],
-            revenueValues: apiData.chartValues || [],
+            chartLabels: apiData.chartLabels || [],       
+            chartValues: apiData.chartValues || [],       
+            revenueLabels: apiData.revenueLabels || [],   
+            revenueValues: apiData.revenueValues || [],   
+            
             formattedTotalRevenue: apiData.totalRevenue || "0.00",
             formattedBalance: apiData.balance || "0.00",
             date: new Date().toLocaleDateString('en-GB', {
-            day: 'numeric', month: 'short', year: 'numeric'
+                day: 'numeric', month: 'short', year: 'numeric'
             })
         };
     } catch (error: any) {
-        // Handle unauthorized responses from the backend API
         if (error.status === 401 || error.response?.status === 401) {
             throw redirect('/login');
         }
@@ -157,8 +157,8 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
                             <h5 className="fw-800 text-dark mb-4">Sales by Category</h5>
                             <div style={{ height: '300px' }}>
                                 <SalesByCategoryChart 
-                                    chartLabels={loaderData.revenueLabels} 
-                                    chartValues={loaderData.revenueValues} 
+                                    chartLabels={loaderData.chartLabels} 
+                                    chartValues={loaderData.chartValues} 
                                 />
                             </div>
                         </Card.Body>

@@ -134,20 +134,22 @@ export async function clientLoader() {
 
   try {
     const apiData = await getUserDashboardStats();
-
-    // MAPPING BASED ON YOUR JSON:
+    
     return {
-      // Your API calls it 'salesCount' for the list of transactions
-      userSales: apiData.salesCount || [],
-      revenueLabels: apiData.chartLabels || [],
-      revenueValues: apiData.chartValues || [],
-      // Total revenue and balance from root
-      formattedTotalRevenue: (apiData.totalRevenue || 0).toFixed(2),
-      formattedInventoryValue: (apiData.balance || 0).toFixed(2),
-      // Charts (using empty arrays if null to avoid crashes)
+      userSales: apiData.salesCount || [], 
+      // Doughnut
+      chartLabels: apiData.chartLabels || [],
+      chartValues: apiData.chartValues || [],
+      // Lines
+      revenueLabels: apiData.revenueLabels || [],
+      revenueValues: apiData.revenueValues || [],
+      // Bars
       barLabels: apiData.barLabels || ["No Data"],
       visitsByCategory: apiData.visitsByCategory || [0],
       interestByCategory: apiData.interestByCategory || [0],
+      
+      formattedTotalRevenue: (apiData.totalRevenue || 0).toFixed(2),
+      formattedInventoryValue: (apiData.balance || 0).toFixed(2),
       date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
     };
   } catch (error: any) {
@@ -263,8 +265,8 @@ export default function UserStatistics() {
             <h5 className="fw-800 text-dark mb-4">Sales by Category</h5>
             <div style={{ height: '300px' }}>
               <SalesByCategoryChart
-                chartLabels={loaderData.barLabels}
-                chartValues={loaderData.visitsByCategory}
+                chartLabels={loaderData.chartLabels}
+                chartValues={loaderData.chartValues}
               />
             </div>
           </Card>
