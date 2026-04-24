@@ -765,9 +765,9 @@ Mi contribución se ha centrado en la mejora y consolidación de la capa REST de
 
    Ejecuta la aplicación (Run).
 
-    El servidor arrancará en:
+    El servidor estará disponible en:
     ```bash
-      https://localhost:8443/new/
+      https://localhost:8443
     ```
 4. **Navegar a la carpeta del proyecto React**
     
@@ -781,16 +781,24 @@ Mi contribución se ha centrado en la mejora y consolidación de la capa REST de
    ```bash
    npm install
    ```
+    Construye la aplicación:
+    ```bash
+      npm run build
+    ```
+    
+    Esto generará los archivos estáticos que el backend servirá.
+    La web estará disponible en:
+   ```bash
+    https://localhost:8443/new/
+   ```
+5. **Ejecuta el Frontend en modo desarrollo (Opcional)**
 
-5. **Ejecuta el Frontend**
-
-    Inicia el servidor de desarrollo de Vite:
+   Inicia el servidor de desarrollo de Vite:
    
     ```bash
      npm run dev
      ```
-   El terminal mostrará que la aplicación está lista en (navega a esa URL):
-   
+   El terminal mostrará que la aplicación está disponible en:   
    ```bash
     http://localhost:5173/new/
    ```
