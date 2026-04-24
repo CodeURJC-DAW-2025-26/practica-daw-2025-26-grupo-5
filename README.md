@@ -840,6 +840,8 @@ Por motivos de seguridad, esta funcionalidad está **deshabilitada por defecto**
 
 > **Nota:** La aplicación cuenta con "degradación progresiva" (*graceful degradation*). Si decides no configurar la IA, Stilnovo arrancará con normalidad y el resto de funciones de gestión de productos seguirán operativas sin errores.
 
+🌐 **URL de acceso remota (URJC)**: `https://appweb05.dawgis.etsii.urjc.es:8443/new/`
+
 ### **Participación de Miembros en la Práctica 3**
 
 #### **Alumno 1 - Victor Hugo Oliveira Petroceli**
