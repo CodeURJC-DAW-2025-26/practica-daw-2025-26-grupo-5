@@ -134,9 +134,9 @@ export async function clientLoader() {
     return data || {};
   } catch (error) {
     if (error instanceof HttpError && error.status === 403) {
-          console.log("Loader caught 403: Letting AdminRoute handle the Access Denied screen.");
-          return {}; 
-        }
+      console.log("Loader caught 403: Letting AdminRoute handle the Access Denied screen.");
+      return {};
+    }
     throw redirect('/login');
   }
 }
@@ -425,9 +425,13 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
                       <td><span className="badge-cat cat-tech">{product.category}</span></td>
                       <td className="fw-800 text-success">€{product.price?.toFixed(2)}</td>
                       <td>
-                        <span className={`badge-status ${product.status === 'Banned' ? 'status-banned' : 'status-active'}`}>
-                          {product.status?.toUpperCase()}
-                        </span>
+                        <td>
+                          <span className={`badge-status ${product.status === 'Banned' ? 'status-banned' :
+                              product.status === 'Hidden' ? 'status-hidden' : 'status-active'
+                            }`}>
+                            {product.status?.toUpperCase()}
+                          </span>
+                        </td>
                       </td>
                       <td>
                         <Stack direction="horizontal" gap={2}>

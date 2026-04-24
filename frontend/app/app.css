@@ -2487,3 +2487,11 @@ main.overflow-auto {
 .leaflet-popup-close-button:hover {
     color: rgba(255, 255, 255, 0.7) !important;
 }
+
+.status-hidden { 
+    color: #856404; 
+    background-color: #fff3cd; 
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 700;
+}
