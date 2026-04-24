@@ -37,6 +37,34 @@ import VisitsInterestChart from "~/components/VisitsInterestChart";
 
 export const clientLoader = sharedDashboardLoader;
 
+const getMoneyMessage = (value: number, isRevenue: boolean): string => {
+    if (value <= 0) return "Let's get started!";
+
+    if (isRevenue) {
+        if (value < 100) return "Nice start!";
+        if (value < 500) return "Good momentum!";
+        if (value < 1000) return "Strong push!";
+        if (value < 5000) return "Great flow!";
+        if (value < 10000) return "Impressive run!";
+        if (value < 50000) return "Big numbers!";
+        if (value < 100000) return "Serious growth!";
+        if (value < 500000) return "Massive gains!";
+        if (value < 1000000) return "Incredible scale!";
+        return "Revenue beast!";
+    } else {
+        if (value < 100) return "Nice start!";
+        if (value < 500) return "Looking good!";
+        if (value < 1000) return "Solid balance!";
+        if (value < 5000) return "Great stability!";
+        if (value < 10000) return "Very healthy!";
+        if (value < 50000) return "Strong position!";
+        if (value < 100000) return "Elite level!";
+        if (value < 500000) return "Top tier!";
+        if (value < 1000000) return "Next league!";
+        return "Balance king!";
+    }
+};
+
 /**
  * User Dashboard Component
  * * Main component for displaying seller analytics and performance metrics.
@@ -84,7 +112,9 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
                         <Card.Body>
                             <p className="text-muted small fw-700 mb-2" style={{ letterSpacing: '0.5px' }}>Total Revenue</p>
                             <h2 className="fw-800 text-primary mb-1">{loaderData.formattedTotalRevenue} €</h2>
-                            <span className="text-success fw-700 small">Keep going!</span>
+                            <span className="text-primary fw-700 small">
+                                {getMoneyMessage(loaderData?.formattedTotalRevenue || 0, true)}
+                            </span>             
                         </Card.Body>
                     </Card>
                 </Col>
@@ -93,7 +123,9 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
                         <Card.Body>
                             <p className="text-muted small fw-700 mb-2" style={{ letterSpacing: '0.5px' }}>Current Balance</p>
                             <h2 className="fw-800 text-dark mb-1">{loaderData.formattedBalance} €</h2>
-                            <span className="text-primary fw-700 small">Wow!</span>
+                            <span className="text-primary fw-700 small">
+                                {getMoneyMessage(loaderData?.formattedBalance || 0, false)}
+                            </span>
                         </Card.Body>
                     </Card>
                 </Col>
@@ -107,9 +139,9 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
                             <h5 className="fw-800 text-dark mb-4">Monthly Revenue Trend</h5>
                             {/* Wrapper height is important for responsive charts */}
                             <div style={{ height: '300px' }}>
-                                <RevenueChart 
-                                    labels={loaderData.revenueLabels} 
-                                    values={loaderData.revenueValues} 
+                                <RevenueChart
+                                    labels={loaderData.revenueLabels}
+                                    values={loaderData.revenueValues}
                                 />
                             </div>
                         </Card.Body>
@@ -120,9 +152,9 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
                         <Card.Body>
                             <h5 className="fw-800 text-dark mb-4">Sales by Category</h5>
                             <div style={{ height: '300px' }}>
-                                <SalesByCategoryChart 
-                                    chartLabels={loaderData.chartLabels} 
-                                    chartValues={loaderData.chartValues} 
+                                <SalesByCategoryChart
+                                    chartLabels={loaderData.chartLabels}
+                                    chartValues={loaderData.chartValues}
                                 />
                             </div>
                         </Card.Body>
@@ -136,7 +168,7 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
                         <Card.Body>
                             <h5 className="fw-800 text-dark mb-4">Visits & Interest by Category</h5>
                             <div style={{ height: '300px' }}>
-                                <VisitsInterestChart 
+                                <VisitsInterestChart
                                     labels={loaderData.barLabels}
                                     visits={loaderData.visitsByCategory}
                                     interest={loaderData.interestByCategory}
