@@ -244,11 +244,10 @@ export default function AdminValorations({ loaderData }: { readonly loaderData: 
   };
 
   const handleClearSearch = async () => {
-    setSearchMode('id');
     setSearchId('');
     setSearchSeller('');
     setSearchBuyer('');
-    await loadValorations({ mode: 'id', id: '', seller: '', buyer: '' });
+    await loadValorations({ mode: searchMode, id: '', seller: '', buyer: '' });
   };
 
   const handleDeleteClick = (val: ValorationDTO) => {

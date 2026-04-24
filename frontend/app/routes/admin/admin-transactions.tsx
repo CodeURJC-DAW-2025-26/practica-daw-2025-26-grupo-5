@@ -239,11 +239,10 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
   };
 
   const handleClearSearch = async () => {
-    setSearchMode('id');
     setSearchId('');
     setSearchSeller('');
     setSearchBuyer('');
-    await loadTransactions({ mode: 'id', id: '', seller: '', buyer: '' });
+    await loadTransactions({ mode: searchMode, id: '', seller: '', buyer: '' });
   };
 
   return (
