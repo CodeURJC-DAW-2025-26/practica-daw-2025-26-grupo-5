@@ -12,6 +12,8 @@ import React, { useEffect, useRef } from 'react';
 import { Stack } from 'react-bootstrap';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import stilWarehouseBox from "../assets/stilnovo-warehouse.png";
+import stilWarehouseBlueBG from "../assets/stilnovo-warehouse-1.png";
 
 /**
  * Store details
@@ -71,7 +73,7 @@ export default function StoreLocationMap() {
                     box-shadow: 0 4px 12px rgba(47, 108, 237, 0.4);
                 ">
                     <img 
-                        src="/stilnovo-warehouse-1.png" 
+                        src=${stilWarehouseBlueBG} 
                         alt="Warehouse" 
                         style="width: 28px; height: 28px; object-fit: contain;"
                     />
@@ -118,7 +120,7 @@ export default function StoreLocationMap() {
                         box-shadow: 0 2px 6px rgba(0,0,0,0.2);
                     ">
                         <img 
-                            src="/stilnovo-warehouse.png" 
+                            src=${stilWarehouseBox} 
                             alt="Warehouse" 
                             style="width: 25px; height: 25px; object-fit: contain;"
                         />
