@@ -840,7 +840,23 @@ Por motivos de seguridad, esta funcionalidad está **deshabilitada por defecto**
 
 > **Nota:** La aplicación cuenta con "degradación progresiva" (*graceful degradation*). Si decides no configurar la IA, Stilnovo arrancará con normalidad y el resto de funciones de gestión de productos seguirán operativas sin errores.
 
-🌐 **URL de acceso remota (URJC)**: `https://appweb05.dawgis.etsii.urjc.es:8443/new/`
+### Despliegue en Servidor URJC
+
+La plataforma Stilnovo está desplegada con dos arquitecturas que conviven de forma integrada y comparten la **misma base de datos MySQL**:
+
+* **Web Clásica (Spring Boot MVC):** [https://appweb05.dawgis.etsii.urjc.es:8443/](https://appweb05.dawgis.etsii.urjc.es:8443/)
+* **Web Moderna (SPA React):** [https://appweb05.dawgis.etsii.urjc.es:8443/new/](https://appweb05.dawgis.etsii.urjc.es:8443/new/)
+
+> **Nota:** Para acceder a los siguientes enlaces es necesario estar conectado a la red de la universidad (**Eduroam**) o a través de la **VPN** de la URJC.
+
+### Infraestructura Docker (DockerHub)
+
+El proyecto está completamente contenedorizado y alojado en **DockerHub** para facilitar su despliegue automático:
+
+| Artefacto | Enlace al Repositorio | Descripción |
+| :--- | :--- | :--- |
+| **Imagen de la App** | [raultejada24/stilnovo](https://hub.docker.com/r/raultejada24/stilnovo) | Construcción multi-etapa (Spring Boot + React SPA) |
+| **Configuración Compose** | [raultejada24/stilnovo-compose](https://hub.docker.com/repository/docker/raultejada24/stilnovo-compose) | Artefacto OCI con la orquestación del stack completo |
 
 ### **Participación de Miembros en la Práctica 3**
 
