@@ -87,6 +87,7 @@ import { getAdminTransactions, deleteTransaction } from '~/services/admin-servic
 import type TransactionDTO from '~/dto/TransactionDTO';
 import type PagedResponse from '~/dto/PagedResponse';
 import AdminHeader from '~/components/admin/AdminHeader';
+import { HttpError } from '~/services/api';
 
 /**
  * Client-side loader: Fetch transactions
@@ -103,6 +104,10 @@ export async function clientLoader() {
     const response = await getAdminTransactions(0, 1000);
     return response;
   } catch (error: any) {
+    if (error instanceof HttpError && error.status === 403) {
+          console.log("Loader caught 403: Letting AdminRoute handle the Access Denied screen.");
+          return {}; 
+        }
     throw new Error(error.message || "Failed to load transactions");
   }
 }

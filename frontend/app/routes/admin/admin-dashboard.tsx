@@ -49,9 +49,10 @@
  */
 
 import { redirect, Link } from 'react-router';
-import { Container, Row, Col, Card, Table, Badge, Button, Image, ProgressBar, Stack, Alert } from 'react-bootstrap';
+import { Container, Row, Col, Card, Table, Image, ProgressBar, Stack, Alert } from 'react-bootstrap';
 import { getAdminSummary } from '~/services/admin-service';
 import AdminHeader from '~/components/admin/AdminHeader';
+import { HttpError } from '~/services/api';
 
 /**
  * Client-side loader: Fetches admin summary data
@@ -62,6 +63,11 @@ export async function clientLoader() {
     const data = await getAdminSummary();
     return data || {};
   } catch (error) {
+    if (error instanceof HttpError && error.status === 403) {
+      console.log("Loader caught 403: Letting AdminRoute handle the Access Denied screen.");
+      return {}; 
+    }
+    
     console.error('Failed to fetch admin summary:', error);
     throw redirect('/login');
   }

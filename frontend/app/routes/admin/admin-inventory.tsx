@@ -80,6 +80,7 @@ import type UserDTO from '~/dto/UserDTO';
 import type PagedResponse from '~/dto/PagedResponse';
 import AdminHeader from '~/components/admin/AdminHeader';
 import ConfirmModal from '~/components/ConfirmModal';
+import { HttpError } from '~/services/api';
 
 /**
  * KPI Card Props Interface
@@ -132,6 +133,10 @@ export async function clientLoader() {
     const data = await getAdminProducts(0, 1000);
     return data || {};
   } catch (error) {
+    if (error instanceof HttpError && error.status === 403) {
+          console.log("Loader caught 403: Letting AdminRoute handle the Access Denied screen.");
+          return {}; 
+        }
     throw redirect('/login');
   }
 }
