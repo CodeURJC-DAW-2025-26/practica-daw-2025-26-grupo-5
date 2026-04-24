@@ -95,12 +95,12 @@ export default function StoreLocationMap() {
                 min-width: 240px;
                 border-radius: 12px;
                 overflow: hidden;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
             ">
                 <div style="
                     background: #2f6ced;
                     color: white;
-                    padding: 12px 15px;
+                    padding: 12px 40px 12px 15px; /* Aumentamos el padding derecho a 40px */
                     margin: 0;
                     display: flex;
                     align-items: center;
@@ -115,15 +115,15 @@ export default function StoreLocationMap() {
                         align-items: center;
                         justify-content: center;
                         flex-shrink: 0;
-                        box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
                     ">
                         <img 
                             src="/stilnovo-warehouse.png" 
                             alt="Warehouse" 
-                            style="width: 25px; height: 20px; object-fit: contain;"
+                            style="width: 25px; height: 25px; object-fit: contain;"
                         />
                     </div>
-                    <h5 style="margin: 0; font-weight: 700; font-size: 15px; letter-spacing: 0.3px;">
+                    <h5 style="margin: 0; font-weight: 700; font-size: 15px; letter-spacing: 0.3px; white-space: nowrap;">
                         ${STORE_LOCATION.name}
                     </h5>
                 </div>
