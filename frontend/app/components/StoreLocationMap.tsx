@@ -60,7 +60,7 @@ export default function StoreLocationMap() {
         const customIcon = L.divIcon({
             html: `
                 <div style="
-                    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+                    background: #2f6ced;
                     border: 3px solid white;
                     border-radius: 50%;
                     width: 48px;
@@ -68,11 +68,13 @@ export default function StoreLocationMap() {
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
-                    font-size: 24px;
-                    color: white;
+                    box-shadow: 0 4px 12px rgba(47, 108, 237, 0.4);
                 ">
-                    📦
+                    <img 
+                        src="/stilnovo-warehouse-1.png" 
+                        alt="Warehouse" 
+                        style="width: 28px; height: 28px; object-fit: contain;"
+                    />
                 </div>
             `,
             iconSize: [48, 48],
@@ -90,26 +92,49 @@ export default function StoreLocationMap() {
         const popupContent = `
             <div style="
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                min-width: 220px;
+                min-width: 240px;
                 border-radius: 12px;
                 overflow: hidden;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
             ">
                 <div style="
-                    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+                    background: #2f6ced;
                     color: white;
-                    padding: 12px;
+                    padding: 12px 40px 12px 15px; /* Aumentamos el padding derecho a 40px */
                     margin: 0;
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
                 ">
-                    <h5 style="margin: 0; font-weight: bold; display: flex; align-items: center; gap: 8px;">
-                        📦
-                        <span>${STORE_LOCATION.name}</span>
+                    <div style="
+                        background: white;
+                        width: 38px;
+                        height: 38px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        flex-shrink: 0;
+                        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+                    ">
+                        <img 
+                            src="/stilnovo-warehouse.png" 
+                            alt="Warehouse" 
+                            style="width: 25px; height: 25px; object-fit: contain;"
+                        />
+                    </div>
+                    <h5 style="margin: 0; font-weight: 700; font-size: 15px; letter-spacing: 0.3px; white-space: nowrap;">
+                        ${STORE_LOCATION.name}
                     </h5>
                 </div>
-                <div style="padding: 12px; background: white; color: #333;">
-                    <p style="margin: 8px 0; font-size: 13px; color: #333; font-weight: 600;">
-                        ${STORE_LOCATION.street}
-                    </p>
-                    <p style="margin: 4px 0; font-size: 12px; color: #666;">
+
+                <div style="padding: 15px; background: white; color: #333;">
+                    <div style="display: flex; align-items: flex-start; gap: 8px; margin-bottom: 4px;">
+                        <p style="margin: 0; font-size: 13px; color: #1a1a1a; font-weight: 700; line-height: 1.4;">
+                            ${STORE_LOCATION.street}
+                        </p>
+                    </div>
+                    <p style="margin: 0; font-size: 12px; color: #666; padding-left: 0px;">
                         ${STORE_LOCATION.city}
                     </p>
                 </div>

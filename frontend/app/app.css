@@ -2471,3 +2471,19 @@ main.overflow-auto {
 .border-transparent {
     border-color: transparent;
 }
+
+/* Add this to your global stylesheet */
+.leaflet-popup-close-button {
+    color: #ffffff !important;
+    font-weight: bold;
+    font-size: 18px;
+    top: 10px !important;
+    right: 12px !important;
+    background: none !important;
+    border: none !important;
+    opacity: 1 !important;
+}
+
+.leaflet-popup-close-button:hover {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
