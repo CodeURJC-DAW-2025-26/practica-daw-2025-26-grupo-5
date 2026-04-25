@@ -919,15 +919,17 @@ Por otro lado, he liderado gran parte del diseño y desarrollo de la interfaz gr
 
 #### **Alumno 4 - Gabriele Antonio Ricucci**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+He sido el responsable de migrar y evolucionar el motor de recomendaciones y el sistema de productos favoritos hacia la arquitectura SPA. Mi trabajo se ha centrado en conectar los servicios del frontend con las APIs REST desarrolladas previamente, permitiendo que las sugerencias personalizadas basadas en interacciones de usuario (algoritmo avanzado) funcionen de forma fluida en React. 
+
+Además, he desarrollado los componentes de interfaz para la gestión de favoritos en tiempo reale y he colaborado en el filtrado de datos en el lado del cliente para asegurar que el catálogo principal y las recomendaciones no presenten duplicados, mejorando significativamente la fluidez de la experiencia de usuario.
 
 | Nº    | Commits      | Files      |
 |:------------: |:------------:| :------------:|
-|1| [Descripción commit 1](URL_commit_1)  | [Archivo1](URL_archivo_1)   |
-|2| [Descripción commit 2](URL_commit_2)  | [Archivo2](URL_archivo_2)   |
-|3| [Descripción commit 3](URL_commit_3)  | [Archivo3](URL_archivo_3)   |
-|4| [Descripción commit 4](URL_commit_4)  | [Archivo4](URL_archivo_4)   |
-|5| [Descripción commit 5](URL_commit_5)  | [Archivo5](URL_archivo_5)   |
+|1| [feat: Added logic and queries for the product recommendation algorithm](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/c3e5f0f847be76ef75de380d1df893497092796e)  | [ProductService.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/service/ProductService.java)   |
+|2| [feat(products): implement catalog fetching and enhance product listing](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/254c7578d87ebabd52bff9aa9a7b71f0765d0110)  | [product-list.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/routes/product/product-list.tsx)   |
+|3| [fix: update user dashboard stats to return safe default structure3](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/f97d91adf17a4389530f8dca233b503707596afe)  | [user-statistics.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/routes/user/user-statistics.tsx)   |
+|4| [feat: add query to find most interacted product categories by user](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/084d5bd2b250976af543db050acd8c41c0540bae)  | [UserInteractionRepository.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/repository/UserInteractionRepository.java)   |
+|5| [feat: add method to find products by category excluding specific user and update recommendation logic](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/4b1827d88f7139148f1e07237546eaa39d8a3cbe)  | [product-list.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/routes/product/product-list.tsx)   |
 
 ---
 
