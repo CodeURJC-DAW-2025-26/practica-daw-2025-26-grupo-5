@@ -48,7 +48,7 @@
  */
 
 import { useState } from 'react';
-import { redirect } from 'react-router';
+import { redirect, Link, useNavigate } from 'react-router';
 import { Modal, Form, Button, Container, Row, Col, Card, Table, Image, Stack, Alert } from 'react-bootstrap';
 import { getAdminUsers, banUser, deleteUser, updateUser, getAdminProducts, updateProduct } from '~/services/admin-service';
 import { useUserStore } from '~/stores/useUserStore';
@@ -110,9 +110,9 @@ export async function clientLoader() {
     return data || {};
   } catch (error) {
     if (error instanceof HttpError && error.status === 403) {
-          console.log("Loader caught 403: Letting AdminRoute handle the Access Denied screen.");
-          return {}; 
-        }
+      console.log("Loader caught 403: Letting AdminRoute handle the Access Denied screen.");
+      return {};
+    }
     console.error('Failed to fetch admin users:', error);
     throw redirect('/login');
   }
@@ -122,6 +122,8 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
   const pagedData = loaderData as PagedResponse<UserDTO>;
   const users = pagedData.content || [];
   const loggedInUser = useUserStore((state) => state.user);
+
+  const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -375,6 +377,15 @@ export default function AdminUsers({ loaderData }: { readonly loaderData: any })
                       </td>
                       <td>
                         <Stack direction="horizontal" gap={2}>
+                          <Button
+                            variant="light"
+                            size="sm"
+                            className="btn-action-admin text-primary"
+                            onClick={() => navigate(`/seller/${user.id}`)}
+                            title="View Profile"
+                          >
+                            <i className="fa-solid fa-eye" />
+                          </Button>
                           {canEditUser(user) && (
                             <Button variant="light" size="sm" className="btn-action-admin btn-edit" onClick={() => handleEditClick(user)}>
                               <i className="fa-solid fa-pencil" />

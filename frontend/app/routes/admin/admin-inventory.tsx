@@ -72,7 +72,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { redirect } from 'react-router';
+import { redirect, useNavigate } from 'react-router';
 import { Container, Row, Col, Card, Table, Button, Image, Stack, Alert, Modal, Form } from 'react-bootstrap';
 import { getAdminProducts, deleteProduct, createProduct, updateProduct, getAdminUsers } from '~/services/admin-service';
 import type ProductDTO from '~/dto/ProductDTO';
@@ -134,9 +134,9 @@ export async function clientLoader() {
     return data || {};
   } catch (error) {
     if (error instanceof HttpError && error.status === 403) {
-          console.log("Loader caught 403: Letting AdminRoute handle the Access Denied screen.");
-          return {}; 
-        }
+      console.log("Loader caught 403: Letting AdminRoute handle the Access Denied screen.");
+      return {};
+    }
     throw redirect('/login');
   }
 }
@@ -147,6 +147,8 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
 
   const [searchTerm, setSearchTerm] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+
+  const navigate = useNavigate();
 
   // Individual form field states for product modal
   const [productSellerId, setProductSellerId] = useState('');
@@ -429,6 +431,15 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
                       </td>
                       <td>
                         <Stack direction="horizontal" gap={2}>
+                          <Button
+                            variant="light"
+                            size="sm"
+                            className="btn-action-admin text-primary"
+                            onClick={() => navigate(`/product/${product.id}`)}
+                            title="View Product"
+                          >
+                            <i className="fa-solid fa-eye" />
+                          </Button>
                           <Button variant="light" size="sm" className="btn-action-admin btn-edit" onClick={() => handleEditProduct(product)}><i className="fa-solid fa-edit" /></Button>
                           <Button variant="light" size="sm" className="btn-action-admin btn-ban" onClick={() => handleBanProduct(product)} disabled={product.status === 'Banned'}><i className="fa-solid fa-lock" /></Button>
                           <Button variant="light" size="sm" className="btn-action-admin btn-delete" onClick={() => handleDeleteClick(product)}><i className="fa-solid fa-trash" /></Button>

@@ -139,7 +139,8 @@ export default function AdminDashboard({ loaderData }: DashboardProps) {
   // Products by category
   const categoryMap: Record<string, number> = {};
   products.forEach((p: any) => {
-    const cat = p.category || 'Other';
+    let cat = p.category || 'Other';
+    cat = cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase();
     categoryMap[cat] = (categoryMap[cat] || 0) + 1;
   });
 
