@@ -105,9 +105,9 @@ export async function clientLoader() {
     return response;
   } catch (error: any) {
     if (error instanceof HttpError && error.status === 403) {
-          console.log("Loader caught 403: Letting AdminRoute handle the Access Denied screen.");
-          return {}; 
-        }
+      console.log("Loader caught 403: Letting AdminRoute handle the Access Denied screen.");
+      return {};
+    }
     throw new Error(error.message || "Failed to load transactions");
   }
 }
@@ -400,19 +400,21 @@ export default function AdminTransactions({ loaderData }: { readonly loaderData:
                         </Badge>
                       </td>
                       <td>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          className="fw-700 rounded-pill"
-                          onClick={() => {
-                            setSelectedTransaction(transaction);
-                            setShowDeleteModal(true);
-                            setDeleteError(null);
-                          }}
-                          title="Delete transaction"
-                        >
-                          <i className="fa-solid fa-trash"></i>
-                        </Button>
+                        <Stack direction="horizontal" gap={2}>
+                          <Button
+                            variant="light"
+                            size="sm"
+                            className="btn-action-admin btn-delete"
+                            onClick={() => {
+                              setSelectedTransaction(transaction);
+                              setShowDeleteModal(true);
+                              setDeleteError(null);
+                            }}
+                            title="Delete transaction"
+                          >
+                            <i className="fa-solid fa-trash" />
+                          </Button>
+                        </Stack>
                       </td>
                     </tr>
                   ))
