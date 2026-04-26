@@ -2472,7 +2472,6 @@ main.overflow-auto {
     border-color: transparent;
 }
 
-/* Add this to your global stylesheet */
 .leaflet-popup-close-button {
     color: #ffffff !important;
     font-weight: bold;

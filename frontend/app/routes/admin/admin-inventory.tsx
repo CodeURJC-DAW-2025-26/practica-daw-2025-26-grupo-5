@@ -287,12 +287,14 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
       formData.append('price', String(product.price));
       formData.append('location', product.location);
       formData.append('description', product.description);
-      formData.append('status', 'Banned');
+      // Toggle: if Banned -> Active, if Active -> Banned
+      const newStatus = product.status?.toLowerCase() === 'banned' ? 'Active' : 'Banned';
+      formData.append('status', newStatus);
       formData.append('sellerId', String(product.seller?.id || ''));
       await updateProduct(product.id, formData);
       await loadProducts(searchTerm);
     } catch (error) {
-      alert('Failed to ban product.');
+      alert('Failed to ban/unban product.');
     } finally { setIsLoading(false); }
   };
 
@@ -425,9 +427,11 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
                       <td><span className="badge-cat cat-tech">{product.category}</span></td>
                       <td className="fw-800 text-success">€{product.price?.toFixed(2)}</td>
                       <td>
-                        <span className={`badge-status ${product.status === 'Banned' ? 'status-banned' : 'status-active'}`}>
-                          {product.status?.toUpperCase()}
-                        </span>
+                        <td>
+                          <span className={`badge-status ${product.status === 'Banned' ? 'status-banned' : 'status-active'}`}>
+                            {product.status?.toUpperCase()}
+                          </span>
+                        </td>
                       </td>
                       <td>
                         <Stack direction="horizontal" gap={2}>
@@ -441,7 +445,7 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
                             <i className="fa-solid fa-eye" />
                           </Button>
                           <Button variant="light" size="sm" className="btn-action-admin btn-edit" onClick={() => handleEditProduct(product)}><i className="fa-solid fa-edit" /></Button>
-                          <Button variant="light" size="sm" className="btn-action-admin btn-ban" onClick={() => handleBanProduct(product)} disabled={product.status === 'Banned'}><i className="fa-solid fa-lock" /></Button>
+                          <Button variant="light" size="sm" className="btn-action-admin btn-ban" onClick={() => handleBanProduct(product)}><i className="fa-solid fa-lock" /></Button>
                           <Button variant="light" size="sm" className="btn-action-admin btn-delete" onClick={() => handleDeleteClick(product)}><i className="fa-solid fa-trash" /></Button>
                         </Stack>
                       </td>
@@ -520,7 +524,6 @@ export default function AdminInventory({ loaderData }: { readonly loaderData: an
                   <Form.Label className="fw-700 small text-uppercase text-muted">Status</Form.Label>
                   <Form.Select name="status" value={productStatus} onChange={(e) => setProductStatus(e.target.value)} className="rounded-3 py-2 bg-light border-0" disabled={isLoading}>
                     <option value="Active">Active</option>
-                    <option value="Hidden">Hidden</option>
                     <option value="Banned">Banned</option>
                   </Form.Select>
                 </Form.Group>

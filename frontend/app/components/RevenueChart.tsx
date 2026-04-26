@@ -12,7 +12,6 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
-// Register required Chart.js elements
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -23,8 +22,6 @@ ChartJS.register(
     Filler,
     Legend
 );
-ChartJS.defaults.font.family = "'Inter', sans-serif";
-ChartJS.defaults.color = '#6b7280';
 
 interface RevenueChartProps {
     labels: string[];
@@ -32,8 +29,9 @@ interface RevenueChartProps {
 }
 
 export default function RevenueChart({ labels, values }: RevenueChartProps) {
-    // Handle empty state
-    if (!labels || labels.length === 0 || !values || values.length === 0 || values[0] === 0) {
+    const hasRevenue = values && values.some(val => val > 0);
+
+    if (!labels || labels.length === 0 || !hasRevenue) {
         return (
             <div className="d-flex align-items-center justify-content-center h-100 py-5 opacity-50">
                 <p className="fw-600 text-dark mb-0">No revenue data available yet</p>
@@ -45,12 +43,18 @@ export default function RevenueChart({ labels, values }: RevenueChartProps) {
         labels,
         datasets: [
             {
-                label: 'Revenue €',
+                label: 'Revenue',
                 data: values,
                 borderColor: '#2f6ced',
-                backgroundColor: 'rgba(47, 108, 237, 0.05)',
-                fill: true,
+                backgroundColor: 'rgba(47, 108, 237, 0.15)',
+                borderWidth: 2,
+                fill: true, 
                 tension: 0.4,
+                pointBackgroundColor: '#2f6ced', 
+                pointBorderColor: '#ffffff', 
+                pointBorderWidth: 1.5,
+                pointRadius: 4,
+                pointHoverRadius: 6, 
             },
         ],
     };
@@ -60,12 +64,46 @@ export default function RevenueChart({ labels, values }: RevenueChartProps) {
         maintainAspectRatio: false,
         plugins: {
             legend: {
-                display: false, // Hidden as requested in your original code
+                display: false, 
             },
+            tooltip: {
+                callbacks: {
+                    label: function (context: any) {
+                        let label = context.dataset.label || '';
+                        if (label) {
+                            label += ': ';
+                        }
+                        if (context.parsed.y !== null) {
+                            label += context.parsed.y + ' €';
+                        }
+                        return label;
+                    }
+                }
+            }
         },
         scales: {
+            x: {
+                grid: {
+                    color: '#f3f4f6', 
+                },
+                ticks: {
+                    color: '#6b7280',
+                    font: { family: "'Inter', sans-serif" }
+                }
+            },
             y: {
                 beginAtZero: true,
+                grid: {
+                    color: '#f3f4f6', 
+                },
+                ticks: {
+                    color: '#6b7280',
+                    font: { family: "'Inter', sans-serif" },
+                    stepSize: 10000, 
+                    callback: function (value: any) {
+                        return value + ' €';
+                    },
+                },
             },
         },
     };

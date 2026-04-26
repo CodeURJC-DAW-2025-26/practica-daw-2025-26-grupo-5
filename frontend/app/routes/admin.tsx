@@ -26,7 +26,7 @@ export default function AdminRoute({ }: Route.ComponentProps) {
 
   // 2. Redirect guests to the login page
   if (!user) {
-    return <Navigate to="/login-page" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   // 3. Check if the authenticated user has administrator privileges

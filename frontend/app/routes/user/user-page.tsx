@@ -27,51 +27,43 @@
  * @returns React component with seller dashboard and analytics
  */
 import { Row, Col, Table, Badge, Card, Stack, Image } from "react-bootstrap";
-import { Link, redirect } from "react-router";
+import { Link } from "react-router";
 import { useUserStore } from "~/stores/useUserStore";
 import type { Route } from "./+types/user-page";
-import { getUserDashboardStats } from "~/services/user-service";
 import RevenueChart from "~/components/RevenueChart";
 import SalesByCategoryChart from "~/components/SalesByCategoryChart";
-/**
- * Client-side loader function
- * Fetches dashboard statistics for the currently logged-in seller.
- * * Process:
- * 1. Checks for an active user session directly in the Zustand store.
- * 2. Redirects to login instantly if unauthorized (prevents UI flickering).
- * 3. Fetches dashboard data via REST API using clientLoader (Project requirement).
- * 4. Formats currency and dates for UI display.
- */
-export async function clientLoader() {
-    // Instant authentication check to prevent component rendering if not logged in
-    const currentUser = useUserStore.getState().user;
-    if (!currentUser) {
-        throw redirect('/login');
-    }
+import { sharedDashboardLoader } from "~/utils/dashboardLoader";
+import VisitsInterestChart from "~/components/VisitsInterestChart";
 
-    try {
-        // Fetch data from REST API using clientLoader
-        const stats = await getUserDashboardStats();
-        const apiData = stats || {};
-        
-        return {
-            userSales: apiData.salesCount || [],
-            revenueLabels: apiData.chartLabels || [],
-            revenueValues: apiData.chartValues || [],
-            formattedTotalRevenue: apiData.totalRevenue || "0.00",
-            formattedBalance: apiData.balance || "0.00",
-            date: new Date().toLocaleDateString('en-GB', {
-            day: 'numeric', month: 'short', year: 'numeric'
-            })
-        };
-    } catch (error: any) {
-        // Handle unauthorized responses from the backend API
-        if (error.status === 401 || error.response?.status === 401) {
-            throw redirect('/login');
-        }
-        throw error;
+export const clientLoader = sharedDashboardLoader;
+
+const getMoneyMessage = (value: number, isRevenue: boolean): string => {
+    if (value <= 0) return "Let's get started!";
+
+    if (isRevenue) {
+        if (value < 100) return "Nice start!";
+        if (value < 500) return "Good momentum!";
+        if (value < 1000) return "Strong push!";
+        if (value < 5000) return "Great flow!";
+        if (value < 10000) return "Impressive run!";
+        if (value < 50000) return "Big numbers!";
+        if (value < 100000) return "Serious growth!";
+        if (value < 500000) return "Massive gains!";
+        if (value < 1000000) return "Incredible scale!";
+        return "Revenue beast!";
+    } else {
+        if (value < 100) return "Nice start!";
+        if (value < 500) return "Looking good!";
+        if (value < 1000) return "Solid balance!";
+        if (value < 5000) return "Great stability!";
+        if (value < 10000) return "Very healthy!";
+        if (value < 50000) return "Strong position!";
+        if (value < 100000) return "Elite level!";
+        if (value < 500000) return "Top tier!";
+        if (value < 1000000) return "Next league!";
+        return "Balance king!";
     }
-}
+};
 
 /**
  * User Dashboard Component
@@ -120,7 +112,9 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
                         <Card.Body>
                             <p className="text-muted small fw-700 mb-2" style={{ letterSpacing: '0.5px' }}>Total Revenue</p>
                             <h2 className="fw-800 text-primary mb-1">{loaderData.formattedTotalRevenue} €</h2>
-                            <span className="text-success fw-700 small">Keep going!</span>
+                            <span className="text-primary fw-700 small">
+                                {getMoneyMessage(loaderData?.formattedTotalRevenue || 0, true)}
+                            </span>             
                         </Card.Body>
                     </Card>
                 </Col>
@@ -129,7 +123,9 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
                         <Card.Body>
                             <p className="text-muted small fw-700 mb-2" style={{ letterSpacing: '0.5px' }}>Current Balance</p>
                             <h2 className="fw-800 text-dark mb-1">{loaderData.formattedBalance} €</h2>
-                            <span className="text-primary fw-700 small">Wow!</span>
+                            <span className="text-primary fw-700 small">
+                                {getMoneyMessage(loaderData?.formattedBalance || 0, false)}
+                            </span>
                         </Card.Body>
                     </Card>
                 </Col>
@@ -143,9 +139,9 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
                             <h5 className="fw-800 text-dark mb-4">Monthly Revenue Trend</h5>
                             {/* Wrapper height is important for responsive charts */}
                             <div style={{ height: '300px' }}>
-                                <RevenueChart 
-                                    labels={loaderData.revenueLabels} 
-                                    values={loaderData.revenueValues} 
+                                <RevenueChart
+                                    labels={loaderData.revenueLabels}
+                                    values={loaderData.revenueValues}
                                 />
                             </div>
                         </Card.Body>
@@ -156,9 +152,26 @@ export default function UserPage({ loaderData }: Route.ComponentProps) {
                         <Card.Body>
                             <h5 className="fw-800 text-dark mb-4">Sales by Category</h5>
                             <div style={{ height: '300px' }}>
-                                <SalesByCategoryChart 
-                                    chartLabels={loaderData.revenueLabels} 
-                                    chartValues={loaderData.revenueValues} 
+                                <SalesByCategoryChart
+                                    chartLabels={loaderData.chartLabels}
+                                    chartValues={loaderData.chartValues}
+                                />
+                            </div>
+                        </Card.Body>
+                    </Card>
+                </Col>
+            </Row>
+            {/* Visits & Interest Chart (New Row) */}
+            <Row className="g-4 mb-4">
+                <Col lg={12}>
+                    <Card className="clay-card border-0 p-3 h-100">
+                        <Card.Body>
+                            <h5 className="fw-800 text-dark mb-4">Visits & Interest by Category</h5>
+                            <div style={{ height: '300px' }}>
+                                <VisitsInterestChart
+                                    labels={loaderData.barLabels}
+                                    visits={loaderData.visitsByCategory}
+                                    interest={loaderData.interestByCategory}
                                 />
                             </div>
                         </Card.Body>

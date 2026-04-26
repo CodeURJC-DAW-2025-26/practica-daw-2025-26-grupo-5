@@ -103,7 +103,7 @@ export default function Footer() {
                                                 onChange={(e) => setAiQuestion(e.target.value)}
                                                 style={{ backgroundColor: '#ffffff', color: '#1e293b', fontSize: '0.9rem', outline: 'none', boxShadow: 'none' }}
                                             />
-                                            <Button type="submit" variant="primary" className="px-4 fw-bold border-0" disabled={isAiLoading || !aiQuestion.trim()}>
+                                            <Button type="submit" variant="primary" className="px-2 fw-bold border-0" disabled={isAiLoading || !aiQuestion.trim()}>
                                                 {isAiLoading ? <Spinner animation="border" size="sm" /> : "Ask Stilnovo AI"}
                                             </Button>
                                         </InputGroup>

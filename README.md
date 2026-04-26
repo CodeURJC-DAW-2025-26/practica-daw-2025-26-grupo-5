@@ -765,9 +765,9 @@ Mi contribución se ha centrado en la mejora y consolidación de la capa REST de
 
    Ejecuta la aplicación (Run).
 
-    El servidor arrancará en:
+    El servidor estará disponible en:
     ```bash
-      https://localhost:8443/new/
+      https://localhost:8443
     ```
 4. **Navegar a la carpeta del proyecto React**
     
@@ -781,16 +781,24 @@ Mi contribución se ha centrado en la mejora y consolidación de la capa REST de
    ```bash
    npm install
    ```
+    Construye la aplicación:
+    ```bash
+      npm run build
+    ```
+    
+    Esto generará los archivos estáticos que el backend servirá.
+    La web estará disponible en:
+   ```bash
+    https://localhost:8443/new/
+   ```
+5. **Ejecuta el Frontend en modo desarrollo (Opcional)**
 
-5. **Ejecuta el Frontend**
-
-    Inicia el servidor de desarrollo de Vite:
+   Inicia el servidor de desarrollo de Vite:
    
     ```bash
      npm run dev
      ```
-   El terminal mostrará que la aplicación está lista en (navega a esa URL):
-   
+   El terminal mostrará que la aplicación está disponible en:   
    ```bash
     http://localhost:5173/new/
    ```
@@ -880,15 +888,16 @@ Además, he participado en la implementación y refinamiento de funcionalidades 
 
 #### **Alumno 2 - Alonso Gutiérrez Sánchez**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+Durante esta fase, mi contribución al desarrollo de la nueva SPA en React se ha centrado en áreas específicas del frontend, destacando fuertemente la creación de todos los componentes y vistas relacionadas con los **productos**. Además, he sido responsable de la implementación de los dashboards interactivos en el perfil del usuario (gráficos de ingresos mensuales, ventas por categoría y análisis de visitas), empleando *loaders* para optimizar la obtención de datos.
 
-| Nº    | Commits      | Files      |
-|:------------: |:------------:| :------------:|
-|1| [Descripción commit 1](URL_commit_1)  | [Archivo1](URL_archivo_1)   |
-|2| [Descripción commit 2](URL_commit_2)  | [Archivo2](URL_archivo_2)   |
-|3| [Descripción commit 3](URL_commit_3)  | [Archivo3](URL_archivo_3)   |
-|4| [Descripción commit 4](URL_commit_4)  | [Archivo4](URL_archivo_4)   |
-|5| [Descripción commit 5](URL_commit_5)  | [Archivo5](URL_archivo_5)   |
+También he desarrollado el flujo de vistas para las transacciones (pasarela de pago y detalles) y he refactorizado la lógica de la barra de búsqueda global. En cuanto al rendimiento y la navegación, he programado la lógica asíncrona mediante peticiones AJAX para el botón "Cargar más" de la página principal, permitiendo cargar el catálogo de productos de 10 en 10 de forma eficiente. Finalmente, a nivel de UX, he diseñado los estados de visualización de carga (*loading states*) y ajustado los estilos de mis propios componentes.
+| Nº | Commits | Files |
+|:--:|:--------|:------|
+| 1 | [feat: implement graphs at user profile and dashboardLoader](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/fb3b276d46eb6c6583b0df2effe78cbd1b37c10e) | [user-page.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/routes/user/user-page.tsx) |
+| 2 | [feat: transaction flow, product detail, payment page and user-sale-orders](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/2608c34cc712320d5153d206b85369e916f5938c) | [payment-page.$id.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/routes/transactions/payment-page.$id.tsx) |
+| 3 | [feat: AJAX logic implemented, load more button done](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/e2c0fde05fe5987ee3e0cfa6f3be6ca2e855294f) | [product-list.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/routes/product/product-list.tsx) |
+| 4 | [refactor: Improved logic of the search bar](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/818ebb325ac752743879fea0abcb6c494b94326e) | [header.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/components/header.tsx) |
+| 5 | [style: implement bootstrap at product components and loading page](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/8253c12c05a2921ead9e7ed8bcfba65c0cdae17b) | [product-detail.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/routes/product/product-detail.tsx) |
 
 ---
 
@@ -910,15 +919,17 @@ Por otro lado, he liderado gran parte del diseño y desarrollo de la interfaz gr
 
 #### **Alumno 4 - Gabriele Antonio Ricucci**
 
-[Descripción de las tareas y responsabilidades principales del alumno en el proyecto]
+He sido el responsable de migrar y evolucionar el motor de recomendaciones y el sistema de productos favoritos hacia la arquitectura SPA. Mi trabajo se ha centrado en conectar los servicios del frontend con las APIs REST desarrolladas previamente, permitiendo que las sugerencias personalizadas basadas en interacciones de usuario (algoritmo avanzado) funcionen de forma fluida en React. 
+
+Además, he desarrollado los componentes de interfaz para la gestión de favoritos en tiempo reale y he colaborado en el filtrado de datos en el lado del cliente para asegurar que el catálogo principal y las recomendaciones no presenten duplicados, mejorando significativamente la fluidez de la experiencia de usuario.
 
 | Nº    | Commits      | Files      |
 |:------------: |:------------:| :------------:|
-|1| [Descripción commit 1](URL_commit_1)  | [Archivo1](URL_archivo_1)   |
-|2| [Descripción commit 2](URL_commit_2)  | [Archivo2](URL_archivo_2)   |
-|3| [Descripción commit 3](URL_commit_3)  | [Archivo3](URL_archivo_3)   |
-|4| [Descripción commit 4](URL_commit_4)  | [Archivo4](URL_archivo_4)   |
-|5| [Descripción commit 5](URL_commit_5)  | [Archivo5](URL_archivo_5)   |
+|1| [feat: Added logic and queries for the product recommendation algorithm](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/c3e5f0f847be76ef75de380d1df893497092796e)  | [ProductService.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/service/ProductService.java)   |
+|2| [feat(products): implement catalog fetching and enhance product listing](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/254c7578d87ebabd52bff9aa9a7b71f0765d0110)  | [product-list.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/routes/product/product-list.tsx)   |
+|3| [fix: update user dashboard stats to return safe default structure3](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/f97d91adf17a4389530f8dca233b503707596afe)  | [user-statistics.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/routes/user/user-statistics.tsx)   |
+|4| [feat: add query to find most interacted product categories by user](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/084d5bd2b250976af543db050acd8c41c0540bae)  | [UserInteractionRepository.java](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/backend/src/main/java/es/stilnovo/library/repository/UserInteractionRepository.java)   |
+|5| [feat: add method to find products by category excluding specific user and update recommendation logic](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/commit/4b1827d88f7139148f1e07237546eaa39d8a3cbe)  | [product-list.tsx](https://github.com/CodeURJC-DAW-2025-26/practica-daw-2025-26-grupo-5/blob/main/frontend/app/routes/product/product-list.tsx)   |
 
 ---
 

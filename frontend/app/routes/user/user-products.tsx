@@ -238,7 +238,7 @@ export default function MyProducts({ loaderData }: Route.ComponentProps) {
                                                     </Button>
                                                 </Link>
 
-                                                <Link to="/" className="text-decoration-none">
+                                                <Link to="/#featured-treasures" className="text-decoration-none">
                                                     <Button
                                                         className="d-flex align-items-center justify-content-center border-0 shadow-sm"
                                                         style={{
