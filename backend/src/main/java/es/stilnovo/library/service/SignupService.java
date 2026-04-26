@@ -36,18 +36,28 @@ public class SignupService {
 
     /**
      * Registers a new user in the system with validation and profile setup
-     * @param profilePicture Optional profile picture file
-     * @param username Unique username for the new account
-     * @param email Unique email address
-     * @param password Account password
+     * 
+     * @param profilePicture  Optional profile picture file
+     * @param username        Unique username for the new account
+     * @param email           Unique email address
+     * @param password        Account password
      * @param confirmPassword Confirmation of password
      * @return Created User entity with default settings
-     * @throws IOException If image processing fails
-     * @throws ResponseStatusException 400 if passwords don't match, 409 if username/email exists
+     * @throws IOException             If image processing fails
+     * @throws ResponseStatusException 400 if passwords don't match, 409 if
+     *                                 username/email exists
      */
     public User registerUser(MultipartFile profilePicture, String username, String email, String password,
             String confirmPassword)
             throws IOException {
+
+        // Gender
+        // List<String> genders = List.of("Male", "Female"); <- important
+        // if (!genders.contains(gender)) {
+        // throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Gender do not
+        // exists");
+        // }
+
         // STEP 1: Validate password confirmation match
         if (!password.equals(confirmPassword)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Passwords do not match");
