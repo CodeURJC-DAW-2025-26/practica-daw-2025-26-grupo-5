@@ -728,7 +728,7 @@ Mi contribución se ha centrado en la mejora y consolidación de la capa REST de
 ## 🛠 **Práctica 3: Implementación de la web con arquitectura SPA**
 
 ### **Vídeo de Demostración**
-📹 **[Enlace al vídeo en YouTube](URL_del_video)**
+📹 **[Enlace al vídeo en YouTube](https://www.youtube.com/watch?v=Ez1wUaVW944)**
 > Vídeo mostrando las principales funcionalidades de la aplicación web.
 
 ### **Preparación del Entorno de Desarrollo**
